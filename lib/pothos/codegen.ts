@@ -9,6 +9,16 @@ const config: CodegenConfig = {
     'schema.graphql': {
       plugins: ['schema-ast'],
     },
+    'lib/types/generated/types.ts': {
+      plugins: ['typescript', 'typescript-operations'],
+      config: {
+        scalars: {
+          DateTime: 'string | Date',
+          Json: 'Record<string, unknown>',
+          ID: 'string',
+        },
+      },
+    },
   },
 };
 

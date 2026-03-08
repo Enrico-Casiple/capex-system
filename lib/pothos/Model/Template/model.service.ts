@@ -136,6 +136,16 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
     );
   }
 
+  // private get session() {
+  //   getSession().then((session) => {
+  //     if (!session) {
+  //       console.warn(`No active session found for ${this.modelName} operations`);
+  //     }
+
+  //     return session;
+  //   });
+  // }
+
   private get deligate() {
     const deligate = this.prisma[this.prismaModel] as unknown as PrismaModelMethods<PrismaModel>;
     if (!deligate) {

@@ -11,12 +11,20 @@ import { createYoga } from 'graphql-yoga';
 import type { IncomingMessage } from 'http';
 import { createServer } from 'http';
 import next from 'next';
+import { getSession } from 'next-auth/react';
 import { parse } from 'url';
 import type { WebSocket } from 'ws';
 import { WebSocketServer } from 'ws';
 import { rateLimiter } from '../pothos/rateLimiter';
 import schema from '../pothos/schema';
 import { pubsub } from '../pothos/subscription';
+
+// Inside your Yoga setup
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
 // ============================================================================
 // CONFIGURATION CONSTANTS
@@ -54,14 +62,11 @@ const graphqlEndpoint: string = '/api/graphql';
 const yoga = createYoga({
   schema: schema,
   graphqlEndpoint,
-  context: async (yogaContext) => {
+  context: async () => {
     // Get session from the request headers instead of calling auth()
     // auth() uses AsyncLocalStorage which isn't available in Yoga's context
-    const request = yogaContext.request as unknown as IncomingMessage;
-
-    // Parse/validate the session from the request
-    // This replaces the auth() call that uses AsyncLocalStorage
-    const session = parseSessionFromRequest(request); // Create this helper
+    // const request = yogaContext.request as unknown as IncomingMessage;
+    const session = await getSession();
 
     return { pubsub, rateLimiter, session };
   },
@@ -296,29 +301,33 @@ interface Extra {
   }
 })();
 
-function parseSessionFromRequest(request: IncomingMessage) {
-  try {
-    // Try to extract session from cookies
-    const cookies = request.headers.cookie || '';
-    const sessionCookie = cookies.split(';').find((cookie) => cookie.trim().startsWith('session='));
+// function parseSessionFromRequest(request: IncomingMessage) {
+//   try {
+//     // Try to extract from authorization header first (preferred for JWT)
+//     const authHeader = request.headers.authorization || '';
+//     if (authHeader.startsWith('Bearer ')) {
+//       const token = authHeader.slice(7);
 
-    if (sessionCookie) {
-      const sessionValue = sessionCookie.split('=')[1];
-      return JSON.parse(decodeURIComponent(sessionValue));
-    }
+//       // Verify and decode JWT
+//       const secret = process.env.NEXTAUTH_SECRET || 'HelloWorld';
+//       const decoded = jwt.verify(token, secret) as Record<string, unknown>;
 
-    // Fallback: try to extract from authorization header
-    const authHeader = request.headers.authorization || '';
-    if (authHeader.startsWith('Bearer ')) {
-      const token = authHeader.slice(7);
-      // Decode JWT payload (basic implementation)
-      const payload = token.split('.')[1];
-      return JSON.parse(Buffer.from(payload, 'base64').toString());
-    }
-    // Return null if no session found
-    return null;
-  } catch (error) {
-    console.warn('Failed to parse session from request:', error);
-    return null;
-  }
-}
+//       return decoded;
+//     }
+
+//     // Fallback: try to extract session from cookies
+//     const cookies = request.headers.cookie || '';
+//     const sessionCookie = cookies.split(';').find((cookie) => cookie.trim().startsWith('session='));
+
+//     if (sessionCookie) {
+//       const sessionValue = sessionCookie.split('=')[1];
+//       return JSON.parse(decodeURIComponent(sessionValue));
+//     }
+
+//     // Return null if no session found
+//     return null;
+//   } catch (error) {
+//     console.warn('Failed to parse session from request:', error);
+//     return null;
+//   }
+// }
