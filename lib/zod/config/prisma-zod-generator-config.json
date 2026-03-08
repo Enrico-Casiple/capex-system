@@ -1,0 +1,16 @@
+{
+  "mode": "default",
+  "variants": {
+    "input": {
+      "enabled": true,
+      "suffix": ".input",
+      "partial": false,
+      "strictMode": false
+    },
+    "pure": {
+      "enabled": false
+    }
+  },
+  "skipSchemas": true,
+  "skipDefaultExports": true
+}

@@ -1,0 +1,8 @@
+{
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma",
+    "prisma.validation": false
+  },
+  "WillLuke.nextjs.hasPrompted": true,
+  "prisma.pinToPrisma6": true
+}

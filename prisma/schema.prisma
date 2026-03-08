@@ -1,0 +1,510 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+generator pothos {
+  provider          = "prisma-pothos-types"
+  clientOutput      = "../generated/prisma"
+  output            = "../lib/pothos/pothos-prisma-types.ts"
+  documentation     = true
+  prismaUtils       = true
+  generateDatamodel = true
+}
+
+// generator zod {
+//   provider = "npx zod-prisma-types"
+//   output   = "../lib/zod/prisma-zod-types"
+
+//   useMultipleFiles          = false // default is false
+//   writeBarrelFiles          = false // default is true
+//   createInputTypes          = true // default is true
+//   createModelTypes          = true // default is true
+//   addInputTypeValidation    = false // default is true
+//   addIncludeType            = false // default is true
+//   addSelectType             = false // default is true
+//   validateWhereUniqueInput  = false // default is true
+//   createUncheckedInputTypes = true // MAKE SURE THIS IS TRUE
+//   createRelationValuesTypes = true // default is false
+//   createPartialTypes        = false // default is false
+//   useDefaultValidators      = false // default is true
+//   coerceDate                = true // default is true
+//   writeNullishInModelTypes  = true // default is false
+//   useNoIntermediateModels   = false // helps in keeping the structure clean
+//   prismaClientPath          = "../../generated/prisma/client" // default is client output path
+// }
+generator zod {
+  provider = "npx zod-prisma-types"
+  output   = "../lib/zod/prisma-zod-types"
+
+  useMultipleFiles          = false
+  writeBarrelFiles          = false
+  createInputTypes          = true // DISABLE - don't create regular input types
+  createModelTypes          = true // DISABLE - don't create model types
+  addInputTypeValidation    = false
+  addIncludeType            = false
+  addSelectType             = false
+  validateWhereUniqueInput  = false
+  createUncheckedInputTypes = true // ENABLE - create only unchecked input types
+  createRelationValuesTypes = true // DISABLE
+  createPartialTypes        = false
+  useDefaultValidators      = false
+  coerceDate                = true
+  writeNullishInModelTypes  = false
+  useNoIntermediateModels   = false
+  prismaClientPath          = "../../generated/prisma/client"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     String            @id @default(auto()) @map("_id") @db.ObjectId
+  name                   String?
+  email                  String?           @unique
+  password               String?
+  userName               String?           @unique
+  emailVerified          DateTime?
+  image                  String?
+  basicInformations      BasicInformation?
+  isTwoFactorAuthEnabled Boolean?          @default(false)
+  otpCode                String?
+  auditLogs              AuditLog[]
+  actions                AuditLog[]        @relation("UserAsActor")
+  userRoles              UserRole[]
+
+  isActive  Boolean?  @default(true)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // ✅ Add indexes for common searches
+  @@index([isActive]) // Filter active/inactive users
+  @@index([createdAt]) // Sort by creation date
+}
+
+model BasicInformation {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  firstName  String?
+  middleName String?
+  lastName   String?
+  suffix     String?
+  fullName   String?
+  birthDate  DateTime?
+  gender     String?
+
+  phoneNumber String?
+
+  address  String?
+  city     String?
+  province String?
+  country  String?
+
+  userId           String?           @unique @db.ObjectId
+  user             User?             @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  reportingManager WorkInformation[] @relation("Manager")
+  workInformations WorkInformation[] @relation("Employee")
+  auditLogs        AuditLog[]
+
+  isActive  Boolean?  @default(true)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // ✅ Add indexes
+  @@index([fullName]) // Search by full name
+  @@index([phoneNumber]) // Search by phone
+  @@index([isActive]) // Filter active/inactive
+}
+
+model WorkInformation {
+  id             String  @id @default(auto()) @map("_id") @db.ObjectId
+  employeeNumber String? @unique
+
+  employeeId String?           @db.ObjectId
+  employee   BasicInformation? @relation("Employee", fields: [employeeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  groupOfCompanyId String?         @db.ObjectId
+  groupOfCompany   GroupOfCompany? @relation(fields: [groupOfCompanyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  companyId        String?         @db.ObjectId
+  company          Company?        @relation(fields: [companyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  departmentId     String?         @db.ObjectId
+  department       Department?     @relation(fields: [departmentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  positionId       String?         @db.ObjectId
+  position         Position?       @relation(fields: [positionId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  jobLevelId       String?         @db.ObjectId
+  jobLevel         JobLevel?       @relation(fields: [jobLevelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  employmentTypeId String?         @db.ObjectId // Full-time, Part-time, Contract, Probationary
+  employmentType   Type?           @relation("EmploymentType", fields: [employmentTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  employmentStatusId String? @db.ObjectId // Active, Resigned, Terminated, On Leave
+  employmentStatus   Status? @relation("EmploymentStatus", fields: [employmentStatusId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  reportingManagerId String?           @db.ObjectId
+  reportingManager   BasicInformation? @relation("Manager", fields: [reportingManagerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  hireDate                     DateTime? // The date the employee was hired
+  regularizationDate           DateTime? // For probationary employees, the date they become regular employees but in 180 days period after hire date
+  firstProbationEvaluationDate DateTime? // For probationary employees, the date of their first evaluation, typically 3rd month after hire
+  finalProbationEvaluationDate DateTime? // For probationary employees, the date of their final evaluation, typically 5th month after hire
+  contractEndDate              DateTime? // For contract employees, the date their contract ends
+  seasonalEndDate              DateTime? // For seasonal employees, the date their season ends
+  endDate                      DateTime? // For resigned employees, the date they resigned
+
+  workLocationId  String?   @db.ObjectId // Onsite, Remote, Hybrid
+  workLocation    Location? @relation("WorkLocation", fields: [workLocationId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  workSetupTypeId String?   @db.ObjectId // Onsite, Hybrid, Remote
+  workSetupType   Type?     @relation("WorkSetupType", fields: [workSetupTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  shiftingSchedule ShiftingSchedule? @relation("ShiftingSchedule")
+  auditLogs        AuditLog[]
+
+  isActive  Boolean?  @default(true)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // ✅ Add indexes
+  @@index([employeeId]) // Lookup employee
+  @@index([companyId]) // Filter by company
+  @@index([departmentId]) // Filter by department
+  @@index([employmentStatusId]) // Filter by employment status
+  @@index([hireDate]) // Sort by hire date
+  @@index([isActive]) // Filter active employees
+  @@index([companyId, departmentId]) // Composite: company + department
+}
+
+model GroupOfCompany {
+  id               String            @id @default(auto()) @map("_id") @db.ObjectId
+  name             String?
+  acronym          String?
+  description      String? // Description of the group of company
+  industryTypeId   String?           @db.ObjectId
+  industryType     Type?             @relation("IndustryType", fields: [industryTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  headquartersId   String?           @db.ObjectId
+  headquarters     Location?         @relation("GroupOfCompanyLocation", fields: [headquartersId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  companies        Company[]
+  auditLogs        AuditLog[]
+  workInformations WorkInformation[]
+
+  isActive  Boolean?  @default(true)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // ✅ Add indexes
+  @@index([name]) // Search by name
+  @@index([industryTypeId]) // Filter by industry
+}
+
+model Company {
+  id               String            @id @default(auto()) @map("_id") @db.ObjectId
+  name             String?
+  acronym          String?
+  description      String? // Description of the company
+  groupOfCompanyId String?           @db.ObjectId
+  groupOfCompany   GroupOfCompany?   @relation(fields: [groupOfCompanyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  locationsid      String?           @db.ObjectId
+  locations        Location?         @relation("CompaniesLocation", fields: [locationsid], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  conctactNumber   String?
+  email            String?
+  departments      Department[]      @relation("CompanyDepartments")
+  logo             String?
+  jobLevels        JobLevel[]        @relation("CompanyJobLevels")
+  auditLogs        AuditLog[]
+  workInformations WorkInformation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // ✅ Add indexes
+  @@index([groupOfCompanyId]) // Filter by group
+  @@index([name]) // Search by name
+}
+
+model Department {
+  id               String            @id @default(auto()) @map("_id") @db.ObjectId
+  name             String?
+  acronym          String?
+  description      String?
+  companyId        String?           @db.ObjectId
+  company          Company?          @relation("CompanyDepartments", fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  auditLogs        AuditLog[]
+  workInformations WorkInformation[]
+
+  isActive  Boolean?  @default(true)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // ✅ Add indexes
+  @@index([companyId]) // Lookup by company
+  @@index([name]) // Search by name
+}
+
+model Position {
+  id               String            @id @default(auto()) @map("_id") @db.ObjectId
+  name             String?
+  acronym          String?
+  description      String?
+  auditLogs        AuditLog[]
+  workInformations WorkInformation[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  // ✅ Add indexes
+  @@index([name]) // Search by name
+}
+
+model JobLevel {
+  id               String            @id @default(auto()) @map("_id") @db.ObjectId
+  name             String?
+  description      String?
+  acronym          String?
+  jobcodeTypeId    String?           @db.ObjectId
+  jobcodeType      Type?             @relation("JobCodeType", fields: [jobcodeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  companyId        String?           @db.ObjectId
+  company          Company?          @relation("CompanyJobLevels", fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  workInformations WorkInformation[]
+  auditLogs        AuditLog[]
+
+  isActive  Boolean?  @default(true)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // ✅ Add indexes
+  @@index([companyId]) // Lookup by company
+  @@index([name]) // Search by name
+}
+
+model Type {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name            String?
+  modelNameType   String?
+  employmentType  WorkInformation[] @relation("EmploymentType")
+  workSetupType   WorkInformation[] @relation("WorkSetupType")
+  industryType    GroupOfCompany[]  @relation("IndustryType")
+  jobLevels       JobLevel[]        @relation("JobCodeType")
+  actionType      AuditLog[]        @relation("ActionType")
+  auditLogs       AuditLog[]
+  rolePermissions RolePermission[]  @relation("PermissionScopeType")
+
+  isActive  Boolean?  @default(true)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // ✅ Add indexes
+  @@index([modelNameType]) // Filter by type
+  @@index([name]) // Search by name
+}
+
+model Status {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name             String?
+  modelNameType    String?
+  workInformations WorkInformation[] @relation("EmploymentStatus")
+  auditLogs        AuditLog[]
+
+  isActive  Boolean?  @default(true)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // ✅ Add indexes
+  @@index([modelNameType]) // Filter by type
+  @@index([name]) // Search by name
+}
+
+model Location {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name                     String?
+  description              String?
+  workInformations         WorkInformation[] @relation("WorkLocation")
+  groupOfCompaniesLocation GroupOfCompany[]  @relation("GroupOfCompanyLocation")
+  companiesLocation        Company[]         @relation("CompaniesLocation")
+  auditLogs                AuditLog[]
+
+  isActive  Boolean?  @default(true)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // ✅ Add indexes
+  @@index([name]) // Search by name
+}
+
+model ShiftingSchedule {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  name        String // "8-5", "Night Shift", "Flexible"
+  description String
+
+  startTime  DateTime // shift start time (time-of-day)
+  endTime    DateTime // shift end time (time-of-day)
+  lunchStart DateTime
+  lunchEnd   DateTime
+  breakStart DateTime
+  breakEnd   DateTime
+
+  workDays          Int[] // 0 = Sunday, 1 = Monday ... 6 = Saturday
+  // example: [1,2,3,4,5] = Mon–Fri
+  restDays          Int[] // optional, override default Sat/Sun
+  workInformationId String?          @unique @db.ObjectId
+  workInformation   WorkInformation? @relation("ShiftingSchedule", fields: [workInformationId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  auditLogs         AuditLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Holiday {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  date        DateTime
+  isRecurring Boolean    @default(false)
+  description String
+  auditLogs   AuditLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // ✅ Add indexes
+  @@index([date]) // Search by date
+  @@index([isRecurring]) // Filter recurring holidays
+}
+
+model Role {
+  id              String           @id @default(auto()) @map("_id") @db.ObjectId
+  name            String?
+  description     String?
+  rolePermissions RolePermission[]
+  userRoles       UserRole[]
+  auditLogs       AuditLog[]
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([name])
+}
+
+model Permission {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String?
+  description String?
+  resource    String? // e.g., "request", "company", "department"
+  action      String? // e.g., "create", "read", "update", "delete"
+
+  isGlobal        Boolean          @default(false) // true = applies to all scopes
+  isAdmin         Boolean          @default(false) // true = admin-only permission
+  rolePermissions RolePermission[]
+  auditLogs       AuditLog[]
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([name])
+  @@index([resource, action]) // Composite for permission lookup
+}
+
+model RolePermission {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  roleId       String? @db.ObjectId
+  permissionId String? @db.ObjectId
+
+  // ABAC: Attributes for scoped access
+  scopeTypeId String?  @db.ObjectId // Type of scope (company, department, etc.)
+  scopeType   Type?    @relation("PermissionScopeType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  scopeValues String[] // e.g., ["companyA", "companyB"] for multi-scope access
+
+  // Additional ABAC attributes
+  conditions Json? // Dynamic conditions: {"minJobLevel": 3, "departments": ["IT", "HR"]}
+  isActive   Boolean @default(true)
+
+  role       Role?       @relation(fields: [roleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  permission Permission? @relation(fields: [permissionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  auditLogs AuditLog[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@unique([roleId, permissionId, scopeTypeId]) // Prevent duplicates
+  @@index([roleId])
+  @@index([scopeTypeId])
+  @@index([permissionId])
+  @@index([isActive])
+}
+
+model UserRole {
+  id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId String? @db.ObjectId
+  roleId String? @db.ObjectId
+
+  // Optional: scope this role assignment to specific entities
+  scopeTypeId String?  @db.ObjectId
+  scopeValues String[] // e.g., ["deptA", "deptB"]
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  role Role? @relation(fields: [roleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  auditLogs AuditLog[]
+  isActive  Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@unique([userId, roleId, scopeTypeId])
+  @@index([userId])
+  @@index([roleId])
+}
+
+model AuditLog {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  modelId      String?   @db.ObjectId // ID of the affected record
+  modelName    String? // e.g. "User", "Company", etc.
+  action       String? // e.g. "create", "update", "delete"
+  actionTypeId String?   @db.ObjectId // "archived", "restored or created"
+  actionType   Type?     @relation("ActionType", fields: [actionTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  timestamp    DateTime? @default(now())
+  actorId      String?   @db.ObjectId // ID of the user who performed the action
+  actor        User?     @relation("UserAsActor", fields: [actorId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  oldDetails   Json? // JSON string of the record before the change
+  newDetails   Json? // JSON string of the record after the change
+
+  holiday          Holiday?          @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  shiftSchedule    ShiftingSchedule? @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  position         Position?         @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  jobLevel         JobLevel?         @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  type             Type?             @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  status           Status?           @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  location         Location?         @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  user             User?             @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  basicInformation BasicInformation? @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  workInformation  WorkInformation?  @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  groupOfCompany   GroupOfCompany?   @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  company          Company?          @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  department       Department?       @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  userRole         UserRole?         @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  rolePermission   RolePermission?   @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  permission       Permission?       @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  role             Role?             @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  parentId  String?    @db.ObjectId // For hierarchical logs (e.g. a batch of changes)
+  parent    AuditLog?  @relation("ParentLog", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  auditLogs AuditLog[] @relation("ParentLog")
+
+  isActive  Boolean?  @default(true)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // Indexes for fast queries
+  @@index([modelName, action]) // Find changes to specific models
+  @@index([timestamp]) // Sort by time
+  @@index([actorId]) // Find who made changes
+  @@index([modelId]) // Find changes to specific record
+  @@index([isActive]) // Filter active logs
+}
