@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "NODE_ENV=development tsx watch lib/server/server.ts",
+    "dev": "concurrently --names \"DEV\" --prefix \"[{name}]\" --prefix-colors \"blue\" \"npm run memcached:install\" \"NODE_ENV=development tsx watch lib/server/server.ts\"",
     "server": "concurrently --names \"CODEGEN,SERVER,STUDIO\" --prefix \"[{name}]\" --prefix-colors \"blue,green,yellow\" \"npm run codegen:watch\" \"npm run dev\" \"npm run prisma:studio\"",
     "codegen:gen": "npx prisma generate && npx prisma db push && graphql-codegen --config lib/pothos/codegen.ts",
     "codegen:watch": "npx prisma generate && graphql-codegen --config lib/pothos/codegen.ts --watch",
@@ -18,7 +18,8 @@
     "clean": "npm run clean:next && npm run clean:all",
     "prebuild:strict": "npm run type-check && npm run lint:check",
     "prisma:studio": "prisma studio",
-    "prisma:reset": "prisma generate && prisma db push --force-reset && prisma format && npm run codegen:gen && npm run prebuild:strict"
+    "prisma:reset": "prisma generate && prisma db push --force-reset && prisma format && npm run codegen:gen && npm run prebuild:strict",
+    "memcached:install": "sudo dnf install memcached -y && sudo systemctl start memcached && sudo systemctl enable memcached"
   },
   "dependencies": {
     "@apollo/client": "^4.1.6",
