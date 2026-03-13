@@ -20,7 +20,7 @@ generator pothos {
 
 generator zod {
   provider = "npx zod-prisma-types"
-  output   = "../lib/zod/prisma-zod-types"
+  output   = "../lib/generated/zod/prisma-zod-types"
 
   useMultipleFiles          = false
   writeBarrelFiles          = false
@@ -37,7 +37,7 @@ generator zod {
   coerceDate                = true
   writeNullishInModelTypes  = false
   useNoIntermediateModels   = false
-  prismaClientPath          = "../../generated/prisma/client"
+  prismaClientPath          = "../../prisma/client"
 }
 
 datasource db {

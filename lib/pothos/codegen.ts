@@ -9,7 +9,7 @@ const config: CodegenConfig = {
     'schema.graphql': {
       plugins: ['schema-ast'],
     },
-    'lib/types/generated/types.ts': {
+    'lib/generated/types/generated/types.ts': {
       plugins: ['typescript', 'typescript-operations'],
       config: {
         scalars: {

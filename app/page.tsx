@@ -1,6 +1,6 @@
 'use client';
 import { UserFindAll, UserFindAllSubscription } from '@/lib/api/user.api';
-import { Query, UserPageInput } from '@/lib/types/generated/types';
+import { Query, UserPageInput } from '@/lib/generated/types/generated/types';
 import { useQuery, useSubscription } from '@apollo/client/react';
 
 const Home = () => {
