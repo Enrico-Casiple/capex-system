@@ -118,7 +118,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         const rateLimitError = await enforceRateLimit(ctx, modelName);
         if (rateLimitError) return rateLimitError;
         // Authentication check
-        const authError = await checkAuthentication(ctx, modelName, service);
+        const authError = await checkAuthentication(ctx, modelName, service, true);
         if (authError) return authError;
         const result = await service.create({
           data: args.data,
