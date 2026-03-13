@@ -1,79 +1,16 @@
+import { checkAuthentication } from '../../../../lib/util/checkAuthentication';
+import { enforceRateLimit } from '../../../../lib/util/enforceRateLimit';
 import { Prisma } from '../../../generated/prisma/client';
 import { builder } from '../../builder';
 import { createInputRefs, pageInputRefs, updateInputRefs } from '../../Inputs';
 import { getDatamodel } from '../../pothos-prisma-types';
-import { checkRateLimit } from '../../rateLimiter';
 import {
   deletedListResponseRef,
   paginationResponseRefs,
   responseListRefs,
   responseRefs,
 } from '../../Response';
-import { Context } from '../../subscription';
 import services from '../Services';
-import { ModelService } from '../Template/model.service';
-
-// Helper to enforce rate limit and return error response if exceeded
-const enforceRateLimit = async (ctx: Context, modelName: string) => {
-  const consume = await checkRateLimit(ctx.session?.user?.email ?? 'anonymous');
-  if (!consume.allowed) {
-    return {
-      isSuccess: false,
-      message: `Rate limit exceeded. Please try again in ${consume.retryAfter} seconds.`,
-      code: `${modelName.toUpperCase()}_RATE_LIMIT_EXCEEDED`,
-      data: null,
-      allCount: 0,
-      active: 0,
-      inActive: 0,
-      pageinfo: null,
-    };
-  }
-  console.log(
-    `🚦 Rate limit check: ${consume.allowed ? 'Request allowed' : 'Rate limit exceeded'} for user email: ${ctx.session?.user?.email}`,
-  );
-  return null;
-};
-
-// Helper to check authentication and log, returns error response if not authenticated
-const checkAuthentication = async (
-  ctx: Context,
-  modelName: string = 'User',
-  service: ModelService<Prisma.ModelName>,
-  skipForUserModel: boolean = false,
-) => {
-  console.log(
-    `🛡️ ${modelName}: Checking user authentication by email: ${ctx.session?.user?.email}`,
-  );
-  const authWarning = await service.authenticate(ctx.session?.user?.id as string);
-  if (modelName !== 'User' && !authWarning && !skipForUserModel) {
-    return {
-      isSuccess: false,
-      message: `Authentication failed: ${'Unauthorized access'}`,
-      code: `${modelName.toUpperCase()}_AUTHENTICATION_FAILED`,
-      data: null,
-      allCount: 0,
-      active: 0,
-      inActive: 0,
-      pageinfo: null,
-    };
-  }
-  if (modelName === 'User' && !authWarning && skipForUserModel) {
-    return null;
-  }
-  if (!authWarning) {
-    return {
-      isSuccess: false,
-      message: `Authentication failed: ${'Unauthorized access'}`,
-      code: `${modelName.toUpperCase()}_AUTHENTICATION_FAILED`,
-      data: null,
-      allCount: 0,
-      active: 0,
-      inActive: 0,
-      pageinfo: null,
-    };
-  }
-  return null;
-};
 
 const prismaDataModel = getDatamodel();
 
