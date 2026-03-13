@@ -11,13 +11,14 @@ import { createYoga } from 'graphql-yoga';
 import type { IncomingMessage } from 'http';
 import { createServer } from 'http';
 import next from 'next';
-import { getSession } from 'next-auth/react';
+import { getToken } from 'next-auth/jwt';
 import { parse } from 'url';
 import type { WebSocket } from 'ws';
 import { WebSocketServer } from 'ws';
 import { rateLimiter } from '../pothos/rateLimiter';
 import schema from '../pothos/schema';
 import { pubsub } from '../pothos/subscription';
+import { ensureBearerFromSessionCookie } from '../util/ensureBearerFromSessionCookie';
 
 // Inside your Yoga setup
 export const config = {
@@ -62,13 +63,23 @@ const graphqlEndpoint: string = '/api/graphql';
 const yoga = createYoga({
   schema: schema,
   graphqlEndpoint,
-  context: async () => {
-    // Get session from the request headers instead of calling auth()
-    // auth() uses AsyncLocalStorage which isn't available in Yoga's context
-    // const request = yogaContext.request as unknown as IncomingMessage;
-    const session = await getSession();
+  context: async ({ request }) => {
+    // Normalize headers for getToken
+    let session = null; // Placeholder for session data from getToken
+    let cookie = null; // Placeholder for cookie parsing if needed in the future
+    if (request) {
+      // const user = await getToken({ req: request, secret: process.env.AUTH_SECRET });
+      session = await getToken({ req: request, secret: process.env.AUTH_SECRET });
+      cookie = ensureBearerFromSessionCookie(request); // Store cookie for potential use in getToken
+    }
+    console.log('🟢 Session from getToken in Yoga context:', session?.user);
+    console.log('🍪 Cookies in Yoga context:', `Bearer ${cookie}`);
 
-    return { pubsub, rateLimiter, session };
+    return {
+      pubsub,
+      rateLimiter,
+      session,
+    };
   },
   graphiql: {
     subscriptionsProtocol: 'WS',
@@ -219,7 +230,21 @@ interface Extra {
         ) => {
           // Extract WebSocket connection metadata from context
           const extra = context.extra as Extra;
+          const req = {
+            headers: Object.fromEntries(
+              Object.entries(extra.request.headers).map(([k, v]) => [
+                k,
+                Array.isArray(v) ? v.join(', ') : (v ?? ''),
+              ]),
+            ),
+          };
+          const session = await getToken({
+            req, // <-- always pass this object
+            secret: process.env.AUTH_SECRET,
+          });
 
+          // const sessionUser = session?.user || null;
+          console.log('🟢 Session from getToken in onSubscribe:', session?.user);
           /**
            * Get Yoga instance internals for subscription execution
            */
@@ -237,7 +262,10 @@ interface Extra {
             operationName: message.payload?.operationName,
             document: parseGraphQL(message.payload?.query as string),
             variableValues: message.payload?.variables,
-            contextValue: await contextFactory(),
+            contextValue: {
+              ...(await contextFactory()),
+              session,
+            },
             rootValue: {
               execute,
               subscribe,
@@ -301,33 +329,186 @@ interface Extra {
   }
 })();
 
-// function parseSessionFromRequest(request: IncomingMessage) {
-//   try {
-//     // Try to extract from authorization header first (preferred for JWT)
-//     const authHeader = request.headers.authorization || '';
-//     if (authHeader.startsWith('Bearer ')) {
-//       const token = authHeader.slice(7);
+// # How to Deploy and Run Your GraphQL Server on a DigitalOcean Droplet (Non-Technical Guide)
 
-//       // Verify and decode JWT
-//       const secret = process.env.NEXTAUTH_SECRET || 'HelloWorld';
-//       const decoded = jwt.verify(token, secret) as Record<string, unknown>;
+// ---
 
-//       return decoded;
-//     }
+// ## Extra: Use Your Domain and Secure WebSockets (wss://)
 
-//     // Fallback: try to extract session from cookies
-//     const cookies = request.headers.cookie || '';
-//     const sessionCookie = cookies.split(';').find((cookie) => cookie.trim().startsWith('session='));
+// To use your domain (e.g., yourdomain.com) and secure WebSockets (wss://), follow these extra steps after deploying your app:
 
-//     if (sessionCookie) {
-//       const sessionValue = sessionCookie.split('=')[1];
-//       return JSON.parse(decodeURIComponent(sessionValue));
-//     }
+// ### 1. Point Your Domain to Your Droplet
 
-//     // Return null if no session found
-//     return null;
-//   } catch (error) {
-//     console.warn('Failed to parse session from request:', error);
-//     return null;
+// - In your domain provider’s dashboard, set an **A record** to your Droplet’s IP address.
+
+// ### 2. Install Nginx and Certbot
+
+// ```
+// sudo apt update
+// sudo apt install -y nginx certbot python3-certbot-nginx
+// ```
+
+// ### 3. Configure Nginx as a Reverse Proxy (with SSL)
+
+// - Create or edit a config file for your domain:
+//   ```
+//   sudo nano /etc/nginx/sites-available/yourdomain.com
+//   ```
+// - Paste this config (replace `yourdomain.com` with your real domain):
+
+//   ```
+//   server {
+//     listen 80;
+//     server_name yourdomain.com;
+//     # Redirect all HTTP requests to HTTPS
+//     return 301 https://$host$request_uri;
 //   }
-// }
+
+//   server {
+//     listen 443 ssl;
+//     server_name yourdomain.com;
+
+//     ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+//     ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+//     include /etc/letsencrypt/options-ssl-nginx.conf;
+//     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+//     location / {
+//       proxy_pass http://localhost:3000;
+//       proxy_http_version 1.1;
+//       proxy_set_header Upgrade $http_upgrade;
+//       proxy_set_header Connection "upgrade";
+//       proxy_set_header Host $host;
+//       proxy_cache_bypass $http_upgrade;
+//     }
+//   }
+//   ```
+
+// - Enable the config and restart Nginx:
+//   ```
+//   sudo ln -s /etc/nginx/sites-available/yourdomain.com /etc/nginx/sites-enabled/
+//   sudo nginx -t
+//   sudo systemctl restart nginx
+//   ```
+
+// ### 4. Get a Free SSL Certificate (HTTPS)
+
+// ```
+// sudo certbot --nginx -d yourdomain.com
+// ```
+
+// - Follow the prompts. Certbot will update your Nginx config for HTTPS.
+
+// ### 5. Update Your Client App
+
+// - Use these URLs in production:
+//   - GraphQL HTTP: `https://yourdomain.com/api/graphql`
+//   - WebSocket: `wss://yourdomain.com/api/graphql`
+
+// ---
+
+// This guide will help you upload and run your custom server (with `/api/graphql` endpoint) on a DigitalOcean Droplet. Just follow each step and copy-paste the commands.
+
+// ---
+
+// ## 1. Create a DigitalOcean Droplet
+
+// - Go to https://cloud.digitalocean.com/droplets
+// - Click **Create Droplet**
+// - Choose **Ubuntu** as the operating system
+// - Select the size and region you want
+// - Set up authentication (password or SSH key)
+// - Click **Create Droplet**
+
+// ## 2. Connect to Your Droplet
+
+// - On your computer, open Terminal (Mac/Linux) or PowerShell (Windows)
+// - Type:
+//   ```
+//   ssh root@your_droplet_ip
+//   ```
+//   (Replace `your_droplet_ip` with the IP address from DigitalOcean)
+
+// ## 3. Install Node.js, npm, and Git
+
+// - In the Droplet terminal, run:
+//   ```
+//   sudo apt update
+//   sudo apt install -y nodejs npm git
+//   ```
+
+// ## 4. Upload Your Project
+
+// - On your computer, zip your project folder.
+// - In the terminal, use `scp` to upload it:
+//   ```
+//   scp your-project.zip root@your_droplet_ip:/root/
+//   ```
+// - On the Droplet, unzip it:
+//   ```
+//   unzip your-project.zip
+//   cd your-project-folder
+//   ```
+
+// ## 5. Set Environment Variables
+
+// - In the project folder, create a file named `.env`:
+//   ```
+//   nano .env
+//   ```
+// - Add these lines (update values as needed):
+//   ```
+//   NODE_ENV=production
+//   HOST=0.0.0.0
+//   PORT=3000
+//   AUTH_SECRET=your_auth_secret
+//   NEXTAUTH_MEMCACHED_CLIENT=127.0.0.1:11211
+//   ```
+// - Press `Ctrl+O` to save, then `Ctrl+X` to exit.
+
+// ## 6. Install Project Dependencies
+
+// - In the project folder, run:
+//   ```
+//   npm install
+//   ```
+
+// ## 7. Build and Start Your App
+
+// - Build the app:
+//   ```
+//   npm run build
+//   ```
+// - Start the app:
+//   ```
+//   npm start
+//   ```
+
+// ## 8. (Optional) Keep the App Running
+
+// - To keep your app running after you close the terminal, install pm2:
+//   ```
+//   npm install -g pm2
+//   pm2 start npm -- start
+//   pm2 save
+//   pm2 startup
+//   ```
+
+// ## 9. Access Your GraphQL Endpoint
+
+// - Open your browser and go to:
+//   - `http://your_droplet_ip:3000/api/graphql` (for GraphQL Playground/Apollo Sandbox)
+//   - `ws://your_droplet_ip:3000/api/graphql` (for WebSocket subscriptions)
+
+// ---
+
+// ### Useful pm2 Commands
+
+// - Restart app: `pm2 restart all`
+// - Stop app: `pm2 stop all`
+
+// ---
+
+// You’re done! Your custom server (with `/api/graphql`) is now running on your DigitalOcean Droplet, with your domain and secure WebSocket (wss) support.
+
+// If you change your server code (like `server.ts`), just repeat steps 4, 7, and 8.

@@ -59,16 +59,28 @@ const splitLink = ApolloLink.split(
 // // ============================================================================
 
 // const authLink = new ApolloLink((operation, forward) => {
-//   // You can add authentication headers here if needed
-//   // For example, if you have a session token, you can include it in the headers
-//   // Get JWT token from localStorage or cookies
-//   const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
-//   // Set the authorization header if token exists
-//   operation.setContext({
-//     headers: {
-//       authorization: token ? `Bearer ${token}` : '',
-//     },
-//   });
+//   const token = typeof window !== 'undefined' ? getSessionTokenCookie() : null;
+//   console.log('🔍 Retrieved session token for operation:', token ? 'Token found' : 'No token');
+
+//   const operationContext = operation.operationName || 'Unnamed Operation';
+//   console.log('🔍 Operation Context:', operationContext);
+
+//   const PUBLIC_OPERATIONS = ['UserLogin'];
+//   if (!PUBLIC_OPERATIONS.includes(operationContext) && !token) {
+//     console.warn(`⚠️ Attempting to execute "${operationContext}" without a session token.`);
+//     // throw new Error(`Unauthorized: No session token found for operation "${operationContext}".`);
+//   }
+
+//   // Only set the Authorization header if token exists
+//   if (token) {
+//     operation.setContext(({ headers = {} }) => ({
+//       headers: {
+//         ...headers,
+//         authorization: `Bearer ${token}`,
+//       },
+//     }));
+//   }
+
 //   return forward(operation);
 // });
 

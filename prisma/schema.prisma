@@ -18,27 +18,6 @@ generator pothos {
   generateDatamodel = true
 }
 
-// generator zod {
-//   provider = "npx zod-prisma-types"
-//   output   = "../lib/zod/prisma-zod-types"
-
-//   useMultipleFiles          = false // default is false
-//   writeBarrelFiles          = false // default is true
-//   createInputTypes          = true // default is true
-//   createModelTypes          = true // default is true
-//   addInputTypeValidation    = false // default is true
-//   addIncludeType            = false // default is true
-//   addSelectType             = false // default is true
-//   validateWhereUniqueInput  = false // default is true
-//   createUncheckedInputTypes = true // MAKE SURE THIS IS TRUE
-//   createRelationValuesTypes = true // default is false
-//   createPartialTypes        = false // default is false
-//   useDefaultValidators      = false // default is true
-//   coerceDate                = true // default is true
-//   writeNullishInModelTypes  = true // default is false
-//   useNoIntermediateModels   = false // helps in keeping the structure clean
-//   prismaClientPath          = "../../generated/prisma/client" // default is client output path
-// }
 generator zod {
   provider = "npx zod-prisma-types"
   output   = "../lib/zod/prisma-zod-types"

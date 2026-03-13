@@ -2,13 +2,78 @@ import { Prisma } from '../../../generated/prisma/client';
 import { builder } from '../../builder';
 import { createInputRefs, pageInputRefs, updateInputRefs } from '../../Inputs';
 import { getDatamodel } from '../../pothos-prisma-types';
+import { checkRateLimit } from '../../rateLimiter';
 import {
   deletedListResponseRef,
   paginationResponseRefs,
   responseListRefs,
   responseRefs,
 } from '../../Response';
+import { Context } from '../../subscription';
 import services from '../Services';
+import { ModelService } from '../Template/model.service';
+
+// Helper to enforce rate limit and return error response if exceeded
+const enforceRateLimit = async (ctx: Context, modelName: string) => {
+  const consume = await checkRateLimit(ctx.session?.user?.email ?? 'anonymous');
+  if (!consume.allowed) {
+    return {
+      isSuccess: false,
+      message: `Rate limit exceeded. Please try again in ${consume.retryAfter} seconds.`,
+      code: `${modelName.toUpperCase()}_RATE_LIMIT_EXCEEDED`,
+      data: null,
+      allCount: 0,
+      active: 0,
+      inActive: 0,
+      pageinfo: null,
+    };
+  }
+  console.log(
+    `🚦 Rate limit check: ${consume.allowed ? 'Request allowed' : 'Rate limit exceeded'} for user email: ${ctx.session?.user?.email}`,
+  );
+  return null;
+};
+
+// Helper to check authentication and log, returns error response if not authenticated
+const checkAuthentication = async (
+  ctx: Context,
+  modelName: string = 'User',
+  service: ModelService<Prisma.ModelName>,
+  skipForUserModel: boolean = false,
+) => {
+  console.log(
+    `🛡️ ${modelName}: Checking user authentication by email: ${ctx.session?.user?.email}`,
+  );
+  const authWarning = await service.authenticate(ctx.session?.user?.id as string);
+  if (modelName !== 'User' && !authWarning && !skipForUserModel) {
+    return {
+      isSuccess: false,
+      message: `Authentication failed: ${'Unauthorized access'}`,
+      code: `${modelName.toUpperCase()}_AUTHENTICATION_FAILED`,
+      data: null,
+      allCount: 0,
+      active: 0,
+      inActive: 0,
+      pageinfo: null,
+    };
+  }
+  if (modelName === 'User' && !authWarning && skipForUserModel) {
+    return null;
+  }
+  if (!authWarning) {
+    return {
+      isSuccess: false,
+      message: `Authentication failed: ${'Unauthorized access'}`,
+      code: `${modelName.toUpperCase()}_AUTHENTICATION_FAILED`,
+      data: null,
+      allCount: 0,
+      active: 0,
+      inActive: 0,
+      pageinfo: null,
+    };
+  }
+  return null;
+};
 
 const prismaDataModel = getDatamodel();
 
@@ -32,7 +97,13 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           description: `Pagination and filter options for the ${modelName} list query.`,
         }),
       },
-      resolve: async (_parent, args) => {
+      resolve: async (_parent, args, ctx) => {
+        // Rate limit check
+        const rateLimitError = await enforceRateLimit(ctx, modelName);
+        if (rateLimitError) return rateLimitError;
+        // Authentication check
+        const authError = await checkAuthentication(ctx, modelName, service);
+        if (authError) return authError;
         try {
           return await service.findAll(args.paginationInput as never);
         } catch (error) {
@@ -63,7 +134,25 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           description: `The unique identifier of the ${modelName} record to retrieve.`,
         }),
       },
-      resolve: async (_parent, args) => {
+      resolve: async (_parent, args, ctx) => {
+        // Rate limit check
+        const rateLimitError = await enforceRateLimit(ctx, modelName);
+        if (rateLimitError) return rateLimitError;
+        // Authentication check
+        const authError = await checkAuthentication(ctx, modelName, service);
+        if (authError) return authError;
+        console.log(
+          `🛡️ ${modelName}: FindUnique - Checking user authentication by email: ${ctx.session?.user?.email}`,
+        );
+        const authWarning = await service.authenticate(ctx.session?.user?.id as string);
+        if (!authWarning) {
+          return {
+            isSuccess: false,
+            message: `Authentication failed: ${'Unauthorized access'}`,
+            code: `${modelName.toUpperCase()}_AUTHENTICATION_FAILED`,
+            data: null,
+          };
+        }
         return await service.findUnique(args.id);
       },
     }),
@@ -88,11 +177,15 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
-        // const authWarning = await auntenticaionWarning(ctx.session?.user?.id, modelName, 'Create');
-        // if (authWarning?.isSuccess === false) return authWarning;
+        // Rate limit check
+        const rateLimitError = await enforceRateLimit(ctx, modelName);
+        if (rateLimitError) return rateLimitError;
+        // Authentication check
+        const authError = await checkAuthentication(ctx, modelName, service);
+        if (authError) return authError;
         const result = await service.create({
           data: args.data,
-          currentUserId: args.currentUserId ?? ctx.session?.user?.id,
+          currentUserId: (ctx.session?.user?.id as string) ?? ctx.session?.user?.id,
         } as never);
         ctx.pubsub.publish(subscriptionPublishName, result.data);
         return result;
@@ -119,9 +212,15 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
+        // Rate limit check
+        const rateLimitError = await enforceRateLimit(ctx, modelName);
+        if (rateLimitError) return rateLimitError;
+        // Authentication check
+        const authError = await checkAuthentication(ctx, modelName, service);
+        if (authError) return authError;
         const result = await service.createMany({
           data: args.data,
-          currentUserId: args.currentUserId ?? 'system',
+          currentUserId: (ctx.session?.user?.id as string) ?? 'system',
         } as never);
 
         if (result.isSuccess && Array.isArray(result.data)) {
@@ -156,9 +255,15 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
+        // Rate limit check
+        const rateLimitError = await enforceRateLimit(ctx, modelName);
+        if (rateLimitError) return rateLimitError;
+        // Authentication check
+        const authError = await checkAuthentication(ctx, modelName, service);
+        if (authError) return authError;
         const result = await service.update({
           data: { ...args.data, id: args.id },
-          currentUserId: args.currentUserId ?? 'system',
+          currentUserId: (ctx.session?.user?.id as string) ?? 'system',
         } as never);
         ctx.pubsub.publish(subscriptionPublishName, result.data);
         return result;
@@ -183,9 +288,15 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
+        // Rate limit check
+        const rateLimitError = await enforceRateLimit(ctx, modelName);
+        if (rateLimitError) return rateLimitError;
+        // Authentication check
+        const authError = await checkAuthentication(ctx, modelName, service);
+        if (authError) return authError;
         const result = await service.updateMany({
           data: args.data,
-          currentUserId: args.currentUserId ?? 'system',
+          currentUserId: (ctx.session?.user?.id as string) ?? 'system',
         } as never);
         if (result.isSuccess && Array.isArray(result.data)) {
           result.data.forEach((record) => {
@@ -213,9 +324,15 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
+        // Rate limit check
+        const rateLimitError = await enforceRateLimit(ctx, modelName);
+        if (rateLimitError) return rateLimitError;
+        // Authentication check
+        const authError = await checkAuthentication(ctx, modelName, service);
+        if (authError) return authError;
         const result = await service.archive({
           id: args.id,
-          currentUserId: args.currentUserId ?? 'system',
+          currentUserId: (ctx.session?.user?.id as string) ?? 'system',
         } as never);
         ctx.pubsub.publish(subscriptionPublishName, result.data);
         return result;
@@ -239,9 +356,15 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
+        // Rate limit check
+        const rateLimitError = await enforceRateLimit(ctx, modelName);
+        if (rateLimitError) return rateLimitError;
+        // Authentication check
+        const authError = await checkAuthentication(ctx, modelName, service);
+        if (authError) return authError;
         const result = await service.archiveMany({
           ids: args.ids,
-          currentUserId: args.currentUserId ?? 'system',
+          currentUserId: (ctx.session?.user?.id as string) ?? 'system',
         } as never);
         if (result.isSuccess && Array.isArray(result.data)) {
           result.data.forEach((record) => {
@@ -269,9 +392,15 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
+        // Rate limit check
+        const rateLimitError = await enforceRateLimit(ctx, modelName);
+        if (rateLimitError) return rateLimitError;
+        // Authentication check
+        const authError = await checkAuthentication(ctx, modelName, service);
+        if (authError) return authError;
         const result = await service.restore({
           id: args.id,
-          currentUserId: args.currentUserId ?? 'system',
+          currentUserId: (ctx.session?.user?.id as string) ?? 'system',
         } as never);
         ctx.pubsub.publish(subscriptionPublishName, result.data);
         return result;
@@ -295,9 +424,15 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
+        // Rate limit check
+        const rateLimitError = await enforceRateLimit(ctx, modelName);
+        if (rateLimitError) return rateLimitError;
+        // Authentication check
+        const authError = await checkAuthentication(ctx, modelName, service);
+        if (authError) return authError;
         const result = await service.restoreMany({
           ids: args.ids,
-          currentUserId: args.currentUserId ?? 'system',
+          currentUserId: (ctx.session?.user?.id as string) ?? 'system',
         } as never);
         if (result.isSuccess && Array.isArray(result.data)) {
           result.data.forEach((record) => {
@@ -325,9 +460,15 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
+        // Rate limit check
+        const rateLimitError = await enforceRateLimit(ctx, modelName);
+        if (rateLimitError) return rateLimitError;
+        // Authentication check
+        const authError = await checkAuthentication(ctx, modelName, service);
+        if (authError) return authError;
         const result = await service.remove({
           id: args.id,
-          currentUserId: args.currentUserId ?? 'system',
+          currentUserId: (ctx.session?.user?.id as string) ?? 'system',
         } as never);
         ctx.pubsub.publish(subscriptionPublishName, result.data);
         return result;
@@ -351,9 +492,15 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
+        // Rate limit check
+        const rateLimitError = await enforceRateLimit(ctx, modelName);
+        if (rateLimitError) return rateLimitError;
+        // Authentication check
+        const authError = await checkAuthentication(ctx, modelName, service);
+        if (authError) return authError;
         const result = await service.removeMany({
           ids: args.ids,
-          currentUserId: args.currentUserId ?? 'system',
+          currentUserId: (ctx.session?.user?.id as string) ?? 'system',
         } as never);
         if (result.isSuccess && Array.isArray(result.data)) {
           result.data.forEach((record) => {
@@ -370,7 +517,17 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
     t.prismaField({
       type: model,
       description: `Real-time subscription for ${modelName} changes. Emits an event whenever a ${modelName} record is created, updated, archived, restored, or deleted.`,
-      subscribe: (root, args, ctx) => ctx.pubsub.subscribe(subscriptionPublishName),
+      subscribe: async (root, args, ctx) => {
+        console.log(
+          `🔔 ${modelName}: Subscribing to ${subscriptionPublishName} with user email:`,
+          ctx.session?.user?.email,
+        );
+        const authWarning = await service.authenticate(ctx.session?.user?.id as string);
+        if (!authWarning) {
+          throw new Error(`Authentication failed: ${'Unauthorized access'}`);
+        }
+        return ctx.pubsub.subscribe(subscriptionPublishName);
+      },
       resolve: (query, payload) => payload,
     }),
   );

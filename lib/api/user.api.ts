@@ -23,3 +23,22 @@ export const UserFindAll = gql`
     }
   }
 `;
+
+export const UserFindAllSubscription = gql`
+  subscription UserSubscription {
+    UserSubscription {
+      createdAt
+      email
+      emailVerified
+      id
+      image
+      isActive
+      isTwoFactorAuthEnabled
+      name
+      otpCode
+      password
+      updatedAt
+      userName
+    }
+  }
+`;

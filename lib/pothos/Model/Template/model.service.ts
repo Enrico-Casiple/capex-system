@@ -190,7 +190,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
   }> {
     try {
       console.log(
-        `🟢 Processing batch of ${dataArray.length} records for ${this.modelName} at ${this.time}`,
+        `📝 Processing batch of ${dataArray.length} records for ${this.modelName} at ${this.time}`,
       );
       const createdRecords: PrismaTypes[PrismaModel]['Shape'][] = await this.prisma.$transaction(
         async (tx): Promise<PrismaTypes[PrismaModel]['Shape'][]> => {
@@ -242,14 +242,31 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
     for (let i = 0; i < array.length; i += batchSize) {
       batches.push(array.slice(i, i + batchSize));
     }
-    console.log(`🟢 Split data into ${batches.length} batches with batch size of ${batchSize}`);
+    console.log(`📝 Split data into ${batches.length} batches with batch size of ${batchSize}`);
     return batches;
+  }
+
+  async authenticate(id: string): Promise<boolean> {
+    // if id are not ObjectId format, skip authentication (for non-MongoDB models)
+    if (!id || id.length !== 24 || typeof id !== 'string' || !id.match(/^[0-9a-fA-F]{24}$/)) {
+      return false;
+    }
+    console.log(`🔑 Authenticating ${this.modelName} record with id:`, id);
+    try {
+      const record = await this.prisma.user.findUnique({ where: { id } });
+      if (!record) {
+        return false;
+      }
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   // findAll
   async findAll(paginationInput: PaginationInput<PrismaModel>) {
     // For Debugging: Log the incoming pagination input
-    console.log(`🟢 Find called for ${this.modelName} with pagination input:`, paginationInput);
+    console.log(`📝 Find called for ${this.modelName} with pagination input:`, paginationInput);
     const where = {
       isActive: paginationInput.isActive,
       ...(paginationInput.filter || {}),
@@ -327,8 +344,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
 
   // findUnique
   async findUnique(id: string) {
-    // For Debugging: Log the incoming ID for findUnique
-    console.log(`🟢 FindUnique called for ${this.modelName} with id:`, id);
+    console.log(`📝 FindUnique called for ${this.modelName} with id:`, id);
     try {
       const record = await this.deligate.findUnique({
         where: { id } as FindUniqueArgs<PrismaModel>['where'],
@@ -369,7 +385,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
   // create
   async create(input: CreateInput<PrismaModel>) {
     // For Debugging: Log the incoming data for create
-    console.log(`🟢 Create called for ${this.modelName} with data:`, input);
+    console.log(`📝 Create called for ${this.modelName} with data:`, input);
     const { data } = input;
     try {
       const mappedData = this.createMapping(data);
@@ -415,7 +431,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
 
   // createMany  OPTIMIZED FOR MONGODB
   async createMany(input: CreateManyInput<PrismaModel>) {
-    console.log(`🟢 CreateMany called for ${this.modelName} with data:`, input);
+    console.log(`📝 CreateMany called for ${this.modelName} with data:`, input);
     const { data, currentUserId } = input;
     try {
       const mappedData = this.createManyMapping(data);
@@ -465,7 +481,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
   }
   // update
   async update(input: UpdateInput<PrismaModel>) {
-    console.log(`🟢 Update called for ${this.modelName} with data:`, input);
+    console.log(`📝 Update called for ${this.modelName} with data:`, input);
     try {
       const { data, currentUserId } = input;
       const mappedData = this.updateMapping(data);
@@ -535,7 +551,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
   // update many - OPTIMIZED FOR MONGODB
   async updateMany(inputs: UpdateInput<PrismaModel>[] | UpdateInput<PrismaModel>) {
     console.log(
-      `🟢 Starting updateMany for ${this.modelName} at ${this.time} with inputs:`,
+      `📝 Starting updateMany for ${this.modelName} at ${this.time} with inputs:`,
       inputs,
     );
     try {
@@ -676,7 +692,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
 
   // delete (hard delete)
   async remove(input: RemoveInput) {
-    console.log(`🟢 Remove called for ${this.modelName} with id:`, input.id);
+    console.log(`📝 Remove called for ${this.modelName} with id:`, input.id);
     try {
       const { id, currentUserId } = input;
 
@@ -744,7 +760,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
 
   // delete many - OPTIMIZED FOR MONGODB
   async removeMany(input: RemoveManyInput) {
-    console.log(`🟢 Starting removeMany for ${this.modelName} at ${this.time} with inputs:`, input);
+    console.log(`📝 Starting removeMany for ${this.modelName} at ${this.time} with inputs:`, input);
     const { ids, currentUserId } = input;
     try {
       if (!ids || ids.length === 0) {
@@ -857,7 +873,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
   }
   // archive (soft delete)
   async archive(input: ArchiveInput) {
-    console.log(`🟢 Archive called for ${this.modelName} with id:`, input.id);
+    console.log(`📝 Archive called for ${this.modelName} with id:`, input.id);
     try {
       const { id, currentUserId } = input;
 
@@ -930,7 +946,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
   // archive many - OPTIMIZED FOR MONGODB
   async archiveMany(input: ArchiveManyInput) {
     console.log(
-      `🟢 Starting archiveMany for ${this.modelName} at ${this.time} with inputs:`,
+      `📝 Starting archiveMany for ${this.modelName} at ${this.time} with inputs:`,
       input,
     );
     const { ids, currentUserId } = input;
@@ -1048,7 +1064,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
 
   // restore (un-archive)
   async restore(input: ArchiveInput) {
-    console.log(`🟢 Restore called for ${this.modelName} with id:`, input.id);
+    console.log(`📝 Restore called for ${this.modelName} with id:`, input.id);
     try {
       const { id, currentUserId } = input;
 
@@ -1121,7 +1137,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
   // restore many - OPTIMIZED FOR MONGODB
   async restoreMany(input: ArchiveManyInput) {
     console.log(
-      `🟢 Starting restoreMany for ${this.modelName} at ${this.time} with inputs:`,
+      `📝 Starting restoreMany for ${this.modelName} at ${this.time} with inputs:`,
       input,
     );
     const { ids, currentUserId } = input;

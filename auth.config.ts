@@ -1,5 +1,6 @@
 import type { NextAuthConfig } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
+import { login } from './lib/pothos/Model/Custom/Model/User/user.service';
 
 // Notice this is only an object, not a full Auth.js instance
 export default {
@@ -8,16 +9,21 @@ export default {
       credentials: {
         account: {},
         password: {},
-        otpCode: {},
+        otp: {},
       },
       authorize: async (credentials) => {
-        const { account, password, otpCode } = credentials as {
+        const { account, password, otp } = credentials as {
           account: string;
           password: string;
-          otpCode: string;
+          otp: string;
         };
-        if (account === 'admin' && password === 'admin' && otpCode === '123456') {
-          return { id: '1', name: 'Admin User', email: 'admin@essi.ph' };
+        const logins = await login({ account, password, otp: otp || null });
+        if (logins) {
+          return {
+            id: logins?.data?.id,
+            name: logins?.data?.name,
+            email: logins?.data?.email,
+          };
         }
         return null;
       },
