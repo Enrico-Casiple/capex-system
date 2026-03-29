@@ -28,10 +28,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn('font-mono h-full', "font-mono", jetbrainsMono.variable)}>
+    <html lang="en" className={cn('font-mono', 'font-mono', "font-mono", jetbrainsMono.variable)}>
       <ApolloProviderWrapper>
         <SessionProvider>
-          <body className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}>
+          <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
             {children}
           </body>
         </SessionProvider>
