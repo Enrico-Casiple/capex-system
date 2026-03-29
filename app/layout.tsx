@@ -5,7 +5,7 @@ import { Geist, Geist_Mono, JetBrains_Mono } from 'next/font/google';
 import ApolloProviderWrapper from './_context/GraphQLClient/ApolloProvider/ApolloProviderWrapper';
 import './globals.css';
 
-const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
+const jetbrainsMono = JetBrains_Mono({subsets:['latin'],variable:'--font-mono'});
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -28,10 +28,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn('font-mono', jetbrainsMono.variable)}>
+    <html lang="en" className={cn('font-mono h-full', "font-mono", jetbrainsMono.variable)}>
       <ApolloProviderWrapper>
         <SessionProvider>
-          <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+          <body className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}>
             {children}
           </body>
         </SessionProvider>

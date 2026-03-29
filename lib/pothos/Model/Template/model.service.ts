@@ -22,6 +22,7 @@ import { fail, ok } from '../../../../lib/util/reponseUtil';
 import { Prisma, PrismaClient } from '../../../generated/prisma/client';
 import { getPrismaErrorMessage } from '../../../util/getPrismaErrorMessage';
 import PrismaTypes from '../../pothos-prisma-types';
+import { pubsub } from '../../subscription';
 import buildAuditLog from './Builder/audit.builder';
 import { ModelStrategy } from './Strategy/model.strategy';
 import {
@@ -185,6 +186,30 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
     } catch (error) {
       return { ...fail(this.code('CREATE_MANY_FAILED'), `Batch failed: ${error}`), data: null };
     }
+  }
+
+  // ─── Server side subscription ──────────────────────────────
+  subscribeToModel(callback: (data: PrismaTypes[PrismaModel]['Shape']) => void) {
+    const topic = `${this.modelName.toUpperCase()}_SUBSCRIPTION`;
+
+    const subscription = pubsub.subscribe(topic);
+
+    // listen to events
+    (async () => {
+      for await (const event of subscription) {
+        const data = (event as Record<string, unknown>)[`${this.modelName}Subscription`];
+        callback(data as PrismaTypes[PrismaModel]['Shape']);
+      }
+    })();
+
+    return subscription; // return so caller can cancel
+  }
+
+  // ─── Publish helper ────────────────────────────────────────
+  private publish(record: unknown) {
+    pubsub.publish(`${this.modelName.toUpperCase()}_SUBSCRIPTION`, {
+      [`${this.modelName}Subscription`]: record,
+    });
   }
 
   // ─── Public Methods ────────────────────────────────────────
@@ -416,6 +441,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
         },
         include: this.include,
       });
+      this.publish(record);
       return ok(this.code('CREATE_ONE_SUCCESS'), `Created ${this.modelName} record`, record);
     } catch (error) {
       const { message } = getPrismaErrorMessage(error);
@@ -439,6 +465,8 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
         if (result.isSuccess && result.data) results.push(...result.data);
         else console.error(`Batch failed:`, result.message);
       }
+
+      results.forEach((record) => this.publish(record));
 
       return ok(
         this.code('CREATE_MANY_SUCCESS'),
@@ -475,6 +503,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
         },
         include: this.include,
       });
+      this.publish(record);
       return ok(this.code('UPDATE_ONE_SUCCESS'), `Updated ${this.modelName} id:${data.id}`, record);
     } catch (error) {
       const { message } = getPrismaErrorMessage(error);
@@ -548,6 +577,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
       );
 
       const successCount = results.filter((r) => r.isSuccess).length;
+      results.forEach((r) => r.isSuccess && this.publish(r.data));
       return {
         isSuccess: successCount === allData.length,
         code: this.code('UPDATE_MANY_SUCCESS'),
@@ -586,6 +616,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
         },
         include: this.include,
       });
+      this.publish(record);
       return ok(this.code('DELETE_ONE_SUCCESS'), `Deleted ${this.modelName} id:${id}`, record);
     } catch (error) {
       const { message } = getPrismaErrorMessage(error);
@@ -648,6 +679,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
       );
 
       const successCount = results.filter((r) => r.isSuccess).length;
+      results.forEach((r) => r.isSuccess && this.publish(r.data));
       return {
         isSuccess: successCount === ids.length,
         code: this.code('DELETE_MANY_SUCCESS'),
