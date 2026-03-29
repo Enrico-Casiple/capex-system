@@ -1,18 +1,41 @@
+import authenticate from '../../../../lib/util/authenticate';
 import { checkAuthentication } from '../../../../lib/util/checkAuthentication';
 import { enforceRateLimit } from '../../../../lib/util/enforceRateLimit';
 import { Prisma } from '../../../generated/prisma/client';
 import { builder } from '../../builder';
-import { createInputRefs, pageInputRefs, updateInputRefs } from '../../Inputs';
+import {
+  createInputRefs,
+  cursorPaginationInputRefs,
+  findByInputRefs,
+  findFirstInputRefs,
+  pageInputRefs,
+  updateInputRefs,
+} from '../../Inputs';
 import { getDatamodel } from '../../pothos-prisma-types';
 import {
+  cursorPaginationResponseRef,
   deletedListResponseRef,
   paginationResponseRefs,
   responseListRefs,
   responseRefs,
 } from '../../Response';
+import { Context } from '../../subscription';
 import services from '../Services';
+import { FindManyArgs, FindUniqueArgs } from '../Template/Types/prismaArgs.type';
 
 const prismaDataModel = getDatamodel();
+const middlewareCheck = async (
+  ctx: Context,
+  modelName: string,
+  skipForUserModel: boolean = false,
+  isNeeded: boolean = true,
+) => {
+  if (!isNeeded) return;
+  const rateLimitError = await enforceRateLimit(ctx, modelName);
+  if (rateLimitError) return rateLimitError;
+  const authError = await checkAuthentication(ctx, modelName, skipForUserModel);
+  if (authError) return authError;
+};
 
 // Auto-generate all queries and mutations for all models
 Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
@@ -35,12 +58,12 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
-        // Rate limit check
-        const rateLimitError = await enforceRateLimit(ctx, modelName);
-        if (rateLimitError) return rateLimitError;
-        // Authentication check
-        const authError = await checkAuthentication(ctx, modelName, service);
-        if (authError) return authError;
+        console.log(
+          `🔍 ${modelName}: FindAll - Received pagination request with input:`,
+          args.paginationInput,
+        );
+        const middlewareError = await middlewareCheck(ctx, modelName);
+        if (middlewareError) return middlewareError;
         try {
           return await service.findAll(args.paginationInput as never);
         } catch (error) {
@@ -53,6 +76,43 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
             active: 0,
             inActive: 0,
             pageinfo: null,
+          };
+        }
+      },
+    }),
+  );
+
+  // ─── QUERY: findAllWithCursor ───────────────────────────────────────────
+  builder.queryField(`${modelName}FindAllWithCursor`, (t) =>
+    t.field({
+      type: cursorPaginationResponseRef[model],
+      description: `Retrieve a paginated list of ${modelName} records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.`,
+      args: {
+        cursorInput: t.arg({
+          type: cursorPaginationInputRefs[model],
+          required: true,
+          description: `Cursor pagination and filter options for the ${modelName} list query.`,
+        }),
+      },
+      resolve: async (_parent, args, ctx) => {
+        console.log(
+          `🔍 ${modelName}: FindAllWithCursor - Received cursor pagination request with input:`,
+          args.cursorInput,
+        );
+        const middlewareError = await middlewareCheck(ctx, modelName);
+        if (middlewareError) return middlewareError;
+        try {
+          return await service.findAllWithCursor(args.cursorInput as never);
+        } catch (error) {
+          return {
+            isSuccess: false,
+            message: `Failed to retrieve ${modelName} records: ${error}`,
+            code: `${modelName.toUpperCase()}_RETRIEVE_ALL_FAILED`,
+            data: null,
+            nextCursor: null,
+            prevCursor: null,
+            hasNextPage: false,
+            hasPrevPage: false,
           };
         }
       },
@@ -72,25 +132,51 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
-        // Rate limit check
-        const rateLimitError = await enforceRateLimit(ctx, modelName);
-        if (rateLimitError) return rateLimitError;
-        // Authentication check
-        const authError = await checkAuthentication(ctx, modelName, service);
-        if (authError) return authError;
-        console.log(
-          `🛡️ ${modelName}: FindUnique - Checking user authentication by email: ${ctx.session?.user?.email}`,
-        );
-        const authWarning = await service.authenticate(ctx.session?.user?.id as string);
-        if (!authWarning) {
-          return {
-            isSuccess: false,
-            message: `Authentication failed: ${'Unauthorized access'}`,
-            code: `${modelName.toUpperCase()}_AUTHENTICATION_FAILED`,
-            data: null,
-          };
-        }
+        console.log(`🔍 ${modelName}: FindUnique - Received request for id:`, args.id);
+        const middlewareError = await middlewareCheck(ctx, modelName);
+        if (middlewareError) return middlewareError;
         return await service.findUnique(args.id);
+      },
+    }),
+  );
+
+  // ─── QUERY: findBy ───────────────────────────────────────────
+  builder.queryField(`${modelName}FindBy`, (t) =>
+    t.field({
+      type: responseRefs[model],
+      args: {
+        input: t.arg({ type: findByInputRefs[model], required: true }),
+      },
+      resolve: async (_root, { input }, ctx) => {
+        console.log(
+          `🔍 ${modelName}: FindBy - Received with dynamic key and value request with input:`,
+          input,
+        );
+        const middlewareError = await middlewareCheck(ctx, modelName);
+        if (middlewareError) return middlewareError;
+        return services[model].findBy(
+          input.key as keyof FindUniqueArgs<typeof model>['where'],
+          input.value,
+        );
+      },
+    }),
+  );
+
+  // ─── QUERY: findFirst ───────────────────────────────────────────
+  builder.queryField(`${modelName}FindFirst`, (t) =>
+    t.field({
+      type: responseRefs[model],
+      args: {
+        input: t.arg({ type: findFirstInputRefs[model], required: true }),
+      },
+      resolve: async (_root, { input }, ctx) => {
+        console.log(
+          `🔍 ${modelName}: FindFirst - Received where clause request with input:`,
+          input,
+        );
+        const middlewareError = await middlewareCheck(ctx, modelName);
+        if (middlewareError) return middlewareError;
+        return services[model].findFirst(input.where as FindManyArgs<typeof model>['where']);
       },
     }),
   );
@@ -114,12 +200,9 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
-        // Rate limit check
-        const rateLimitError = await enforceRateLimit(ctx, modelName);
-        if (rateLimitError) return rateLimitError;
-        // Authentication check
-        const authError = await checkAuthentication(ctx, modelName, service, true);
-        if (authError) return authError;
+        console.log(`✏️ ${modelName}: Create - Received create request with data:`, args.data);
+        const middlewareError = await middlewareCheck(ctx, modelName, true);
+        if (middlewareError) return middlewareError;
         const result = await service.create({
           data: args.data,
           currentUserId: (ctx.session?.user?.id as string) ?? ctx.session?.user?.id,
@@ -132,7 +215,6 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
 
   // ─── MUTATION: createMany ─────────────────────────────────────
   if (!createInputRefs[model]) return;
-
   builder.mutationField(`${modelName}CreateMany`, (t) =>
     t.field({
       type: responseListRefs[model],
@@ -149,12 +231,12 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
-        // Rate limit check
-        const rateLimitError = await enforceRateLimit(ctx, modelName);
-        if (rateLimitError) return rateLimitError;
-        // Authentication check
-        const authError = await checkAuthentication(ctx, modelName, service);
-        if (authError) return authError;
+        console.log(
+          `✏️ ${modelName}: CreateMany - Received bulk create request with data:`,
+          args.data,
+        );
+        const middlewareError = await middlewareCheck(ctx, modelName, true);
+        if (middlewareError) return middlewareError;
         const result = await service.createMany({
           data: args.data,
           currentUserId: (ctx.session?.user?.id as string) ?? 'system',
@@ -192,12 +274,9 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
-        // Rate limit check
-        const rateLimitError = await enforceRateLimit(ctx, modelName);
-        if (rateLimitError) return rateLimitError;
-        // Authentication check
-        const authError = await checkAuthentication(ctx, modelName, service);
-        if (authError) return authError;
+        console.log(`✏️ ${modelName}: Update - Received update request for id:`, args.id);
+        const middlewareError = await middlewareCheck(ctx, modelName);
+        if (middlewareError) return middlewareError;
         const result = await service.update({
           data: { ...args.data, id: args.id },
           currentUserId: (ctx.session?.user?.id as string) ?? 'system',
@@ -225,12 +304,12 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
-        // Rate limit check
-        const rateLimitError = await enforceRateLimit(ctx, modelName);
-        if (rateLimitError) return rateLimitError;
-        // Authentication check
-        const authError = await checkAuthentication(ctx, modelName, service);
-        if (authError) return authError;
+        console.log(
+          `✏️ ${modelName}: UpdateMany - Received bulk update request with data:`,
+          args.data,
+        );
+        const middlewareError = await middlewareCheck(ctx, modelName);
+        if (middlewareError) return middlewareError;
         const result = await service.updateMany({
           data: args.data,
           currentUserId: (ctx.session?.user?.id as string) ?? 'system',
@@ -261,12 +340,9 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
-        // Rate limit check
-        const rateLimitError = await enforceRateLimit(ctx, modelName);
-        if (rateLimitError) return rateLimitError;
-        // Authentication check
-        const authError = await checkAuthentication(ctx, modelName, service);
-        if (authError) return authError;
+        console.log(`🗄️ ${modelName}: Archive - Received archive request for id:`, args.id);
+        const middlewareError = await middlewareCheck(ctx, modelName);
+        if (middlewareError) return middlewareError;
         const result = await service.archive({
           id: args.id,
           currentUserId: (ctx.session?.user?.id as string) ?? 'system',
@@ -293,12 +369,12 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
-        // Rate limit check
-        const rateLimitError = await enforceRateLimit(ctx, modelName);
-        if (rateLimitError) return rateLimitError;
-        // Authentication check
-        const authError = await checkAuthentication(ctx, modelName, service);
-        if (authError) return authError;
+        console.log(
+          `🗄️ ${modelName}: ArchiveMany - Received bulk archive request for ids:`,
+          args.ids,
+        );
+        const middlewareError = await middlewareCheck(ctx, modelName);
+        if (middlewareError) return middlewareError;
         const result = await service.archiveMany({
           ids: args.ids,
           currentUserId: (ctx.session?.user?.id as string) ?? 'system',
@@ -329,12 +405,9 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
-        // Rate limit check
-        const rateLimitError = await enforceRateLimit(ctx, modelName);
-        if (rateLimitError) return rateLimitError;
-        // Authentication check
-        const authError = await checkAuthentication(ctx, modelName, service);
-        if (authError) return authError;
+        console.log(`🗄️ ${modelName}: Restore - Received restore request for id:`, args.id);
+        const middlewareError = await middlewareCheck(ctx, modelName);
+        if (middlewareError) return middlewareError;
         const result = await service.restore({
           id: args.id,
           currentUserId: (ctx.session?.user?.id as string) ?? 'system',
@@ -361,12 +434,12 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
-        // Rate limit check
-        const rateLimitError = await enforceRateLimit(ctx, modelName);
-        if (rateLimitError) return rateLimitError;
-        // Authentication check
-        const authError = await checkAuthentication(ctx, modelName, service);
-        if (authError) return authError;
+        console.log(
+          `🗄️ ${modelName}: RestoreMany - Received bulk restore request for ids:`,
+          args.ids,
+        );
+        const middlewareError = await middlewareCheck(ctx, modelName);
+        if (middlewareError) return middlewareError;
         const result = await service.restoreMany({
           ids: args.ids,
           currentUserId: (ctx.session?.user?.id as string) ?? 'system',
@@ -397,12 +470,9 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
-        // Rate limit check
-        const rateLimitError = await enforceRateLimit(ctx, modelName);
-        if (rateLimitError) return rateLimitError;
-        // Authentication check
-        const authError = await checkAuthentication(ctx, modelName, service);
-        if (authError) return authError;
+        console.log(`🗄️ ${modelName}: Remove - Received delete request for id:`, args.id);
+        const middlewareError = await middlewareCheck(ctx, modelName);
+        if (middlewareError) return middlewareError;
         const result = await service.remove({
           id: args.id,
           currentUserId: (ctx.session?.user?.id as string) ?? 'system',
@@ -429,12 +499,12 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
       },
       resolve: async (_parent, args, ctx) => {
-        // Rate limit check
-        const rateLimitError = await enforceRateLimit(ctx, modelName);
-        if (rateLimitError) return rateLimitError;
-        // Authentication check
-        const authError = await checkAuthentication(ctx, modelName, service);
-        if (authError) return authError;
+        console.log(
+          `🗄️ ${modelName}: RemoveMany - Received bulk delete request for ids:`,
+          args.ids,
+        );
+        const middlewareError = await middlewareCheck(ctx, modelName);
+        if (middlewareError) return middlewareError;
         const result = await service.removeMany({
           ids: args.ids,
           currentUserId: (ctx.session?.user?.id as string) ?? 'system',
@@ -459,7 +529,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           `🔔 ${modelName}: Subscribing to ${subscriptionPublishName} with user email:`,
           ctx.session?.user?.email,
         );
-        const authWarning = await service.authenticate(ctx.session?.user?.id as string);
+        const authWarning = await authenticate(ctx.session?.user?.id as string);
         if (!authWarning) {
           throw new Error(`Authentication failed: ${'Unauthorized access'}`);
         }

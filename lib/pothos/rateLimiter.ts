@@ -34,6 +34,11 @@ export const checkRateLimit = async (identifier: string) => {
   }
 };
 
+// sudo visudo
+// enrico ALL=(ALL) NOPASSWD: /usr/bin/dnf install memcached -y, /usr/bin/systemctl start memcached, /usr/bin/systemctl enable memcached
+// enrico ALL=(ALL) NOPASSWD: /usr/bin/systemctl start memcached
+// enrico ALL=(ALL) NOPASSWD: /usr/bin/systemctl start memcached
+
 // # Deployment Guide: Next.js App with Memcached Rate Limiting on DigitalOcean Droplet
 
 // This guide will help you deploy your app step by step. You can copy and paste each command.

@@ -1,6 +1,7 @@
-import { GenericInputFieldRef } from '@pothos/core';
+import { Prisma } from '@/lib/generated/prisma/browser';
+import { GenericInputFieldRef, InputRef } from '@pothos/core';
 import { builder } from '../builder';
-import { getDatamodel } from '../pothos-prisma-types';
+import PrismaTypes, { getDatamodel } from '../pothos-prisma-types';
 
 const prismaDataModel = getDatamodel();
 
@@ -9,13 +10,27 @@ export const connectInputSuffix = 'ConnectInput'; // ✅ new
 export const createOrConnectInputSuffix = 'CreateOrConnectInput'; // ✅ new
 export const updateInputSuffix = 'UpdateInput';
 export const pageInputSuffix = 'PageInput';
+export const cursorPaginationInputSuffix = 'CursorPaginationInput';
 export const updateOrConnectInputSuffix = 'UpdateOrConnectInput'; // ✅ new
 export const updateOrConnectInputRefs: Record<string, ReturnType<typeof builder.inputRef>> = {}; // ✅ new
 export const updateInputRefs: Record<string, ReturnType<typeof builder.inputRef>> = {};
 export const createInputRefs: Record<string, ReturnType<typeof builder.inputRef>> = {};
 export const pageInputRefs: Record<string, ReturnType<typeof builder.inputRef>> = {};
+export const cursorPaginationInputRefs: Record<string, ReturnType<typeof builder.inputRef>> = {};
 export const connectInputRefs: Record<string, ReturnType<typeof builder.inputRef>> = {}; // ✅ new
 export const createOrConnectInputRefs: Record<string, ReturnType<typeof builder.inputRef>> = {}; // ✅ new
+export const findByInputRefs = {} as Record<
+  PrismaTypes[keyof PrismaTypes]['Name'],
+  InputRef<{ key: string; value: string }>
+>;
+const findByInputSuffix = 'FindByInput';
+export const findFirstInputRefs = {} as Record<
+  PrismaTypes[keyof PrismaTypes]['Name'],
+  InputRef<{ where?: Record<string, unknown> | null }>
+>;
+
+const findFirstInputSuffix = 'FindFirstInput';
+
 // ─── Step 1: Generate ConnectInput (just { id: string }) for each model ──────
 // ─── Step 1: Generate ConnectInput (just { id: string }) for each model ──────
 Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
@@ -260,5 +275,95 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
     });
   } catch (error) {
     console.error(`Model ${modelName} not found in Prisma schema. ${error}`);
+  }
+});
+
+// ─── Step 7: Generate CursorPaginationInput for each Prisma model ────────────────────────
+Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
+  try {
+    const cursorPaginationRef = builder.inputRef(`${modelName}${cursorPaginationInputSuffix}`);
+    cursorPaginationInputRefs[modelName] = cursorPaginationRef;
+    cursorPaginationInputRefs[modelName].implement({
+      description: `Pagination and filtering input for querying ${modelName} records. Use this to control which page of results to return and how to filter the dataset.`,
+      fields: (t) => ({
+        isActive: t.boolean({
+          required: true,
+          description: `(Required) Filter ${modelName} records by their active status. Set to true to return only active records, false for inactive.`,
+        }),
+        cursor: t.string({
+          required: false,
+          description: `(Optional) The cursor for pagination. Use the ID of the last record from the previous page to fetch the next set of results.`,
+        }),
+        direction: t.field({
+          type: builder.enumType(`${modelName}PaginationDirection`, {
+            values: ['forward', 'backward'],
+          }),
+          required: false,
+          description: `(Optional) The direction for pagination. Set to 'forward' to fetch the next page of results after the cursor, or 'backward' to fetch the previous page before the cursor. Defaults to 'forward'.`,
+        }),
+        take: t.int({
+          required: true,
+          description: `(Required) Number of ${modelName} records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.`,
+        }),
+        search: t.string({
+          required: false,
+          description: `(Optional) Search keyword to filter ${modelName} records by text fields.`,
+        }),
+        filter: t.field({
+          type: 'Json',
+          required: false,
+          description: `(Optional) Advanced JSON filter to narrow down ${modelName} results. Follows Prisma where clause structure.`,
+        }),
+      }),
+    });
+  } catch (error) {
+    console.error(`Model ${modelName} not found in Prisma schema. ${error}`);
+  }
+});
+// ─── Step 8: Generate FindByInput for each Prisma model────────────────────────
+Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
+  try {
+    const findByRef = builder.inputRef<{ key: string; value: string }>(
+      `${modelName}${findByInputSuffix}`,
+    );
+    findByInputRefs[modelName as Prisma.ModelName] = findByRef;
+    findByRef.implement({
+      description: `Dynamic field lookup input for ${modelName}. Provide a unique field key and its value to find a single record.`,
+      fields: (t) => ({
+        key: t.string({
+          required: true,
+          description: `The unique field name to search by (e.g. "id", "email", "username").`,
+        }),
+        value: t.string({
+          required: true,
+          description: `The value to match against the provided key field.`,
+        }),
+      }),
+    });
+  } catch (error) {
+    console.error(`Model ${modelName} FindByInput failed: ${error}`);
+  }
+});
+
+// ─── Step 9: Generate FindFirstInput for each Prisma model────────────────────────
+Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
+  try {
+    const findFirstRef = builder.inputRef<{
+      where?: { [key: string]: object | null | undefined | unknown } | null;
+    }>(`${modelName}${findFirstInputSuffix}`);
+
+    findFirstInputRefs[modelName as PrismaTypes[keyof PrismaTypes]['Name']] = findFirstRef;
+    findFirstRef.implement({
+      description: `Dynamic where input for finding the first matching ${modelName} record.`,
+      fields: (t) => ({
+        where: t.field({
+          type: 'Json',
+          required: true,
+          description: `Prisma where clause to match against ${modelName} fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).`,
+        }),
+      }),
+    });
+  } catch (error) {
+    console.error(`Model ${modelName} FindFirstInput failed: ${error}`);
   }
 });

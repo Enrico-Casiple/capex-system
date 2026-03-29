@@ -273,6 +273,76 @@ input AuditLogCreateOrConnectInput {
 }
 
 """
+Pagination and filtering input for querying AuditLog records. Use this to control which page of results to return and how to filter the dataset.
+"""
+input AuditLogCursorPaginationInput {
+  """
+  (Optional) The cursor for pagination. Use the ID of the last record from the previous page to fetch the next set of results.
+  """
+  cursor: String
+
+  """
+  (Optional) The direction for pagination. Set to 'forward' to fetch the next page of results after the cursor, or 'backward' to fetch the previous page before the cursor. Defaults to 'forward'.
+  """
+  direction: AuditLogPaginationDirection
+
+  """
+  (Optional) Advanced JSON filter to narrow down AuditLog results. Follows Prisma where clause structure.
+  """
+  filter: Json
+
+  """
+  (Required) Filter AuditLog records by their active status. Set to true to return only active records, false for inactive.
+  """
+  isActive: Boolean!
+
+  """(Optional) Search keyword to filter AuditLog records by text fields."""
+  search: String
+
+  """
+  (Required) Number of AuditLog records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
+  """
+  take: Int!
+}
+
+"""
+Paginated response wrapper for AuditLog. Returns a paged list of AuditLog records with pagination metadata and counts.
+"""
+type AuditLogCursorPaginationResponse {
+  """
+  Operation result code for the AuditLog pagination query. e.g. 'AUDITLOG_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of AuditLog records. Null if the query failed."""
+  data: [AuditLog!]
+
+  """Indicates if there is a next page of AuditLog records available."""
+  hasNextPage: Boolean
+
+  """Indicates if there is a previous page of AuditLog records available."""
+  hasPrevPage: Boolean
+
+  """Indicates whether the AuditLog pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the AuditLog pagination query.
+  """
+  message: String
+
+  """
+  Cursor for fetching the next page of AuditLog records. Null if there are no more pages.
+  """
+  nextCursor: String
+
+  """
+  Cursor for fetching the previous page of AuditLog records. Null if there are no previous pages.
+  """
+  prevCursor: String
+}
+
+"""
 Paginated response wrapper for AuditLog. Returns a paged list of AuditLog records with pagination metadata and counts.
 """
 type AuditLogDeletedListResponse {
@@ -291,6 +361,25 @@ type AuditLogDeletedListResponse {
   Human-readable message describing the result of the AuditLog pagination query.
   """
   message: String
+}
+
+"""
+Dynamic field lookup input for AuditLog. Provide a unique field key and its value to find a single record.
+"""
+input AuditLogFindByInput {
+  """The unique field name to search by (e.g. "id", "email", "username")."""
+  key: String!
+
+  """The value to match against the provided key field."""
+  value: String!
+}
+
+"""Dynamic where input for finding the first matching AuditLog record."""
+input AuditLogFindFirstInput {
+  """
+  Prisma where clause to match against AuditLog fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
 }
 
 """
@@ -338,6 +427,11 @@ input AuditLogPageInput {
 
   """(Optional) Search keyword to filter AuditLog records by text fields."""
   search: String
+}
+
+enum AuditLogPaginationDirection {
+  backward
+  forward
 }
 
 """
@@ -765,6 +859,86 @@ input BasicInformationCreateOrConnectInput {
 }
 
 """
+Pagination and filtering input for querying BasicInformation records. Use this to control which page of results to return and how to filter the dataset.
+"""
+input BasicInformationCursorPaginationInput {
+  """
+  (Optional) The cursor for pagination. Use the ID of the last record from the previous page to fetch the next set of results.
+  """
+  cursor: String
+
+  """
+  (Optional) The direction for pagination. Set to 'forward' to fetch the next page of results after the cursor, or 'backward' to fetch the previous page before the cursor. Defaults to 'forward'.
+  """
+  direction: BasicInformationPaginationDirection
+
+  """
+  (Optional) Advanced JSON filter to narrow down BasicInformation results. Follows Prisma where clause structure.
+  """
+  filter: Json
+
+  """
+  (Required) Filter BasicInformation records by their active status. Set to true to return only active records, false for inactive.
+  """
+  isActive: Boolean!
+
+  """
+  (Optional) Search keyword to filter BasicInformation records by text fields.
+  """
+  search: String
+
+  """
+  (Required) Number of BasicInformation records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
+  """
+  take: Int!
+}
+
+"""
+Paginated response wrapper for BasicInformation. Returns a paged list of BasicInformation records with pagination metadata and counts.
+"""
+type BasicInformationCursorPaginationResponse {
+  """
+  Operation result code for the BasicInformation pagination query. e.g. 'BASICINFORMATION_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """
+  The current page of BasicInformation records. Null if the query failed.
+  """
+  data: [BasicInformation!]
+
+  """
+  Indicates if there is a next page of BasicInformation records available.
+  """
+  hasNextPage: Boolean
+
+  """
+  Indicates if there is a previous page of BasicInformation records available.
+  """
+  hasPrevPage: Boolean
+
+  """
+  Indicates whether the BasicInformation pagination query was successful.
+  """
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the BasicInformation pagination query.
+  """
+  message: String
+
+  """
+  Cursor for fetching the next page of BasicInformation records. Null if there are no more pages.
+  """
+  nextCursor: String
+
+  """
+  Cursor for fetching the previous page of BasicInformation records. Null if there are no previous pages.
+  """
+  prevCursor: String
+}
+
+"""
 Paginated response wrapper for BasicInformation. Returns a paged list of BasicInformation records with pagination metadata and counts.
 """
 type BasicInformationDeletedListResponse {
@@ -787,6 +961,27 @@ type BasicInformationDeletedListResponse {
   Human-readable message describing the result of the BasicInformation pagination query.
   """
   message: String
+}
+
+"""
+Dynamic field lookup input for BasicInformation. Provide a unique field key and its value to find a single record.
+"""
+input BasicInformationFindByInput {
+  """The unique field name to search by (e.g. "id", "email", "username")."""
+  key: String!
+
+  """The value to match against the provided key field."""
+  value: String!
+}
+
+"""
+Dynamic where input for finding the first matching BasicInformation record.
+"""
+input BasicInformationFindFirstInput {
+  """
+  Prisma where clause to match against BasicInformation fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
 }
 
 """
@@ -836,6 +1031,11 @@ input BasicInformationPageInput {
   (Optional) Search keyword to filter BasicInformation records by text fields.
   """
   search: String
+}
+
+enum BasicInformationPaginationDirection {
+  backward
+  forward
 }
 
 """
@@ -1172,6 +1372,76 @@ input CompanyCreateOrConnectInput {
 }
 
 """
+Pagination and filtering input for querying Company records. Use this to control which page of results to return and how to filter the dataset.
+"""
+input CompanyCursorPaginationInput {
+  """
+  (Optional) The cursor for pagination. Use the ID of the last record from the previous page to fetch the next set of results.
+  """
+  cursor: String
+
+  """
+  (Optional) The direction for pagination. Set to 'forward' to fetch the next page of results after the cursor, or 'backward' to fetch the previous page before the cursor. Defaults to 'forward'.
+  """
+  direction: CompanyPaginationDirection
+
+  """
+  (Optional) Advanced JSON filter to narrow down Company results. Follows Prisma where clause structure.
+  """
+  filter: Json
+
+  """
+  (Required) Filter Company records by their active status. Set to true to return only active records, false for inactive.
+  """
+  isActive: Boolean!
+
+  """(Optional) Search keyword to filter Company records by text fields."""
+  search: String
+
+  """
+  (Required) Number of Company records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
+  """
+  take: Int!
+}
+
+"""
+Paginated response wrapper for Company. Returns a paged list of Company records with pagination metadata and counts.
+"""
+type CompanyCursorPaginationResponse {
+  """
+  Operation result code for the Company pagination query. e.g. 'COMPANY_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of Company records. Null if the query failed."""
+  data: [Company!]
+
+  """Indicates if there is a next page of Company records available."""
+  hasNextPage: Boolean
+
+  """Indicates if there is a previous page of Company records available."""
+  hasPrevPage: Boolean
+
+  """Indicates whether the Company pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Company pagination query.
+  """
+  message: String
+
+  """
+  Cursor for fetching the next page of Company records. Null if there are no more pages.
+  """
+  nextCursor: String
+
+  """
+  Cursor for fetching the previous page of Company records. Null if there are no previous pages.
+  """
+  prevCursor: String
+}
+
+"""
 Paginated response wrapper for Company. Returns a paged list of Company records with pagination metadata and counts.
 """
 type CompanyDeletedListResponse {
@@ -1190,6 +1460,25 @@ type CompanyDeletedListResponse {
   Human-readable message describing the result of the Company pagination query.
   """
   message: String
+}
+
+"""
+Dynamic field lookup input for Company. Provide a unique field key and its value to find a single record.
+"""
+input CompanyFindByInput {
+  """The unique field name to search by (e.g. "id", "email", "username")."""
+  key: String!
+
+  """The value to match against the provided key field."""
+  value: String!
+}
+
+"""Dynamic where input for finding the first matching Company record."""
+input CompanyFindFirstInput {
+  """
+  Prisma where clause to match against Company fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
 }
 
 """
@@ -1237,6 +1526,11 @@ input CompanyPageInput {
 
   """(Optional) Search keyword to filter Company records by text fields."""
   search: String
+}
+
+enum CompanyPaginationDirection {
+  backward
+  forward
 }
 
 """
@@ -1511,6 +1805,76 @@ input DepartmentCreateOrConnectInput {
 }
 
 """
+Pagination and filtering input for querying Department records. Use this to control which page of results to return and how to filter the dataset.
+"""
+input DepartmentCursorPaginationInput {
+  """
+  (Optional) The cursor for pagination. Use the ID of the last record from the previous page to fetch the next set of results.
+  """
+  cursor: String
+
+  """
+  (Optional) The direction for pagination. Set to 'forward' to fetch the next page of results after the cursor, or 'backward' to fetch the previous page before the cursor. Defaults to 'forward'.
+  """
+  direction: DepartmentPaginationDirection
+
+  """
+  (Optional) Advanced JSON filter to narrow down Department results. Follows Prisma where clause structure.
+  """
+  filter: Json
+
+  """
+  (Required) Filter Department records by their active status. Set to true to return only active records, false for inactive.
+  """
+  isActive: Boolean!
+
+  """(Optional) Search keyword to filter Department records by text fields."""
+  search: String
+
+  """
+  (Required) Number of Department records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
+  """
+  take: Int!
+}
+
+"""
+Paginated response wrapper for Department. Returns a paged list of Department records with pagination metadata and counts.
+"""
+type DepartmentCursorPaginationResponse {
+  """
+  Operation result code for the Department pagination query. e.g. 'DEPARTMENT_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of Department records. Null if the query failed."""
+  data: [Department!]
+
+  """Indicates if there is a next page of Department records available."""
+  hasNextPage: Boolean
+
+  """Indicates if there is a previous page of Department records available."""
+  hasPrevPage: Boolean
+
+  """Indicates whether the Department pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Department pagination query.
+  """
+  message: String
+
+  """
+  Cursor for fetching the next page of Department records. Null if there are no more pages.
+  """
+  nextCursor: String
+
+  """
+  Cursor for fetching the previous page of Department records. Null if there are no previous pages.
+  """
+  prevCursor: String
+}
+
+"""
 Paginated response wrapper for Department. Returns a paged list of Department records with pagination metadata and counts.
 """
 type DepartmentDeletedListResponse {
@@ -1529,6 +1893,25 @@ type DepartmentDeletedListResponse {
   Human-readable message describing the result of the Department pagination query.
   """
   message: String
+}
+
+"""
+Dynamic field lookup input for Department. Provide a unique field key and its value to find a single record.
+"""
+input DepartmentFindByInput {
+  """The unique field name to search by (e.g. "id", "email", "username")."""
+  key: String!
+
+  """The value to match against the provided key field."""
+  value: String!
+}
+
+"""Dynamic where input for finding the first matching Department record."""
+input DepartmentFindFirstInput {
+  """
+  Prisma where clause to match against Department fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
 }
 
 """
@@ -1576,6 +1959,11 @@ input DepartmentPageInput {
 
   """(Optional) Search keyword to filter Department records by text fields."""
   search: String
+}
+
+enum DepartmentPaginationDirection {
+  backward
+  forward
 }
 
 """
@@ -1846,6 +2234,80 @@ input GroupOfCompanyCreateOrConnectInput {
 }
 
 """
+Pagination and filtering input for querying GroupOfCompany records. Use this to control which page of results to return and how to filter the dataset.
+"""
+input GroupOfCompanyCursorPaginationInput {
+  """
+  (Optional) The cursor for pagination. Use the ID of the last record from the previous page to fetch the next set of results.
+  """
+  cursor: String
+
+  """
+  (Optional) The direction for pagination. Set to 'forward' to fetch the next page of results after the cursor, or 'backward' to fetch the previous page before the cursor. Defaults to 'forward'.
+  """
+  direction: GroupOfCompanyPaginationDirection
+
+  """
+  (Optional) Advanced JSON filter to narrow down GroupOfCompany results. Follows Prisma where clause structure.
+  """
+  filter: Json
+
+  """
+  (Required) Filter GroupOfCompany records by their active status. Set to true to return only active records, false for inactive.
+  """
+  isActive: Boolean!
+
+  """
+  (Optional) Search keyword to filter GroupOfCompany records by text fields.
+  """
+  search: String
+
+  """
+  (Required) Number of GroupOfCompany records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
+  """
+  take: Int!
+}
+
+"""
+Paginated response wrapper for GroupOfCompany. Returns a paged list of GroupOfCompany records with pagination metadata and counts.
+"""
+type GroupOfCompanyCursorPaginationResponse {
+  """
+  Operation result code for the GroupOfCompany pagination query. e.g. 'GROUPOFCOMPANY_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of GroupOfCompany records. Null if the query failed."""
+  data: [GroupOfCompany!]
+
+  """Indicates if there is a next page of GroupOfCompany records available."""
+  hasNextPage: Boolean
+
+  """
+  Indicates if there is a previous page of GroupOfCompany records available.
+  """
+  hasPrevPage: Boolean
+
+  """Indicates whether the GroupOfCompany pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the GroupOfCompany pagination query.
+  """
+  message: String
+
+  """
+  Cursor for fetching the next page of GroupOfCompany records. Null if there are no more pages.
+  """
+  nextCursor: String
+
+  """
+  Cursor for fetching the previous page of GroupOfCompany records. Null if there are no previous pages.
+  """
+  prevCursor: String
+}
+
+"""
 Paginated response wrapper for GroupOfCompany. Returns a paged list of GroupOfCompany records with pagination metadata and counts.
 """
 type GroupOfCompanyDeletedListResponse {
@@ -1864,6 +2326,27 @@ type GroupOfCompanyDeletedListResponse {
   Human-readable message describing the result of the GroupOfCompany pagination query.
   """
   message: String
+}
+
+"""
+Dynamic field lookup input for GroupOfCompany. Provide a unique field key and its value to find a single record.
+"""
+input GroupOfCompanyFindByInput {
+  """The unique field name to search by (e.g. "id", "email", "username")."""
+  key: String!
+
+  """The value to match against the provided key field."""
+  value: String!
+}
+
+"""
+Dynamic where input for finding the first matching GroupOfCompany record.
+"""
+input GroupOfCompanyFindFirstInput {
+  """
+  Prisma where clause to match against GroupOfCompany fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
 }
 
 """
@@ -1913,6 +2396,11 @@ input GroupOfCompanyPageInput {
   (Optional) Search keyword to filter GroupOfCompany records by text fields.
   """
   search: String
+}
+
+enum GroupOfCompanyPaginationDirection {
+  backward
+  forward
 }
 
 """
@@ -2144,6 +2632,76 @@ input HolidayCreateOrConnectInput {
 }
 
 """
+Pagination and filtering input for querying Holiday records. Use this to control which page of results to return and how to filter the dataset.
+"""
+input HolidayCursorPaginationInput {
+  """
+  (Optional) The cursor for pagination. Use the ID of the last record from the previous page to fetch the next set of results.
+  """
+  cursor: String
+
+  """
+  (Optional) The direction for pagination. Set to 'forward' to fetch the next page of results after the cursor, or 'backward' to fetch the previous page before the cursor. Defaults to 'forward'.
+  """
+  direction: HolidayPaginationDirection
+
+  """
+  (Optional) Advanced JSON filter to narrow down Holiday results. Follows Prisma where clause structure.
+  """
+  filter: Json
+
+  """
+  (Required) Filter Holiday records by their active status. Set to true to return only active records, false for inactive.
+  """
+  isActive: Boolean!
+
+  """(Optional) Search keyword to filter Holiday records by text fields."""
+  search: String
+
+  """
+  (Required) Number of Holiday records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
+  """
+  take: Int!
+}
+
+"""
+Paginated response wrapper for Holiday. Returns a paged list of Holiday records with pagination metadata and counts.
+"""
+type HolidayCursorPaginationResponse {
+  """
+  Operation result code for the Holiday pagination query. e.g. 'HOLIDAY_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of Holiday records. Null if the query failed."""
+  data: [Holiday!]
+
+  """Indicates if there is a next page of Holiday records available."""
+  hasNextPage: Boolean
+
+  """Indicates if there is a previous page of Holiday records available."""
+  hasPrevPage: Boolean
+
+  """Indicates whether the Holiday pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Holiday pagination query.
+  """
+  message: String
+
+  """
+  Cursor for fetching the next page of Holiday records. Null if there are no more pages.
+  """
+  nextCursor: String
+
+  """
+  Cursor for fetching the previous page of Holiday records. Null if there are no previous pages.
+  """
+  prevCursor: String
+}
+
+"""
 Paginated response wrapper for Holiday. Returns a paged list of Holiday records with pagination metadata and counts.
 """
 type HolidayDeletedListResponse {
@@ -2162,6 +2720,25 @@ type HolidayDeletedListResponse {
   Human-readable message describing the result of the Holiday pagination query.
   """
   message: String
+}
+
+"""
+Dynamic field lookup input for Holiday. Provide a unique field key and its value to find a single record.
+"""
+input HolidayFindByInput {
+  """The unique field name to search by (e.g. "id", "email", "username")."""
+  key: String!
+
+  """The value to match against the provided key field."""
+  value: String!
+}
+
+"""Dynamic where input for finding the first matching Holiday record."""
+input HolidayFindFirstInput {
+  """
+  Prisma where clause to match against Holiday fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
 }
 
 """
@@ -2209,6 +2786,11 @@ input HolidayPageInput {
 
   """(Optional) Search keyword to filter Holiday records by text fields."""
   search: String
+}
+
+enum HolidayPaginationDirection {
+  backward
+  forward
 }
 
 """
@@ -2442,6 +3024,76 @@ input JobLevelCreateOrConnectInput {
 }
 
 """
+Pagination and filtering input for querying JobLevel records. Use this to control which page of results to return and how to filter the dataset.
+"""
+input JobLevelCursorPaginationInput {
+  """
+  (Optional) The cursor for pagination. Use the ID of the last record from the previous page to fetch the next set of results.
+  """
+  cursor: String
+
+  """
+  (Optional) The direction for pagination. Set to 'forward' to fetch the next page of results after the cursor, or 'backward' to fetch the previous page before the cursor. Defaults to 'forward'.
+  """
+  direction: JobLevelPaginationDirection
+
+  """
+  (Optional) Advanced JSON filter to narrow down JobLevel results. Follows Prisma where clause structure.
+  """
+  filter: Json
+
+  """
+  (Required) Filter JobLevel records by their active status. Set to true to return only active records, false for inactive.
+  """
+  isActive: Boolean!
+
+  """(Optional) Search keyword to filter JobLevel records by text fields."""
+  search: String
+
+  """
+  (Required) Number of JobLevel records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
+  """
+  take: Int!
+}
+
+"""
+Paginated response wrapper for JobLevel. Returns a paged list of JobLevel records with pagination metadata and counts.
+"""
+type JobLevelCursorPaginationResponse {
+  """
+  Operation result code for the JobLevel pagination query. e.g. 'JOBLEVEL_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of JobLevel records. Null if the query failed."""
+  data: [JobLevel!]
+
+  """Indicates if there is a next page of JobLevel records available."""
+  hasNextPage: Boolean
+
+  """Indicates if there is a previous page of JobLevel records available."""
+  hasPrevPage: Boolean
+
+  """Indicates whether the JobLevel pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the JobLevel pagination query.
+  """
+  message: String
+
+  """
+  Cursor for fetching the next page of JobLevel records. Null if there are no more pages.
+  """
+  nextCursor: String
+
+  """
+  Cursor for fetching the previous page of JobLevel records. Null if there are no previous pages.
+  """
+  prevCursor: String
+}
+
+"""
 Paginated response wrapper for JobLevel. Returns a paged list of JobLevel records with pagination metadata and counts.
 """
 type JobLevelDeletedListResponse {
@@ -2460,6 +3112,25 @@ type JobLevelDeletedListResponse {
   Human-readable message describing the result of the JobLevel pagination query.
   """
   message: String
+}
+
+"""
+Dynamic field lookup input for JobLevel. Provide a unique field key and its value to find a single record.
+"""
+input JobLevelFindByInput {
+  """The unique field name to search by (e.g. "id", "email", "username")."""
+  key: String!
+
+  """The value to match against the provided key field."""
+  value: String!
+}
+
+"""Dynamic where input for finding the first matching JobLevel record."""
+input JobLevelFindFirstInput {
+  """
+  Prisma where clause to match against JobLevel fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
 }
 
 """
@@ -2507,6 +3178,11 @@ input JobLevelPageInput {
 
   """(Optional) Search keyword to filter JobLevel records by text fields."""
   search: String
+}
+
+enum JobLevelPaginationDirection {
+  backward
+  forward
 }
 
 """
@@ -2758,6 +3434,76 @@ input LocationCreateOrConnectInput {
 }
 
 """
+Pagination and filtering input for querying Location records. Use this to control which page of results to return and how to filter the dataset.
+"""
+input LocationCursorPaginationInput {
+  """
+  (Optional) The cursor for pagination. Use the ID of the last record from the previous page to fetch the next set of results.
+  """
+  cursor: String
+
+  """
+  (Optional) The direction for pagination. Set to 'forward' to fetch the next page of results after the cursor, or 'backward' to fetch the previous page before the cursor. Defaults to 'forward'.
+  """
+  direction: LocationPaginationDirection
+
+  """
+  (Optional) Advanced JSON filter to narrow down Location results. Follows Prisma where clause structure.
+  """
+  filter: Json
+
+  """
+  (Required) Filter Location records by their active status. Set to true to return only active records, false for inactive.
+  """
+  isActive: Boolean!
+
+  """(Optional) Search keyword to filter Location records by text fields."""
+  search: String
+
+  """
+  (Required) Number of Location records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
+  """
+  take: Int!
+}
+
+"""
+Paginated response wrapper for Location. Returns a paged list of Location records with pagination metadata and counts.
+"""
+type LocationCursorPaginationResponse {
+  """
+  Operation result code for the Location pagination query. e.g. 'LOCATION_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of Location records. Null if the query failed."""
+  data: [Location!]
+
+  """Indicates if there is a next page of Location records available."""
+  hasNextPage: Boolean
+
+  """Indicates if there is a previous page of Location records available."""
+  hasPrevPage: Boolean
+
+  """Indicates whether the Location pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Location pagination query.
+  """
+  message: String
+
+  """
+  Cursor for fetching the next page of Location records. Null if there are no more pages.
+  """
+  nextCursor: String
+
+  """
+  Cursor for fetching the previous page of Location records. Null if there are no previous pages.
+  """
+  prevCursor: String
+}
+
+"""
 Paginated response wrapper for Location. Returns a paged list of Location records with pagination metadata and counts.
 """
 type LocationDeletedListResponse {
@@ -2776,6 +3522,25 @@ type LocationDeletedListResponse {
   Human-readable message describing the result of the Location pagination query.
   """
   message: String
+}
+
+"""
+Dynamic field lookup input for Location. Provide a unique field key and its value to find a single record.
+"""
+input LocationFindByInput {
+  """The unique field name to search by (e.g. "id", "email", "username")."""
+  key: String!
+
+  """The value to match against the provided key field."""
+  value: String!
+}
+
+"""Dynamic where input for finding the first matching Location record."""
+input LocationFindFirstInput {
+  """
+  Prisma where clause to match against Location fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
 }
 
 """
@@ -2823,6 +3588,11 @@ input LocationPageInput {
 
   """(Optional) Search keyword to filter Location records by text fields."""
   search: String
+}
+
+enum LocationPaginationDirection {
+  backward
+  forward
 }
 
 """
@@ -5612,6 +6382,76 @@ input PermissionCreateOrConnectInput {
 }
 
 """
+Pagination and filtering input for querying Permission records. Use this to control which page of results to return and how to filter the dataset.
+"""
+input PermissionCursorPaginationInput {
+  """
+  (Optional) The cursor for pagination. Use the ID of the last record from the previous page to fetch the next set of results.
+  """
+  cursor: String
+
+  """
+  (Optional) The direction for pagination. Set to 'forward' to fetch the next page of results after the cursor, or 'backward' to fetch the previous page before the cursor. Defaults to 'forward'.
+  """
+  direction: PermissionPaginationDirection
+
+  """
+  (Optional) Advanced JSON filter to narrow down Permission results. Follows Prisma where clause structure.
+  """
+  filter: Json
+
+  """
+  (Required) Filter Permission records by their active status. Set to true to return only active records, false for inactive.
+  """
+  isActive: Boolean!
+
+  """(Optional) Search keyword to filter Permission records by text fields."""
+  search: String
+
+  """
+  (Required) Number of Permission records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
+  """
+  take: Int!
+}
+
+"""
+Paginated response wrapper for Permission. Returns a paged list of Permission records with pagination metadata and counts.
+"""
+type PermissionCursorPaginationResponse {
+  """
+  Operation result code for the Permission pagination query. e.g. 'PERMISSION_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of Permission records. Null if the query failed."""
+  data: [Permission!]
+
+  """Indicates if there is a next page of Permission records available."""
+  hasNextPage: Boolean
+
+  """Indicates if there is a previous page of Permission records available."""
+  hasPrevPage: Boolean
+
+  """Indicates whether the Permission pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Permission pagination query.
+  """
+  message: String
+
+  """
+  Cursor for fetching the next page of Permission records. Null if there are no more pages.
+  """
+  nextCursor: String
+
+  """
+  Cursor for fetching the previous page of Permission records. Null if there are no previous pages.
+  """
+  prevCursor: String
+}
+
+"""
 Paginated response wrapper for Permission. Returns a paged list of Permission records with pagination metadata and counts.
 """
 type PermissionDeletedListResponse {
@@ -5630,6 +6470,25 @@ type PermissionDeletedListResponse {
   Human-readable message describing the result of the Permission pagination query.
   """
   message: String
+}
+
+"""
+Dynamic field lookup input for Permission. Provide a unique field key and its value to find a single record.
+"""
+input PermissionFindByInput {
+  """The unique field name to search by (e.g. "id", "email", "username")."""
+  key: String!
+
+  """The value to match against the provided key field."""
+  value: String!
+}
+
+"""Dynamic where input for finding the first matching Permission record."""
+input PermissionFindFirstInput {
+  """
+  Prisma where clause to match against Permission fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
 }
 
 """
@@ -5677,6 +6536,11 @@ input PermissionPageInput {
 
   """(Optional) Search keyword to filter Permission records by text fields."""
   search: String
+}
+
+enum PermissionPaginationDirection {
+  backward
+  forward
 }
 
 """
@@ -5900,6 +6764,76 @@ input PositionCreateOrConnectInput {
 }
 
 """
+Pagination and filtering input for querying Position records. Use this to control which page of results to return and how to filter the dataset.
+"""
+input PositionCursorPaginationInput {
+  """
+  (Optional) The cursor for pagination. Use the ID of the last record from the previous page to fetch the next set of results.
+  """
+  cursor: String
+
+  """
+  (Optional) The direction for pagination. Set to 'forward' to fetch the next page of results after the cursor, or 'backward' to fetch the previous page before the cursor. Defaults to 'forward'.
+  """
+  direction: PositionPaginationDirection
+
+  """
+  (Optional) Advanced JSON filter to narrow down Position results. Follows Prisma where clause structure.
+  """
+  filter: Json
+
+  """
+  (Required) Filter Position records by their active status. Set to true to return only active records, false for inactive.
+  """
+  isActive: Boolean!
+
+  """(Optional) Search keyword to filter Position records by text fields."""
+  search: String
+
+  """
+  (Required) Number of Position records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
+  """
+  take: Int!
+}
+
+"""
+Paginated response wrapper for Position. Returns a paged list of Position records with pagination metadata and counts.
+"""
+type PositionCursorPaginationResponse {
+  """
+  Operation result code for the Position pagination query. e.g. 'POSITION_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of Position records. Null if the query failed."""
+  data: [Position!]
+
+  """Indicates if there is a next page of Position records available."""
+  hasNextPage: Boolean
+
+  """Indicates if there is a previous page of Position records available."""
+  hasPrevPage: Boolean
+
+  """Indicates whether the Position pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Position pagination query.
+  """
+  message: String
+
+  """
+  Cursor for fetching the next page of Position records. Null if there are no more pages.
+  """
+  nextCursor: String
+
+  """
+  Cursor for fetching the previous page of Position records. Null if there are no previous pages.
+  """
+  prevCursor: String
+}
+
+"""
 Paginated response wrapper for Position. Returns a paged list of Position records with pagination metadata and counts.
 """
 type PositionDeletedListResponse {
@@ -5918,6 +6852,25 @@ type PositionDeletedListResponse {
   Human-readable message describing the result of the Position pagination query.
   """
   message: String
+}
+
+"""
+Dynamic field lookup input for Position. Provide a unique field key and its value to find a single record.
+"""
+input PositionFindByInput {
+  """The unique field name to search by (e.g. "id", "email", "username")."""
+  key: String!
+
+  """The value to match against the provided key field."""
+  value: String!
+}
+
+"""Dynamic where input for finding the first matching Position record."""
+input PositionFindFirstInput {
+  """
+  Prisma where clause to match against Position fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
 }
 
 """
@@ -5965,6 +6918,11 @@ input PositionPageInput {
 
   """(Optional) Search keyword to filter Position records by text fields."""
   search: String
+}
+
+enum PositionPaginationDirection {
+  backward
+  forward
 }
 
 """
@@ -6094,6 +7052,16 @@ type Query {
     paginationInput: AuditLogPageInput!
   ): AuditLogPaginationResponse
 
+  """
+  Retrieve a paginated list of AuditLog records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  AuditLogFindAllWithCursor(
+    """Cursor pagination and filter options for the AuditLog list query."""
+    cursorInput: AuditLogCursorPaginationInput!
+  ): AuditLogCursorPaginationResponse
+  AuditLogFindBy(input: AuditLogFindByInput!): AuditLogResponse
+  AuditLogFindFirst(input: AuditLogFindFirstInput!): AuditLogResponse
+
   """Retrieve a single AuditLog record by its unique ID."""
   AuditLogFindUnique(
     """The unique identifier of the AuditLog record to retrieve."""
@@ -6107,6 +7075,18 @@ type Query {
     """Pagination and filter options for the BasicInformation list query."""
     paginationInput: BasicInformationPageInput!
   ): BasicInformationPaginationResponse
+
+  """
+  Retrieve a paginated list of BasicInformation records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  BasicInformationFindAllWithCursor(
+    """
+    Cursor pagination and filter options for the BasicInformation list query.
+    """
+    cursorInput: BasicInformationCursorPaginationInput!
+  ): BasicInformationCursorPaginationResponse
+  BasicInformationFindBy(input: BasicInformationFindByInput!): BasicInformationResponse
+  BasicInformationFindFirst(input: BasicInformationFindFirstInput!): BasicInformationResponse
 
   """Retrieve a single BasicInformation record by its unique ID."""
   BasicInformationFindUnique(
@@ -6122,6 +7102,16 @@ type Query {
     paginationInput: CompanyPageInput!
   ): CompanyPaginationResponse
 
+  """
+  Retrieve a paginated list of Company records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  CompanyFindAllWithCursor(
+    """Cursor pagination and filter options for the Company list query."""
+    cursorInput: CompanyCursorPaginationInput!
+  ): CompanyCursorPaginationResponse
+  CompanyFindBy(input: CompanyFindByInput!): CompanyResponse
+  CompanyFindFirst(input: CompanyFindFirstInput!): CompanyResponse
+
   """Retrieve a single Company record by its unique ID."""
   CompanyFindUnique(
     """The unique identifier of the Company record to retrieve."""
@@ -6135,6 +7125,16 @@ type Query {
     """Pagination and filter options for the Department list query."""
     paginationInput: DepartmentPageInput!
   ): DepartmentPaginationResponse
+
+  """
+  Retrieve a paginated list of Department records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  DepartmentFindAllWithCursor(
+    """Cursor pagination and filter options for the Department list query."""
+    cursorInput: DepartmentCursorPaginationInput!
+  ): DepartmentCursorPaginationResponse
+  DepartmentFindBy(input: DepartmentFindByInput!): DepartmentResponse
+  DepartmentFindFirst(input: DepartmentFindFirstInput!): DepartmentResponse
 
   """Retrieve a single Department record by its unique ID."""
   DepartmentFindUnique(
@@ -6150,6 +7150,18 @@ type Query {
     paginationInput: GroupOfCompanyPageInput!
   ): GroupOfCompanyPaginationResponse
 
+  """
+  Retrieve a paginated list of GroupOfCompany records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  GroupOfCompanyFindAllWithCursor(
+    """
+    Cursor pagination and filter options for the GroupOfCompany list query.
+    """
+    cursorInput: GroupOfCompanyCursorPaginationInput!
+  ): GroupOfCompanyCursorPaginationResponse
+  GroupOfCompanyFindBy(input: GroupOfCompanyFindByInput!): GroupOfCompanyResponse
+  GroupOfCompanyFindFirst(input: GroupOfCompanyFindFirstInput!): GroupOfCompanyResponse
+
   """Retrieve a single GroupOfCompany record by its unique ID."""
   GroupOfCompanyFindUnique(
     """The unique identifier of the GroupOfCompany record to retrieve."""
@@ -6163,6 +7175,16 @@ type Query {
     """Pagination and filter options for the Holiday list query."""
     paginationInput: HolidayPageInput!
   ): HolidayPaginationResponse
+
+  """
+  Retrieve a paginated list of Holiday records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  HolidayFindAllWithCursor(
+    """Cursor pagination and filter options for the Holiday list query."""
+    cursorInput: HolidayCursorPaginationInput!
+  ): HolidayCursorPaginationResponse
+  HolidayFindBy(input: HolidayFindByInput!): HolidayResponse
+  HolidayFindFirst(input: HolidayFindFirstInput!): HolidayResponse
 
   """Retrieve a single Holiday record by its unique ID."""
   HolidayFindUnique(
@@ -6178,6 +7200,16 @@ type Query {
     paginationInput: JobLevelPageInput!
   ): JobLevelPaginationResponse
 
+  """
+  Retrieve a paginated list of JobLevel records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  JobLevelFindAllWithCursor(
+    """Cursor pagination and filter options for the JobLevel list query."""
+    cursorInput: JobLevelCursorPaginationInput!
+  ): JobLevelCursorPaginationResponse
+  JobLevelFindBy(input: JobLevelFindByInput!): JobLevelResponse
+  JobLevelFindFirst(input: JobLevelFindFirstInput!): JobLevelResponse
+
   """Retrieve a single JobLevel record by its unique ID."""
   JobLevelFindUnique(
     """The unique identifier of the JobLevel record to retrieve."""
@@ -6191,6 +7223,16 @@ type Query {
     """Pagination and filter options for the Location list query."""
     paginationInput: LocationPageInput!
   ): LocationPaginationResponse
+
+  """
+  Retrieve a paginated list of Location records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  LocationFindAllWithCursor(
+    """Cursor pagination and filter options for the Location list query."""
+    cursorInput: LocationCursorPaginationInput!
+  ): LocationCursorPaginationResponse
+  LocationFindBy(input: LocationFindByInput!): LocationResponse
+  LocationFindFirst(input: LocationFindFirstInput!): LocationResponse
 
   """Retrieve a single Location record by its unique ID."""
   LocationFindUnique(
@@ -6206,6 +7248,16 @@ type Query {
     paginationInput: PermissionPageInput!
   ): PermissionPaginationResponse
 
+  """
+  Retrieve a paginated list of Permission records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  PermissionFindAllWithCursor(
+    """Cursor pagination and filter options for the Permission list query."""
+    cursorInput: PermissionCursorPaginationInput!
+  ): PermissionCursorPaginationResponse
+  PermissionFindBy(input: PermissionFindByInput!): PermissionResponse
+  PermissionFindFirst(input: PermissionFindFirstInput!): PermissionResponse
+
   """Retrieve a single Permission record by its unique ID."""
   PermissionFindUnique(
     """The unique identifier of the Permission record to retrieve."""
@@ -6219,6 +7271,16 @@ type Query {
     """Pagination and filter options for the Position list query."""
     paginationInput: PositionPageInput!
   ): PositionPaginationResponse
+
+  """
+  Retrieve a paginated list of Position records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  PositionFindAllWithCursor(
+    """Cursor pagination and filter options for the Position list query."""
+    cursorInput: PositionCursorPaginationInput!
+  ): PositionCursorPaginationResponse
+  PositionFindBy(input: PositionFindByInput!): PositionResponse
+  PositionFindFirst(input: PositionFindFirstInput!): PositionResponse
 
   """Retrieve a single Position record by its unique ID."""
   PositionFindUnique(
@@ -6234,6 +7296,16 @@ type Query {
     paginationInput: RolePageInput!
   ): RolePaginationResponse
 
+  """
+  Retrieve a paginated list of Role records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  RoleFindAllWithCursor(
+    """Cursor pagination and filter options for the Role list query."""
+    cursorInput: RoleCursorPaginationInput!
+  ): RoleCursorPaginationResponse
+  RoleFindBy(input: RoleFindByInput!): RoleResponse
+  RoleFindFirst(input: RoleFindFirstInput!): RoleResponse
+
   """Retrieve a single Role record by its unique ID."""
   RoleFindUnique(
     """The unique identifier of the Role record to retrieve."""
@@ -6247,6 +7319,18 @@ type Query {
     """Pagination and filter options for the RolePermission list query."""
     paginationInput: RolePermissionPageInput!
   ): RolePermissionPaginationResponse
+
+  """
+  Retrieve a paginated list of RolePermission records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  RolePermissionFindAllWithCursor(
+    """
+    Cursor pagination and filter options for the RolePermission list query.
+    """
+    cursorInput: RolePermissionCursorPaginationInput!
+  ): RolePermissionCursorPaginationResponse
+  RolePermissionFindBy(input: RolePermissionFindByInput!): RolePermissionResponse
+  RolePermissionFindFirst(input: RolePermissionFindFirstInput!): RolePermissionResponse
 
   """Retrieve a single RolePermission record by its unique ID."""
   RolePermissionFindUnique(
@@ -6262,6 +7346,18 @@ type Query {
     paginationInput: ShiftingSchedulePageInput!
   ): ShiftingSchedulePaginationResponse
 
+  """
+  Retrieve a paginated list of ShiftingSchedule records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  ShiftingScheduleFindAllWithCursor(
+    """
+    Cursor pagination and filter options for the ShiftingSchedule list query.
+    """
+    cursorInput: ShiftingScheduleCursorPaginationInput!
+  ): ShiftingScheduleCursorPaginationResponse
+  ShiftingScheduleFindBy(input: ShiftingScheduleFindByInput!): ShiftingScheduleResponse
+  ShiftingScheduleFindFirst(input: ShiftingScheduleFindFirstInput!): ShiftingScheduleResponse
+
   """Retrieve a single ShiftingSchedule record by its unique ID."""
   ShiftingScheduleFindUnique(
     """The unique identifier of the ShiftingSchedule record to retrieve."""
@@ -6275,6 +7371,16 @@ type Query {
     """Pagination and filter options for the Status list query."""
     paginationInput: StatusPageInput!
   ): StatusPaginationResponse
+
+  """
+  Retrieve a paginated list of Status records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  StatusFindAllWithCursor(
+    """Cursor pagination and filter options for the Status list query."""
+    cursorInput: StatusCursorPaginationInput!
+  ): StatusCursorPaginationResponse
+  StatusFindBy(input: StatusFindByInput!): StatusResponse
+  StatusFindFirst(input: StatusFindFirstInput!): StatusResponse
 
   """Retrieve a single Status record by its unique ID."""
   StatusFindUnique(
@@ -6290,6 +7396,16 @@ type Query {
     paginationInput: TypePageInput!
   ): TypePaginationResponse
 
+  """
+  Retrieve a paginated list of Type records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  TypeFindAllWithCursor(
+    """Cursor pagination and filter options for the Type list query."""
+    cursorInput: TypeCursorPaginationInput!
+  ): TypeCursorPaginationResponse
+  TypeFindBy(input: TypeFindByInput!): TypeResponse
+  TypeFindFirst(input: TypeFindFirstInput!): TypeResponse
+
   """Retrieve a single Type record by its unique ID."""
   TypeFindUnique(
     """The unique identifier of the Type record to retrieve."""
@@ -6303,6 +7419,16 @@ type Query {
     """Pagination and filter options for the User list query."""
     paginationInput: UserPageInput!
   ): UserPaginationResponse
+
+  """
+  Retrieve a paginated list of User records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  UserFindAllWithCursor(
+    """Cursor pagination and filter options for the User list query."""
+    cursorInput: UserCursorPaginationInput!
+  ): UserCursorPaginationResponse
+  UserFindBy(input: UserFindByInput!): UserResponse
+  UserFindFirst(input: UserFindFirstInput!): UserResponse
 
   """Retrieve a single User record by its unique ID."""
   UserFindUnique(
@@ -6318,6 +7444,16 @@ type Query {
     paginationInput: UserRolePageInput!
   ): UserRolePaginationResponse
 
+  """
+  Retrieve a paginated list of UserRole records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  UserRoleFindAllWithCursor(
+    """Cursor pagination and filter options for the UserRole list query."""
+    cursorInput: UserRoleCursorPaginationInput!
+  ): UserRoleCursorPaginationResponse
+  UserRoleFindBy(input: UserRoleFindByInput!): UserRoleResponse
+  UserRoleFindFirst(input: UserRoleFindFirstInput!): UserRoleResponse
+
   """Retrieve a single UserRole record by its unique ID."""
   UserRoleFindUnique(
     """The unique identifier of the UserRole record to retrieve."""
@@ -6331,6 +7467,18 @@ type Query {
     """Pagination and filter options for the WorkInformation list query."""
     paginationInput: WorkInformationPageInput!
   ): WorkInformationPaginationResponse
+
+  """
+  Retrieve a paginated list of WorkInformation records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  WorkInformationFindAllWithCursor(
+    """
+    Cursor pagination and filter options for the WorkInformation list query.
+    """
+    cursorInput: WorkInformationCursorPaginationInput!
+  ): WorkInformationCursorPaginationResponse
+  WorkInformationFindBy(input: WorkInformationFindByInput!): WorkInformationResponse
+  WorkInformationFindFirst(input: WorkInformationFindFirstInput!): WorkInformationResponse
 
   """Retrieve a single WorkInformation record by its unique ID."""
   WorkInformationFindUnique(
@@ -6429,6 +7577,76 @@ input RoleCreateOrConnectInput {
 }
 
 """
+Pagination and filtering input for querying Role records. Use this to control which page of results to return and how to filter the dataset.
+"""
+input RoleCursorPaginationInput {
+  """
+  (Optional) The cursor for pagination. Use the ID of the last record from the previous page to fetch the next set of results.
+  """
+  cursor: String
+
+  """
+  (Optional) The direction for pagination. Set to 'forward' to fetch the next page of results after the cursor, or 'backward' to fetch the previous page before the cursor. Defaults to 'forward'.
+  """
+  direction: RolePaginationDirection
+
+  """
+  (Optional) Advanced JSON filter to narrow down Role results. Follows Prisma where clause structure.
+  """
+  filter: Json
+
+  """
+  (Required) Filter Role records by their active status. Set to true to return only active records, false for inactive.
+  """
+  isActive: Boolean!
+
+  """(Optional) Search keyword to filter Role records by text fields."""
+  search: String
+
+  """
+  (Required) Number of Role records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
+  """
+  take: Int!
+}
+
+"""
+Paginated response wrapper for Role. Returns a paged list of Role records with pagination metadata and counts.
+"""
+type RoleCursorPaginationResponse {
+  """
+  Operation result code for the Role pagination query. e.g. 'ROLE_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of Role records. Null if the query failed."""
+  data: [Role!]
+
+  """Indicates if there is a next page of Role records available."""
+  hasNextPage: Boolean
+
+  """Indicates if there is a previous page of Role records available."""
+  hasPrevPage: Boolean
+
+  """Indicates whether the Role pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Role pagination query.
+  """
+  message: String
+
+  """
+  Cursor for fetching the next page of Role records. Null if there are no more pages.
+  """
+  nextCursor: String
+
+  """
+  Cursor for fetching the previous page of Role records. Null if there are no previous pages.
+  """
+  prevCursor: String
+}
+
+"""
 Paginated response wrapper for Role. Returns a paged list of Role records with pagination metadata and counts.
 """
 type RoleDeletedListResponse {
@@ -6447,6 +7665,25 @@ type RoleDeletedListResponse {
   Human-readable message describing the result of the Role pagination query.
   """
   message: String
+}
+
+"""
+Dynamic field lookup input for Role. Provide a unique field key and its value to find a single record.
+"""
+input RoleFindByInput {
+  """The unique field name to search by (e.g. "id", "email", "username")."""
+  key: String!
+
+  """The value to match against the provided key field."""
+  value: String!
+}
+
+"""Dynamic where input for finding the first matching Role record."""
+input RoleFindFirstInput {
+  """
+  Prisma where clause to match against Role fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
 }
 
 """
@@ -6494,6 +7731,11 @@ input RolePageInput {
 
   """(Optional) Search keyword to filter Role records by text fields."""
   search: String
+}
+
+enum RolePaginationDirection {
+  backward
+  forward
 }
 
 """
@@ -6654,6 +7896,80 @@ input RolePermissionCreateOrConnectInput {
 }
 
 """
+Pagination and filtering input for querying RolePermission records. Use this to control which page of results to return and how to filter the dataset.
+"""
+input RolePermissionCursorPaginationInput {
+  """
+  (Optional) The cursor for pagination. Use the ID of the last record from the previous page to fetch the next set of results.
+  """
+  cursor: String
+
+  """
+  (Optional) The direction for pagination. Set to 'forward' to fetch the next page of results after the cursor, or 'backward' to fetch the previous page before the cursor. Defaults to 'forward'.
+  """
+  direction: RolePermissionPaginationDirection
+
+  """
+  (Optional) Advanced JSON filter to narrow down RolePermission results. Follows Prisma where clause structure.
+  """
+  filter: Json
+
+  """
+  (Required) Filter RolePermission records by their active status. Set to true to return only active records, false for inactive.
+  """
+  isActive: Boolean!
+
+  """
+  (Optional) Search keyword to filter RolePermission records by text fields.
+  """
+  search: String
+
+  """
+  (Required) Number of RolePermission records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
+  """
+  take: Int!
+}
+
+"""
+Paginated response wrapper for RolePermission. Returns a paged list of RolePermission records with pagination metadata and counts.
+"""
+type RolePermissionCursorPaginationResponse {
+  """
+  Operation result code for the RolePermission pagination query. e.g. 'ROLEPERMISSION_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of RolePermission records. Null if the query failed."""
+  data: [RolePermission!]
+
+  """Indicates if there is a next page of RolePermission records available."""
+  hasNextPage: Boolean
+
+  """
+  Indicates if there is a previous page of RolePermission records available.
+  """
+  hasPrevPage: Boolean
+
+  """Indicates whether the RolePermission pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the RolePermission pagination query.
+  """
+  message: String
+
+  """
+  Cursor for fetching the next page of RolePermission records. Null if there are no more pages.
+  """
+  nextCursor: String
+
+  """
+  Cursor for fetching the previous page of RolePermission records. Null if there are no previous pages.
+  """
+  prevCursor: String
+}
+
+"""
 Paginated response wrapper for RolePermission. Returns a paged list of RolePermission records with pagination metadata and counts.
 """
 type RolePermissionDeletedListResponse {
@@ -6672,6 +7988,27 @@ type RolePermissionDeletedListResponse {
   Human-readable message describing the result of the RolePermission pagination query.
   """
   message: String
+}
+
+"""
+Dynamic field lookup input for RolePermission. Provide a unique field key and its value to find a single record.
+"""
+input RolePermissionFindByInput {
+  """The unique field name to search by (e.g. "id", "email", "username")."""
+  key: String!
+
+  """The value to match against the provided key field."""
+  value: String!
+}
+
+"""
+Dynamic where input for finding the first matching RolePermission record.
+"""
+input RolePermissionFindFirstInput {
+  """
+  Prisma where clause to match against RolePermission fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
 }
 
 """
@@ -6721,6 +8058,11 @@ input RolePermissionPageInput {
   (Optional) Search keyword to filter RolePermission records by text fields.
   """
   search: String
+}
+
+enum RolePermissionPaginationDirection {
+  backward
+  forward
 }
 
 """
@@ -7105,6 +8447,86 @@ input ShiftingScheduleCreateOrConnectInput {
 }
 
 """
+Pagination and filtering input for querying ShiftingSchedule records. Use this to control which page of results to return and how to filter the dataset.
+"""
+input ShiftingScheduleCursorPaginationInput {
+  """
+  (Optional) The cursor for pagination. Use the ID of the last record from the previous page to fetch the next set of results.
+  """
+  cursor: String
+
+  """
+  (Optional) The direction for pagination. Set to 'forward' to fetch the next page of results after the cursor, or 'backward' to fetch the previous page before the cursor. Defaults to 'forward'.
+  """
+  direction: ShiftingSchedulePaginationDirection
+
+  """
+  (Optional) Advanced JSON filter to narrow down ShiftingSchedule results. Follows Prisma where clause structure.
+  """
+  filter: Json
+
+  """
+  (Required) Filter ShiftingSchedule records by their active status. Set to true to return only active records, false for inactive.
+  """
+  isActive: Boolean!
+
+  """
+  (Optional) Search keyword to filter ShiftingSchedule records by text fields.
+  """
+  search: String
+
+  """
+  (Required) Number of ShiftingSchedule records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
+  """
+  take: Int!
+}
+
+"""
+Paginated response wrapper for ShiftingSchedule. Returns a paged list of ShiftingSchedule records with pagination metadata and counts.
+"""
+type ShiftingScheduleCursorPaginationResponse {
+  """
+  Operation result code for the ShiftingSchedule pagination query. e.g. 'SHIFTINGSCHEDULE_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """
+  The current page of ShiftingSchedule records. Null if the query failed.
+  """
+  data: [ShiftingSchedule!]
+
+  """
+  Indicates if there is a next page of ShiftingSchedule records available.
+  """
+  hasNextPage: Boolean
+
+  """
+  Indicates if there is a previous page of ShiftingSchedule records available.
+  """
+  hasPrevPage: Boolean
+
+  """
+  Indicates whether the ShiftingSchedule pagination query was successful.
+  """
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the ShiftingSchedule pagination query.
+  """
+  message: String
+
+  """
+  Cursor for fetching the next page of ShiftingSchedule records. Null if there are no more pages.
+  """
+  nextCursor: String
+
+  """
+  Cursor for fetching the previous page of ShiftingSchedule records. Null if there are no previous pages.
+  """
+  prevCursor: String
+}
+
+"""
 Paginated response wrapper for ShiftingSchedule. Returns a paged list of ShiftingSchedule records with pagination metadata and counts.
 """
 type ShiftingScheduleDeletedListResponse {
@@ -7127,6 +8549,27 @@ type ShiftingScheduleDeletedListResponse {
   Human-readable message describing the result of the ShiftingSchedule pagination query.
   """
   message: String
+}
+
+"""
+Dynamic field lookup input for ShiftingSchedule. Provide a unique field key and its value to find a single record.
+"""
+input ShiftingScheduleFindByInput {
+  """The unique field name to search by (e.g. "id", "email", "username")."""
+  key: String!
+
+  """The value to match against the provided key field."""
+  value: String!
+}
+
+"""
+Dynamic where input for finding the first matching ShiftingSchedule record.
+"""
+input ShiftingScheduleFindFirstInput {
+  """
+  Prisma where clause to match against ShiftingSchedule fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
 }
 
 """
@@ -7176,6 +8619,11 @@ input ShiftingSchedulePageInput {
   (Optional) Search keyword to filter ShiftingSchedule records by text fields.
   """
   search: String
+}
+
+enum ShiftingSchedulePaginationDirection {
+  backward
+  forward
 }
 
 """
@@ -7425,6 +8873,76 @@ input StatusCreateOrConnectInput {
 }
 
 """
+Pagination and filtering input for querying Status records. Use this to control which page of results to return and how to filter the dataset.
+"""
+input StatusCursorPaginationInput {
+  """
+  (Optional) The cursor for pagination. Use the ID of the last record from the previous page to fetch the next set of results.
+  """
+  cursor: String
+
+  """
+  (Optional) The direction for pagination. Set to 'forward' to fetch the next page of results after the cursor, or 'backward' to fetch the previous page before the cursor. Defaults to 'forward'.
+  """
+  direction: StatusPaginationDirection
+
+  """
+  (Optional) Advanced JSON filter to narrow down Status results. Follows Prisma where clause structure.
+  """
+  filter: Json
+
+  """
+  (Required) Filter Status records by their active status. Set to true to return only active records, false for inactive.
+  """
+  isActive: Boolean!
+
+  """(Optional) Search keyword to filter Status records by text fields."""
+  search: String
+
+  """
+  (Required) Number of Status records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
+  """
+  take: Int!
+}
+
+"""
+Paginated response wrapper for Status. Returns a paged list of Status records with pagination metadata and counts.
+"""
+type StatusCursorPaginationResponse {
+  """
+  Operation result code for the Status pagination query. e.g. 'STATUS_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of Status records. Null if the query failed."""
+  data: [Status!]
+
+  """Indicates if there is a next page of Status records available."""
+  hasNextPage: Boolean
+
+  """Indicates if there is a previous page of Status records available."""
+  hasPrevPage: Boolean
+
+  """Indicates whether the Status pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Status pagination query.
+  """
+  message: String
+
+  """
+  Cursor for fetching the next page of Status records. Null if there are no more pages.
+  """
+  nextCursor: String
+
+  """
+  Cursor for fetching the previous page of Status records. Null if there are no previous pages.
+  """
+  prevCursor: String
+}
+
+"""
 Paginated response wrapper for Status. Returns a paged list of Status records with pagination metadata and counts.
 """
 type StatusDeletedListResponse {
@@ -7443,6 +8961,25 @@ type StatusDeletedListResponse {
   Human-readable message describing the result of the Status pagination query.
   """
   message: String
+}
+
+"""
+Dynamic field lookup input for Status. Provide a unique field key and its value to find a single record.
+"""
+input StatusFindByInput {
+  """The unique field name to search by (e.g. "id", "email", "username")."""
+  key: String!
+
+  """The value to match against the provided key field."""
+  value: String!
+}
+
+"""Dynamic where input for finding the first matching Status record."""
+input StatusFindFirstInput {
+  """
+  Prisma where clause to match against Status fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
 }
 
 """
@@ -7490,6 +9027,11 @@ input StatusPageInput {
 
   """(Optional) Search keyword to filter Status records by text fields."""
   search: String
+}
+
+enum StatusPaginationDirection {
+  backward
+  forward
 }
 
 """
@@ -7824,6 +9366,76 @@ input TypeCreateOrConnectInput {
 }
 
 """
+Pagination and filtering input for querying Type records. Use this to control which page of results to return and how to filter the dataset.
+"""
+input TypeCursorPaginationInput {
+  """
+  (Optional) The cursor for pagination. Use the ID of the last record from the previous page to fetch the next set of results.
+  """
+  cursor: String
+
+  """
+  (Optional) The direction for pagination. Set to 'forward' to fetch the next page of results after the cursor, or 'backward' to fetch the previous page before the cursor. Defaults to 'forward'.
+  """
+  direction: TypePaginationDirection
+
+  """
+  (Optional) Advanced JSON filter to narrow down Type results. Follows Prisma where clause structure.
+  """
+  filter: Json
+
+  """
+  (Required) Filter Type records by their active status. Set to true to return only active records, false for inactive.
+  """
+  isActive: Boolean!
+
+  """(Optional) Search keyword to filter Type records by text fields."""
+  search: String
+
+  """
+  (Required) Number of Type records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
+  """
+  take: Int!
+}
+
+"""
+Paginated response wrapper for Type. Returns a paged list of Type records with pagination metadata and counts.
+"""
+type TypeCursorPaginationResponse {
+  """
+  Operation result code for the Type pagination query. e.g. 'TYPE_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of Type records. Null if the query failed."""
+  data: [Type!]
+
+  """Indicates if there is a next page of Type records available."""
+  hasNextPage: Boolean
+
+  """Indicates if there is a previous page of Type records available."""
+  hasPrevPage: Boolean
+
+  """Indicates whether the Type pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Type pagination query.
+  """
+  message: String
+
+  """
+  Cursor for fetching the next page of Type records. Null if there are no more pages.
+  """
+  nextCursor: String
+
+  """
+  Cursor for fetching the previous page of Type records. Null if there are no previous pages.
+  """
+  prevCursor: String
+}
+
+"""
 Paginated response wrapper for Type. Returns a paged list of Type records with pagination metadata and counts.
 """
 type TypeDeletedListResponse {
@@ -7842,6 +9454,25 @@ type TypeDeletedListResponse {
   Human-readable message describing the result of the Type pagination query.
   """
   message: String
+}
+
+"""
+Dynamic field lookup input for Type. Provide a unique field key and its value to find a single record.
+"""
+input TypeFindByInput {
+  """The unique field name to search by (e.g. "id", "email", "username")."""
+  key: String!
+
+  """The value to match against the provided key field."""
+  value: String!
+}
+
+"""Dynamic where input for finding the first matching Type record."""
+input TypeFindFirstInput {
+  """
+  Prisma where clause to match against Type fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
 }
 
 """
@@ -7889,6 +9520,11 @@ input TypePageInput {
 
   """(Optional) Search keyword to filter Type records by text fields."""
   search: String
+}
+
+enum TypePaginationDirection {
+  backward
+  forward
 }
 
 """
@@ -8163,6 +9799,76 @@ input UserCreateOrConnectInput {
 }
 
 """
+Pagination and filtering input for querying User records. Use this to control which page of results to return and how to filter the dataset.
+"""
+input UserCursorPaginationInput {
+  """
+  (Optional) The cursor for pagination. Use the ID of the last record from the previous page to fetch the next set of results.
+  """
+  cursor: String
+
+  """
+  (Optional) The direction for pagination. Set to 'forward' to fetch the next page of results after the cursor, or 'backward' to fetch the previous page before the cursor. Defaults to 'forward'.
+  """
+  direction: UserPaginationDirection
+
+  """
+  (Optional) Advanced JSON filter to narrow down User results. Follows Prisma where clause structure.
+  """
+  filter: Json
+
+  """
+  (Required) Filter User records by their active status. Set to true to return only active records, false for inactive.
+  """
+  isActive: Boolean!
+
+  """(Optional) Search keyword to filter User records by text fields."""
+  search: String
+
+  """
+  (Required) Number of User records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
+  """
+  take: Int!
+}
+
+"""
+Paginated response wrapper for User. Returns a paged list of User records with pagination metadata and counts.
+"""
+type UserCursorPaginationResponse {
+  """
+  Operation result code for the User pagination query. e.g. 'USER_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of User records. Null if the query failed."""
+  data: [User!]
+
+  """Indicates if there is a next page of User records available."""
+  hasNextPage: Boolean
+
+  """Indicates if there is a previous page of User records available."""
+  hasPrevPage: Boolean
+
+  """Indicates whether the User pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the User pagination query.
+  """
+  message: String
+
+  """
+  Cursor for fetching the next page of User records. Null if there are no more pages.
+  """
+  nextCursor: String
+
+  """
+  Cursor for fetching the previous page of User records. Null if there are no previous pages.
+  """
+  prevCursor: String
+}
+
+"""
 Paginated response wrapper for User. Returns a paged list of User records with pagination metadata and counts.
 """
 type UserDeletedListResponse {
@@ -8181,6 +9887,25 @@ type UserDeletedListResponse {
   Human-readable message describing the result of the User pagination query.
   """
   message: String
+}
+
+"""
+Dynamic field lookup input for User. Provide a unique field key and its value to find a single record.
+"""
+input UserFindByInput {
+  """The unique field name to search by (e.g. "id", "email", "username")."""
+  key: String!
+
+  """The value to match against the provided key field."""
+  value: String!
+}
+
+"""Dynamic where input for finding the first matching User record."""
+input UserFindFirstInput {
+  """
+  Prisma where clause to match against User fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
 }
 
 """
@@ -8244,6 +9969,11 @@ input UserPageInput {
 
   """(Optional) Search keyword to filter User records by text fields."""
   search: String
+}
+
+enum UserPaginationDirection {
+  backward
+  forward
 }
 
 """
@@ -8403,6 +10133,76 @@ input UserRoleCreateOrConnectInput {
 }
 
 """
+Pagination and filtering input for querying UserRole records. Use this to control which page of results to return and how to filter the dataset.
+"""
+input UserRoleCursorPaginationInput {
+  """
+  (Optional) The cursor for pagination. Use the ID of the last record from the previous page to fetch the next set of results.
+  """
+  cursor: String
+
+  """
+  (Optional) The direction for pagination. Set to 'forward' to fetch the next page of results after the cursor, or 'backward' to fetch the previous page before the cursor. Defaults to 'forward'.
+  """
+  direction: UserRolePaginationDirection
+
+  """
+  (Optional) Advanced JSON filter to narrow down UserRole results. Follows Prisma where clause structure.
+  """
+  filter: Json
+
+  """
+  (Required) Filter UserRole records by their active status. Set to true to return only active records, false for inactive.
+  """
+  isActive: Boolean!
+
+  """(Optional) Search keyword to filter UserRole records by text fields."""
+  search: String
+
+  """
+  (Required) Number of UserRole records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
+  """
+  take: Int!
+}
+
+"""
+Paginated response wrapper for UserRole. Returns a paged list of UserRole records with pagination metadata and counts.
+"""
+type UserRoleCursorPaginationResponse {
+  """
+  Operation result code for the UserRole pagination query. e.g. 'USERROLE_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of UserRole records. Null if the query failed."""
+  data: [UserRole!]
+
+  """Indicates if there is a next page of UserRole records available."""
+  hasNextPage: Boolean
+
+  """Indicates if there is a previous page of UserRole records available."""
+  hasPrevPage: Boolean
+
+  """Indicates whether the UserRole pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the UserRole pagination query.
+  """
+  message: String
+
+  """
+  Cursor for fetching the next page of UserRole records. Null if there are no more pages.
+  """
+  nextCursor: String
+
+  """
+  Cursor for fetching the previous page of UserRole records. Null if there are no previous pages.
+  """
+  prevCursor: String
+}
+
+"""
 Paginated response wrapper for UserRole. Returns a paged list of UserRole records with pagination metadata and counts.
 """
 type UserRoleDeletedListResponse {
@@ -8421,6 +10221,25 @@ type UserRoleDeletedListResponse {
   Human-readable message describing the result of the UserRole pagination query.
   """
   message: String
+}
+
+"""
+Dynamic field lookup input for UserRole. Provide a unique field key and its value to find a single record.
+"""
+input UserRoleFindByInput {
+  """The unique field name to search by (e.g. "id", "email", "username")."""
+  key: String!
+
+  """The value to match against the provided key field."""
+  value: String!
+}
+
+"""Dynamic where input for finding the first matching UserRole record."""
+input UserRoleFindFirstInput {
+  """
+  Prisma where clause to match against UserRole fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
 }
 
 """
@@ -8468,6 +10287,11 @@ input UserRolePageInput {
 
   """(Optional) Search keyword to filter UserRole records by text fields."""
   search: String
+}
+
+enum UserRolePaginationDirection {
+  backward
+  forward
 }
 
 """
@@ -9026,6 +10850,82 @@ input WorkInformationCreateOrConnectInput {
 }
 
 """
+Pagination and filtering input for querying WorkInformation records. Use this to control which page of results to return and how to filter the dataset.
+"""
+input WorkInformationCursorPaginationInput {
+  """
+  (Optional) The cursor for pagination. Use the ID of the last record from the previous page to fetch the next set of results.
+  """
+  cursor: String
+
+  """
+  (Optional) The direction for pagination. Set to 'forward' to fetch the next page of results after the cursor, or 'backward' to fetch the previous page before the cursor. Defaults to 'forward'.
+  """
+  direction: WorkInformationPaginationDirection
+
+  """
+  (Optional) Advanced JSON filter to narrow down WorkInformation results. Follows Prisma where clause structure.
+  """
+  filter: Json
+
+  """
+  (Required) Filter WorkInformation records by their active status. Set to true to return only active records, false for inactive.
+  """
+  isActive: Boolean!
+
+  """
+  (Optional) Search keyword to filter WorkInformation records by text fields.
+  """
+  search: String
+
+  """
+  (Required) Number of WorkInformation records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
+  """
+  take: Int!
+}
+
+"""
+Paginated response wrapper for WorkInformation. Returns a paged list of WorkInformation records with pagination metadata and counts.
+"""
+type WorkInformationCursorPaginationResponse {
+  """
+  Operation result code for the WorkInformation pagination query. e.g. 'WORKINFORMATION_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of WorkInformation records. Null if the query failed."""
+  data: [WorkInformation!]
+
+  """
+  Indicates if there is a next page of WorkInformation records available.
+  """
+  hasNextPage: Boolean
+
+  """
+  Indicates if there is a previous page of WorkInformation records available.
+  """
+  hasPrevPage: Boolean
+
+  """Indicates whether the WorkInformation pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the WorkInformation pagination query.
+  """
+  message: String
+
+  """
+  Cursor for fetching the next page of WorkInformation records. Null if there are no more pages.
+  """
+  nextCursor: String
+
+  """
+  Cursor for fetching the previous page of WorkInformation records. Null if there are no previous pages.
+  """
+  prevCursor: String
+}
+
+"""
 Paginated response wrapper for WorkInformation. Returns a paged list of WorkInformation records with pagination metadata and counts.
 """
 type WorkInformationDeletedListResponse {
@@ -9044,6 +10944,27 @@ type WorkInformationDeletedListResponse {
   Human-readable message describing the result of the WorkInformation pagination query.
   """
   message: String
+}
+
+"""
+Dynamic field lookup input for WorkInformation. Provide a unique field key and its value to find a single record.
+"""
+input WorkInformationFindByInput {
+  """The unique field name to search by (e.g. "id", "email", "username")."""
+  key: String!
+
+  """The value to match against the provided key field."""
+  value: String!
+}
+
+"""
+Dynamic where input for finding the first matching WorkInformation record.
+"""
+input WorkInformationFindFirstInput {
+  """
+  Prisma where clause to match against WorkInformation fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
 }
 
 """
@@ -9093,6 +11014,11 @@ input WorkInformationPageInput {
   (Optional) Search keyword to filter WorkInformation records by text fields.
   """
   search: String
+}
+
+enum WorkInformationPaginationDirection {
+  backward
+  forward
 }
 
 """

@@ -1,31 +1,117 @@
 'use client';
-import { UserFindAll, UserFindAllSubscription } from '@/lib/api/user.api';
-import { Query, UserPageInput } from '@/lib/generated/types/generated/types';
+
+import { modelGQL } from '@/lib/api/crud.gql';
+import {
+  Query,
+  Subscription,
+  UserCursorPaginationInput,
+} from '@/lib/generated/api/customHookAPI/graphql';
 import { useQuery, useSubscription } from '@apollo/client/react';
+import { useState } from 'react';
+
+const modelAPI = modelGQL;
 
 const Home = () => {
-  const findAll = useQuery<
-    { UserFindAll: Query['UserFindAll'] },
-    { paginationInput: UserPageInput }
-  >(UserFindAll, {
-    variables: {
-      paginationInput: {
-        currentPage: 1,
-        pageSize: 10,
-        isActive: true,
-      },
-    },
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [cursorStack, setCursorStack] = useState<string[]>([]);
+  const [page, setPage] = useState(1);
+
+  const { data, loading } = useQuery<
+    { UserFindAllWithCursor: Query['UserFindAllWithCursor'] },
+    { cursorInput: UserCursorPaginationInput }
+  >(modelAPI.UserGQL.findAllWithCursor, {
+    variables: { cursorInput: { cursor, isActive: true, take: 5 } },
   });
 
-  useSubscription(UserFindAllSubscription, {
-    onData: ({ data }) => {
-      console.log('📡 Subscription update received:', data.data);
+  useSubscription<{ UserSubscription: Subscription['UserSubscription'] }>(
+    modelAPI.UserGQL.subscription,
+    {
+      onData({ client, data }) {
+        const newData = data.data?.UserSubscription;
+        client.cache.modify({
+          fields: {
+            UserFindAllWithCursor(existing) {
+              return { ...existing, data: [newData, ...(existing?.data ?? [])] };
+            },
+          },
+        });
+      },
     },
-    onError: (error) => {
-      console.log('❌ Subscription error:', error);
-    },
-  });
-  return <div>{JSON.stringify(findAll.data?.UserFindAll?.__typename, null, 2)}</div>;
+  );
+
+  const result = data?.UserFindAllWithCursor;
+  const rows = result?.data ?? [];
+  const hasNextPage = result?.hasNextPage ?? false;
+  const hasPrevPage = cursorStack.length > 0;
+
+  const handleNext = () => {
+    if (!hasNextPage || !result?.nextCursor) return;
+    setCursorStack((prev) => [...prev, cursor ?? '']);
+    setCursor(result.nextCursor);
+    setPage((prev) => prev + 1);
+  };
+
+  const handlePrev = () => {
+    if (!hasPrevPage) return;
+    const stack = [...cursorStack];
+    const prevCursor = stack.pop() ?? null;
+    setCursorStack(stack);
+    setCursor(prevCursor);
+    setPage((prev) => prev - 1);
+  };
+
+  return (
+    <div>
+      {/* ─── Table ─────────────────────────────────────── */}
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Username</th>
+            <th>Active</th>
+            <th>Created At</th>
+          </tr>
+        </thead>
+        <tbody>
+          {loading ? (
+            <tr>
+              <td colSpan={5} style={{ textAlign: 'center' }}>
+                Loading...
+              </td>
+            </tr>
+          ) : rows.length === 0 ? (
+            <tr>
+              <td colSpan={5} style={{ textAlign: 'center' }}>
+                No records found
+              </td>
+            </tr>
+          ) : (
+            rows.map((user) => (
+              <tr key={user?.id}>
+                <td>{user?.name}</td>
+                <td>{user?.email}</td>
+                <td>{user?.userName}</td>
+                <td>{user?.isActive ? 'Yes' : 'No'}</td>
+                <td>{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-'}</td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+
+      {/* ─── Pagination ────────────────────────────────── */}
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 12 }}>
+        <button onClick={handlePrev} disabled={!hasPrevPage || loading}>
+          ← Prev
+        </button>
+        <span>{page}</span>
+        <button onClick={handleNext} disabled={!hasNextPage || loading}>
+          Next →
+        </button>
+      </div>
+    </div>
+  );
 };
 
 export default Home;
