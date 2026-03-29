@@ -174,7 +174,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           `🔍 ${modelName}: FindFirst - Received where clause request with input:`,
           input,
         );
-        const middlewareError = await middlewareCheck(ctx, modelName);
+        const middlewareError = await middlewareCheck(ctx, modelName, true);
         if (middlewareError) return middlewareError;
         return services[model].findFirst(input.where as FindManyArgs<typeof model>['where']);
       },

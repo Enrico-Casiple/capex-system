@@ -1,3 +1,5 @@
+import LoginSchema, { LoginType } from '@/app/auth/_forms/schema/Login';
+import { fail } from '@/lib/util/reponseUtil';
 import { RateLimiterMemory, RateLimiterRes } from 'rate-limiter-flexible';
 import { prisma } from '../../../../../prisma/prisma';
 import { createResponse } from '../../../../../util/createResponse';
@@ -16,8 +18,17 @@ export type LoginArgs = {
   ipAddress?: string | null;
 };
 
-export const login = async (input: LoginArgs) => {
-  const { account, password, otp, ipAddress = 'unknown' } = input;
+export const login = async (input: LoginType) => {
+  const validatedData = LoginSchema.safeParse(input);
+
+  if (!validatedData.success) {
+    const errorMessages = validatedData.error.issues.map((err) => err.message).join(', ');
+    console.error('Validation errors:', validatedData.error.issues);
+    return fail('VALIDATION_ERROR', `Validation failed: ${errorMessages}`);
+  }
+
+  const { account, password, otp, ipAddress = 'unknown' } = validatedData.data;
+  console.log(`Login attempt for account: ${account} from IP: ${ipAddress}`);
 
   try {
     // ✅ Early validation
@@ -63,12 +74,8 @@ export const login = async (input: LoginArgs) => {
 
     const isPasswordValid = password === user.password; // Replace with real hash comparison in production
     if (!isPasswordValid) {
-      return createResponse<'User'>(
-        false,
-        'SERVICE_LOGIN_INVALID_PASSWORD',
-        'Please check your credentials and try again.',
-        null,
-      );
+      console.warn(`Invalid password attempt for user: ${account} from IP: ${ipAddress}`);
+      return fail('SERVICE_LOGIN_INVALID_PASSWORD', 'Please check your credentials and try again.');
     }
 
     // ✅ If 2FA disabled, return immediately
@@ -100,8 +107,8 @@ export const login = async (input: LoginArgs) => {
       console.log(`🟢 TODO: Send OTP to ${user.email}. OTP: ${code}`);
       return createResponse<'User'>(
         false,
-        'SERVICE_LOGIN_OTP_REQUIRED',
-        'Two-factor authentication is enabled. Please provide your OTP code.',
+        'SERVICE_LOGIN_OTP_SENDING',
+        'Sending your OTP code. Please check your email and enter the code to complete login.',
         null,
       );
     }

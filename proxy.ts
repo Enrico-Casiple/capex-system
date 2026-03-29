@@ -17,11 +17,12 @@ const { auth: proxy } = NextAuth(authMiddlewareConfig);
 type LogLevel = 'INFO' | 'WARN' | 'REDIRECT' | 'API';
 
 const getIP = (request: NextRequest): string => {
-  return (
+  const raw =
     request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
     request.headers.get('x-real-ip') ||
-    'unknown'
-  );
+    'unknown';
+
+  return raw === '::1' ? '127.0.0.1' : raw;
 };
 
 const log = (level: LogLevel, path: string, ip: string, user: string, detail?: string) => {
