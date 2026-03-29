@@ -1,8 +1,7 @@
-import LoginSchema, { LoginType } from '@/app/auth/_forms/schema/Login';
-import { fail } from '@/lib/util/reponseUtil';
 import { RateLimiterMemory, RateLimiterRes } from 'rate-limiter-flexible';
+import LoginSchema, { LoginType } from '../../../../../../app/auth/_forms/schema/Login';
+import { fail, ok } from '../../../../../../lib/util/reponseUtil';
 import { prisma } from '../../../../../prisma/prisma';
-import { createResponse } from '../../../../../util/createResponse';
 import { generateOtpCode } from '../../../../../util/generateOtpCode';
 import { getPrismaErrorMessage } from '../../../../../util/getPrismaErrorMessage';
 
@@ -33,12 +32,7 @@ export const login = async (input: LoginType) => {
   try {
     // ✅ Early validation
     if (!account?.trim() || !password?.trim()) {
-      return createResponse<'User'>(
-        false,
-        'SERVICE_LOGIN_INVALID_INPUT',
-        'Account and password are required.',
-        null,
-      );
+      return fail('SERVICE_LOGIN_INVALID_INPUT', 'Account and password are required.');
     }
 
     // ✅ Rate limit check (fail fast)
@@ -47,11 +41,9 @@ export const login = async (input: LoginType) => {
       await rateLimiter.consume(rateLimitKey);
     } catch (rejRes) {
       const secondsRemaining = Math.round((rejRes as RateLimiterRes).msBeforeNext / 1000);
-      return createResponse<'User'>(
-        false,
+      return fail(
         'SERVICE_LOGIN_RATE_LIMITED',
         `Too many login attempts. Please try again in ${secondsRemaining} seconds.`,
-        null,
       );
     }
 
@@ -64,12 +56,7 @@ export const login = async (input: LoginType) => {
     });
 
     if (!user) {
-      return createResponse<'User'>(
-        false,
-        'SERVICE_LOGIN_USER_NOT_FOUND',
-        'User not found with the provided account.',
-        null,
-      );
+      return fail('SERVICE_LOGIN_USER_NOT_FOUND', 'User not found with the provided account.');
     }
 
     const isPasswordValid = password === user.password; // Replace with real hash comparison in production
@@ -83,12 +70,7 @@ export const login = async (input: LoginType) => {
       // Reset rate limit on success
       await rateLimiter.delete(rateLimitKey).catch(() => {});
 
-      return createResponse<'User'>(
-        true,
-        'SERVICE_LOGIN_SUCCESS',
-        `Login successful. Welcome back, ${user.name}. Please consider enabling two-factor authentication for enhanced security.`,
-        user, // Return full user object (or a safe subset in production
-      );
+      return ok('SERVICE_LOGIN_SUCCESS', `Login successful. Welcome back, ${user.name}.`, user);
     }
 
     // ✅ 2FA enabled: Generate OTP only if needed
@@ -105,22 +87,15 @@ export const login = async (input: LoginType) => {
 
       // TODO: Send OTP via email/SMS
       console.log(`🟢 TODO: Send OTP to ${user.email}. OTP: ${code}`);
-      return createResponse<'User'>(
-        false,
+      return fail(
         'SERVICE_LOGIN_OTP_SENDING',
         'Sending your OTP code. Please check your email and enter the code to complete login.',
-        null,
       );
     }
 
     // ✅ Validate OTP
     if (otp !== user.otpCode) {
-      return createResponse<'User'>(
-        false,
-        'SERVICE_LOGIN_INVALID_OTP',
-        'Invalid OTP code. Please try again.',
-        null,
-      );
+      return fail('SERVICE_LOGIN_INVALID_OTP', 'Invalid OTP code. Please try again.');
     }
 
     // ✅ Clear OTP on success
@@ -132,12 +107,7 @@ export const login = async (input: LoginType) => {
     // Reset rate limit
     await rateLimiter.delete(rateLimitKey).catch(() => {});
 
-    return createResponse<'User'>(
-      true,
-      'SERVICE_LOGIN_SUCCESS',
-      `Login successful. Welcome back, ${user.name}.`,
-      user,
-    );
+    return ok('SERVICE_LOGIN_SUCCESS', `Login successful. Welcome back, ${user.name}.`, user);
   } catch (error) {
     const errorMessage = getPrismaErrorMessage(error);
 
@@ -146,11 +116,6 @@ export const login = async (input: LoginType) => {
       stack: error instanceof Error ? error.stack : 'No stack trace',
       type: error?.constructor?.name,
     });
-    return createResponse<'User'>(
-      false,
-      'SERVICE_LOGIN_FAILED',
-      `Login failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      null,
-    );
+    return fail('SERVICE_LOGIN_FAILED', `Login failed: ${errorMessage}`);
   }
 };

@@ -37,6 +37,7 @@ const SignInPage = () => {
       return fail(login.code, login.message);
     }
     router.push('/home');
+    alert(`Login successful! Welcome back. Message: ${login.message} Code: ${login.code}`);
     return login;
   };
   return (
