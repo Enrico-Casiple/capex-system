@@ -27,7 +27,7 @@
     "prisma:reset": "prisma generate && prisma db push --force-reset && prisma format && npm run codegen:gen && npm run prebuild:strict",
     "memcached:install": "sudo dnf install memcached -y && sudo systemctl start memcached && sudo systemctl enable memcached",
     "setup:memcached": "chmod +x lib/scripts/setup.sh && bash lib/scripts/setup.sh",
-    "git:push": "git add . && git commit -m \"${npm_config_message:-Update}\" && git push origin master"
+   "git:push": "cross-env-shell \"git add . && git commit -m \\\"%npm_config_message%\\\" && git push origin master\""
   },
   "dependencies": {
     "@apollo/client": "^4.1.6",
