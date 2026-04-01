@@ -29,7 +29,12 @@ builder.mutationField('UserLogin', (t) =>
       }),
     },
     resolve: async (_parent, args) => {
-      const result = await login(args.input);
+      const result = await login({
+        account: args.input.account,
+        password: args.input.password,
+        otp: args.input.otp || undefined,
+        ipAddress: args.input.ipAddress || undefined,
+      });
 
       if (!result.isSuccess) {
         return {

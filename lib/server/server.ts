@@ -25,12 +25,12 @@ export const config = { api: { bodyParser: false } };
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
-
 const development: boolean = process.env.NODE_ENV === 'development';
 const hostname: string = process.env.HOST || 'localhost';
 const port: number = parseInt(process.env.PORT || '3000', 10);
 const app = next({ dev: development, hostname, port });
 const graphqlEndpoint: string = '/api/graphql';
+
 
 // ============================================================================
 // GRAPHQL YOGA

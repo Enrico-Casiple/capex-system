@@ -1,6 +1,5 @@
 import authenticate from '../../../../lib/util/authenticate';
 import { checkAuthentication } from '../../../../lib/util/checkAuthentication';
-import { enforceRateLimit } from '../../../../lib/util/enforceRateLimit';
 import { Prisma } from '../../../generated/prisma/client';
 import { builder } from '../../builder';
 import {
@@ -31,8 +30,8 @@ const middlewareCheck = async (
   isNeeded: boolean = true,
 ) => {
   if (!isNeeded) return;
-  const rateLimitError = await enforceRateLimit(ctx, modelName);
-  if (rateLimitError) return rateLimitError;
+  // const rateLimitError = await enforceRateLimit(ctx, modelName);
+  // if (rateLimitError) return rateLimitError;
   const authError = await checkAuthentication(ctx, modelName, skipForUserModel);
   if (authError) return authError;
 };

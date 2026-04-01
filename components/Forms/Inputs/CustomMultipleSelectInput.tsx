@@ -360,3 +360,37 @@ const CustomMultipleSelectInput = <TFormValues extends FieldValues>({
 };
 
 export default CustomMultipleSelectInput;
+
+    //  {/* ─── Multiple Select ─────────────────────────────── */}
+    //       <CustomMultipleSelectInput
+    //         name="userIds"
+    //         control={form.control}
+    //         label="Users (Multiple)"
+    //         findAllWithCursorGQL={modelGQL.UserGQL.findAllWithCursor}
+    //         findAllGQL={modelGQL.UserGQL.findAll}
+    //         placeholder="Select users..."
+    //         searchPlaceholder="Search by name..."
+    //         emptyAllSelectedMessage="All users selected."
+    //         emptyMessage="No users found."
+    //         maxVisible={1}
+    //         cursorVariables={(search, cursor, take) => ({
+    //           cursorInput: {
+    //             cursor,
+    //             isActive: true,
+    //             take,
+    //             filter: search ? { name: { contains: search, mode: 'insensitive' } } : undefined,
+    //           },
+    //         })}
+    //         countVariables={() => ({
+    //           paginationInput: { currentPage: 1, pageSize: 1, isActive: true },
+    //         })}
+    //         allIdsVariables={(take) => ({
+    //           cursorInput: { cursor: null, isActive: true, take },
+    //         })}
+    //         mapOption={(user: unknown) => {
+    //           const u = user as { id?: string; name?: string; userName?: string; email?: string };
+    //           return {
+    //             label: u.name ?? u.userName ?? u.email ?? '',
+    //             value: u.id ?? '',
+    //           };
+    //         }}

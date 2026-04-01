@@ -306,3 +306,43 @@ const CustomSingleSelectInput = <TFormValues extends FieldValues>({
 };
 
 export default CustomSingleSelectInput;
+
+  // {/* ─── Single Select ───────────────────────────────── */}
+  //         <CustomSingleSelectInput
+  //           name="userId"
+  //           control={form.control}
+  //           label="User"
+  //           findAllWithCursorGQL={modelGQL.UserGQL.findAllWithCursor}
+  //           findUniqueGQL={modelGQL.UserGQL.findUnique}
+  //           defaultValueId={DEFAULT_USER_ID}
+  //           placeholder="Select a user"
+  //           searchPlaceholder="Search by name..."
+  //           emptySelectedMessage="User already selected."
+  //           emptyMessage="No users found."
+  //           cursorVariables={(search, cursor, take) => ({
+  //             cursorInput: {
+  //               cursor,
+  //               isActive: true,
+  //               take,
+  //               filter: search ? { name: { contains: search, mode: 'insensitive' } } : undefined,
+  //             },
+  //           })}
+  //           uniqueVariables={(id) => ({ id })}
+  //           mapOption={(user: unknown) => {
+  //             const u = user as { id?: string; name?: string; userName?: string; email?: string };
+  //             return {
+  //               label: u.name ?? u.userName ?? u.email ?? '',
+  //               value: u.id ?? '',
+  //             };
+  //           }}
+  //           mapDefaultOption={(data: unknown) => {
+  //             const d = data as {
+  //               data?: { id?: string; name?: string; userName?: string; email?: string };
+  //             };
+  //             if (!d?.data) return null;
+  //             return {
+  //               label: d.data.name ?? d.data.userName ?? d.data.email ?? '',
+  //               value: d.data.id ?? '',
+  //             };
+  //           }}
+  //         />
