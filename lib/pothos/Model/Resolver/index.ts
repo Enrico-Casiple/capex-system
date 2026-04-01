@@ -3,6 +3,7 @@ import { checkAuthentication } from '../../../../lib/util/checkAuthentication';
 import { Prisma } from '../../../generated/prisma/client';
 import { builder } from '../../builder';
 import {
+  countInputRefs,
   createInputRefs,
   cursorPaginationInputRefs,
   findByInputRefs,
@@ -12,6 +13,7 @@ import {
 } from '../../Inputs';
 import { getDatamodel } from '../../pothos-prisma-types';
 import {
+  countResponseRef,
   cursorPaginationResponseRef,
   deletedListResponseRef,
   paginationResponseRefs,
@@ -176,6 +178,25 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         const middlewareError = await middlewareCheck(ctx, modelName, true);
         if (middlewareError) return middlewareError;
         return services[model].findFirst(input.where as FindManyArgs<typeof model>['where']);
+      },
+    }),
+  );
+
+    // ─── QUERY: count ───────────────────────────────────────────
+  builder.queryField(`${modelName}Count`, (t) =>
+    t.field({
+      type: countResponseRef[model],
+      args: {
+        input: t.arg({ type: countInputRefs[model], required: true }),
+      },
+      resolve: async (_root, { input }, ctx) => {
+        console.log(
+          `🔍 ${modelName}: Count - Received count request with input:`,
+          input,
+        );
+        const middlewareError = await middlewareCheck(ctx, modelName, true);
+        if (middlewareError) return middlewareError;
+        return services[model].count(input.where as FindManyArgs<typeof model>['where']);
       },
     }),
   );

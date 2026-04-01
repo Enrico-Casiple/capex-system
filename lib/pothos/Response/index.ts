@@ -16,6 +16,13 @@ export interface LIST_RESPONSE {
   data: PrismaTypes[keyof PrismaTypes]['Shape'][] | null;
 }
 
+export interface COUNT_RESPONSE {
+  code: string;
+  isSuccess: boolean;
+  message: string;
+  data: number;
+}
+
 export interface DELETED_ITEM_RESPONSE {
   id: string; // Assuming this will return the ID of the deleted record
 }
@@ -60,12 +67,14 @@ export const responseListSuffix = 'ListResponse';
 export const responsePaginationSuffix = 'PaginationResponse';
 export const responseDeletedListSuffix = 'DeletedListResponse';
 export const responseCursorPaginationListSuffix = 'CursorPaginationResponse';
+export const responseCountSuffix = 'CountResponse';
 
 export const responseRefs: Record<string, ReturnType<typeof builder.objectRef>> = {};
 export const responseListRefs: Record<string, ReturnType<typeof builder.objectRef>> = {};
 export const paginationResponseRefs: Record<string, ReturnType<typeof builder.objectRef>> = {};
 export const deletedListResponseRef: Record<string, ReturnType<typeof builder.objectRef>> = {};
 export const cursorPaginationResponseRef: Record<string, ReturnType<typeof builder.objectRef>> = {};
+export const countResponseRef: Record<string, ReturnType<typeof builder.objectRef>> = {};
 
 const PageInfo = builder.objectRef<PAGE_INFO>('PageInfo').implement({
   fields: (t) => ({
@@ -155,6 +164,37 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
       code: 'ERROR',
       isSuccess: false,
       message: `Failed to implement ${modelName}${responseListSuffix}: ${error}`,
+    };
+  }
+});
+
+// COUNT RESPONSE STRUCTURE: We can also have a count response for each model, where we return a simple count of records instead of the records themselves. This is useful for queries that only need to know how many records match certain criteria.
+Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
+  try {
+    const ref = builder.objectRef<COUNT_RESPONSE>(`${modelName}${responseCountSuffix}`);
+    countResponseRef[modelName] = ref;
+    ref.implement({
+      description: `Count response wrapper for ${modelName}. Returns the count of ${modelName} records matching the criteria.`,
+      fields: (t) => ({
+        code: t.exposeString('code', {
+          description: `Operation result code for the ${modelName} count operation. e.g. '${modelName.toUpperCase()}_COUNT_SUCCESS'.`,
+        }),
+        isSuccess: t.exposeBoolean('isSuccess', {
+          description: `Indicates whether the ${modelName} count operation was successful.`,
+        }),
+        message: t.exposeString('message', {
+          description: `Human-readable message describing the result of the ${modelName} count operation.`,
+        }),
+        data: t.exposeInt('data', {
+          description: `The count of ${modelName} records matching the criteria. Null if the operation failed.`,
+        }),
+      }),
+    });
+  } catch (error) {
+    return {
+      code: 'ERROR',
+      isSuccess: false,
+      message: `Failed to implement ${modelName}${responseCountSuffix}: ${error}`,
     };
   }
 });

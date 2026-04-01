@@ -24,14 +24,19 @@ export const findByInputRefs = {} as Record<
   InputRef<{ key: string; value: string }>
 >;
 const findByInputSuffix = 'FindByInput';
+
 export const findFirstInputRefs = {} as Record<
   PrismaTypes[keyof PrismaTypes]['Name'],
   InputRef<{ where?: Record<string, unknown> | null }>
 >;
-
 const findFirstInputSuffix = 'FindFirstInput';
 
-// ─── Step 1: Generate ConnectInput (just { id: string }) for each model ──────
+export const countInputRefs = {} as Record<
+  PrismaTypes[keyof PrismaTypes]['Name'],
+  InputRef<{ where?: Record<string, unknown> | null }>
+>;
+const countInputSuffix = 'CountInput';
+
 // ─── Step 1: Generate ConnectInput (just { id: string }) for each model ──────
 Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   try {
@@ -355,6 +360,29 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
     findFirstInputRefs[modelName as PrismaTypes[keyof PrismaTypes]['Name']] = findFirstRef;
     findFirstRef.implement({
       description: `Dynamic where input for finding the first matching ${modelName} record.`,
+      fields: (t) => ({
+        where: t.field({
+          type: 'Json',
+          required: true,
+          description: `Prisma where clause to match against ${modelName} fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).`,
+        }),
+      }),
+    });
+  } catch (error) {
+    console.error(`Model ${modelName} FindFirstInput failed: ${error}`);
+  }
+});
+
+// ─── Step 10: Generate CountInput for each Prisma model────────────────────────
+Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
+  try {
+    const countRef = builder.inputRef<{
+      where?: { [key: string]: object | null | undefined | unknown } | null;
+    }>(`${modelName}${countInputSuffix}`);
+
+    countInputRefs[modelName as PrismaTypes[keyof PrismaTypes]['Name']] = countRef;
+    countRef.implement({
+      description: `Dynamic where input for counting ${modelName} records.`,
       fields: (t) => ({
         where: t.field({
           type: 'Json',
