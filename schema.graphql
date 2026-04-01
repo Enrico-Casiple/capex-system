@@ -111,6 +111,37 @@ input AuditLogConnectInput {
   id: String!
 }
 
+"""Dynamic where input for counting AuditLog records."""
+input AuditLogCountInput {
+  """
+  Prisma where clause to match against AuditLog fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
+}
+
+"""
+Count response wrapper for AuditLog. Returns the count of AuditLog records matching the criteria.
+"""
+type AuditLogCountResponse {
+  """
+  Operation result code for the AuditLog count operation. e.g. 'AUDITLOG_COUNT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The count of AuditLog records matching the criteria. Null if the operation failed.
+  """
+  data: Int
+
+  """Indicates whether the AuditLog count operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the AuditLog count operation.
+  """
+  message: String
+}
+
 """
 Input fields required to create a new AuditLog record. Required fields must be provided. Relation fields support nested create or connect.
 """
@@ -770,6 +801,37 @@ input BasicInformationConnectInput {
   id: String!
 }
 
+"""Dynamic where input for counting BasicInformation records."""
+input BasicInformationCountInput {
+  """
+  Prisma where clause to match against BasicInformation fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
+}
+
+"""
+Count response wrapper for BasicInformation. Returns the count of BasicInformation records matching the criteria.
+"""
+type BasicInformationCountResponse {
+  """
+  Operation result code for the BasicInformation count operation. e.g. 'BASICINFORMATION_COUNT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The count of BasicInformation records matching the criteria. Null if the operation failed.
+  """
+  data: Int
+
+  """Indicates whether the BasicInformation count operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the BasicInformation count operation.
+  """
+  message: String
+}
+
 """
 Input fields required to create a new BasicInformation record. Required fields must be provided. Relation fields support nested create or connect.
 """
@@ -1291,6 +1353,37 @@ input CompanyConnectInput {
   id: String!
 }
 
+"""Dynamic where input for counting Company records."""
+input CompanyCountInput {
+  """
+  Prisma where clause to match against Company fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
+}
+
+"""
+Count response wrapper for Company. Returns the count of Company records matching the criteria.
+"""
+type CompanyCountResponse {
+  """
+  Operation result code for the Company count operation. e.g. 'COMPANY_COUNT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The count of Company records matching the criteria. Null if the operation failed.
+  """
+  data: Int
+
+  """Indicates whether the Company count operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Company count operation.
+  """
+  message: String
+}
+
 """
 Input fields required to create a new Company record. Required fields must be provided. Relation fields support nested create or connect.
 """
@@ -1748,6 +1841,37 @@ input DepartmentConnectInput {
   id: String!
 }
 
+"""Dynamic where input for counting Department records."""
+input DepartmentCountInput {
+  """
+  Prisma where clause to match against Department fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
+}
+
+"""
+Count response wrapper for Department. Returns the count of Department records matching the criteria.
+"""
+type DepartmentCountResponse {
+  """
+  Operation result code for the Department count operation. e.g. 'DEPARTMENT_COUNT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The count of Department records matching the criteria. Null if the operation failed.
+  """
+  data: Int
+
+  """Indicates whether the Department count operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Department count operation.
+  """
+  message: String
+}
+
 """
 Input fields required to create a new Department record. Required fields must be provided. Relation fields support nested create or connect.
 """
@@ -2162,6 +2286,37 @@ input GroupOfCompanyConnectInput {
   The unique identifier of the existing GroupOfCompany record to connect.
   """
   id: String!
+}
+
+"""Dynamic where input for counting GroupOfCompany records."""
+input GroupOfCompanyCountInput {
+  """
+  Prisma where clause to match against GroupOfCompany fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
+}
+
+"""
+Count response wrapper for GroupOfCompany. Returns the count of GroupOfCompany records matching the criteria.
+"""
+type GroupOfCompanyCountResponse {
+  """
+  Operation result code for the GroupOfCompany count operation. e.g. 'GROUPOFCOMPANY_COUNT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The count of GroupOfCompany records matching the criteria. Null if the operation failed.
+  """
+  data: Int
+
+  """Indicates whether the GroupOfCompany count operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the GroupOfCompany count operation.
+  """
+  message: String
 }
 
 """
@@ -2588,6 +2743,37 @@ input HolidayConnectInput {
   id: String!
 }
 
+"""Dynamic where input for counting Holiday records."""
+input HolidayCountInput {
+  """
+  Prisma where clause to match against Holiday fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
+}
+
+"""
+Count response wrapper for Holiday. Returns the count of Holiday records matching the criteria.
+"""
+type HolidayCountResponse {
+  """
+  Operation result code for the Holiday count operation. e.g. 'HOLIDAY_COUNT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The count of Holiday records matching the criteria. Null if the operation failed.
+  """
+  data: Int
+
+  """Indicates whether the Holiday count operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Holiday count operation.
+  """
+  message: String
+}
+
 """
 Input fields required to create a new Holiday record. Required fields must be provided. Relation fields support nested create or connect.
 """
@@ -2957,6 +3143,37 @@ Input to connect an existing JobLevel record by its unique ID. Use this when you
 input JobLevelConnectInput {
   """The unique identifier of the existing JobLevel record to connect."""
   id: String!
+}
+
+"""Dynamic where input for counting JobLevel records."""
+input JobLevelCountInput {
+  """
+  Prisma where clause to match against JobLevel fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
+}
+
+"""
+Count response wrapper for JobLevel. Returns the count of JobLevel records matching the criteria.
+"""
+type JobLevelCountResponse {
+  """
+  Operation result code for the JobLevel count operation. e.g. 'JOBLEVEL_COUNT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The count of JobLevel records matching the criteria. Null if the operation failed.
+  """
+  data: Int
+
+  """Indicates whether the JobLevel count operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the JobLevel count operation.
+  """
+  message: String
 }
 
 """
@@ -3376,6 +3593,37 @@ Input to connect an existing Location record by its unique ID. Use this when you
 input LocationConnectInput {
   """The unique identifier of the existing Location record to connect."""
   id: String!
+}
+
+"""Dynamic where input for counting Location records."""
+input LocationCountInput {
+  """
+  Prisma where clause to match against Location fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
+}
+
+"""
+Count response wrapper for Location. Returns the count of Location records matching the criteria.
+"""
+type LocationCountResponse {
+  """
+  Operation result code for the Location count operation. e.g. 'LOCATION_COUNT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The count of Location records matching the criteria. Null if the operation failed.
+  """
+  data: Int
+
+  """Indicates whether the Location count operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Location count operation.
+  """
+  message: String
 }
 
 """
@@ -6289,6 +6537,9 @@ type Permission {
   """(Optional) description field of Permission. Type: String."""
   description: String
 
+  """(Optional) displayOrder field of Permission. Type: Integer."""
+  displayOrder: Int
+
   """Unique identifier of the Permission record."""
   id: ID!
 
@@ -6300,6 +6551,9 @@ type Permission {
 
   """(Required) isGlobal field of Permission. Type: Boolean."""
   isGlobal: Boolean!
+
+  """(Optional) module field of Permission. Type: String."""
+  module: String
 
   """(Optional) name field of Permission. Type: String."""
   name: String
@@ -6324,6 +6578,37 @@ input PermissionConnectInput {
   id: String!
 }
 
+"""Dynamic where input for counting Permission records."""
+input PermissionCountInput {
+  """
+  Prisma where clause to match against Permission fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
+}
+
+"""
+Count response wrapper for Permission. Returns the count of Permission records matching the criteria.
+"""
+type PermissionCountResponse {
+  """
+  Operation result code for the Permission count operation. e.g. 'PERMISSION_COUNT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The count of Permission records matching the criteria. Null if the operation failed.
+  """
+  data: Int
+
+  """Indicates whether the Permission count operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Permission count operation.
+  """
+  message: String
+}
+
 """
 Input fields required to create a new Permission record. Required fields must be provided. Relation fields support nested create or connect.
 """
@@ -6342,6 +6627,9 @@ input PermissionCreateInput {
   """(Optional) The description of the new Permission. Type: String."""
   description: String
 
+  """(Optional) The displayOrder of the new Permission. Type: Int."""
+  displayOrder: Int
+
   """(Required) The isActive of the new Permission. Type: Boolean."""
   isActive: Boolean!
 
@@ -6350,6 +6638,9 @@ input PermissionCreateInput {
 
   """(Required) The isGlobal of the new Permission. Type: Boolean."""
   isGlobal: Boolean!
+
+  """(Optional) The module of the new Permission. Type: String."""
+  module: String
 
   """(Optional) The name of the new Permission. Type: String."""
   name: String
@@ -6628,6 +6919,11 @@ input PermissionUpdateInput {
   description: String
 
   """
+  (Optional) Update the displayOrder of the Permission. Type: Int. Leave empty to keep existing value.
+  """
+  displayOrder: Int
+
+  """
   (Optional) Update the id of the Permission. Type: String. Leave empty to keep existing value.
   """
   id: String
@@ -6646,6 +6942,11 @@ input PermissionUpdateInput {
   (Optional) Update the isGlobal of the Permission. Type: Boolean. Leave empty to keep existing value.
   """
   isGlobal: Boolean
+
+  """
+  (Optional) Update the module of the Permission. Type: String. Leave empty to keep existing value.
+  """
+  module: String
 
   """
   (Optional) Update the name of the Permission. Type: String. Leave empty to keep existing value.
@@ -6716,6 +7017,37 @@ Input to connect an existing Position record by its unique ID. Use this when you
 input PositionConnectInput {
   """The unique identifier of the existing Position record to connect."""
   id: String!
+}
+
+"""Dynamic where input for counting Position records."""
+input PositionCountInput {
+  """
+  Prisma where clause to match against Position fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
+}
+
+"""
+Count response wrapper for Position. Returns the count of Position records matching the criteria.
+"""
+type PositionCountResponse {
+  """
+  Operation result code for the Position count operation. e.g. 'POSITION_COUNT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The count of Position records matching the criteria. Null if the operation failed.
+  """
+  data: Int
+
+  """Indicates whether the Position count operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Position count operation.
+  """
+  message: String
 }
 
 """
@@ -7044,6 +7376,8 @@ input PositionUpdateOrConnectInput {
 }
 
 type Query {
+  AuditLogCount(input: AuditLogCountInput!): AuditLogCountResponse
+
   """
   Retrieve a paginated list of AuditLog records. Supports filtering by active status, keyword search, and advanced JSON filters.
   """
@@ -7067,6 +7401,7 @@ type Query {
     """The unique identifier of the AuditLog record to retrieve."""
     id: String!
   ): AuditLogResponse
+  BasicInformationCount(input: BasicInformationCountInput!): BasicInformationCountResponse
 
   """
   Retrieve a paginated list of BasicInformation records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7093,6 +7428,7 @@ type Query {
     """The unique identifier of the BasicInformation record to retrieve."""
     id: String!
   ): BasicInformationResponse
+  CompanyCount(input: CompanyCountInput!): CompanyCountResponse
 
   """
   Retrieve a paginated list of Company records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7117,6 +7453,7 @@ type Query {
     """The unique identifier of the Company record to retrieve."""
     id: String!
   ): CompanyResponse
+  DepartmentCount(input: DepartmentCountInput!): DepartmentCountResponse
 
   """
   Retrieve a paginated list of Department records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7141,6 +7478,7 @@ type Query {
     """The unique identifier of the Department record to retrieve."""
     id: String!
   ): DepartmentResponse
+  GroupOfCompanyCount(input: GroupOfCompanyCountInput!): GroupOfCompanyCountResponse
 
   """
   Retrieve a paginated list of GroupOfCompany records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7167,6 +7505,7 @@ type Query {
     """The unique identifier of the GroupOfCompany record to retrieve."""
     id: String!
   ): GroupOfCompanyResponse
+  HolidayCount(input: HolidayCountInput!): HolidayCountResponse
 
   """
   Retrieve a paginated list of Holiday records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7191,6 +7530,7 @@ type Query {
     """The unique identifier of the Holiday record to retrieve."""
     id: String!
   ): HolidayResponse
+  JobLevelCount(input: JobLevelCountInput!): JobLevelCountResponse
 
   """
   Retrieve a paginated list of JobLevel records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7215,6 +7555,7 @@ type Query {
     """The unique identifier of the JobLevel record to retrieve."""
     id: String!
   ): JobLevelResponse
+  LocationCount(input: LocationCountInput!): LocationCountResponse
 
   """
   Retrieve a paginated list of Location records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7239,6 +7580,7 @@ type Query {
     """The unique identifier of the Location record to retrieve."""
     id: String!
   ): LocationResponse
+  PermissionCount(input: PermissionCountInput!): PermissionCountResponse
 
   """
   Retrieve a paginated list of Permission records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7263,6 +7605,7 @@ type Query {
     """The unique identifier of the Permission record to retrieve."""
     id: String!
   ): PermissionResponse
+  PositionCount(input: PositionCountInput!): PositionCountResponse
 
   """
   Retrieve a paginated list of Position records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7287,6 +7630,7 @@ type Query {
     """The unique identifier of the Position record to retrieve."""
     id: String!
   ): PositionResponse
+  RoleCount(input: RoleCountInput!): RoleCountResponse
 
   """
   Retrieve a paginated list of Role records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7311,6 +7655,7 @@ type Query {
     """The unique identifier of the Role record to retrieve."""
     id: String!
   ): RoleResponse
+  RolePermissionCount(input: RolePermissionCountInput!): RolePermissionCountResponse
 
   """
   Retrieve a paginated list of RolePermission records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7337,6 +7682,7 @@ type Query {
     """The unique identifier of the RolePermission record to retrieve."""
     id: String!
   ): RolePermissionResponse
+  ShiftingScheduleCount(input: ShiftingScheduleCountInput!): ShiftingScheduleCountResponse
 
   """
   Retrieve a paginated list of ShiftingSchedule records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7363,6 +7709,7 @@ type Query {
     """The unique identifier of the ShiftingSchedule record to retrieve."""
     id: String!
   ): ShiftingScheduleResponse
+  StatusCount(input: StatusCountInput!): StatusCountResponse
 
   """
   Retrieve a paginated list of Status records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7387,6 +7734,7 @@ type Query {
     """The unique identifier of the Status record to retrieve."""
     id: String!
   ): StatusResponse
+  TypeCount(input: TypeCountInput!): TypeCountResponse
 
   """
   Retrieve a paginated list of Type records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7411,6 +7759,7 @@ type Query {
     """The unique identifier of the Type record to retrieve."""
     id: String!
   ): TypeResponse
+  UserCount(input: UserCountInput!): UserCountResponse
 
   """
   Retrieve a paginated list of User records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7435,6 +7784,7 @@ type Query {
     """The unique identifier of the User record to retrieve."""
     id: String!
   ): UserResponse
+  UserRoleCount(input: UserRoleCountInput!): UserRoleCountResponse
 
   """
   Retrieve a paginated list of UserRole records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7459,6 +7809,7 @@ type Query {
     """The unique identifier of the UserRole record to retrieve."""
     id: String!
   ): UserRoleResponse
+  WorkInformationCount(input: WorkInformationCountInput!): WorkInformationCountResponse
 
   """
   Retrieve a paginated list of WorkInformation records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7493,6 +7844,9 @@ type Role {
   """(Optional) List of related AuditLog records linked to this Role."""
   auditLogs: [AuditLog!]!
 
+  """(Optional) List of related Role records linked to this Role."""
+  childRoles: [Role!]!
+
   """(Required) createdAt field of Role. Type: DateTime (ISO 8601)."""
   createdAt: DateTime!
 
@@ -7505,11 +7859,23 @@ type Role {
   """(Required) isActive field of Role. Type: Boolean."""
   isActive: Boolean!
 
+  """(Required) isDefault field of Role. Type: Boolean."""
+  isDefault: Boolean!
+
   """(Optional) name field of Role. Type: String."""
   name: String
 
+  """(Optional) Related Role record linked to this Role."""
+  parentRole: Role
+
+  """(Optional) parentRoleId field of Role. Type: String."""
+  parentRoleId: String
+
   """(Optional) List of related RolePermission records linked to this Role."""
   rolePermissions: [RolePermission!]!
+
+  """(Optional) roleType field of Role. Type: String."""
+  roleType: String
 
   """(Required) updatedAt field of Role. Type: DateTime (ISO 8601)."""
   updatedAt: DateTime!
@@ -7526,6 +7892,37 @@ input RoleConnectInput {
   id: String!
 }
 
+"""Dynamic where input for counting Role records."""
+input RoleCountInput {
+  """
+  Prisma where clause to match against Role fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
+}
+
+"""
+Count response wrapper for Role. Returns the count of Role records matching the criteria.
+"""
+type RoleCountResponse {
+  """
+  Operation result code for the Role count operation. e.g. 'ROLE_COUNT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The count of Role records matching the criteria. Null if the operation failed.
+  """
+  data: Int
+
+  """Indicates whether the Role count operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Role count operation.
+  """
+  message: String
+}
+
 """
 Input fields required to create a new Role record. Required fields must be provided. Relation fields support nested create or connect.
 """
@@ -7534,6 +7931,11 @@ input RoleCreateInput {
   (Optional) List of AuditLog relation — create a new AuditLog inline or connect to an existing one by ID.
   """
   auditLogs: [AuditLogCreateOrConnectInput!]
+
+  """
+  (Optional) List of Role relation — create a new Role inline or connect to an existing one by ID.
+  """
+  childRoles: [RoleCreateOrConnectInput!]
 
   """(Required) The createdAt of the new Role. Type: DateTime."""
   createdAt: DateTime!
@@ -7544,13 +7946,27 @@ input RoleCreateInput {
   """(Required) The isActive of the new Role. Type: Boolean."""
   isActive: Boolean!
 
+  """(Required) The isDefault of the new Role. Type: Boolean."""
+  isDefault: Boolean!
+
   """(Optional) The name of the new Role. Type: String."""
   name: String
+
+  """
+  (Optional) Single Role relation — create a new Role inline or connect to an existing one by ID.
+  """
+  parentRole: RoleCreateOrConnectInput
+
+  """(Optional) The parentRoleId of the new Role. Type: String."""
+  parentRoleId: String
 
   """
   (Optional) List of RolePermission relation — create a new RolePermission inline or connect to an existing one by ID.
   """
   rolePermissions: [RolePermissionCreateOrConnectInput!]
+
+  """(Optional) The roleType of the new Role. Type: String."""
+  roleType: String
 
   """(Required) The updatedAt of the new Role. Type: DateTime."""
   updatedAt: DateTime!
@@ -7829,6 +8245,37 @@ input RolePermissionConnectInput {
   The unique identifier of the existing RolePermission record to connect.
   """
   id: String!
+}
+
+"""Dynamic where input for counting RolePermission records."""
+input RolePermissionCountInput {
+  """
+  Prisma where clause to match against RolePermission fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
+}
+
+"""
+Count response wrapper for RolePermission. Returns the count of RolePermission records matching the criteria.
+"""
+type RolePermissionCountResponse {
+  """
+  Operation result code for the RolePermission count operation. e.g. 'ROLEPERMISSION_COUNT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The count of RolePermission records matching the criteria. Null if the operation failed.
+  """
+  data: Int
+
+  """Indicates whether the RolePermission count operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the RolePermission count operation.
+  """
+  message: String
 }
 
 """
@@ -8241,6 +8688,11 @@ input RoleUpdateInput {
   auditLogs: [AuditLogUpdateOrConnectInput!]
 
   """
+  (Optional) List of Role relation — update the related record inline or reconnect to a different Role by ID.
+  """
+  childRoles: [RoleUpdateOrConnectInput!]
+
+  """
   (Optional) Update the createdAt of the Role. Type: DateTime. Leave empty to keep existing value.
   """
   createdAt: DateTime
@@ -8261,14 +8713,34 @@ input RoleUpdateInput {
   isActive: Boolean
 
   """
+  (Optional) Update the isDefault of the Role. Type: Boolean. Leave empty to keep existing value.
+  """
+  isDefault: Boolean
+
+  """
   (Optional) Update the name of the Role. Type: String. Leave empty to keep existing value.
   """
   name: String
 
   """
+  (Optional) Single Role relation — update the related record inline or reconnect to a different Role by ID.
+  """
+  parentRole: RoleUpdateOrConnectInput
+
+  """
+  (Optional) Update the parentRoleId of the Role. Type: String. Leave empty to keep existing value.
+  """
+  parentRoleId: String
+
+  """
   (Optional) List of RolePermission relation — update the related record inline or reconnect to a different RolePermission by ID.
   """
   rolePermissions: [RolePermissionUpdateOrConnectInput!]
+
+  """
+  (Optional) Update the roleType of the Role. Type: String. Leave empty to keep existing value.
+  """
+  roleType: String
 
   """
   (Optional) Update the updatedAt of the Role. Type: DateTime. Leave empty to keep existing value.
@@ -8373,6 +8845,37 @@ input ShiftingScheduleConnectInput {
   The unique identifier of the existing ShiftingSchedule record to connect.
   """
   id: String!
+}
+
+"""Dynamic where input for counting ShiftingSchedule records."""
+input ShiftingScheduleCountInput {
+  """
+  Prisma where clause to match against ShiftingSchedule fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
+}
+
+"""
+Count response wrapper for ShiftingSchedule. Returns the count of ShiftingSchedule records matching the criteria.
+"""
+type ShiftingScheduleCountResponse {
+  """
+  Operation result code for the ShiftingSchedule count operation. e.g. 'SHIFTINGSCHEDULE_COUNT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The count of ShiftingSchedule records matching the criteria. Null if the operation failed.
+  """
+  data: Int
+
+  """Indicates whether the ShiftingSchedule count operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the ShiftingSchedule count operation.
+  """
+  message: String
 }
 
 """
@@ -8825,6 +9328,37 @@ Input to connect an existing Status record by its unique ID. Use this when you w
 input StatusConnectInput {
   """The unique identifier of the existing Status record to connect."""
   id: String!
+}
+
+"""Dynamic where input for counting Status records."""
+input StatusCountInput {
+  """
+  Prisma where clause to match against Status fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
+}
+
+"""
+Count response wrapper for Status. Returns the count of Status records matching the criteria.
+"""
+type StatusCountResponse {
+  """
+  Operation result code for the Status count operation. e.g. 'STATUS_COUNT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The count of Status records matching the criteria. Null if the operation failed.
+  """
+  data: Int
+
+  """Indicates whether the Status count operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Status count operation.
+  """
+  message: String
 }
 
 """
@@ -9295,6 +9829,37 @@ input TypeConnectInput {
   id: String!
 }
 
+"""Dynamic where input for counting Type records."""
+input TypeCountInput {
+  """
+  Prisma where clause to match against Type fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
+}
+
+"""
+Count response wrapper for Type. Returns the count of Type records matching the criteria.
+"""
+type TypeCountResponse {
+  """
+  Operation result code for the Type count operation. e.g. 'TYPE_COUNT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The count of Type records matching the criteria. Null if the operation failed.
+  """
+  data: Int
+
+  """Indicates whether the Type count operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Type count operation.
+  """
+  message: String
+}
+
 """
 Input fields required to create a new Type record. Required fields must be provided. Relation fields support nested create or connect.
 """
@@ -9710,6 +10275,9 @@ type User {
   """(Optional) updatedAt field of User. Type: DateTime (ISO 8601)."""
   updatedAt: DateTime
 
+  """(Optional) List of related UserRole records linked to this User."""
+  userAssignedBy: [UserRole!]!
+
   """(Optional) userName field of User. Type: String."""
   userName: String
 
@@ -9723,6 +10291,37 @@ Input to connect an existing User record by its unique ID. Use this when you wan
 input UserConnectInput {
   """The unique identifier of the existing User record to connect."""
   id: String!
+}
+
+"""Dynamic where input for counting User records."""
+input UserCountInput {
+  """
+  Prisma where clause to match against User fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
+}
+
+"""
+Count response wrapper for User. Returns the count of User records matching the criteria.
+"""
+type UserCountResponse {
+  """
+  Operation result code for the User count operation. e.g. 'USER_COUNT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The count of User records matching the criteria. Null if the operation failed.
+  """
+  data: Int
+
+  """Indicates whether the User count operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the User count operation.
+  """
+  message: String
 }
 
 """
@@ -9773,6 +10372,11 @@ input UserCreateInput {
 
   """(Optional) The updatedAt of the new User. Type: DateTime."""
   updatedAt: DateTime
+
+  """
+  (Optional) List of UserRole relation — create a new UserRole inline or connect to an existing one by ID.
+  """
+  userAssignedBy: [UserRoleCreateOrConnectInput!]
 
   """(Optional) The userName of the new User. Type: String."""
   userName: String
@@ -10034,11 +10638,20 @@ type UserResponse {
 
 """Represents a UserRole record in the database."""
 type UserRole {
+  """(Optional) assignedById field of UserRole. Type: String."""
+  assignedById: String
+
   """(Optional) List of related AuditLog records linked to this UserRole."""
   auditLogs: [AuditLog!]!
 
+  """(Optional) conditionOverrides field of UserRole. Type: JSON object."""
+  conditionOverrides: Json
+
   """(Required) createdAt field of UserRole. Type: DateTime (ISO 8601)."""
   createdAt: DateTime!
+
+  """(Optional) expiresAt field of UserRole. Type: DateTime (ISO 8601)."""
+  expiresAt: DateTime
 
   """Unique identifier of the UserRole record."""
   id: ID!
@@ -10064,6 +10677,9 @@ type UserRole {
   """(Optional) Related User record linked to this UserRole."""
   user: User
 
+  """(Optional) Related User record linked to this UserRole."""
+  userAssignedBy: User
+
   """(Optional) userId field of UserRole. Type: String."""
   userId: String
 }
@@ -10076,17 +10692,57 @@ input UserRoleConnectInput {
   id: String!
 }
 
+"""Dynamic where input for counting UserRole records."""
+input UserRoleCountInput {
+  """
+  Prisma where clause to match against UserRole fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
+}
+
+"""
+Count response wrapper for UserRole. Returns the count of UserRole records matching the criteria.
+"""
+type UserRoleCountResponse {
+  """
+  Operation result code for the UserRole count operation. e.g. 'USERROLE_COUNT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The count of UserRole records matching the criteria. Null if the operation failed.
+  """
+  data: Int
+
+  """Indicates whether the UserRole count operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the UserRole count operation.
+  """
+  message: String
+}
+
 """
 Input fields required to create a new UserRole record. Required fields must be provided. Relation fields support nested create or connect.
 """
 input UserRoleCreateInput {
+  """(Optional) The assignedById of the new UserRole. Type: String."""
+  assignedById: String
+
   """
   (Optional) List of AuditLog relation — create a new AuditLog inline or connect to an existing one by ID.
   """
   auditLogs: [AuditLogCreateOrConnectInput!]
 
+  """(Optional) The conditionOverrides of the new UserRole. Type: Json."""
+  conditionOverrides: Json
+
   """(Required) The createdAt of the new UserRole. Type: DateTime."""
   createdAt: DateTime!
+
+  """(Optional) The expiresAt of the new UserRole. Type: DateTime."""
+  expiresAt: DateTime
 
   """(Required) The isActive of the new UserRole. Type: Boolean."""
   isActive: Boolean!
@@ -10112,6 +10768,11 @@ input UserRoleCreateInput {
   (Optional) Single User relation — create a new User inline or connect to an existing one by ID.
   """
   user: UserCreateOrConnectInput
+
+  """
+  (Optional) Single User relation — create a new User inline or connect to an existing one by ID.
+  """
+  userAssignedBy: UserCreateOrConnectInput
 
   """(Optional) The userId of the new UserRole. Type: String."""
   userId: String
@@ -10359,14 +11020,29 @@ Input fields to update an existing UserRole record. All fields are optional — 
 """
 input UserRoleUpdateInput {
   """
+  (Optional) Update the assignedById of the UserRole. Type: String. Leave empty to keep existing value.
+  """
+  assignedById: String
+
+  """
   (Optional) List of AuditLog relation — update the related record inline or reconnect to a different AuditLog by ID.
   """
   auditLogs: [AuditLogUpdateOrConnectInput!]
 
   """
+  (Optional) Update the conditionOverrides of the UserRole. Type: Json. Leave empty to keep existing value.
+  """
+  conditionOverrides: Json
+
+  """
   (Optional) Update the createdAt of the UserRole. Type: DateTime. Leave empty to keep existing value.
   """
   createdAt: DateTime
+
+  """
+  (Optional) Update the expiresAt of the UserRole. Type: DateTime. Leave empty to keep existing value.
+  """
+  expiresAt: DateTime
 
   """
   (Optional) Update the id of the UserRole. Type: String. Leave empty to keep existing value.
@@ -10407,6 +11083,11 @@ input UserRoleUpdateInput {
   (Optional) Single User relation — update the related record inline or reconnect to a different User by ID.
   """
   user: UserUpdateOrConnectInput
+
+  """
+  (Optional) Single User relation — update the related record inline or reconnect to a different User by ID.
+  """
+  userAssignedBy: UserUpdateOrConnectInput
 
   """
   (Optional) Update the userId of the UserRole. Type: String. Leave empty to keep existing value.
@@ -10500,6 +11181,11 @@ input UserUpdateInput {
   (Optional) Update the updatedAt of the User. Type: DateTime. Leave empty to keep existing value.
   """
   updatedAt: DateTime
+
+  """
+  (Optional) List of UserRole relation — update the related record inline or reconnect to a different UserRole by ID.
+  """
+  userAssignedBy: [UserRoleUpdateOrConnectInput!]
 
   """
   (Optional) Update the userName of the User. Type: String. Leave empty to keep existing value.
@@ -10672,6 +11358,37 @@ input WorkInformationConnectInput {
   The unique identifier of the existing WorkInformation record to connect.
   """
   id: String!
+}
+
+"""Dynamic where input for counting WorkInformation records."""
+input WorkInformationCountInput {
+  """
+  Prisma where clause to match against WorkInformation fields. Follows Prisma filter structure (e.g. { "email": "test@example.com" }).
+  """
+  where: Json!
+}
+
+"""
+Count response wrapper for WorkInformation. Returns the count of WorkInformation records matching the criteria.
+"""
+type WorkInformationCountResponse {
+  """
+  Operation result code for the WorkInformation count operation. e.g. 'WORKINFORMATION_COUNT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The count of WorkInformation records matching the criteria. Null if the operation failed.
+  """
+  data: Int
+
+  """Indicates whether the WorkInformation count operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the WorkInformation count operation.
+  """
+  message: String
 }
 
 """

@@ -53,6 +53,17 @@ export const RolePermissionFindAll = gql`
   ${RolePermissionFragment}
 `;
 
+export const RolePermissionCount = gql`
+  query RolePermissionCount($input: RolePermissionCountInput!) {
+    RolePermissionCount(input: $input) {
+      isSuccess
+      message
+      code
+      data
+    }
+  }
+`;
+
 export const RolePermissionFindUnique = gql`
   query RolePermissionFindUnique($id: String!) {
     RolePermissionFindUnique(id: $id) {

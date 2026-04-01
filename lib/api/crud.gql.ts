@@ -16,7 +16,7 @@ export const crudGQL = Object.fromEntries(
 ) as Record<Prisma.ModelName, CrudGQLInstance>;
 
 // ─── Type-safe named accessor ──────────────────────────────────
-type ModelGQLMap = { [K in Prisma.ModelName as `${K}GQL`]: CrudGQLInstance };
+export type ModelGQLMap = { [K in Prisma.ModelName as `${K}GQL`]: CrudGQLInstance };
 
 export const modelGQL = new Proxy({} as ModelGQLMap, {
   get(_target, prop: string) {

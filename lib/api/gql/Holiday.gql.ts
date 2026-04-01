@@ -51,6 +51,17 @@ export const HolidayFindAll = gql`
   ${HolidayFragment}
 `;
 
+export const HolidayCount = gql`
+  query HolidayCount($input: HolidayCountInput!) {
+    HolidayCount(input: $input) {
+      isSuccess
+      message
+      code
+      data
+    }
+  }
+`;
+
 export const HolidayFindUnique = gql`
   query HolidayFindUnique($id: String!) {
     HolidayFindUnique(id: $id) {

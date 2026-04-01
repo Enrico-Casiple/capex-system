@@ -56,6 +56,17 @@ export const UserFindAll = gql`
   ${UserFragment}
 `;
 
+export const UserCount = gql`
+  query UserCount($input: UserCountInput!) {
+    UserCount(input: $input) {
+      isSuccess
+      message
+      code
+      data
+    }
+  }
+`;
+
 export const UserFindUnique = gql`
   query UserFindUnique($id: String!) {
     UserFindUnique(id: $id) {

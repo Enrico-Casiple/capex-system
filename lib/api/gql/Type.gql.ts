@@ -50,6 +50,17 @@ export const TypeFindAll = gql`
   ${TypeFragment}
 `;
 
+export const TypeCount = gql`
+  query TypeCount($input: TypeCountInput!) {
+    TypeCount(input: $input) {
+      isSuccess
+      message
+      code
+      data
+    }
+  }
+`;
+
 export const TypeFindUnique = gql`
   query TypeFindUnique($id: String!) {
     TypeFindUnique(id: $id) {

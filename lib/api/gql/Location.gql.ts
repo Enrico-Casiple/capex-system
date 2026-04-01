@@ -50,6 +50,17 @@ export const LocationFindAll = gql`
   ${LocationFragment}
 `;
 
+export const LocationCount = gql`
+  query LocationCount($input: LocationCountInput!) {
+    LocationCount(input: $input) {
+      isSuccess
+      message
+      code
+      data
+    }
+  }
+`;
+
 export const LocationFindUnique = gql`
   query LocationFindUnique($id: String!) {
     LocationFindUnique(id: $id) {

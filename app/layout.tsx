@@ -4,6 +4,7 @@ import { SessionProvider } from 'next-auth/react';
 import { Geist, Geist_Mono, JetBrains_Mono } from 'next/font/google';
 import ApolloProviderWrapper from './_context/GraphQLClient/ApolloProvider/ApolloProviderWrapper';
 import './globals.css';
+import { Toaster } from 'sonner';
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
 
@@ -28,10 +29,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn(geistSans.variable, geistMono.variable, jetbrainsMono.variable, 'antialiased')}>
+   <html
+      lang="en"
+      suppressHydrationWarning
+      className={cn(geistSans.variable, geistMono.variable, jetbrainsMono.variable, 'antialiased')}
+    >
       <body>
         <ApolloProviderWrapper>
           <SessionProvider>
+           <Toaster
+              position="bottom-right"
+              toastOptions={{
+                style: {
+                  '--border-radius': 'calc(var(--radius) + 4px)',
+                } as React.CSSProperties,
+                classNames: {
+                  content: 'flex flex-col gap-2',
+                  title: 'font-medium text-sm',
+                  description: 'text-xs text-muted-foreground',
+                },
+              }}
+            />
             {children}
           </SessionProvider>
         </ApolloProviderWrapper>

@@ -50,6 +50,17 @@ export const PositionFindAll = gql`
   ${PositionFragment}
 `;
 
+export const PositionCount = gql`
+  query PositionCount($input: PositionCountInput!) {
+    PositionCount(input: $input) {
+      isSuccess
+      message
+      code
+      data
+    }
+  }
+`;
+
 export const PositionFindUnique = gql`
   query PositionFindUnique($id: String!) {
     PositionFindUnique(id: $id) {

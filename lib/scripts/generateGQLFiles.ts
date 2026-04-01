@@ -73,6 +73,17 @@ export const ${modelName}FindAll = gql\`
   \${${fragmentName}}
 \`;
 
+export const ${modelName}Count = gql\`
+  query ${modelName}Count($input: ${modelName}CountInput!) {
+    ${modelName}Count(input: $input) {
+      isSuccess
+      message
+      code
+      data
+    }
+  }
+\`;
+
 export const ${modelName}FindUnique = gql\`
   query ${modelName}FindUnique($id: String!) {
     ${modelName}FindUnique(id: $id) {

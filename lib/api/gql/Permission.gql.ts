@@ -5,8 +5,10 @@ fragment PermissionFragment on Permission {
   id
   name
   description
+  module
   resource
   action
+  displayOrder
   isGlobal
   isAdmin
   isActive
@@ -52,6 +54,17 @@ export const PermissionFindAll = gql`
     }
   }
   ${PermissionFragment}
+`;
+
+export const PermissionCount = gql`
+  query PermissionCount($input: PermissionCountInput!) {
+    PermissionCount(input: $input) {
+      isSuccess
+      message
+      code
+      data
+    }
+  }
 `;
 
 export const PermissionFindUnique = gql`

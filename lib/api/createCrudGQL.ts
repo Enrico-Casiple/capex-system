@@ -14,27 +14,27 @@ type CrudConfig = {
 // BUILDER
 // ─────────────────────────────────────────────────────────────
 
-class CrudGQLBuilder {
-  private readonly e: string;
-  private readonly f: DocumentNode;
-  private readonly fn: string;
+export class CrudGQLBuilder {
+  private readonly entityName: string;
+  private readonly entityFragment: DocumentNode;
+  private readonly entityFragmentName: string;
 
   constructor({ entity, fragment, fragmentName }: CrudConfig) {
-    this.e = entity;
-    this.f = fragment;
-    this.fn = fragmentName;
+    this.entityName = entity;
+    this.entityFragment = fragment;
+    this.entityFragmentName = fragmentName;
   }
 
   // ─── Queries ───────────────────────────────────────────────
 
   get findAll() {
     return gql`
-      query ${this.e}FindAll($paginationInput: ${this.e}PageInput!) {
-        ${this.e}FindAll(paginationInput: $paginationInput) {
+      query ${this.entityName}FindAll($paginationInput: ${this.entityName}PageInput!) {
+        ${this.entityName}FindAll(paginationInput: $paginationInput) {
           isSuccess
           message
           code
-          data { ...${this.fn} }
+          data { ...${this.entityFragmentName} }
           allCount
           active
           inActive
@@ -48,67 +48,80 @@ class CrudGQLBuilder {
           }
         }
       }
-      ${this.f}
+      ${this.entityFragment}
     `;
   }
 
   get findAllWithCursor() {
     return gql`
-      query ${this.e}FindAllWithCursor($cursorInput: ${this.e}CursorPaginationInput!) {
-        ${this.e}FindAllWithCursor(cursorInput: $cursorInput) {
+      query ${this.entityName}FindAllWithCursor($cursorInput: ${this.entityName}CursorPaginationInput!) {
+        ${this.entityName}FindAllWithCursor(cursorInput: $cursorInput) {
           isSuccess
           message
           code
-          data { ...${this.fn} }
+          data { ...${this.entityFragmentName} }
           nextCursor
           prevCursor
           hasNextPage
           hasPrevPage
         }
       }
-      ${this.f}
+      ${this.entityFragment}
     `;
   }
 
   get findUnique() {
     return gql`
-      query ${this.e}FindUnique($id: String!) {
-        ${this.e}FindUnique(id: $id) {
+      query ${this.entityName}FindUnique($id: String!) {
+        ${this.entityName}FindUnique(id: $id) {
           isSuccess
           message
           code
-          data { ...${this.fn} }
+          data { ...${this.entityFragmentName} }
         }
       }
-      ${this.f}
+      ${this.entityFragment}
     `;
   }
 
   get findBy() {
     return gql`
-      query ${this.e}FindBy($input: ${this.e}FindByInput!) {
-        ${this.e}FindBy(input: $input) {
+      query ${this.entityName}FindBy($input: ${this.entityName}FindByInput!) {
+        ${this.entityName}FindBy(input: $input) {
           isSuccess
           message
           code
-          data { ...${this.fn} }
+          data { ...${this.entityFragmentName} }
         }
       }
-      ${this.f}
+      ${this.entityFragment}
     `;
   }
 
   get findFirst() {
     return gql`
-      query ${this.e}FindFirst($input: ${this.e}FindFirstInput!) {
-        ${this.e}FindFirst(input: $input) {
+      query ${this.entityName}FindFirst($input: ${this.entityName}FindFirstInput!) {
+        ${this.entityName}FindFirst(input: $input) {
           isSuccess
           message
           code
-          data { ...${this.fn} }
+          data { ...${this.entityFragmentName} }
         }
       }
-      ${this.f}
+      ${this.entityFragment}
+    `;
+  }
+
+  get count() {
+    return gql`
+      query ${this.entityName}Count($input: ${this.entityName}CountInput!) {
+        ${this.entityName}Count(input: $input) {
+          isSuccess
+          message
+          code
+          data
+        }
+      }
     `;
   }
 
@@ -116,150 +129,150 @@ class CrudGQLBuilder {
 
   get create() {
     return gql`
-      mutation ${this.e}Create($data: ${this.e}CreateInput!, $currentUserId: String) {
-        ${this.e}Create(data: $data, currentUserId: $currentUserId) {
+      mutation ${this.entityName}Create($data: ${this.entityName}CreateInput!, $currentUserId: String) {
+        ${this.entityName}Create(data: $data, currentUserId: $currentUserId) {
           isSuccess
           message
           code
-          data { ...${this.fn} }
+          data { ...${this.entityFragmentName} }
         }
       }
-      ${this.f}
+      ${this.entityFragment}
     `;
   }
 
   get createMany() {
     return gql`
-      mutation ${this.e}CreateMany($data: [${this.e}CreateInput!]!, $currentUserId: String) {
-        ${this.e}CreateMany(data: $data, currentUserId: $currentUserId) {
+      mutation ${this.entityName}CreateMany($data: [${this.entityName}CreateInput!]!, $currentUserId: String) {
+        ${this.entityName}CreateMany(data: $data, currentUserId: $currentUserId) {
           isSuccess
           message
           code
-          data { ...${this.fn} }
+          data { ...${this.entityFragmentName} }
         }
       }
-      ${this.f}
+      ${this.entityFragment}
     `;
   }
 
   get update() {
     return gql`
-      mutation ${this.e}Update($id: String!, $data: ${this.e}UpdateInput!, $currentUserId: String) {
-        ${this.e}Update(id: $id, data: $data, currentUserId: $currentUserId) {
+      mutation ${this.entityName}Update($id: String!, $data: ${this.entityName}UpdateInput!, $currentUserId: String) {
+        ${this.entityName}Update(id: $id, data: $data, currentUserId: $currentUserId) {
           isSuccess
           message
           code
-          data { ...${this.fn} }
+          data { ...${this.entityFragmentName} }
         }
       }
-      ${this.f}
+      ${this.entityFragment}
     `;
   }
 
   get updateMany() {
     return gql`
-      mutation ${this.e}UpdateMany($data: [${this.e}UpdateInput!]!, $currentUserId: String) {
-        ${this.e}UpdateMany(data: $data, currentUserId: $currentUserId) {
+      mutation ${this.entityName}UpdateMany($data: [${this.entityName}UpdateInput!]!, $currentUserId: String) {
+        ${this.entityName}UpdateMany(data: $data, currentUserId: $currentUserId) {
           isSuccess
           message
           code
-          data { ...${this.fn} }
+          data { ...${this.entityFragmentName} }
         }
       }
-      ${this.f}
+      ${this.entityFragment}
     `;
   }
 
   get archive() {
     return gql`
-      mutation ${this.e}Archive($id: String!, $currentUserId: String) {
-        ${this.e}Archive(id: $id, currentUserId: $currentUserId) {
+      mutation ${this.entityName}Archive($id: String!, $currentUserId: String) {
+        ${this.entityName}Archive(id: $id, currentUserId: $currentUserId) {
           isSuccess
           message
           code
-          data { ...${this.fn} }
+          data { ...${this.entityFragmentName} }
         }
       }
-      ${this.f}
+      ${this.entityFragment}
     `;
   }
 
   get archiveMany() {
     return gql`
-      mutation ${this.e}ArchiveMany($ids: [String!]!, $currentUserId: String) {
-        ${this.e}ArchiveMany(ids: $ids, currentUserId: $currentUserId) {
+      mutation ${this.entityName}ArchiveMany($ids: [String!]!, $currentUserId: String) {
+        ${this.entityName}ArchiveMany(ids: $ids, currentUserId: $currentUserId) {
           isSuccess
           message
           code
-          data { ...${this.fn} }
+          data { ...${this.entityFragmentName} }
         }
       }
-      ${this.f}
+      ${this.entityFragment}
     `;
   }
 
   get restore() {
     return gql`
-      mutation ${this.e}Restore($id: String!, $currentUserId: String) {
-        ${this.e}Restore(id: $id, currentUserId: $currentUserId) {
+      mutation ${this.entityName}Restore($id: String!, $currentUserId: String) {
+        ${this.entityName}Restore(id: $id, currentUserId: $currentUserId) {
           isSuccess
           message
           code
-          data { ...${this.fn} }
+          data { ...${this.entityFragmentName} }
         }
       }
-      ${this.f}
+      ${this.entityFragment}
     `;
   }
 
   get restoreMany() {
     return gql`
-      mutation ${this.e}RestoreMany($ids: [String!]!, $currentUserId: String) {
-        ${this.e}RestoreMany(ids: $ids, currentUserId: $currentUserId) {
+      mutation ${this.entityName}RestoreMany($ids: [String!]!, $currentUserId: String) {
+        ${this.entityName}RestoreMany(ids: $ids, currentUserId: $currentUserId) {
           isSuccess
           message
           code
-          data { ...${this.fn} }
+          data { ...${this.entityFragmentName} }
         }
       }
-      ${this.f}
+      ${this.entityFragment}
     `;
   }
 
   get remove() {
     return gql`
-      mutation ${this.e}Remove($id: String!, $currentUserId: String) {
-        ${this.e}Remove(id: $id, currentUserId: $currentUserId) {
+      mutation ${this.entityName}Remove($id: String!, $currentUserId: String) {
+        ${this.entityName}Remove(id: $id, currentUserId: $currentUserId) {
           isSuccess
           message
           code
-          data { ...${this.fn} }
+          data { ...${this.entityFragmentName} }
         }
       }
-      ${this.f}
+      ${this.entityFragment}
     `;
   }
 
   get removeMany() {
     return gql`
-      mutation ${this.e}RemoveMany($ids: [String!]!, $currentUserId: String) {
-        ${this.e}RemoveMany(ids: $ids, currentUserId: $currentUserId) {
+      mutation ${this.entityName}RemoveMany($ids: [String!]!, $currentUserId: String) {
+        ${this.entityName}RemoveMany(ids: $ids, currentUserId: $currentUserId) {
           isSuccess
           message
           code
-          data { ...${this.fn} }
+          data { ...${this.entityFragmentName} }
         }
       }
-      ${this.f}
+      ${this.entityFragment}
     `;
   }
 
-  // ─── Subscription ──────────────────────────────────────────
+  // ─── Subscriptions ─────────────────────────────────────────
 
   get subscription() {
     return gql`
-      subscription ${this.e}Subscription {
-        ${this.e}Subscription {
+      subscription ${this.entityName}Subscription {
+        ${this.entityName}Subscription {
           id
         }
       }

@@ -55,6 +55,17 @@ export const CompanyFindAll = gql`
   ${CompanyFragment}
 `;
 
+export const CompanyCount = gql`
+  query CompanyCount($input: CompanyCountInput!) {
+    CompanyCount(input: $input) {
+      isSuccess
+      message
+      code
+      data
+    }
+  }
+`;
+
 export const CompanyFindUnique = gql`
   query CompanyFindUnique($id: String!) {
     CompanyFindUnique(id: $id) {

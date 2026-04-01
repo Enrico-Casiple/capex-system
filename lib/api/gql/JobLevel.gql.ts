@@ -53,6 +53,17 @@ export const JobLevelFindAll = gql`
   ${JobLevelFragment}
 `;
 
+export const JobLevelCount = gql`
+  query JobLevelCount($input: JobLevelCountInput!) {
+    JobLevelCount(input: $input) {
+      isSuccess
+      message
+      code
+      data
+    }
+  }
+`;
+
 export const JobLevelFindUnique = gql`
   query JobLevelFindUnique($id: String!) {
     JobLevelFindUnique(id: $id) {

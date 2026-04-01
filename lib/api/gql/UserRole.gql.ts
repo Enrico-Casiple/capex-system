@@ -7,6 +7,9 @@ fragment UserRoleFragment on UserRole {
   roleId
   scopeTypeId
   scopeValues
+  conditionOverrides
+  assignedById
+  expiresAt
   isActive
   createdAt
   updatedAt
@@ -50,6 +53,17 @@ export const UserRoleFindAll = gql`
     }
   }
   ${UserRoleFragment}
+`;
+
+export const UserRoleCount = gql`
+  query UserRoleCount($input: UserRoleCountInput!) {
+    UserRoleCount(input: $input) {
+      isSuccess
+      message
+      code
+      data
+    }
+  }
 `;
 
 export const UserRoleFindUnique = gql`

@@ -52,6 +52,17 @@ export const DepartmentFindAll = gql`
   ${DepartmentFragment}
 `;
 
+export const DepartmentCount = gql`
+  query DepartmentCount($input: DepartmentCountInput!) {
+    DepartmentCount(input: $input) {
+      isSuccess
+      message
+      code
+      data
+    }
+  }
+`;
+
 export const DepartmentFindUnique = gql`
   query DepartmentFindUnique($id: String!) {
     DepartmentFindUnique(id: $id) {

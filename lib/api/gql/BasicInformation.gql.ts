@@ -61,6 +61,17 @@ export const BasicInformationFindAll = gql`
   ${BasicInformationFragment}
 `;
 
+export const BasicInformationCount = gql`
+  query BasicInformationCount($input: BasicInformationCountInput!) {
+    BasicInformationCount(input: $input) {
+      isSuccess
+      message
+      code
+      data
+    }
+  }
+`;
+
 export const BasicInformationFindUnique = gql`
   query BasicInformationFindUnique($id: String!) {
     BasicInformationFindUnique(id: $id) {

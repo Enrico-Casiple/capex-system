@@ -430,31 +430,31 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
     }
   }
 
-async count(where: FindManyArgs<PrismaModel>['where']) {
-  console.log(`📝 Count ${this.modelName}`, where);
-  try {
-    const totalCount = await this.delegate.count({ where });
+  async count(where: FindManyArgs<PrismaModel>['where']) {
+    console.log(`📝 Count ${this.modelName}`, where);
+    try {
+      const totalCount = await this.delegate.count({ where });
 
-    if (!totalCount)
-      return fail(
-        this.code('RETRIEVE_COUNT_NOT_FOUND'),
-        `No ${this.modelName} records found matching the given filters`,
+      if (!totalCount)
+        return fail(
+          this.code('RETRIEVE_COUNT_NOT_FOUND'),
+          `No ${this.modelName} records found matching the given filters`,
+        );
+
+      return ok(
+        this.code('RETRIEVE_COUNT_SUCCESS'),
+        `Successfully retrieved ${totalCount} ${this.modelName} record(s)`,
+        totalCount,
       );
-
-    return ok(
-      this.code('RETRIEVE_COUNT_SUCCESS'),
-      `Successfully retrieved ${totalCount} ${this.modelName} record(s)`,
-      totalCount,
-    );
-  } catch (error) {
-    const { message } = getPrismaErrorMessage(error);
-    console.error(`❌ Count ${this.modelName}:`, error);
-    return fail(
-      this.code('RETRIEVE_COUNT_FAILED'),
-      `Something went wrong while counting ${this.modelName} records: ${message}`,
-    );
+    } catch (error) {
+      const { message } = getPrismaErrorMessage(error);
+      console.error(`❌ Count ${this.modelName}:`, error);
+      return fail(
+        this.code('RETRIEVE_COUNT_FAILED'),
+        `Something went wrong while counting ${this.modelName} records: ${message}`,
+      );
+    }
   }
-}
 
   async create(input: CreateInput<PrismaModel>) {
     console.log(`📝 Create ${this.modelName}`, input);

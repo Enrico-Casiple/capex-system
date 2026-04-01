@@ -57,6 +57,17 @@ export const AuditLogFindAll = gql`
   ${AuditLogFragment}
 `;
 
+export const AuditLogCount = gql`
+  query AuditLogCount($input: AuditLogCountInput!) {
+    AuditLogCount(input: $input) {
+      isSuccess
+      message
+      code
+      data
+    }
+  }
+`;
+
 export const AuditLogFindUnique = gql`
   query AuditLogFindUnique($id: String!) {
     AuditLogFindUnique(id: $id) {

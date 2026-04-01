@@ -67,6 +67,17 @@ export const WorkInformationFindAll = gql`
   ${WorkInformationFragment}
 `;
 
+export const WorkInformationCount = gql`
+  query WorkInformationCount($input: WorkInformationCountInput!) {
+    WorkInformationCount(input: $input) {
+      isSuccess
+      message
+      code
+      data
+    }
+  }
+`;
+
 export const WorkInformationFindUnique = gql`
   query WorkInformationFindUnique($id: String!) {
     WorkInformationFindUnique(id: $id) {

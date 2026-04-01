@@ -58,6 +58,17 @@ export const ShiftingScheduleFindAll = gql`
   ${ShiftingScheduleFragment}
 `;
 
+export const ShiftingScheduleCount = gql`
+  query ShiftingScheduleCount($input: ShiftingScheduleCountInput!) {
+    ShiftingScheduleCount(input: $input) {
+      isSuccess
+      message
+      code
+      data
+    }
+  }
+`;
+
 export const ShiftingScheduleFindUnique = gql`
   query ShiftingScheduleFindUnique($id: String!) {
     ShiftingScheduleFindUnique(id: $id) {

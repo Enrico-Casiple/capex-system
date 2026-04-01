@@ -5,6 +5,9 @@ fragment RoleFragment on Role {
   id
   name
   description
+  roleType
+  isDefault
+  parentRoleId
   isActive
   createdAt
   updatedAt
@@ -48,6 +51,17 @@ export const RoleFindAll = gql`
     }
   }
   ${RoleFragment}
+`;
+
+export const RoleCount = gql`
+  query RoleCount($input: RoleCountInput!) {
+    RoleCount(input: $input) {
+      isSuccess
+      message
+      code
+      data
+    }
+  }
 `;
 
 export const RoleFindUnique = gql`

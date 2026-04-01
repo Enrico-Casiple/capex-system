@@ -27,7 +27,7 @@
     "prisma:reset": "prisma generate && prisma db push --force-reset && prisma format && npm run codegen:gen && npm run prebuild:strict",
     "memcached:install": "sudo dnf install memcached -y && sudo systemctl start memcached && sudo systemctl enable memcached",
     "setup:memcached": "chmod +x lib/scripts/setup.sh && bash lib/scripts/setup.sh",
-      "git:push": "cross-env-shell \"git add . && git commit -m \\\"%npm_config_message%\\\" && git push origin master\""
+    "git:push": "cross-env-shell \"git add . && git commit -m \\\"%npm_config_message%\\\" && git push origin master\""
   },
   "dependencies": {
     "@apollo/client": "^4.1.6",
@@ -40,6 +40,7 @@
     "@pothos/plugin-prisma": "^4.14.2",
     "@prisma/client": "^6.19.2",
     "@prisma/extension-accelerate": "^3.0.1",
+    "@tanstack/react-table": "^8.21.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cookie-parser": "^1.4.7",
@@ -57,6 +58,7 @@
     "memcached": "^2.2.2",
     "next": "16.1.6",
     "next-auth": "^5.0.0-beta.30",
+    "next-themes": "^0.4.6",
     "radix-ui": "^1.4.3",
     "rate-limiter-flexible": "^9.1.1",
     "react": "19.2.3",
@@ -65,6 +67,7 @@
     "react-hook-form": "^7.72.0",
     "shadcn": "^4.1.1",
     "shadcn-ui": "^0.9.5",
+    "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
     "tailwindcss-animate": "^1.0.7",
     "tw-animate": "^1.0.3",

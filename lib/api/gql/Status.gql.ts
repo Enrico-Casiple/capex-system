@@ -50,6 +50,17 @@ export const StatusFindAll = gql`
   ${StatusFragment}
 `;
 
+export const StatusCount = gql`
+  query StatusCount($input: StatusCountInput!) {
+    StatusCount(input: $input) {
+      isSuccess
+      message
+      code
+      data
+    }
+  }
+`;
+
 export const StatusFindUnique = gql`
   query StatusFindUnique($id: String!) {
     StatusFindUnique(id: $id) {

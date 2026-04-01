@@ -59,6 +59,7 @@ model User {
   auditLogs              AuditLog[]
   actions                AuditLog[]        @relation("UserAsActor")
   userRoles              UserRole[]
+  userAssignedBy         UserRole[]        @relation("UserAsRoleAssigner")
 
   isActive  Boolean?  @default(true)
   createdAt DateTime? @default(now())
@@ -357,9 +358,24 @@ model Holiday {
 }
 
 model Role {
-  id              String           @id @default(auto()) @map("_id") @db.ObjectId
-  name            String?
-  description     String?
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String?
+  description String?
+
+  // ERP additions
+  roleType String? // "SYSTEM" | "CUSTOM" | "TEMPLATE"
+  // SYSTEM = built-in like SAP standard roles, cannot be deleted
+  // CUSTOM  = user created
+  // TEMPLATE = used as base to clone from
+
+  isDefault Boolean @default(false)
+  // true = auto-assigned to new users (like NetSuite "Employee Center")
+
+  parentRoleId String? @db.ObjectId
+  parentRole   Role?   @relation("RoleHierarchy", fields: [parentRoleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  childRoles   Role[]  @relation("RoleHierarchy")
+  // Role inheritance — child inherits parent permissions (like SAP role hierarchy)
+
   rolePermissions RolePermission[]
   userRoles       UserRole[]
   auditLogs       AuditLog[]
@@ -369,17 +385,24 @@ model Role {
   updatedAt DateTime @updatedAt
 
   @@index([name])
+  @@index([roleType])
 }
 
 model Permission {
   id          String  @id @default(auto()) @map("_id") @db.ObjectId
   name        String?
   description String?
-  resource    String? // e.g., "request", "company", "department"
-  action      String? // e.g., "create", "read", "update", "delete"
+  module      String? // "FINANCE" | "HR" | "PROCUREMENT" | "INVENTORY"
+  // Groups permissions by ERP module like SAP transaction codes
 
-  isGlobal        Boolean          @default(false) // true = applies to all scopes
-  isAdmin         Boolean          @default(false) // true = admin-only permission
+  resource String? // "request", "invoice", "employee"
+  action   String? // "create", "read", "update", "delete", "approve", "reject", "export"
+  // Note: ERP needs more than CRUD — approve/reject/export are common
+
+  displayOrder Int? // for UI ordering in permission matrix
+
+  isGlobal        Boolean          @default(false)
+  isAdmin         Boolean          @default(false)
   rolePermissions RolePermission[]
   auditLogs       AuditLog[]
 
@@ -388,7 +411,8 @@ model Permission {
   updatedAt DateTime @updatedAt
 
   @@index([name])
-  @@index([resource, action]) // Composite for permission lookup
+  @@index([module])
+  @@index([resource, action])
 }
 
 model RolePermission {
@@ -396,26 +420,27 @@ model RolePermission {
   roleId       String? @db.ObjectId
   permissionId String? @db.ObjectId
 
-  // ABAC: Attributes for scoped access
-  scopeTypeId String?  @db.ObjectId // Type of scope (company, department, etc.)
-  scopeType   Type?    @relation("PermissionScopeType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  scopeValues String[] // e.g., ["companyA", "companyB"] for multi-scope access
+  scopeTypeId String?  @db.ObjectId
+  scopeType   Type?    @relation("PermissionScopeType", fields: [scopeTypeId], references: [id], onDelete: SetNull)
+  scopeValues String[]
 
-  // Additional ABAC attributes
-  conditions Json? // Dynamic conditions: {"minJobLevel": 3, "departments": ["IT", "HR"]}
-  isActive   Boolean @default(true)
+  conditions Json?
+  // Stores PermissionConditions type above
+  // evaluated at runtime in your GraphQL resolvers
 
-  role       Role?       @relation(fields: [roleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  permission Permission? @relation(fields: [permissionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  isActive Boolean @default(true)
+
+  role       Role?       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission? @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   auditLogs AuditLog[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
-  @@unique([roleId, permissionId, scopeTypeId]) // Prevent duplicates
+  @@unique([roleId, permissionId, scopeTypeId])
   @@index([roleId])
-  @@index([scopeTypeId])
   @@index([permissionId])
+  @@index([scopeTypeId])
   @@index([isActive])
 }
 
@@ -424,9 +449,20 @@ model UserRole {
   userId String? @db.ObjectId
   roleId String? @db.ObjectId
 
-  // Optional: scope this role assignment to specific entities
   scopeTypeId String?  @db.ObjectId
-  scopeValues String[] // e.g., ["deptA", "deptB"]
+  scopeValues String[]
+
+  // Override conditions per user assignment
+  conditionOverrides Json?
+  // Example: same Role "Manager" but this specific user
+  // gets extra condition { "maxApprovalAmount": 50000 }
+
+  assignedById   String? @db.ObjectId
+  // who assigned this role — important for audit
+  userAssignedBy User?   @relation("UserAsRoleAssigner", fields: [assignedById], references: [id], onDelete: SetNull)
+
+  expiresAt DateTime?
+  // temporary role assignment — auto-expires (like SAP time-based roles)
 
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   role Role? @relation(fields: [roleId], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -439,6 +475,7 @@ model UserRole {
   @@unique([userId, roleId, scopeTypeId])
   @@index([userId])
   @@index([roleId])
+  @@index([expiresAt])
 }
 
 model AuditLog {
