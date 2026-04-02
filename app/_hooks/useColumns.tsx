@@ -27,7 +27,7 @@ const useColumns = <Model extends { id: string }>({
       </div>
     ),
     cell: ({ row }) => (
-      <div className="flex items-center justify-start pl-2">
+      <div className="flex items-center justify-start pl-3">
         <input
           type="checkbox"
           checked={row.getIsSelected()}
@@ -38,6 +38,7 @@ const useColumns = <Model extends { id: string }>({
     ),
     enableSorting: false, // by default, True so we need to disable sorting for this column
     enableColumnFilter: false, // by default, True so we need to disable filtering for this column
+    size: 5,
   });
 
   // Add the unique columns for this table

@@ -13,13 +13,15 @@ const SortIcon = ({ sorted }: { sorted: string | false }) => {
 };
 
 const TableHeaderWrapper = <Model,>({ table }: TableHeaderWrapperProps<Model>) => (
-  <TableHeader className="sticky top-0 z-10 bg-background">
+  <TableHeader className="bg-background shadow-sm">
     {table.getHeaderGroups().map((headerGroup) => (
-      <TableRow key={headerGroup.id}>
+      <TableRow
+        key={headerGroup.id}
+        style={{ display: 'table', width: '100%', tableLayout: 'fixed' }}
+      >
         {headerGroup.headers.map((header) => {
           const canSort = header.column.getCanSort();
           const sorted = header.column.getIsSorted();
-
           return (
             <TableHead
               key={header.id}

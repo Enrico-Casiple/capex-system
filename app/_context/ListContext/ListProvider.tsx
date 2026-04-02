@@ -10,27 +10,26 @@ import {
   ColumnDef,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
 import { LoaderIcon } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-// ─── What the CONTEXT exposes to children ─────────────────────
-interface ListContextValue<
-  TQuery extends Record<string, Query[keyof Query]>,
-  TModel = unknown
-> {
+interface ListContextValue<TQuery extends Record<string, Query[keyof Query]>, TModel = unknown> {
   singleKey: keyof Query;
   cursorKey: keyof Query;
   subscriptionKey: keyof Subscription;
   modelGQL: ModelGQLMap;
   model: keyof ModelGQLMap;
-  returnModel: TModel;
+  modelName: string;
   session: ReturnType<typeof useSession>;
-  returnQuery: useQuery.Result<TQuery, Record<string, OperationVariables>, 'empty' | 'complete' | 'streaming'>;
+  returnQuery: useQuery.Result<
+    TQuery,
+    Record<string, OperationVariables>,
+    'empty' | 'complete' | 'streaming'
+  >;
   cursor: string | null;
   setCursor: React.Dispatch<React.SetStateAction<string | null>>;
   active: boolean;
@@ -41,20 +40,19 @@ interface ListContextValue<
   setTake: React.Dispatch<React.SetStateAction<number>>;
   initialFilter: Record<string, unknown>;
   initialColumnVisibility: Record<string, boolean>;
-  // table
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   table: ReturnType<typeof useReactTable<any>>;
   allRecordData: TModel[];
   newItems: TModel[];
   setNewItems: React.Dispatch<React.SetStateAction<TModel[]>>;
-  paginationPageIndex: { pageIndex: number; pageSize: number };
-  setPaginationPageIndex: React.Dispatch<React.SetStateAction<{ pageIndex: number; pageSize: number }>>;
   columnVisibility: Record<string, boolean>;
   setColumnVisibility: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-   columns: ColumnDef<TModel, unknown>[];
+  columns: ColumnDef<TModel, unknown>[];
+  hasNextPage: boolean;
+  nextCursor: string | null;
+  loadMore: () => void;
 }
 
-// ─── Context ──────────────────────────────────────────────────
 const ListContext = React.createContext<ListContextValue<
   Record<string, Query[keyof Query]>,
   unknown
@@ -62,7 +60,7 @@ const ListContext = React.createContext<ListContextValue<
 
 export const useListContext = <
   TQuery extends Record<string, Query[keyof Query]> = Record<string, Query[keyof Query]>,
-  TModel = unknown
+  TModel = unknown,
 >() => {
   const toast = useToast();
   const context = React.useContext(ListContext) as ListContextValue<TQuery, TModel> | null;
@@ -76,103 +74,133 @@ export const useListContext = <
   return context;
 };
 
-// ─── What the CONSUMER passes in ──────────────────────────────
 interface ListProviderProps<
   TQuery extends Record<string, Query[keyof Query]>,
   TSubscription extends Record<string, Subscription[keyof Subscription]>,
-  TModel
+  TModel,
 > {
   children?: React.ReactNode;
-  singleKey: keyof Query;
-  cursorKey: keyof Query;
-  subscriptionKey: keyof Subscription;
   modelGQL: ModelGQLMap;
-  model: keyof ModelGQLMap;
-  returnModel: TModel;
   queryResult?: TQuery;
   subscriptionResult?: TSubscription;
   initialFilter: Record<string, unknown>;
   initialColumnVisibility: Record<string, boolean>;
   columns: ColumnDef<TModel, unknown>[];
+  modelName: string;
 }
 
 const MAX_TAKE = 20;
-// ─── Provider ─────────────────────────────────────────────────
+const MAX_PAGES_IN_MEMORY = 5;
+
 const ListProvider = <
   TQuery extends Record<string, Query[keyof Query]>,
   TSubscription extends Record<string, Subscription[keyof Subscription]>,
-  TModel
->(props: ListProviderProps<TQuery, TSubscription, TModel>) => {
+  TModel,
+>(
+  props: ListProviderProps<TQuery, TSubscription, TModel>,
+) => {
   const session = useSession();
   const [cursor, setCursor] = useState<string | null>(null);
   const [active, setActive] = useState<boolean>(true);
   const [filter, setFilter] = useState<Record<string, unknown> | null>(props.initialFilter);
   const [take, setTake] = useState<number>(MAX_TAKE);
   const [newItems, setNewItems] = useState<TModel[]>([]);
-  const [paginationPageIndex, setPaginationPageIndex] = useState({ pageIndex: 0, pageSize: MAX_TAKE });
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>(
-    props.initialColumnVisibility
+    props.initialColumnVisibility,
   );
+
+  const [accumulatedData, setAccumulatedData] = useState<TModel[]>([]);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const seenCursors = useRef<Set<string | null>>(new Set([null]));
+
+  const singleKey = `${props.modelName}FindUnique` as keyof Query;
+  const cursorKey = `${props.modelName}FindAllWithCursor` as keyof Query;
+  const subscriptionKey = `${props.modelName}Subscription` as keyof Subscription;
+  const model = `${props.modelName}GQL` as keyof ModelGQLMap;
 
   const returnQuery = useQuery<TQuery, Record<string, OperationVariables>>(
-    props.modelGQL[props.model].findAllWithCursor,
+    props.modelGQL[model].findAllWithCursor,
     {
       variables: { cursorInput: { cursor, isActive: active, take, filter } },
-    }
+      notifyOnNetworkStatusChange: true,
+      fetchPolicy: 'network-only',
+    },
   );
 
-  useSubscription<TSubscription>(props.modelGQL[props.model].subscription, {
+  // ─── Append new page, window to MAX_PAGES_IN_MEMORY ───────────
+  useEffect(() => {
+    if (returnQuery.loading || !returnQuery.data) return;
+    const result = returnQuery.data?.[cursorKey as keyof TQuery] as
+      | { data?: TModel[]; nextCursor?: string | null; hasNextPage?: boolean }
+      | undefined;
+    if (!result?.data?.length) return;
+
+    setAccumulatedData((prev) => {
+      const incoming = result.data ?? [];
+      const existingIds = new Set(
+        (prev as Array<{ id?: string }>).map((r) => r.id).filter(Boolean),
+      );
+      const fresh = incoming.filter((r) => !existingIds.has((r as { id?: string }).id));
+      if (!fresh.length) return prev;
+
+      const combined = [...prev, ...fresh];
+      const maxRows = MAX_PAGES_IN_MEMORY * MAX_TAKE;
+      // drop oldest rows when over memory limit
+      return combined.length > maxRows ? combined.slice(combined.length - maxRows) : combined;
+    });
+
+    setHasNextPage(result.hasNextPage ?? false);
+    setNextCursor(result.nextCursor ?? null);
+  }, [returnQuery.data, returnQuery.loading, cursorKey]);
+
+  // ─── Reset on filter/active change ────────────────────────────
+  useEffect(() => {
+    setAccumulatedData([]);
+    seenCursors.current = new Set([null]);
+    setCursor(null);
+  }, [filter, active]);
+
+  useSubscription<TSubscription>(props.modelGQL[model].subscription, {
     onData(options) {
-      const newData = options.data.data?.[props.subscriptionKey];
+      const newData = options.data.data?.[subscriptionKey];
       if (!newData) return;
-      options.client.cache.modify({
-        fields: {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          [props.cursorKey](existing: any = { data: [] }) {
-            if (existing?.__ref) return existing;
-            const existingData = Array.isArray(existing?.data) ? existing.data : [];
-            return { ...existing, data: [newData, ...existingData] };
-          },
-        },
-      });
+      setAccumulatedData((prev) => [newData as TModel, ...prev]);
     },
   });
 
-  const allRecordData = React.useMemo<TModel[]>(() => {
-    const result = returnQuery.data?.[props.cursorKey as keyof TQuery];
-    const pageData = (result && typeof result === 'object' && 'data' in result)
-      ? (result.data as TModel[]) ?? []  // ← cast directly to TModel[]
-      : [];
-    return [...newItems, ...pageData];
-  }, [newItems, returnQuery.data, props.cursorKey]);
+  const allRecordData = React.useMemo<TModel[]>(
+    () => [...newItems, ...accumulatedData],
+    [newItems, accumulatedData],
+  );
+
+  const loadMore = useCallback(() => {
+    if (!hasNextPage || returnQuery.loading || !nextCursor) return;
+    if (seenCursors.current.has(nextCursor)) return;
+    seenCursors.current.add(nextCursor);
+    setCursor(nextCursor);
+  }, [hasNextPage, nextCursor, returnQuery.loading]);
 
   const table = useReactTable<TModel>({
     columns: props.columns as ColumnDef<TModel, unknown>[],
     data: allRecordData,
-    state: {
-      pagination: paginationPageIndex,
-      columnVisibility,
-    },
+    state: { columnVisibility },
     onColumnVisibilityChange: setColumnVisibility,
-    onPaginationChange: setPaginationPageIndex,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-
-    // Open Debugging
     debugTable: true,
     debugHeaders: true,
     debugColumns: true,
   });
 
   const value = {
-    singleKey: props.singleKey,
-    cursorKey: props.cursorKey,
-    subscriptionKey: props.subscriptionKey,
+    singleKey,
+    cursorKey,
+    subscriptionKey,
     modelGQL: props.modelGQL,
-    model: props.model,
-    returnModel: props.returnModel,
+    model,
+    modelName: props.modelName,
     session,
     returnQuery,
     cursor,
@@ -189,19 +217,28 @@ const ListProvider = <
     allRecordData,
     newItems,
     setNewItems,
-    paginationPageIndex,
-    setPaginationPageIndex,
     columnVisibility,
     setColumnVisibility,
     columns: props.columns,
+    hasNextPage,
+    nextCursor,
+    loadMore,
+    paginationPageIndex: { pageIndex: 0, pageSize: MAX_TAKE },
+    setPaginationPageIndex: () => {},
   };
 
-  if (returnQuery.loading) {
-    return <div className='grid place-items-center h-screen'><Spinner /></div>;
+  if (returnQuery.loading && !allRecordData.length) {
+    return (
+      <div className="grid place-items-center h-screen">
+        <Spinner />
+      </div>
+    );
   }
 
   return (
-    <ListContext.Provider value={value as unknown as ListContextValue<Record<string, Query[keyof Query]>, unknown>}>
+    <ListContext.Provider
+      value={value as unknown as ListContextValue<Record<string, Query[keyof Query]>, unknown>}
+    >
       {props.children}
     </ListContext.Provider>
   );
@@ -209,9 +246,7 @@ const ListProvider = <
 
 export default ListProvider;
 
-type SpinnerProps = React.ComponentProps<'svg'> & {
-  containerClassName?: string;
-};
+type SpinnerProps = React.ComponentProps<'svg'> & { containerClassName?: string };
 
 export const Spinner = ({ className, containerClassName, ...props }: SpinnerProps) => (
   <div
