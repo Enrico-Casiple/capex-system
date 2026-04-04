@@ -238,6 +238,7 @@ export const WorkInformationRemoveMany = gql`
 
 export const WorkInformationSubscription = gql`
   subscription WorkInformationSubscription {
-    WorkInformationSubscription { id }
+    WorkInformationSubscription { ...WorkInformationFragment }
   }
+  ${WorkInformationFragment}
 `;

@@ -7,6 +7,7 @@ import z from 'zod';
 import CustomDateRangeInput from '@/components/Forms/Inputs/CustomDateRangeInput';
 import CustomDateInput from '@/components/Forms/Inputs/CustomDateInput';
 import { useForm } from 'react-hook-form';
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
 
 export const Schema = z.object({
   startDate: z.date({ error: 'Please select a start date' }),
@@ -65,6 +66,17 @@ const form = useForm<SchemaType>({
         </div>
         <Button type="submit">Submit</Button>
       </FormTemplate>
+      <Drawer>
+        <DrawerTrigger asChild>
+          <Button>Open</Button>
+        </DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Are you absolutely sure?</DrawerTitle>
+            <DrawerDescription>This action cannot be undone.</DrawerDescription>
+          </DrawerHeader>
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 };

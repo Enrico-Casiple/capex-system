@@ -5,6 +5,7 @@ import { Geist, Geist_Mono, JetBrains_Mono } from 'next/font/google';
 import ApolloProviderWrapper from './_context/GraphQLClient/ApolloProvider/ApolloProviderWrapper';
 import './globals.css';
 import { Toaster } from 'sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
 
@@ -37,7 +38,8 @@ export default function RootLayout({
       <body>
         <ApolloProviderWrapper>
           <SessionProvider>
-           <Toaster
+            <TooltipProvider>
+            <Toaster
               position="bottom-right"
               toastOptions={{
                 style: {
@@ -50,7 +52,8 @@ export default function RootLayout({
                 },
               }}
             />
-            {children}
+              {children}
+            </TooltipProvider>
           </SessionProvider>
         </ApolloProviderWrapper>
       </body>

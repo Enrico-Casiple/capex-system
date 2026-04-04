@@ -1,35 +1,43 @@
 'use client';
 import ListProvider from '@/app/_context/ListContext/ListProvider';
 import { modelGQL } from '@/lib/api/crud.gql';
-import { Query, Subscription, User } from '@/lib/generated/api/customHookAPI/graphql';
-import { ColumnDef } from '@tanstack/react-table';
+import { Query, Subscription } from '@/lib/generated/api/customHookAPI/graphql';
+import { ColumnDef, ColumnFiltersState } from '@tanstack/react-table';
 import useColumns from '../_hooks/useColumns';
 
 const modelAPI = modelGQL;
 
-type ListPageProps = {
+type ListPageProps<ModelShape extends { id: string }> = {
   modelName: string;
   children: React.ReactNode;
-  extraColumns?: ColumnDef<User, unknown>[];
+  extraColumns?: ColumnDef<ModelShape, unknown>[];
+  initialColumnVisibility: Record<string, boolean>;
+  initialFilter: Record<string, unknown>;
+  showActions: boolean;
+  initialColumnFilters?: ColumnFiltersState;
+  actionComponent: (row: ModelShape) => React.ReactNode;
 };
 
-const ListPage = ({ modelName, children, extraColumns = [] }: ListPageProps) => {
-  const columns = useColumns<User>({
-    extraColumns,
-    showActions: false,
+const ListPage = <ModelShape extends { id: string }>({ modelName, children, extraColumns = [], initialColumnVisibility, initialFilter, showActions, initialColumnFilters = [], actionComponent }: ListPageProps<ModelShape>) => {
+  
+  const columns = useColumns<ModelShape>({
+      extraColumns,
+      showActions,
+      actionCell: actionComponent
   });
 
   return (
     <ListProvider<
       Pick<Query, `${string}FindAllWithCursor` & keyof Query>,
       Pick<Subscription, `${string}Subscription` & keyof Subscription>,
-      User
+      ModelShape
     >
       modelGQL={modelAPI}
       columns={columns}
-      initialFilter={{}}
-      initialColumnVisibility={{}}
+      initialFilter={initialFilter}
+      initialColumnVisibility={initialColumnVisibility}
       modelName={modelName}
+      initialColumnFilters={initialColumnFilters } // Pass this down
     >
       {children}
     </ListProvider>

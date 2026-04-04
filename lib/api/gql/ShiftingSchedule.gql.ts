@@ -229,6 +229,7 @@ export const ShiftingScheduleRemoveMany = gql`
 
 export const ShiftingScheduleSubscription = gql`
   subscription ShiftingScheduleSubscription {
-    ShiftingScheduleSubscription { id }
+    ShiftingScheduleSubscription { ...ShiftingScheduleFragment }
   }
+  ${ShiftingScheduleFragment}
 `;

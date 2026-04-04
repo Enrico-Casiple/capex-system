@@ -223,6 +223,7 @@ export const DepartmentRemoveMany = gql`
 
 export const DepartmentSubscription = gql`
   subscription DepartmentSubscription {
-    DepartmentSubscription { id }
+    DepartmentSubscription { ...DepartmentFragment }
   }
+  ${DepartmentFragment}
 `;

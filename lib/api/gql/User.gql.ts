@@ -227,6 +227,7 @@ export const UserRemoveMany = gql`
 
 export const UserSubscription = gql`
   subscription UserSubscription {
-    UserSubscription { id }
+    UserSubscription { ...UserFragment }
   }
+  ${UserFragment}
 `;

@@ -228,6 +228,7 @@ export const AuditLogRemoveMany = gql`
 
 export const AuditLogSubscription = gql`
   subscription AuditLogSubscription {
-    AuditLogSubscription { id }
+    AuditLogSubscription { ...AuditLogFragment }
   }
+  ${AuditLogFragment}
 `;

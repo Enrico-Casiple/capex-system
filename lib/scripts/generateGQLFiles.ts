@@ -244,8 +244,9 @@ export const ${modelName}RemoveMany = gql\`
 
 export const ${modelName}Subscription = gql\`
   subscription ${modelName}Subscription {
-    ${modelName}Subscription { id }
+    ${modelName}Subscription { ...${fragmentName} }
   }
+  \${${fragmentName}}
 \`;
 `.trim();
 

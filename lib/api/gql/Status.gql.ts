@@ -221,6 +221,7 @@ export const StatusRemoveMany = gql`
 
 export const StatusSubscription = gql`
   subscription StatusSubscription {
-    StatusSubscription { id }
+    StatusSubscription { ...StatusFragment }
   }
+  ${StatusFragment}
 `;

@@ -221,6 +221,7 @@ export const PositionRemoveMany = gql`
 
 export const PositionSubscription = gql`
   subscription PositionSubscription {
-    PositionSubscription { id }
+    PositionSubscription { ...PositionFragment }
   }
+  ${PositionFragment}
 `;

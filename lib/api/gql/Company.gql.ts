@@ -226,6 +226,7 @@ export const CompanyRemoveMany = gql`
 
 export const CompanySubscription = gql`
   subscription CompanySubscription {
-    CompanySubscription { id }
+    CompanySubscription { ...CompanyFragment }
   }
+  ${CompanyFragment}
 `;

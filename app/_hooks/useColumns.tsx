@@ -38,7 +38,7 @@ const useColumns = <Model extends { id: string }>({
     ),
     enableSorting: false, // by default, True so we need to disable sorting for this column
     enableColumnFilter: false, // by default, True so we need to disable filtering for this column
-    size: 5,
+    size: 50,
   });
 
   // Add the unique columns for this table
@@ -51,17 +51,45 @@ const useColumns = <Model extends { id: string }>({
 
   columns.push(...extraColumns);
 
-  columns.push({
-    id: 'createdAt',
-    accessorKey: 'createdAt',
-    header: 'Created At',
-    cell: ({ getValue }) => {
-      const date = new Date(getValue() as string);
-      return formatDate(date, 'PPP p'); // Format the date as "Jun 1, 2024, 12:00 PM"
-    },
-    enableSorting: false, // by default, True so we need to disable sorting for this column
-    enableColumnFilter: false, // by default, True so we need to disable filtering for this column
-  });
+columns.push({
+  id: 'createdAt',
+  accessorKey: 'createdAt',
+  header: 'Created At',
+  cell: ({ getValue }) => {
+    const value = getValue();
+    
+    // Safety checks
+    if (!value) return 'Today';
+    
+    try {
+      const date = new Date(value as string);
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        return 'Today';
+      }
+      
+      return formatDate(date, 'PPP p'); // Format as "Jun 1, 2024, 12:00 PM"
+    } catch (error) {
+      console.error('Date formatting error:', error);
+      return 'Today';
+    }
+  },
+  enableSorting: false,
+  enableColumnFilter: false,
+});
+
+  // columns.push({
+  //   id: 'updatedAt',
+  //   accessorKey: 'updatedAt',
+  //   header: 'Updated At',
+  //   cell: ({ getValue }) => {
+  //     const date = new Date(getValue() as string);
+  //     return formatDate(date, 'PPP p'); // Format the date as "Jun 1, 2024, 12:00 PM"
+  //   },
+  //   enableSorting: false, // by default, True so we need to disable sorting for this column
+  //   enableColumnFilter: false, // by default, True so we need to disable filtering for this column
+  // });
 
   if (showActions) {
     columns.push({

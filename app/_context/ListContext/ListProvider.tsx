@@ -8,6 +8,7 @@ import { OperationVariables } from '@apollo/client';
 import { useQuery, useSubscription } from '@apollo/client/react';
 import {
   ColumnDef,
+  ColumnFiltersState,
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
@@ -47,6 +48,7 @@ interface ListContextValue<TQuery extends Record<string, Query[keyof Query]>, TM
   setNewItems: React.Dispatch<React.SetStateAction<TModel[]>>;
   columnVisibility: Record<string, boolean>;
   setColumnVisibility: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  columnFilters: ColumnFiltersState;
   columns: ColumnDef<TModel, unknown>[];
   hasNextPage: boolean;
   nextCursor: string | null;
@@ -85,6 +87,7 @@ interface ListProviderProps<
   subscriptionResult?: TSubscription;
   initialFilter: Record<string, unknown>;
   initialColumnVisibility: Record<string, boolean>;
+  initialColumnFilters: ColumnFiltersState;
   columns: ColumnDef<TModel, unknown>[];
   modelName: string;
 }
@@ -108,6 +111,7 @@ const ListProvider = <
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>(
     props.initialColumnVisibility,
   );
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(props.initialColumnFilters || []);
 
   const [accumulatedData, setAccumulatedData] = useState<TModel[]>([]);
   const [hasNextPage, setHasNextPage] = useState(false);
@@ -181,11 +185,13 @@ const ListProvider = <
     setCursor(nextCursor);
   }, [hasNextPage, nextCursor, returnQuery.loading]);
 
+
   const table = useReactTable<TModel>({
     columns: props.columns as ColumnDef<TModel, unknown>[],
     data: allRecordData,
-    state: { columnVisibility },
+    state: { columnVisibility, columnFilters },
     onColumnVisibilityChange: setColumnVisibility,
+    onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -219,6 +225,8 @@ const ListProvider = <
     setNewItems,
     columnVisibility,
     setColumnVisibility,
+    columnFilters,
+    setColumnFilters,
     columns: props.columns,
     hasNextPage,
     nextCursor,

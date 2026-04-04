@@ -227,6 +227,7 @@ export const PermissionRemoveMany = gql`
 
 export const PermissionSubscription = gql`
   subscription PermissionSubscription {
-    PermissionSubscription { id }
+    PermissionSubscription { ...PermissionFragment }
   }
+  ${PermissionFragment}
 `;

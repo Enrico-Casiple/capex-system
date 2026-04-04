@@ -221,6 +221,7 @@ export const TypeRemoveMany = gql`
 
 export const TypeSubscription = gql`
   subscription TypeSubscription {
-    TypeSubscription { id }
+    TypeSubscription { ...TypeFragment }
   }
+  ${TypeFragment}
 `;

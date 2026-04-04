@@ -1,11 +1,12 @@
 import { Spinner, useListContext } from '@/app/_context/ListContext/ListProvider';
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { Query } from '@/lib/generated/api/customHookAPI/graphql';
 import { flexRender } from '@tanstack/react-table';
 import { FileSearchIcon } from 'lucide-react';
 import TableBodyWrapper from './TableBodyWrapper';
 import TableHeaderWrapper from './TableHeaderWrapper';
+import TableFooterWrapper from './TableFooterWrapper';
 
 const TableWrapper = <ModelShape, Response extends Record<string, Query[keyof Query]>>() => {
   const { allRecordData, returnQuery, table } = useListContext<Response, ModelShape>();
@@ -14,6 +15,8 @@ const TableWrapper = <ModelShape, Response extends Record<string, Query[keyof Qu
 
   return (
     <div className="flex flex-col rounded-md border border-border overflow-hidden bg-background">
+
+        
       <div className="relative flex flex-col">
         {returnQuery.loading && !hasData && (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm gap-2">
@@ -26,7 +29,21 @@ const TableWrapper = <ModelShape, Response extends Record<string, Query[keyof Qu
         <div className="hidden md:block">
           <Table className="w-full text-xs table-fixed">
             <TableHeaderWrapper table={table} />
-            <TableBodyWrapper table={table} />
+              {isEmpty ? (
+                <TableBody>
+                  <TableRow style={{ display: 'table', width: '100%', tableLayout: 'fixed' }} 
+                  >
+                    <TableCell className="flex flex-col items-center justify-center text-center border-0 space-y-4 p-10">
+                      <FileSearchIcon size={36} strokeWidth={1.2} className="text-muted-foreground/50 text-center" />
+                      <span className="text-sm font-medium">No records found</span>
+                      <span className="text-xs mt-0.5 opacity-70">
+                        Try adjusting your filters or search criteria
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              ) : <TableBodyWrapper table={table} />}
+            <TableFooterWrapper />
           </Table>
         </div>
 
@@ -45,7 +62,7 @@ const TableWrapper = <ModelShape, Response extends Record<string, Query[keyof Qu
               row.original && typeof row.original === 'object'
                 ? (row.original as Record<string, unknown>)
                 : null;
-            const createdAt = raw?.createdAt ? new Date(raw.createdAt as string) : null;
+            // const createdAt = raw?.createdAt ? new Date(raw.createdAt as string) : null;
 
             return (
               <Card key={row.id} className="w-full">
@@ -133,18 +150,6 @@ const TableWrapper = <ModelShape, Response extends Record<string, Query[keyof Qu
             );
           })}
         </div>
-
-        {isEmpty && (
-          <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted-foreground">
-            <FileSearchIcon size={36} strokeWidth={1.2} className="text-muted-foreground/50" />
-            <div className="text-center">
-              <p className="text-sm font-medium">No records found</p>
-              <p className="text-xs mt-0.5 opacity-70">
-                Try adjusting your filters or search criteria
-              </p>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

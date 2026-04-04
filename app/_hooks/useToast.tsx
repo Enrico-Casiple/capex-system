@@ -33,7 +33,7 @@ const useToast = () => {
             )}
         </div>
         ),
-        position: 'bottom-right',
+        position: 'top-right',
         classNames: sharedClassNames,
         style: sharedStyle,
     });
@@ -51,7 +51,7 @@ const useToast = () => {
             )}
         </div>
         ),
-        position: 'bottom-right',
+        position: 'top-right',
         classNames: sharedClassNames,
         style: sharedStyle,
     });

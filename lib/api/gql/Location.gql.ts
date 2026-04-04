@@ -221,6 +221,7 @@ export const LocationRemoveMany = gql`
 
 export const LocationSubscription = gql`
   subscription LocationSubscription {
-    LocationSubscription { id }
+    LocationSubscription { ...LocationFragment }
   }
+  ${LocationFragment}
 `;

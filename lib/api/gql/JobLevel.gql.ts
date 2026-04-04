@@ -224,6 +224,7 @@ export const JobLevelRemoveMany = gql`
 
 export const JobLevelSubscription = gql`
   subscription JobLevelSubscription {
-    JobLevelSubscription { id }
+    JobLevelSubscription { ...JobLevelFragment }
   }
+  ${JobLevelFragment}
 `;

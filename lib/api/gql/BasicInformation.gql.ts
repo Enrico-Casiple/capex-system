@@ -232,6 +232,7 @@ export const BasicInformationRemoveMany = gql`
 
 export const BasicInformationSubscription = gql`
   subscription BasicInformationSubscription {
-    BasicInformationSubscription { id }
+    BasicInformationSubscription { ...BasicInformationFragment }
   }
+  ${BasicInformationFragment}
 `;

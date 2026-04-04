@@ -272,10 +272,9 @@ export class CrudGQLBuilder {
   get subscription() {
     return gql`
       subscription ${this.entityName}Subscription {
-        ${this.entityName}Subscription {
-          id
-        }
+        ${this.entityName}Subscription { ...${this.entityFragmentName} }
       }
+      ${this.entityFragment}
     `;
   }
 }

@@ -222,6 +222,7 @@ export const HolidayRemoveMany = gql`
 
 export const HolidaySubscription = gql`
   subscription HolidaySubscription {
-    HolidaySubscription { id }
+    HolidaySubscription { ...HolidayFragment }
   }
+  ${HolidayFragment}
 `;

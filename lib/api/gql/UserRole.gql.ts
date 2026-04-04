@@ -226,6 +226,7 @@ export const UserRoleRemoveMany = gql`
 
 export const UserRoleSubscription = gql`
   subscription UserRoleSubscription {
-    UserRoleSubscription { id }
+    UserRoleSubscription { ...UserRoleFragment }
   }
+  ${UserRoleFragment}
 `;
