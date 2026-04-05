@@ -1,6 +1,7 @@
 import { useListContext } from '@/app/_context/ListContext/ListProvider';
 import useToast from '@/app/_hooks/useToast';
 import CustomDrawer from '@/components/custom/CusotmDrawer';
+import CustomDialog from '@/components/custom/CustomDialog';
 import { Button } from '@/components/ui/button';
 import { 
   DropdownMenu, 
@@ -20,9 +21,12 @@ import {
   Trash2 
 } from 'lucide-react';
 import React, { useState } from 'react';
+import ArchiveOne from './Archive';
+import RestoreOne from './RestoreOne';
+import RemoveOne from './RemoveOne';
 
-type ActionType = 'view' | 'edit' | 'duplicate' | 'archive' | 'restore' | 'delete';
-type PopupType = 'dialog' | 'drawer' | 'none';
+export type ActionType = 'view' | 'edit' | 'duplicate' | 'archive' | 'restore' | 'delete' | 'none'; // none -> create
+export type PopupType = 'dialog' | 'drawer' | 'none';
 
 interface ActionState {
   id: string;
@@ -32,11 +36,13 @@ interface ActionState {
 
 type ActionProps = {
   rowId: string;
+  component: (rowid: string | null, actionType: ActionType, popupType: PopupType, drawerOpen: boolean, setDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>) => React.ReactNode;
 }
 
-const Action = ({ rowId }: ActionProps) => {
+const Action = ({ rowId, component }: ActionProps) => {
   const { active } = useListContext();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [currentAction, setCurrentAction] = useState<ActionState | null>(null);
   const toast = useToast();
 
@@ -54,8 +60,7 @@ const Action = ({ rowId }: ActionProps) => {
         setDrawerOpen(true);
         break;
       case 'dialog':
-        // Implement dialog logic here
-        alert(`Dialog for ${actionType} - ID: ${rowId}`);
+        setDialogOpen(true);
         break;
       case 'none':
         toast.error({
@@ -67,6 +72,33 @@ const Action = ({ rowId }: ActionProps) => {
     }
 
   };
+
+  const getActionDetails = (actionType: ActionType) => {
+  const titles: Record<ActionType, string> = {
+    view: 'View User Details',
+    edit: 'Edit User Information',
+    duplicate: 'Duplicate User',
+    archive: 'Archive User',
+    restore: 'Restore User',
+    delete: 'Delete User',
+    none: 'Action',
+  };
+
+  const descriptions: Record<ActionType, string> = {
+    view: 'Review the complete information for this user account.',
+    edit: 'Update user information, settings, and permissions.',
+    duplicate: 'Create a copy of this user with new details.',
+    archive: 'Are you sure? This user will be moved to archived records. You can restore it later.',
+    restore: 'Are you sure? This user will return to active records.',
+    delete: 'This action is permanent and cannot be undone. All associated data will be deleted.',
+    none: 'Perform an action on this record.',
+  };
+
+  return {
+    title: titles[actionType] || 'Action',
+    description: descriptions[actionType] || 'Perform an action.',
+  };
+};
 
 
   return (
@@ -92,36 +124,38 @@ const Action = ({ rowId }: ActionProps) => {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
 
-          <DropdownMenuItem 
-            onSelect={() => handleAction('view', 'drawer')}
-            className="cursor-pointer group"
-          >
-            <EyeIcon className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-foreground transition-colors" />
-            <span>View Details</span>
-          </DropdownMenuItem>
+         
 
           {active && (
-            <DropdownMenuItem 
-              onSelect={() => handleAction('edit', 'drawer')}
-              className="cursor-pointer group"
-            >
-              <Edit className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-foreground transition-colors" />
-              <span>Edit</span>
-            </DropdownMenuItem>
+            <React.Fragment>
+              <DropdownMenuItem 
+                onSelect={() => handleAction('view', 'drawer')}
+                className="cursor-pointer group"
+              >
+                <EyeIcon className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-foreground transition-colors" />
+                <span>View Details</span>
+                </DropdownMenuItem>
+              <DropdownMenuItem 
+                onSelect={() => handleAction('edit', 'drawer')}
+                className="cursor-pointer group"
+              >
+                <Edit className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-foreground transition-colors" />
+                <span>Edit</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onSelect={() => handleAction('duplicate', 'drawer')}
+                className="cursor-pointer group"
+              >
+                <Copy className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-foreground transition-colors" />
+                <span>Duplicate</span>
+              </DropdownMenuItem>
+            </React.Fragment>
           )}
-
-          <DropdownMenuItem 
-            onSelect={() => handleAction('duplicate', 'drawer')}
-            className="cursor-pointer group"
-          >
-            <Copy className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-foreground transition-colors" />
-            <span>Duplicate</span>
-          </DropdownMenuItem>
 
           {active ? (
             <DropdownMenuItem 
               onSelect={() => handleAction('archive', 'dialog')}
-              className="cursor-pointer group text-amber-600 focus:text-amber-600 focus:bg-amber-50"
+              className="cursor-pointer group group-hover:text-foreground transition-colors"
             >
               <Archive className="h-4 w-4 mr-3" />
               <span>Archive</span>
@@ -130,7 +164,7 @@ const Action = ({ rowId }: ActionProps) => {
             <>
               <DropdownMenuItem 
                 onSelect={() => handleAction('restore', 'dialog')}
-                className="cursor-pointer group text-blue-600 focus:text-blue-600 focus:bg-blue-50"
+                className="cursor-pointer group group-hover:text-foreground transition-colors"
               >
                 <ArchiveRestore className="h-4 w-4 mr-3" />
                 <span>Restore</span>
@@ -138,7 +172,7 @@ const Action = ({ rowId }: ActionProps) => {
 
               <DropdownMenuItem 
                 onSelect={() => handleAction('delete', 'dialog')}
-                className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 group"
+                className="cursor-pointer group group-hover:text-foreground transition-colors"
               >
                 <Trash2 className="h-4 w-4 mr-3" />
                 <span>Delete</span>
@@ -148,18 +182,31 @@ const Action = ({ rowId }: ActionProps) => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {currentAction && (
-        <CustomDrawer 
-          open={drawerOpen} 
-          setOpen={setDrawerOpen}
-          title={`${currentAction.actionType.charAt(0).toUpperCase() + currentAction.actionType.slice(1)} - ID: ${currentAction.id}`} 
-          description={`This is a ${currentAction.popupType} for ${currentAction.actionType} action.`}
-        >
-          {currentAction.actionType === 'view' && <div>Viewing details for ID: {currentAction.id}</div>}
-          {currentAction.actionType === 'edit' && <div>Editing item with ID: {currentAction.id}</div>}
-          {currentAction.actionType === 'duplicate' && <div>Duplicating item with ID: {currentAction.id}</div>}
-        </CustomDrawer>
-      )}
+    {currentAction?.popupType === 'drawer' && (
+      <CustomDrawer 
+        open={drawerOpen} 
+        setOpen={setDrawerOpen}
+        title={getActionDetails(currentAction.actionType).title}
+        description={getActionDetails(currentAction.actionType).description}
+      >
+        {currentAction.actionType === 'view' && component(currentAction.id, currentAction.actionType, currentAction.popupType, drawerOpen, setDrawerOpen)}
+        {currentAction.actionType === 'edit' && component(currentAction.id, currentAction.actionType, currentAction.popupType, drawerOpen, setDrawerOpen)}
+        {currentAction.actionType === 'duplicate' && component(currentAction.id, currentAction.actionType, currentAction.popupType, drawerOpen, setDrawerOpen)}
+      </CustomDrawer>
+    )}
+
+    {currentAction?.popupType === 'dialog' && (
+      <CustomDialog 
+        open={dialogOpen} 
+        setOpen={setDialogOpen}
+        title={getActionDetails(currentAction.actionType).title}
+        description={getActionDetails(currentAction.actionType).description}
+      >
+        {currentAction.actionType === 'archive' && <ArchiveOne rowId={currentAction.id} setDialogOpen={setDialogOpen} />}
+        {currentAction.actionType === 'restore' && <RestoreOne rowId={currentAction.id} setDialogOpen={setDialogOpen} />}
+        {currentAction.actionType === 'delete' && <RemoveOne rowId={currentAction.id} setDialogOpen={setDialogOpen} />}
+      </CustomDialog>
+    )}
     </React.Fragment>
   );
 };

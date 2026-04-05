@@ -13,12 +13,12 @@ type CustomButtonProps = {
 const CustomButton = (props: CustomButtonProps) => {
   return (
     <div>
-      <div>
+      <div className={`flex ${props.isSolo ? 'justify-center' : 'justify-end'} gap-2`}>
         {!props.loading && !props.isSolo && (
           <Button
             {...props.inputPropsCancel}
             disabled={props.loading}
-            type={props.type}
+            type={'button'}
             size={'sm'}
             variant={props.variant ? props.variant : 'outline'}
             className="rounded-sm"

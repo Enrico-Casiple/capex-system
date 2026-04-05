@@ -47,4 +47,7 @@ export type PrismaModelMethods<PrismaModel extends Prisma.ModelName> = {
   delete: (args: {
     where: UpdateArgs<PrismaModel>['where'];
   }) => Promise<PrismaTypes[PrismaModel]['Shape'] | null>;
+  deleteMany: (args: {
+    where?: UpdateManyArgs<PrismaModel>['where'];
+  }) => Promise<PrismaTypes[PrismaModel]['Shape'] | null>;
 };

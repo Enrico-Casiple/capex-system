@@ -331,6 +331,11 @@ input AuditLogCursorPaginationInput {
   search: String
 
   """
+  (Optional) Specify which text fields to apply the search keyword to. Provide an array of field names (e.g. ["name", "email"]) to search within those fields for the provided search keyword.
+  """
+  searchFields: [String!]
+
+  """
   (Required) Number of AuditLog records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
   """
   take: Int!
@@ -950,6 +955,11 @@ input BasicInformationCursorPaginationInput {
   search: String
 
   """
+  (Optional) Specify which text fields to apply the search keyword to. Provide an array of field names (e.g. ["name", "email"]) to search within those fields for the provided search keyword.
+  """
+  searchFields: [String!]
+
+  """
   (Required) Number of BasicInformation records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
   """
   take: Int!
@@ -1492,6 +1502,11 @@ input CompanyCursorPaginationInput {
   search: String
 
   """
+  (Optional) Specify which text fields to apply the search keyword to. Provide an array of field names (e.g. ["name", "email"]) to search within those fields for the provided search keyword.
+  """
+  searchFields: [String!]
+
+  """
   (Required) Number of Company records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
   """
   take: Int!
@@ -1956,6 +1971,11 @@ input DepartmentCursorPaginationInput {
   search: String
 
   """
+  (Optional) Specify which text fields to apply the search keyword to. Provide an array of field names (e.g. ["name", "email"]) to search within those fields for the provided search keyword.
+  """
+  searchFields: [String!]
+
+  """
   (Required) Number of Department records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
   """
   take: Int!
@@ -2418,6 +2438,11 @@ input GroupOfCompanyCursorPaginationInput {
   search: String
 
   """
+  (Optional) Specify which text fields to apply the search keyword to. Provide an array of field names (e.g. ["name", "email"]) to search within those fields for the provided search keyword.
+  """
+  searchFields: [String!]
+
+  """
   (Required) Number of GroupOfCompany records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
   """
   take: Int!
@@ -2845,6 +2870,11 @@ input HolidayCursorPaginationInput {
   search: String
 
   """
+  (Optional) Specify which text fields to apply the search keyword to. Provide an array of field names (e.g. ["name", "email"]) to search within those fields for the provided search keyword.
+  """
+  searchFields: [String!]
+
+  """
   (Required) Number of Holiday records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
   """
   take: Int!
@@ -3266,6 +3296,11 @@ input JobLevelCursorPaginationInput {
 
   """(Optional) Search keyword to filter JobLevel records by text fields."""
   search: String
+
+  """
+  (Optional) Specify which text fields to apply the search keyword to. Provide an array of field names (e.g. ["name", "email"]) to search within those fields for the provided search keyword.
+  """
+  searchFields: [String!]
 
   """
   (Required) Number of JobLevel records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
@@ -3709,6 +3744,11 @@ input LocationCursorPaginationInput {
   search: String
 
   """
+  (Optional) Specify which text fields to apply the search keyword to. Provide an array of field names (e.g. ["name", "email"]) to search within those fields for the provided search keyword.
+  """
+  searchFields: [String!]
+
+  """
   (Required) Number of Location records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
   """
   take: Int!
@@ -4038,6 +4078,11 @@ type Mutation {
   ): AuditLogResponse
 
   """
+  Permanently delete all AuditLog records. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  AuditLogRemoveAll: AuditLogResponse
+
+  """
   Permanently delete multiple AuditLog records by their IDs. This action is irreversible. Each removed record triggers an individual real-time subscription event.
   """
   AuditLogRemoveMany(
@@ -4183,6 +4228,11 @@ type Mutation {
   ): BasicInformationResponse
 
   """
+  Permanently delete all BasicInformation records. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  BasicInformationRemoveAll: BasicInformationResponse
+
+  """
   Permanently delete multiple BasicInformation records by their IDs. This action is irreversible. Each removed record triggers an individual real-time subscription event.
   """
   BasicInformationRemoveMany(
@@ -4324,6 +4374,11 @@ type Mutation {
   ): CompanyResponse
 
   """
+  Permanently delete all Company records. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  CompanyRemoveAll: CompanyResponse
+
+  """
   Permanently delete multiple Company records by their IDs. This action is irreversible. Each removed record triggers an individual real-time subscription event.
   """
   CompanyRemoveMany(
@@ -4461,6 +4516,11 @@ type Mutation {
     """The unique identifier of the Department record to permanently delete."""
     id: String!
   ): DepartmentResponse
+
+  """
+  Permanently delete all Department records. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  DepartmentRemoveAll: DepartmentResponse
 
   """
   Permanently delete multiple Department records by their IDs. This action is irreversible. Each removed record triggers an individual real-time subscription event.
@@ -4606,6 +4666,11 @@ type Mutation {
   ): GroupOfCompanyResponse
 
   """
+  Permanently delete all GroupOfCompany records. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  GroupOfCompanyRemoveAll: GroupOfCompanyResponse
+
+  """
   Permanently delete multiple GroupOfCompany records by their IDs. This action is irreversible. Each removed record triggers an individual real-time subscription event.
   """
   GroupOfCompanyRemoveMany(
@@ -4743,6 +4808,11 @@ type Mutation {
     """The unique identifier of the Holiday record to permanently delete."""
     id: String!
   ): HolidayResponse
+
+  """
+  Permanently delete all Holiday records. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  HolidayRemoveAll: HolidayResponse
 
   """
   Permanently delete multiple Holiday records by their IDs. This action is irreversible. Each removed record triggers an individual real-time subscription event.
@@ -4884,6 +4954,11 @@ type Mutation {
   ): JobLevelResponse
 
   """
+  Permanently delete all JobLevel records. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  JobLevelRemoveAll: JobLevelResponse
+
+  """
   Permanently delete multiple JobLevel records by their IDs. This action is irreversible. Each removed record triggers an individual real-time subscription event.
   """
   JobLevelRemoveMany(
@@ -5021,6 +5096,11 @@ type Mutation {
     """The unique identifier of the Location record to permanently delete."""
     id: String!
   ): LocationResponse
+
+  """
+  Permanently delete all Location records. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  LocationRemoveAll: LocationResponse
 
   """
   Permanently delete multiple Location records by their IDs. This action is irreversible. Each removed record triggers an individual real-time subscription event.
@@ -5162,6 +5242,11 @@ type Mutation {
   ): PermissionResponse
 
   """
+  Permanently delete all Permission records. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  PermissionRemoveAll: PermissionResponse
+
+  """
   Permanently delete multiple Permission records by their IDs. This action is irreversible. Each removed record triggers an individual real-time subscription event.
   """
   PermissionRemoveMany(
@@ -5299,6 +5384,11 @@ type Mutation {
     """The unique identifier of the Position record to permanently delete."""
     id: String!
   ): PositionResponse
+
+  """
+  Permanently delete all Position records. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  PositionRemoveAll: PositionResponse
 
   """
   Permanently delete multiple Position records by their IDs. This action is irreversible. Each removed record triggers an individual real-time subscription event.
@@ -5496,6 +5586,11 @@ type Mutation {
   ): RolePermissionResponse
 
   """
+  Permanently delete all RolePermission records. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  RolePermissionRemoveAll: RolePermissionResponse
+
+  """
   Permanently delete multiple RolePermission records by their IDs. This action is irreversible. Each removed record triggers an individual real-time subscription event.
   """
   RolePermissionRemoveMany(
@@ -5581,6 +5676,11 @@ type Mutation {
     """The unique identifier of the Role record to permanently delete."""
     id: String!
   ): RoleResponse
+
+  """
+  Permanently delete all Role records. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  RoleRemoveAll: RoleResponse
 
   """
   Permanently delete multiple Role records by their IDs. This action is irreversible. Each removed record triggers an individual real-time subscription event.
@@ -5728,6 +5828,11 @@ type Mutation {
   ): ShiftingScheduleResponse
 
   """
+  Permanently delete all ShiftingSchedule records. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  ShiftingScheduleRemoveAll: ShiftingScheduleResponse
+
+  """
   Permanently delete multiple ShiftingSchedule records by their IDs. This action is irreversible. Each removed record triggers an individual real-time subscription event.
   """
   ShiftingScheduleRemoveMany(
@@ -5869,6 +5974,11 @@ type Mutation {
   ): StatusResponse
 
   """
+  Permanently delete all Status records. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  StatusRemoveAll: StatusResponse
+
+  """
   Permanently delete multiple Status records by their IDs. This action is irreversible. Each removed record triggers an individual real-time subscription event.
   """
   StatusRemoveMany(
@@ -6006,6 +6116,11 @@ type Mutation {
     """The unique identifier of the Type record to permanently delete."""
     id: String!
   ): TypeResponse
+
+  """
+  Permanently delete all Type records. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  TypeRemoveAll: TypeResponse
 
   """
   Permanently delete multiple Type records by their IDs. This action is irreversible. Each removed record triggers an individual real-time subscription event.
@@ -6157,6 +6272,11 @@ type Mutation {
   ): UserResponse
 
   """
+  Permanently delete all User records. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  UserRemoveAll: UserResponse
+
+  """
   Permanently delete multiple User records by their IDs. This action is irreversible. Each removed record triggers an individual real-time subscription event.
   """
   UserRemoveMany(
@@ -6261,6 +6381,11 @@ type Mutation {
     """The unique identifier of the UserRole record to permanently delete."""
     id: String!
   ): UserRoleResponse
+
+  """
+  Permanently delete all UserRole records. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  UserRoleRemoveAll: UserRoleResponse
 
   """
   Permanently delete multiple UserRole records by their IDs. This action is irreversible. Each removed record triggers an individual real-time subscription event.
@@ -6437,6 +6562,11 @@ type Mutation {
     """
     id: String!
   ): WorkInformationResponse
+
+  """
+  Permanently delete all WorkInformation records. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  WorkInformationRemoveAll: WorkInformationResponse
 
   """
   Permanently delete multiple WorkInformation records by their IDs. This action is irreversible. Each removed record triggers an individual real-time subscription event.
@@ -6698,6 +6828,11 @@ input PermissionCursorPaginationInput {
 
   """(Optional) Search keyword to filter Permission records by text fields."""
   search: String
+
+  """
+  (Optional) Specify which text fields to apply the search keyword to. Provide an array of field names (e.g. ["name", "email"]) to search within those fields for the provided search keyword.
+  """
+  searchFields: [String!]
 
   """
   (Required) Number of Permission records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
@@ -7121,6 +7256,11 @@ input PositionCursorPaginationInput {
 
   """(Optional) Search keyword to filter Position records by text fields."""
   search: String
+
+  """
+  (Optional) Specify which text fields to apply the search keyword to. Provide an array of field names (e.g. ["name", "email"]) to search within those fields for the provided search keyword.
+  """
+  searchFields: [String!]
 
   """
   (Required) Number of Position records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
@@ -8020,6 +8160,11 @@ input RoleCursorPaginationInput {
   search: String
 
   """
+  (Optional) Specify which text fields to apply the search keyword to. Provide an array of field names (e.g. ["name", "email"]) to search within those fields for the provided search keyword.
+  """
+  searchFields: [String!]
+
+  """
   (Required) Number of Role records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
   """
   take: Int!
@@ -8370,6 +8515,11 @@ input RolePermissionCursorPaginationInput {
   (Optional) Search keyword to filter RolePermission records by text fields.
   """
   search: String
+
+  """
+  (Optional) Specify which text fields to apply the search keyword to. Provide an array of field names (e.g. ["name", "email"]) to search within those fields for the provided search keyword.
+  """
+  searchFields: [String!]
 
   """
   (Required) Number of RolePermission records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
@@ -8979,6 +9129,11 @@ input ShiftingScheduleCursorPaginationInput {
   search: String
 
   """
+  (Optional) Specify which text fields to apply the search keyword to. Provide an array of field names (e.g. ["name", "email"]) to search within those fields for the provided search keyword.
+  """
+  searchFields: [String!]
+
+  """
   (Required) Number of ShiftingSchedule records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
   """
   take: Int!
@@ -9432,6 +9587,11 @@ input StatusCursorPaginationInput {
 
   """(Optional) Search keyword to filter Status records by text fields."""
   search: String
+
+  """
+  (Optional) Specify which text fields to apply the search keyword to. Provide an array of field names (e.g. ["name", "email"]) to search within those fields for the provided search keyword.
+  """
+  searchFields: [String!]
 
   """
   (Required) Number of Status records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
@@ -9958,6 +10118,11 @@ input TypeCursorPaginationInput {
   search: String
 
   """
+  (Optional) Specify which text fields to apply the search keyword to. Provide an array of field names (e.g. ["name", "email"]) to search within those fields for the provided search keyword.
+  """
+  searchFields: [String!]
+
+  """
   (Required) Number of Type records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
   """
   take: Int!
@@ -10430,6 +10595,11 @@ input UserCursorPaginationInput {
   search: String
 
   """
+  (Optional) Specify which text fields to apply the search keyword to. Provide an array of field names (e.g. ["name", "email"]) to search within those fields for the provided search keyword.
+  """
+  searchFields: [String!]
+
+  """
   (Required) Number of User records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
   """
   take: Int!
@@ -10819,6 +10989,11 @@ input UserRoleCursorPaginationInput {
 
   """(Optional) Search keyword to filter UserRole records by text fields."""
   search: String
+
+  """
+  (Optional) Specify which text fields to apply the search keyword to. Provide an array of field names (e.g. ["name", "email"]) to search within those fields for the provided search keyword.
+  """
+  searchFields: [String!]
 
   """
   (Required) Number of UserRole records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.
@@ -11594,6 +11769,11 @@ input WorkInformationCursorPaginationInput {
   (Optional) Search keyword to filter WorkInformation records by text fields.
   """
   search: String
+
+  """
+  (Optional) Specify which text fields to apply the search keyword to. Provide an array of field names (e.g. ["name", "email"]) to search within those fields for the provided search keyword.
+  """
+  searchFields: [String!]
 
   """
   (Required) Number of WorkInformation records to return. Use a positive number for 'forward' pagination and a negative number for 'backward' pagination.

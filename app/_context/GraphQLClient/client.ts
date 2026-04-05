@@ -221,11 +221,11 @@ export const client = new ApolloClient({
   }),
   defaultOptions: {
     watchQuery: {
-      fetchPolicy: 'cache-first', // ← use cache, no unnecessary refetch
+      fetchPolicy: 'cache-and-network', // ← Better for real-time data
     },
     query: {
-      fetchPolicy: 'cache-first', // ← consistent with watchQuery
-      errorPolicy: 'all', // ← return partial data on error
+      fetchPolicy: 'cache-first',
+      errorPolicy: 'all',
     },
     mutate: {
       errorPolicy: 'all',

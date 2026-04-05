@@ -16,9 +16,10 @@ type ListPageProps<ModelShape extends { id: string }> = {
   showActions: boolean;
   initialColumnFilters?: ColumnFiltersState;
   actionComponent: (row: ModelShape) => React.ReactNode;
+  initialSearchField: string[]
 };
 
-const ListPage = <ModelShape extends { id: string }>({ modelName, children, extraColumns = [], initialColumnVisibility, initialFilter, showActions, initialColumnFilters = [], actionComponent }: ListPageProps<ModelShape>) => {
+const ListPage = <ModelShape extends { id: string }>({ modelName, children, extraColumns = [], initialColumnVisibility, initialFilter, showActions, initialColumnFilters = [], actionComponent, initialSearchField = []}: ListPageProps<ModelShape>) => {
   
   const columns = useColumns<ModelShape>({
       extraColumns,
@@ -38,6 +39,7 @@ const ListPage = <ModelShape extends { id: string }>({ modelName, children, extr
       initialColumnVisibility={initialColumnVisibility}
       modelName={modelName}
       initialColumnFilters={initialColumnFilters } // Pass this down
+      initialSearchField={initialSearchField}
     >
       {children}
     </ListProvider>

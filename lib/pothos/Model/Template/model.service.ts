@@ -286,7 +286,13 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
       isActive: input.isActive,
       ...(input.filter || {}),
     } as FindManyArgs<PrismaModel>['where'];
-
+     
+    if(input.search?.trim() && input.searchFields?.length) {
+      where!.OR = input.searchFields.map((field) => ({
+        [field]: { contains: input.search, mode: 'insensitive' },
+      })) 
+    }
+      
     try {
       const records = await this.delegate.findMany({
         where,
@@ -629,18 +635,8 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
       const existing = await this.findUnique(id);
       if (!existing.isSuccess) return fail(this.code('DELETE_ONE_FAILED'), existing.message);
 
-      const record = await this.delegate.update({
+      const record = await this.delegate.delete({
         where: { id } as FindManyArgs<PrismaModel>['where'],
-        data: {
-          isActive: false,
-          auditLogs: this.audit(
-            'DELETE',
-            currentUserId,
-            { record: null, userId: currentUserId },
-            existing.data,
-          ),
-        },
-        include: this.include,
       });
       this.publish(record);
       return ok(this.code('DELETE_ONE_SUCCESS'), `Deleted ${this.modelName} id:${id}`, record);
@@ -718,6 +714,23 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
       return fail(
         this.code('DELETE_MANY_FAILED'),
         `Failed to removeMany ${this.modelName}: ${message}`,
+      );
+    }
+  }
+  
+  async removeAll() {
+    console.log(`📝 RemoveAll ${this.modelName}`) ;
+    try {
+      const deleted = await this.delegate.deleteMany({
+        where: {}, // delete all records
+      });
+      return ok(this.code('DELETE_ALL_SUCCESS'), `Deleted all ${this.modelName} records`, deleted);
+    } catch (error) {
+      const { message } = getPrismaErrorMessage(error);
+      console.error(`❌ RemoveAll ${this.modelName}:`, error);
+      return fail(
+        this.code('DELETE_ALL_FAILED'),
+        `Failed to delete all ${this.modelName} records: ${message}`,
       );
     }
   }

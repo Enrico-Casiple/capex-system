@@ -7,7 +7,7 @@ interface CustomDrawerProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   title: string;
-  description?: string;
+  description: string;
   children: React.ReactNode;
 }
 
@@ -15,9 +15,9 @@ const CustomDrawer = (props: CustomDrawerProps) => {
   return (
     <Drawer open={props.open} onOpenChange={props.setOpen} direction='right'>
       <DrawerContent 
-        className="fixed right-0 top-0 bottom-0 h-screen max-h-screen rounded-none"
+        // className="fixed right-0 top-0 bottom-0 h-screen max-h-screen rounded-none"
         style={{
-          width: '100vw',
+          width: '90vw',
           maxWidth: '100vw',
         }}
       >

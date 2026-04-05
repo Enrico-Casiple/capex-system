@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 type CardWrapperProps = {
   title: string;
   description?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   isHaveBorder: boolean;
 };
 
@@ -15,7 +15,9 @@ const CardWrapper = ({ title, description, children, isHaveBorder = true }: Card
         <CardTitle>{title}</CardTitle>
         {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
-      <CardContent>{children}</CardContent>
+      {
+        children && <CardContent>{children}</CardContent>
+      }
     </Card>
   );
 };

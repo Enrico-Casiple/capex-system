@@ -260,10 +260,9 @@ export class CrudGQLBuilder {
           isSuccess
           message
           code
-          data { ...${this.entityFragmentName} }
+          data { id }
         }
       }
-      ${this.entityFragment}
     `;
   }
 

@@ -409,7 +409,7 @@ model Permission {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
+ @@unique([module, resource, action], name: "module_resource_action")
   @@index([name])
   @@index([module])
   @@index([resource, action])

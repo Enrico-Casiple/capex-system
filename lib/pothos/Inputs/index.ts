@@ -314,6 +314,12 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           required: false,
           description: `(Optional) Search keyword to filter ${modelName} records by text fields.`,
         }),
+        // searchFields: keyof PrismaTypes[modelName]['Shape'][] is not working, need to figure out how to get the keys of the model shape
+        searchFields: t.field({
+          type: [`String`] as never,
+          required: false,
+          description: `(Optional) Specify which text fields to apply the search keyword to. Provide an array of field names (e.g. ["name", "email"]) to search within those fields for the provided search keyword.`,
+        }),
         filter: t.field({
           type: 'Json',
           required: false,

@@ -62,6 +62,7 @@ const Home = () => {
 
   return (
     <div>
+      <pre>{JSON.stringify({ data }, null, 2)}</pre>
       {/* ─── Table ─────────────────────────────────────── */}
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>

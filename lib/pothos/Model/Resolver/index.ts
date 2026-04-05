@@ -539,6 +539,23 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
     }),
   );
 
+  // ─── MUTATION: removeAll ─────────────────────────────────────
+  builder.mutationField(`${modelName}RemoveAll`, (t) =>
+    t.field({
+      type: responseRefs[model],
+      description: `Permanently delete all ${modelName} records. This action is irreversible. Triggers a real-time subscription event on success.`,
+      resolve: async (_parent, args, ctx) => {
+        console.log(`🗄️ ${modelName}: RemoveAll - Received remove all request`);
+        const middlewareError = await middlewareCheck(ctx, modelName);
+        if (middlewareError) return middlewareError;
+        const result = await service.removeAll();
+        ctx.pubsub.publish(subscriptionPublishName, result.data);
+        return result;
+      },
+    }),
+  );
+
+
   // ─── SUBSCRIPTION: onChange ─────────────────────────────────
   builder.subscriptionField(subscriptionPublishName, (t) =>
     t.prismaField({

@@ -33,6 +33,7 @@ export type CursorPaginationInput<PrismaModel extends Prisma.ModelName> = {
   take?: number;
   filter?: FindManyArgs<PrismaModel>['where'];
   search?: string;
+  searchFields?: (keyof PrismaTypes[PrismaModel]['Shape'])[]; // ← add this
 };
 
 export type CursorPaginationResult<PrismaModel extends Prisma.ModelName> = {
