@@ -1,5 +1,6 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { formatDate } from 'date-fns';
+import { useMemo } from 'react';
 
 type ColumnsProps<Model> = {
   extraColumns: ColumnDef<Model>[];
@@ -12,6 +13,7 @@ const useColumns = <Model extends { id: string }>({
   showActions,
   actionCell,
 }: ColumnsProps<Model>) => {
+  return useMemo(() => {
   const columns: ColumnDef<Model>[] = [];
 
   // Add selection column
@@ -21,6 +23,10 @@ const useColumns = <Model extends { id: string }>({
       <div className="flex items-center justify-start pl-3">
         <input
           type="checkbox"
+          checked={table.getIsAllRowsSelected()}
+          ref={(el) => {
+            if (el) el.indeterminate = table.getIsSomeRowsSelected();
+          }}
           onChange={table.getToggleAllRowsSelectedHandler()}
           className="cursor-pointer"
         />
@@ -31,6 +37,7 @@ const useColumns = <Model extends { id: string }>({
         <input
           type="checkbox"
           checked={row.getIsSelected()}
+          disabled={!row.getCanSelect()}
           onChange={row.getToggleSelectedHandler()}
           className="cursor-pointer"
         />
@@ -103,6 +110,8 @@ columns.push({
   }
 
   return columns;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showActions, extraColumns, actionCell]);
 };
 
 export default useColumns;

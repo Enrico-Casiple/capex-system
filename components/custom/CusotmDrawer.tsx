@@ -1,7 +1,14 @@
-import React from 'react'
+import React from 'react';
 import { Button } from '../ui/button';
 import { X } from 'lucide-react';
-import { DrawerHeader, Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerTitle } from '../ui/drawer';
+import {
+  DrawerHeader,
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+} from '../ui/drawer';
 
 interface CustomDrawerProps {
   open: boolean;
@@ -13,8 +20,14 @@ interface CustomDrawerProps {
 
 const CustomDrawer = (props: CustomDrawerProps) => {
   return (
-    <Drawer open={props.open} onOpenChange={props.setOpen} direction='right'>
-      <DrawerContent 
+    <Drawer
+      open={props.open}
+      onOpenChange={(val) => {
+        if (val !== props.open) props.setOpen(val);
+      }}
+      direction="right"
+    >
+      <DrawerContent
         // className="fixed right-0 top-0 bottom-0 h-screen max-h-screen rounded-none"
         style={{
           width: '90vw',
@@ -34,12 +47,10 @@ const CustomDrawer = (props: CustomDrawerProps) => {
             </Button>
           </DrawerClose>
         </DrawerHeader>
-        <div className="flex-1 overflow-y-auto px-4 py-4">
-          {props.children}
-        </div>
+        <div className="flex-1 overflow-y-auto px-4 py-4">{props.children}</div>
       </DrawerContent>
     </Drawer>
-  )
-}
+  );
+};
 
-export default CustomDrawer
+export default CustomDrawer;

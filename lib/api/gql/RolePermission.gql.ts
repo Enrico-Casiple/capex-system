@@ -1,17 +1,17 @@
 import { gql } from '@apollo/client';
 
 export const RolePermissionFragment = gql`
-fragment RolePermissionFragment on RolePermission {
-  id
-  roleId
-  permissionId
-  scopeTypeId
-  scopeValues
-  conditions
-  isActive
-  createdAt
-  updatedAt
-}
+  fragment RolePermissionFragment on RolePermission {
+    id
+    roleId
+    permissionId
+    scopeTypeId
+    scopeValues
+    conditions
+    isActive
+    createdAt
+    updatedAt
+  }
 `;
 
 export const RolePermissionFindAllWithCursor = gql`
@@ -20,7 +20,9 @@ export const RolePermissionFindAllWithCursor = gql`
       isSuccess
       message
       code
-      data { ...RolePermissionFragment }
+      data {
+        ...RolePermissionFragment
+      }
       nextCursor
       prevCursor
       hasNextPage
@@ -36,7 +38,9 @@ export const RolePermissionFindAll = gql`
       isSuccess
       message
       code
-      data { ...RolePermissionFragment }
+      data {
+        ...RolePermissionFragment
+      }
       allCount
       active
       inActive
@@ -70,7 +74,9 @@ export const RolePermissionFindUnique = gql`
       isSuccess
       message
       code
-      data { ...RolePermissionFragment }
+      data {
+        ...RolePermissionFragment
+      }
     }
   }
   ${RolePermissionFragment}
@@ -82,7 +88,9 @@ export const RolePermissionFindBy = gql`
       isSuccess
       message
       code
-      data { ...RolePermissionFragment }
+      data {
+        ...RolePermissionFragment
+      }
     }
   }
   ${RolePermissionFragment}
@@ -94,7 +102,9 @@ export const RolePermissionFindFirst = gql`
       isSuccess
       message
       code
-      data { ...RolePermissionFragment }
+      data {
+        ...RolePermissionFragment
+      }
     }
   }
   ${RolePermissionFragment}
@@ -106,7 +116,9 @@ export const RolePermissionCreate = gql`
       isSuccess
       message
       code
-      data { ...RolePermissionFragment }
+      data {
+        ...RolePermissionFragment
+      }
     }
   }
   ${RolePermissionFragment}
@@ -118,19 +130,27 @@ export const RolePermissionCreateMany = gql`
       isSuccess
       message
       code
-      data { ...RolePermissionFragment }
+      data {
+        ...RolePermissionFragment
+      }
     }
   }
   ${RolePermissionFragment}
 `;
 
 export const RolePermissionUpdate = gql`
-  mutation RolePermissionUpdate($id: String!, $data: RolePermissionUpdateInput!, $currentUserId: String) {
+  mutation RolePermissionUpdate(
+    $id: String!
+    $data: RolePermissionUpdateInput!
+    $currentUserId: String
+  ) {
     RolePermissionUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
       code
-      data { ...RolePermissionFragment }
+      data {
+        ...RolePermissionFragment
+      }
     }
   }
   ${RolePermissionFragment}
@@ -142,7 +162,9 @@ export const RolePermissionUpdateMany = gql`
       isSuccess
       message
       code
-      data { ...RolePermissionFragment }
+      data {
+        ...RolePermissionFragment
+      }
     }
   }
   ${RolePermissionFragment}
@@ -154,7 +176,9 @@ export const RolePermissionArchive = gql`
       isSuccess
       message
       code
-      data { ...RolePermissionFragment }
+      data {
+        ...RolePermissionFragment
+      }
     }
   }
   ${RolePermissionFragment}
@@ -166,7 +190,9 @@ export const RolePermissionArchiveMany = gql`
       isSuccess
       message
       code
-      data { ...RolePermissionFragment }
+      data {
+        ...RolePermissionFragment
+      }
     }
   }
   ${RolePermissionFragment}
@@ -178,7 +204,9 @@ export const RolePermissionRestore = gql`
       isSuccess
       message
       code
-      data { ...RolePermissionFragment }
+      data {
+        ...RolePermissionFragment
+      }
     }
   }
   ${RolePermissionFragment}
@@ -190,7 +218,9 @@ export const RolePermissionRestoreMany = gql`
       isSuccess
       message
       code
-      data { ...RolePermissionFragment }
+      data {
+        ...RolePermissionFragment
+      }
     }
   }
   ${RolePermissionFragment}
@@ -224,7 +254,9 @@ export const RolePermissionRemoveMany = gql`
 
 export const RolePermissionSubscription = gql`
   subscription RolePermissionSubscription {
-    RolePermissionSubscription { ...RolePermissionFragment }
+    RolePermissionSubscription {
+      ...RolePermissionFragment
+    }
   }
   ${RolePermissionFragment}
 `;

@@ -182,7 +182,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
     }),
   );
 
-    // ─── QUERY: count ───────────────────────────────────────────
+  // ─── QUERY: count ───────────────────────────────────────────
   builder.queryField(`${modelName}Count`, (t) =>
     t.field({
       type: countResponseRef[model],
@@ -190,10 +190,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         input: t.arg({ type: countInputRefs[model], required: true }),
       },
       resolve: async (_root, { input }, ctx) => {
-        console.log(
-          `🔍 ${modelName}: Count - Received count request with input:`,
-          input,
-        );
+        console.log(`🔍 ${modelName}: Count - Received count request with input:`, input);
         const middlewareError = await middlewareCheck(ctx, modelName, true);
         if (middlewareError) return middlewareError;
         return services[model].count(input.where as FindManyArgs<typeof model>['where']);
@@ -554,7 +551,6 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
       },
     }),
   );
-
 
   // ─── SUBSCRIPTION: onChange ─────────────────────────────────
   builder.subscriptionField(subscriptionPublishName, (t) =>

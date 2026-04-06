@@ -213,7 +213,6 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
   }
 
   // ─── Public Methods ────────────────────────────────────────
-
   async findAll(input: PaginationInput<PrismaModel>) {
     console.log(`📝 FindAll ${this.modelName}`, input);
     const where = {
@@ -221,11 +220,8 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
       ...(input.filter || {}),
     } as FindManyArgs<PrismaModel>['where'];
 
-    // if (input.search?.trim()) {
-    //   where!.OR = this.searchableFields.map((field) => ({
-    //     [field]: { contains: input.search, mode: 'insensitive' },
-    //   }));
-    // }
+    // ← fetch all if pageSize is 0 OR pageSize is 1 with currentPage 1
+    const fetchAll = input.pageSize === 0 || (input.currentPage === 1 && input.pageSize === 1);
 
     try {
       const [inActive, active, total, filtered, records] = await Promise.all([
@@ -236,13 +232,19 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
         this.delegate.findMany({
           where,
           orderBy: this.orderBy,
-          skip: (input.currentPage - 1) * input.pageSize,
-          take: input.pageSize,
+          // ← skip/take only when paginating normally
+          ...(!fetchAll
+            ? {
+                skip: (input.currentPage - 1) * input.pageSize,
+                take: input.pageSize,
+              }
+            : {}),
           include: this.include,
         }),
       ]);
 
-      const totalPages = Math.ceil(filtered / input.pageSize);
+      const effectivePageSize = fetchAll ? filtered : input.pageSize;
+      const totalPages = effectivePageSize > 0 ? Math.ceil(filtered / effectivePageSize) : 1;
 
       return {
         ...ok(
@@ -254,8 +256,8 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
         active,
         inActive,
         pageinfo: {
-          hasNextPage: input.currentPage < totalPages,
-          hasPreviousPage: input.currentPage > 1,
+          hasNextPage: fetchAll ? false : input.currentPage < totalPages,
+          hasPreviousPage: fetchAll ? false : input.currentPage > 1,
           pageSize: input.pageSize,
           currentPage: input.currentPage,
           totalPages,
@@ -286,13 +288,13 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
       isActive: input.isActive,
       ...(input.filter || {}),
     } as FindManyArgs<PrismaModel>['where'];
-     
-    if(input.search?.trim() && input.searchFields?.length) {
+
+    if (input.search?.trim() && input.searchFields?.length) {
       where!.OR = input.searchFields.map((field) => ({
         [field]: { contains: input.search, mode: 'insensitive' },
-      })) 
+      }));
     }
-      
+
     try {
       const records = await this.delegate.findMany({
         where,
@@ -717,9 +719,9 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
       );
     }
   }
-  
+
   async removeAll() {
-    console.log(`📝 RemoveAll ${this.modelName}`) ;
+    console.log(`📝 RemoveAll ${this.modelName}`);
     try {
       const deleted = await this.delegate.deleteMany({
         where: {}, // delete all records

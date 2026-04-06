@@ -3,8 +3,13 @@ import { config } from 'dotenv';
 import { resolve } from 'path';
 config({ path: resolve(__dirname, '../.env') });
 
-import { PermissionTemplate } from "@/app/_role/role";
-import { prisma } from "@/lib/prisma/prisma";
+import {
+  GLOBAL_ACCESS_PERMISSION,
+  PermissionTemplate,
+  roleManagementPermissions,
+  userManagementPermissions,
+} from '@/app/_role/role';
+import { prisma } from '@/lib/prisma/prisma';
 
 const seedComplete = async () => {
   console.log('🌱 Starting complete seed...');
@@ -14,46 +19,10 @@ const seedComplete = async () => {
   // ============================================
   console.log('\n📋 Creating permissions...');
 
-  const userPermissions = new PermissionTemplate({
-    moduleName: 'USER_MANAGEMENT',
-    resourceName: 'user',
-    displayName: 'User',
-    hasApproval: false,
-    customActions: [
-      { action: 'assign_role', name: 'Assign Role', description: 'Assign roles to users' },
-      { action: 'reset_password', name: 'Reset Password', description: 'Reset user passwords' },
-      { action: 'activate', name: 'Activate User', description: 'Activate user accounts' },
-      { action: 'deactivate', name: 'Deactivate User', description: 'Deactivate user accounts' },
-    ],
-  }).getPermissions();
-
-  const rolePermissions = new PermissionTemplate({
-    moduleName: 'ROLE_MANAGEMENT',
-    resourceName: 'role',
-    displayName: 'Role',
-    hasApproval: false,
-    customActions: [
-      { action: 'assign_permissions', name: 'Assign Permissions', description: 'Assign permissions to roles' },
-      { action: 'clone', name: 'Clone Role', description: 'Clone existing role' },
-    ],
-  }).getPermissions();
-
-  // Global Admin Permission
-  const globalAdminPermission = {
-    module: 'SYSTEM',
-    resource: 'system',
-    action: 'full_access',
-    name: 'Full System Access',
-    description: 'Complete access to all system features and modules',
-    displayOrder: 0,
-    isGlobal: true,
-    isAdmin: true,
-  };
-
   const allPermissions = [
-    ...userPermissions,
-    ...rolePermissions,
-    globalAdminPermission,
+    ...userManagementPermissions,
+    ...roleManagementPermissions,
+    GLOBAL_ACCESS_PERMISSION,
   ];
 
   for (const perm of allPermissions) {
@@ -95,23 +64,25 @@ const seedComplete = async () => {
   console.log('\n👥 Creating roles...');
 
   // Global Administrator (SYSTEM role)
-  const adminRole = await prisma.role.findFirst({
-    where: { name: 'Global Administrator' }
-  }) || await prisma.role.create({
-    data: {
-      name: 'Global Administrator',
-      description: 'Full system access with all permissions across all modules',
-      roleType: 'SYSTEM',
-      isDefault: false,
-      isActive: true,
-    },
-  });
+  const adminRole =
+    (await prisma.role.findFirst({
+      where: { name: 'Global Administrator' },
+    })) ||
+    (await prisma.role.create({
+      data: {
+        name: 'Global Administrator',
+        description: 'Full system access with all permissions across all modules',
+        roleType: 'SYSTEM',
+        isDefault: false,
+        isActive: true,
+      },
+    }));
 
   // Employee (SYSTEM role - default for new users)
   const existingEmployee = await prisma.role.findFirst({
-    where: { name: 'Employee' }
+    where: { name: 'Employee' },
   });
-  
+
   if (!existingEmployee) {
     await prisma.role.create({
       data: {
@@ -133,7 +104,7 @@ const seedComplete = async () => {
 
   // Get all permissions
   const allPerms = await prisma.permission.findMany({
-    where: { isActive: true }
+    where: { isActive: true },
   });
 
   // 3.1 Global Administrator - ALL permissions
@@ -142,7 +113,7 @@ const seedComplete = async () => {
       where: {
         roleId: adminRole.id,
         permissionId: perm.id,
-      }
+      },
     });
 
     if (!existing) {

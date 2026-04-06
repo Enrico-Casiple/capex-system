@@ -8373,8 +8373,8 @@ type RolePermission {
   """(Optional) scopeTypeId field of RolePermission. Type: String."""
   scopeTypeId: String
 
-  """(Required) scopeValues field of RolePermission. Type: String."""
-  scopeValues: String!
+  """(Required) scopeValues field of RolePermission. Type: String[]."""
+  scopeValues: [String!]!
 
   """
   (Required) updatedAt field of RolePermission. Type: DateTime (ISO 8601).
@@ -10838,8 +10838,8 @@ type UserRole {
   """(Optional) scopeTypeId field of UserRole. Type: String."""
   scopeTypeId: String
 
-  """(Required) scopeValues field of UserRole. Type: String."""
-  scopeValues: String!
+  """(Required) scopeValues field of UserRole. Type: String[]."""
+  scopeValues: [String!]!
 
   """(Required) updatedAt field of UserRole. Type: DateTime (ISO 8601)."""
   updatedAt: DateTime!

@@ -16,7 +16,7 @@ import {
 } from '@tanstack/react-table';
 import { LoaderIcon } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import React, {useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 interface ListContextValue<TQuery extends Record<string, Query[keyof Query]>, TModel = unknown> {
   singleKey: keyof Query;
@@ -101,8 +101,7 @@ interface ListProviderProps<
   modelName: string;
 }
 
-const MAX_TAKE = 20;
-// const MAX_PAGES_IN_MEMORY = 5;
+const MAX_TAKE = process.env.NODE_ENV === 'production'  ? Number(process.env.NEXTAUTH_MAX_TAKE) : Number(process.env.NEXT_PUBLIC_MAX_TAKE);
 
 const ListProvider = <
   TQuery extends Record<string, Query[keyof Query]>,
@@ -117,20 +116,19 @@ const ListProvider = <
   const [filter, setFilter] = useState<Record<string, unknown> | null>(props.initialFilter);
   const [take, setTake] = useState<number>(MAX_TAKE);
   const [newItems, setNewItems] = useState<TModel[]>([]);
+  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>(
     props.initialColumnVisibility,
   );
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(props.initialColumnFilters || []);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
+    props.initialColumnFilters || [],
+  );
   const [searchItems, setSearchItems] = useState<string | null>(null);
-  const [searchFields, setSearchFields] = useState<string[] | null>(props.initialSearchField || null);
+  const [searchFields, setSearchFields] = useState<string[] | null>(
+    props.initialSearchField || null,
+  );
   const [cursorStack, setCursorStack] = useState<(string | null)[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-
-
-  // const [accumulatedData, setAccumulatedData] = useState<TModel[]>([]);
-  // const [hasNextPage, setHasNextPage] = useState(false);
-  // const [nextCursor, setNextCursor] = useState<string | null>(null);
-  // const seenCursors = useRef<Set<string | null>>(new Set([null]));
 
   const singleKey = `${props.modelName}FindUnique` as keyof Query;
   const cursorKey = `${props.modelName}FindAllWithCursor` as keyof Query;
@@ -140,162 +138,117 @@ const ListProvider = <
   const returnQuery = useQuery<TQuery, Record<string, OperationVariables>>(
     props.modelGQL[model].findAllWithCursor,
     {
-      variables: { cursorInput: { cursor, isActive: active, take, filter, search: searchItems, searchFields } },
+      variables: {
+        cursorInput: { cursor, isActive: active, take, filter, search: searchItems, searchFields },
+      },
       notifyOnNetworkStatusChange: true,
       fetchPolicy: 'cache-and-network',
     },
   );
-
-  // // ─── Append new page, window to MAX_PAGES_IN_MEMORY ───────────
-  // useEffect(() => {
-  //   if (returnQuery.loading || !returnQuery.data) return;
-  //   const result = returnQuery.data?.[cursorKey as keyof TQuery] as
-  //     | { data?: TModel[]; nextCursor?: string | null; hasNextPage?: boolean }
-  //     | undefined;
-    
-  //   // Allow empty results to clear data
-  //   if (!result?.data) return;
-
-  //   setAccumulatedData((prev) => {
-  //     const incoming = result.data ?? [];
-      
-  //     // If no incoming data, clear everything
-  //     if (incoming.length === 0) {
-  //       return [];
-  //     }
-      
-  //     // If cursor is null, it's a fresh fetch/refetch - replace all data
-  //     if (cursor === null) {
-  //       return incoming;
-  //     }
-
-  //     // Otherwise, merge with existing data
-  //     const existingMap = new Map(
-  //       (prev as Array<{ id?: string }>).map((r) => [r.id, r])
-  //     );
-
-  //     // Update existing records or add new ones
-  //     const updated: TModel[] = [];
-  //     const newRecords: TModel[] = [];
-
-  //     incoming.forEach((item) => {
-  //       const id = (item as { id?: string }).id;
-  //       if (id && existingMap.has(id)) {
-  //         // Update existing record
-  //         updated.push(item);
-  //         existingMap.delete(id);
-  //       } else {
-  //         // New record
-  //         newRecords.push(item);
-  //       }
-  //     });
-
-  //     // Keep records that weren't in incoming (not updated)
-  //     const unchanged = Array.from(existingMap.values()) as TModel[];
-
-  //     // Combine: unchanged + updated + new
-  //     const combined = [...unchanged, ...updated, ...newRecords];
-  //     const maxRows = MAX_PAGES_IN_MEMORY * MAX_TAKE;
-      
-  //     // Drop oldest rows when over memory limit
-  //     return combined.length > maxRows ? combined.slice(combined.length - maxRows) : combined;
-  //   });
-
-  //   setHasNextPage(result.hasNextPage ?? false);
-  //   setNextCursor(result.nextCursor ?? null);
-  // }, [returnQuery.data, returnQuery.loading, cursorKey, cursor]);
-
-
-  // // ─── Reset on filter/active change ────────────────────────────
-  // useEffect(() => {
-  //   setAccumulatedData([]);
-  //   seenCursors.current = new Set([null]);
-  //   setCursor(null);
-  // }, [filter, active]);
 
   useSubscription<TSubscription>(props.modelGQL[model].subscription, {
     onData(options) {
       const newData = options.data.data?.[subscriptionKey];
       if (!newData) return;
       returnQuery.refetch();
-      // setAccumulatedData((prev) => [newData as TModel, ...prev]);
     },
   });
 
-  // const allRecordData = React.useMemo<TModel[]>(
-  //   () => [...newItems, ...accumulatedData],
-  //   [newItems, accumulatedData],
-  // );
-
   const allRecordData = React.useMemo<TModel[]>(() => {
-    const currentData = returnQuery.data?.[cursorKey as keyof TQuery] as | { data?: TModel[] } | undefined;
+    const currentData = returnQuery.data?.[cursorKey as keyof TQuery] as
+      | { data?: TModel[] }
+      | undefined;
     return currentData?.data ? [...newItems, ...currentData.data] : newItems;
   }, [newItems, returnQuery.data, cursorKey]);
 
-  // const loadMore = useCallback(() => {
-  //   if (!hasNextPage || returnQuery.loading || !nextCursor) return;
-  //   if (seenCursors.current.has(nextCursor)) return;
-  //   seenCursors.current.add(nextCursor);
-  //   setCursor(nextCursor);
-  // }, [hasNextPage, nextCursor, returnQuery.loading]);
-
+  const coreRowModel = useMemo(() => getCoreRowModel(), []);
+  const filteredRowModel = useMemo(() => getFilteredRowModel(), []);
+  const sortedRowModel = useMemo(() => getSortedRowModel(), []);
 
   const table = useReactTable<TModel>({
     columns: props.columns as ColumnDef<TModel, unknown>[],
     data: allRecordData,
-    state: { columnVisibility, columnFilters },
+    state: { columnVisibility, columnFilters, rowSelection },
     onColumnVisibilityChange: setColumnVisibility,
     onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    onRowSelectionChange: setRowSelection,
+    enableRowSelection: true,
+    getRowId: (row) => (row as { id: string }).id,
+    getCoreRowModel: coreRowModel,
+    getFilteredRowModel: filteredRowModel,
+    getSortedRowModel: sortedRowModel,
     debugTable: true,
     debugHeaders: true,
     debugColumns: true,
   });
 
-  const value = {
-    singleKey,
-    cursorKey,
-    subscriptionKey,
-    modelGQL: props.modelGQL,
-    model,
-    modelName: props.modelName,
-    session,
-    returnQuery,
-    cursor,
-    setCursor,
-    active,
-    setActive,
-    filter,
-    setFilter,
-    searchItems,
-    setSearchItems,
-    searchFields,
-    setSearchFields,
-    initialFilter: props.initialFilter,
-    initialColumnVisibility: props.initialColumnVisibility,
-    take,
-    setTake,
-    table,
-    allRecordData,
-    newItems,
-    setNewItems,
-    cursorStack,
-    setCursorStack,
-    currentPage,
-    setCurrentPage,
-    columnVisibility,
-    setColumnVisibility,
-    columnFilters,
-    setColumnFilters,
-    columns: props.columns,
-    // hasNextPage,
-    // nextCursor,
-    // loadMore,
-    paginationPageIndex: { pageIndex: 0, pageSize: MAX_TAKE },
-    setPaginationPageIndex: () => {},
-  };
+  const value = useMemo(
+    () => ({
+      singleKey,
+      cursorKey,
+      subscriptionKey,
+      modelGQL: props.modelGQL,
+      model,
+      modelName: props.modelName,
+      session,
+      returnQuery,
+      cursor,
+      setCursor,
+      active,
+      setActive,
+      filter,
+      setFilter,
+      searchItems,
+      setSearchItems,
+      searchFields,
+      setSearchFields,
+      initialFilter: props.initialFilter,
+      initialColumnVisibility: props.initialColumnVisibility,
+      take,
+      setTake,
+      table,
+      allRecordData,
+      newItems,
+      setNewItems,
+      cursorStack,
+      setCursorStack,
+      currentPage,
+      setCurrentPage,
+      columnVisibility,
+      setColumnVisibility,
+      columnFilters,
+      setColumnFilters,
+      columns: props.columns,
+      paginationPageIndex: { pageIndex: 0, pageSize: MAX_TAKE },
+      setPaginationPageIndex: () => {},
+    }),
+    [
+      session,
+      returnQuery,
+      cursor,
+      active,
+      filter,
+      take,
+      newItems,
+      columnVisibility,
+      columnFilters,
+      searchItems,
+      searchFields,
+      cursorStack,
+      currentPage,
+      allRecordData,
+      cursorKey,
+      model,
+      props.columns,
+      props.initialColumnVisibility,
+      props.initialFilter,
+      props.modelGQL,
+      props.modelName,
+      singleKey,
+      subscriptionKey,
+      table,
+    ],
+  );
 
   if (returnQuery.loading && !allRecordData.length) {
     return (

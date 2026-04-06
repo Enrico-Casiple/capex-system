@@ -32,11 +32,22 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           if (field.kind === 'scalar') {
             switch (field.type) {
               case 'String':
-                fields[fieldName] = t.exposeString(fieldName as never, {
-                  nullable: isNullable,
-                  description: `${nullableNote} ${fieldName} field of ${modelName}. Type: String.`,
-                });
+                if (field.isList) {
+                  fields[fieldName] = t.field({
+                    type: ['String'],
+                    nullable: isNullable,
+                    resolve: (parent) =>
+                      (parent as unknown as Record<string, string[]>)[fieldName] ?? [],
+                    description: `${nullableNote} ${fieldName} field of ${modelName}. Type: String[].`,
+                  });
+                } else {
+                  fields[fieldName] = t.exposeString(fieldName as never, {
+                    nullable: isNullable,
+                    description: `${nullableNote} ${fieldName} field of ${modelName}. Type: String.`,
+                  });
+                }
                 break;
+
               case 'Int':
                 fields[fieldName] = t.exposeInt(fieldName as never, {
                   nullable: isNullable,

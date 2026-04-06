@@ -17,18 +17,31 @@ interface ModelDataProps {
   title: string;
   description: string;
   newBulkAction: React.ReactNode[];
-  createAction: (rowid: string | null, actionType: ActionType, popupType: PopupType, drawerOpen: boolean, setDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>) => React.ReactNode;
+  createAction: (
+    rowid: string | null,
+    actionType: ActionType,
+    popupType: PopupType,
+    open: boolean,
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>,
+  ) => React.ReactNode;
   importComponent?: React.ReactNode;
   exportComponent?: React.ReactNode;
 }
 
-const ModelData = <ModelShape, Response extends Record<string, Query[keyof Query]>>({ title, description, newBulkAction, importComponent, exportComponent, createAction }: ModelDataProps) => {
-  const {active, table} = useListContext();
+const ModelData = <ModelShape, Response extends Record<string, Query[keyof Query]>>({
+  title,
+  description,
+  newBulkAction,
+  importComponent,
+  exportComponent,
+  createAction,
+}: ModelDataProps) => {
+  const { active, table } = useListContext();
   const [open, setOpen] = React.useState(false);
   return (
     <div className="flex flex-col h-full bg-muted/30">
       {/* Breadcrumbs */}
-     <Breadcrumbs />
+      <Breadcrumbs />
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
         <div className="mx-auto p-6 space-y-6">
@@ -40,19 +53,17 @@ const ModelData = <ModelShape, Response extends Record<string, Query[keyof Query
             </div>
 
             {/* Primary Action */}
-            {
-              active && (
-                <Button 
-                  size="sm" 
-                  variant={'default'}
-                  className='px-4 rounded-sm'
-                  onClick={() => setOpen(true)}
-                >
-                  <Plus className="h-4 w-4" />
-                  Create New
-                </Button>
-              )
-            }
+            {active && (
+              <Button
+                size="sm"
+                variant={'default'}
+                className="px-4 rounded-sm"
+                onClick={() => setOpen(true)}
+              >
+                <Plus className="h-4 w-4" />
+                Create New
+              </Button>
+            )}
           </div>
 
           {/* Action Bar & Search */}
@@ -61,32 +72,29 @@ const ModelData = <ModelShape, Response extends Record<string, Query[keyof Query
               {/* Action Buttons */}
               <ListAction importComponent={importComponent} exportComponent={exportComponent} />
               {/* Search Bar */}
-               <ListSearch />
+              <ListSearch />
             </div>
           </Card>
 
           {/* Bulk Actions Bar */}
-          {
-            table.getSelectedRowModel().flatRows.length > 0 && (
-              <ListBulkAction newBulkAction={newBulkAction} />
-            )
-          }
+          {table.getSelectedRowModel().flatRows.length > 0 && (
+            <ListBulkAction newBulkAction={newBulkAction} />
+          )}
 
           {/* Table */}
-          <TableWrapper<ModelShape,Response> />
+          <TableWrapper<ModelShape, Response> />
         </div>
       </div>
-      <CustomDrawer 
-        open={open} 
+      <CustomDrawer
+        open={open}
         setOpen={setOpen}
-        title={`Create New Record`} 
+        title={`Create New Record`}
         description={`This is a drawer for creating a new record.`}
       >
-        {createAction(null, 'none', 'drawer', open, setOpen)}
+        {open && createAction(null, 'none', 'drawer', open, setOpen)}
       </CustomDrawer>
     </div>
   );
 };
 
 export default ModelData;
- 

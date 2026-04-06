@@ -16,16 +16,27 @@ type ListPageProps<ModelShape extends { id: string }> = {
   showActions: boolean;
   initialColumnFilters?: ColumnFiltersState;
   actionComponent: (row: ModelShape) => React.ReactNode;
-  initialSearchField: string[]
+  initialSearchField: string[];
 };
 
-const ListPage = <ModelShape extends { id: string }>({ modelName, children, extraColumns = [], initialColumnVisibility, initialFilter, showActions, initialColumnFilters = [], actionComponent, initialSearchField = []}: ListPageProps<ModelShape>) => {
-  
+const ListPage = <ModelShape extends { id: string }>({
+  modelName,
+  children,
+  extraColumns = [],
+  initialColumnVisibility,
+  initialFilter,
+  showActions,
+  initialColumnFilters = [],
+  actionComponent,
+  initialSearchField = [],
+}: ListPageProps<ModelShape>) => {
   const columns = useColumns<ModelShape>({
-      extraColumns,
-      showActions,
-      actionCell: actionComponent
+    extraColumns,
+    showActions,
+    actionCell: actionComponent,
   });
+
+  // TODO: ROLE ACCESS FOR VIEW -> IF UNAUTHORIZARE SHOW 403 PAGE OR SOMETHING THAT YOU ARE NOT ALLOWED TO VIEW THIS PAGE
 
   return (
     <ListProvider<
@@ -38,7 +49,7 @@ const ListPage = <ModelShape extends { id: string }>({ modelName, children, extr
       initialFilter={initialFilter}
       initialColumnVisibility={initialColumnVisibility}
       modelName={modelName}
-      initialColumnFilters={initialColumnFilters } // Pass this down
+      initialColumnFilters={initialColumnFilters} // Pass this down
       initialSearchField={initialSearchField}
     >
       {children}

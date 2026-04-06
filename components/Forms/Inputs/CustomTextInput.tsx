@@ -27,6 +27,7 @@ const CustomTextInput = <TFormValues extends FieldValues>(
             placeholder={props.placeholder}
             aria-invalid={fieldState.invalid}
             autoComplete="off"
+            type="text"
           />
           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
         </Field>
