@@ -16,6 +16,7 @@ import React, { useState } from 'react';
 import ArchiveOne from './Archive';
 import RestoreOne from './RestoreOne';
 import RemoveOne from './RemoveOne';
+import RoleGate from '../RoleGate/RoleGate';
 
 export type ActionType = 'view' | 'edit' | 'duplicate' | 'archive' | 'restore' | 'delete' | 'none'; // none -> create
 export type PopupType = 'dialog' | 'drawer' | 'none';
@@ -38,7 +39,7 @@ type ActionProps = {
 };
 
 const Action = ({ rowId, component }: ActionProps) => {
-  const { active } = useListContext();
+  const { active,modelName } = useListContext();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentAction, setCurrentAction] = useState<ActionState | null>(null);
@@ -126,40 +127,72 @@ const Action = ({ rowId, component }: ActionProps) => {
 
           {active && (
             <React.Fragment>
-              <DropdownMenuItem
-                onSelect={() => handleAction('view', 'drawer')}
-                className="cursor-pointer group"
+              <RoleGate
+                module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
+                resource={[`${modelName.toLowerCase()}`, "*"]}
+                action={['read', '*']}
               >
-                <EyeIcon className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-foreground transition-colors" />
-                <span>View Details</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onSelect={() => handleAction('edit', 'drawer')}
-                className="cursor-pointer group"
+                <DropdownMenuItem
+                  onSelect={() => handleAction('view', 'drawer')}
+                  className="cursor-pointer group"
+                >
+                  <EyeIcon className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-foreground transition-colors" />
+                  <span>View Details</span>
+                </DropdownMenuItem>
+
+              </RoleGate>
+               <RoleGate
+                module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
+                resource={[`${modelName.toLowerCase()}`, "*"]}
+                action={['update', '*']}
               >
-                <Edit className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-foreground transition-colors" />
-                <span>Edit</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onSelect={() => handleAction('duplicate', 'drawer')}
-                className="cursor-pointer group"
+                <DropdownMenuItem
+                  onSelect={() => handleAction('edit', 'drawer')}
+                  className="cursor-pointer group"
+                >
+                  <Edit className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-foreground transition-colors" />
+                  <span>Edit</span>
+                </DropdownMenuItem>
+              </RoleGate>
+              <RoleGate
+                module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
+                resource={[`${modelName.toLowerCase()}`, "*"]}
+                action={['duplicate', '*']}
               >
-                <Copy className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-foreground transition-colors" />
-                <span>Duplicate</span>
-              </DropdownMenuItem>
+                
+                <DropdownMenuItem
+                  onSelect={() => handleAction('duplicate', 'drawer')}
+                  className="cursor-pointer group"
+                >
+                  <Copy className="h-4 w-4 mr-3 text-muted-foreground group-hover:text-foreground transition-colors" />
+                  <span>Duplicate</span>
+                </DropdownMenuItem>
+              </RoleGate>
             </React.Fragment>
           )}
 
           {active ? (
-            <DropdownMenuItem
-              onSelect={() => handleAction('archive', 'dialog')}
-              className="cursor-pointer group group-hover:text-foreground transition-colors"
-            >
-              <Archive className="h-4 w-4 mr-3" />
-              <span>Archive</span>
-            </DropdownMenuItem>
+             <RoleGate
+                module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
+                resource={[`${modelName.toLowerCase()}`, "*"]}
+                action={['archive', '*']}
+              >
+              <DropdownMenuItem
+                onSelect={() => handleAction('archive', 'dialog')}
+                className="cursor-pointer group group-hover:text-foreground transition-colors"
+              >
+                <Archive className="h-4 w-4 mr-3" />
+                <span>Archive</span>
+              </DropdownMenuItem>
+              </RoleGate>
           ) : (
             <>
+            <RoleGate
+                module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
+                resource={[`${modelName.toLowerCase()}`, "*"]}
+                action={['restore', '*']}
+              >
+
               <DropdownMenuItem
                 onSelect={() => handleAction('restore', 'dialog')}
                 className="cursor-pointer group group-hover:text-foreground transition-colors"
@@ -167,7 +200,12 @@ const Action = ({ rowId, component }: ActionProps) => {
                 <ArchiveRestore className="h-4 w-4 mr-3" />
                 <span>Restore</span>
               </DropdownMenuItem>
-
+              </RoleGate>
+             <RoleGate
+                module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
+                resource={[`${modelName.toLowerCase()}`, "*"]}
+                action={['delete', '*']}
+              >
               <DropdownMenuItem
                 onSelect={() => handleAction('delete', 'dialog')}
                 className="cursor-pointer group group-hover:text-foreground transition-colors"
@@ -175,6 +213,7 @@ const Action = ({ rowId, component }: ActionProps) => {
                 <Trash2 className="h-4 w-4 mr-3" />
                 <span>Delete</span>
               </DropdownMenuItem>
+              </RoleGate>
             </>
           )}
         </DropdownMenuContent>

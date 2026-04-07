@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/incompatible-library */
 'use client';
+import RoleGate from '@/app/_component/RoleGate/RoleGate';
 import useToast from '@/app/_hooks/useToast';
 import { ModelGQLMap } from '@/lib/api/crud.gql';
 import { Query, Subscription } from '@/lib/generated/api/customHookAPI/graphql';
@@ -261,8 +262,14 @@ const ListProvider = <
   return (
     <ListContext.Provider
       value={value as unknown as ListContextValue<Record<string, Query[keyof Query]>, unknown>}
-    >
-      {props.children}
+    > 
+        <RoleGate 
+          module={[`${props.modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
+          resource={[`${props.modelName.toLowerCase()}`, "*"]}
+          action={['read', '*']}
+        >
+          {props.children}
+        </RoleGate>
     </ListContext.Provider>
   );
 };

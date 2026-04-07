@@ -52,6 +52,7 @@ const ListPage = <ModelShape extends { id: string }>({
       initialColumnFilters={initialColumnFilters} // Pass this down
       initialSearchField={initialSearchField}
     >
+
       {children}
     </ListProvider>
   );

@@ -43,6 +43,7 @@ const ModelPage = () => {
       )}
       initialSearchField={['name', 'email', 'userName']}
     >
+
       <ModelData
         title="Manage Users"
         description="Browse and manage all users in your system. Use the actions column to view details, edit profiles, duplicate entries, archive, restore, or permanently delete users."

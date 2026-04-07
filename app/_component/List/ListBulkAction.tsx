@@ -7,13 +7,14 @@ import { Card } from '@/components/ui/card';
 import { Archive, RotateCcw, Trash2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import React from 'react'
+import RoleGate from '../RoleGate/RoleGate';
 
 type ListBulkActionProps = {
   newBulkAction: React.ReactNode[];
 }
 
 const ListBulkAction = (props: ListBulkActionProps) => {
-  const {active, modelGQL, model, table} = useListContext();
+  const {active, modelGQL, model, table, modelName} = useListContext();
   const [isArchiveOpen, setIsArchiveOpen] = React.useState(false);
   const [isRestoreOpen, setIsRestoreOpen] = React.useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = React.useState(false);
@@ -95,26 +96,42 @@ const handleAction = async (actionType: 'archive' | 'restore' | 'delete') => {
             {
               active ? (
                 <React.Fragment>
-                  {/* <Button variant="ghost" size="sm" className="gap-1.5 h-8 px-3">
-                    <Edit className="h-3.5 w-3.5" />
-                    Update
-                  </Button> */}
+                  <RoleGate
+                    module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
+                    resource={[`${modelName.toLowerCase()}`, "*"]}
+                    action={['bulk_archive', '*']}
+                  >
+
                   <Button variant="ghost" size="sm" className="gap-1.5 h-8 px-3" onClick={() => setIsArchiveOpen(true)}>
                     <Archive className="h-3.5 w-3.5" />
                     Archive
                   </Button>
+                 </RoleGate>
                   {props.newBulkAction}
                 </React.Fragment>
               ) : (
                 <React.Fragment>
-                  <Button variant="ghost" size="sm" className="gap-1.5 h-8 px-3" onClick={() => setIsDeleteOpen(true)}>
-                    <Trash2 className="h-3.5 w-3.5" />
-                    Delete
-                  </Button>
-                  <Button variant="ghost" size="sm" className="gap-1.5 h-8 px-3" onClick={() => setIsRestoreOpen(true)}>
-                    <RotateCcw className="h-3.5 w-3.5" />
-                    Restore
-                  </Button>
+                  <RoleGate
+                    module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
+                    resource={[`${modelName.toLowerCase()}`, "*"]}
+                    action={['bulk_restore', '*']}
+                  >
+                     <Button variant="ghost" size="sm" className="gap-1.5 h-8 px-3" onClick={() => setIsRestoreOpen(true)}>
+                      <RotateCcw className="h-3.5 w-3.5" />
+                      Restore
+                    </Button>
+                  </RoleGate>
+                   <RoleGate
+                    module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
+                    resource={[`${modelName.toLowerCase()}`, "*"]}
+                    action={['bulk_delete', '*']}
+                  >
+                    <Button variant="ghost" size="sm" className="gap-1.5 h-8 px-3" onClick={() => setIsDeleteOpen(true)}>
+                      <Trash2 className="h-3.5 w-3.5" />
+                      Delete
+                    </Button>
+                  </RoleGate>
+                 
                 </React.Fragment>
               )
             }

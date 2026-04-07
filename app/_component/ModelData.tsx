@@ -12,6 +12,7 @@ import ListBulkAction from '@/app/_component/List/ListBulkAction';
 import React from 'react';
 import { ActionType, PopupType } from '@/app/_component/Row/Action';
 import CustomDrawer from '@/components/custom/CusotmDrawer';
+import RoleGate from './RoleGate/RoleGate';
 
 interface ModelDataProps {
   title: string;
@@ -36,7 +37,7 @@ const ModelData = <ModelShape, Response extends Record<string, Query[keyof Query
   exportComponent,
   createAction,
 }: ModelDataProps) => {
-  const { active, table } = useListContext();
+  const { active, table, modelName } = useListContext();
   const [open, setOpen] = React.useState(false);
   return (
     <div className="flex flex-col h-full bg-muted/30">
@@ -54,15 +55,22 @@ const ModelData = <ModelShape, Response extends Record<string, Query[keyof Query
 
             {/* Primary Action */}
             {active && (
-              <Button
-                size="sm"
-                variant={'default'}
-                className="px-4 rounded-sm"
-                onClick={() => setOpen(true)}
-              >
-                <Plus className="h-4 w-4" />
-                Create New
-              </Button>
+               <RoleGate 
+                  module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
+                  resource={[`${modelName.toLowerCase()}`, "*"]}
+                  action={['create', '*']}
+                >
+
+                  <Button
+                    size="sm"
+                    variant={'default'}
+                    className="px-4 rounded-sm"
+                    onClick={() => setOpen(true)}
+                  >
+                    <Plus className="h-4 w-4" />
+                    Create New
+                  </Button>
+                </RoleGate>
             )}
           </div>
 

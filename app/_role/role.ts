@@ -74,6 +74,7 @@ export class PermissionTemplate {
       { action: 'read', name: 'View', description: `View ${this.resource} details` },
       { action: 'update', name: 'Edit', description: `Edit ${this.resource}` },
       { action: 'delete', name: 'Delete', description: `Delete ${this.resource}` },
+      { action: 'duplicate', name: 'Duplicate', description: `Duplicate ${this.resource}` },
     ].forEach((item, i) =>
       this.permissions.push({
         module: this.module,
