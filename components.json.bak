@@ -1,4 +1,5 @@
 {
+  "$schema": "https://ui.shadcn.com/schema.json",
   "style": "radix-nova",
   "rsc": true,
   "tsx": true,
@@ -11,15 +12,15 @@
   },
   "iconLibrary": "lucide",
   "rtl": false,
-  "menuColor": "default",
-  "menuAccent": "subtle",
   "aliases": {
     "components": "@/components",
     "utils": "@/lib/utils",
     "ui": "@/components/ui",
     "lib": "@/lib",
-    "hooks": "@/app/_hooks"
+    "hooks": "@/hooks"
   },
+  "menuColor": "default",
+  "menuAccent": "subtle",
   "registries": {
     "@kibo-ui": "https://www.kibo-ui.com/r/{name}.json"
   }
