@@ -1,16 +1,5 @@
 // components/SideBar/sidebar-data.ts
-import {
-  Users,
-  Shield,
-  BookOpen,
-  Settings2,
-  LifeBuoy,
-  Send,
-  Frame,
-  PieChart,
-  Map,
-  LucideIcon,
-} from 'lucide-react';
+import { Users, Shield, LucideIcon } from 'lucide-react';
 
 export interface SidebarItem {
   title: string;
@@ -22,6 +11,7 @@ export interface SidebarItem {
     resource: string;
     action: string;
   };
+  items?: SidebarItem[]; // 👈 recursive — this was missing
 }
 
 export interface SidebarSection {
@@ -35,6 +25,7 @@ export interface SidebarSection {
     resource: string;
     action: string;
   };
+  // 👈 removed duplicate `item` field
 }
 
 export interface SidebarProject {
@@ -54,35 +45,37 @@ export interface SidebarSecondaryItem {
   icon: LucideIcon;
 }
 
-export const sidebarData = {
+export const sidebarData: {
+  navMain: SidebarSection[];
+} = {
   navMain: [
     {
       title: 'User Management',
       url: '/user',
       icon: Users,
-      permission: {
-        module: 'USER_MANAGEMENT',
-        resource: 'user',
-        action: 'read',
-      },
+      permission: { module: 'USER_MANAGEMENT', resource: 'user', action: 'read' },
       items: [
+        // {
+        //   title: 'All Users',
+        //   url: '/user',
+        //   permission: { module: 'USER_MANAGEMENT', resource: 'user', action: 'read' },
+        //   items: [
+        //     {
+        //       title: 'Active Users',
+        //       url: '/user?status=active',
+        //       permission: { module: 'USER_MANAGEMENT', resource: 'user', action: 'read' },
+        //     },
+        //     {
+        //       title: 'Inactive Users',
+        //       url: '/user?status=inactive',
+        //       permission: { module: 'USER_MANAGEMENT', resource: 'user', action: 'read' },
+        //     },
+        //   ],
+        // },
         {
           title: 'All Users',
           url: '/user',
-          permission: {
-            module: 'USER_MANAGEMENT',
-            resource: 'user',
-            action: 'read',
-          },
-        },
-        {
-          title: 'Create User',
-          url: '/user/create',
-          permission: {
-            module: 'USER_MANAGEMENT',
-            resource: 'user',
-            action: 'create',
-          },
+          permission: { module: 'USER_MANAGEMENT', resource: 'user', action: 'read' },
         },
       ],
     },
@@ -90,90 +83,14 @@ export const sidebarData = {
       title: 'Role Management',
       url: '/role',
       icon: Shield,
-      permission: {
-        module: 'ROLE_MANAGEMENT',
-        resource: 'role',
-        action: 'read',
-      },
+      permission: { module: 'ROLE_MANAGEMENT', resource: 'role', action: 'read' },
       items: [
         {
           title: 'All Roles',
           url: '/role',
-          permission: {
-            module: 'ROLE_MANAGEMENT',
-            resource: 'role',
-            action: 'read',
-          },
-        },
-        {
-          title: 'Create Role',
-          url: '/role/create',
-          permission: {
-            module: 'ROLE_MANAGEMENT',
-            resource: 'role',
-            action: 'create',
-          },
+          permission: { module: 'ROLE_MANAGEMENT', resource: 'role', action: 'read' },
         },
       ],
-    },
-    {
-      title: 'Documentation',
-      url: '#',
-      icon: BookOpen,
-      items: [
-        {
-          title: 'Introduction',
-          url: '#',
-        },
-        {
-          title: 'Get Started',
-          url: '#',
-        },
-      ],
-    },
-    {
-      title: 'Settings',
-      url: '#',
-      icon: Settings2,
-      items: [
-        {
-          title: 'General',
-          url: '#',
-        },
-        {
-          title: 'Team',
-          url: '#',
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: 'Support',
-      url: '#',
-      icon: LifeBuoy,
-    },
-    {
-      title: 'Feedback',
-      url: '#',
-      icon: Send,
-    },
-  ],
-  projects: [
-    {
-      name: 'Design Engineering',
-      url: '#',
-      icon: Frame,
-    },
-    {
-      name: 'Sales & Marketing',
-      url: '#',
-      icon: PieChart,
-    },
-    {
-      name: 'Travel',
-      url: '#',
-      icon: Map,
     },
   ],
 };

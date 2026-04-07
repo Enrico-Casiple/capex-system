@@ -4,5 +4,7 @@
     "prisma.validation": false
   },
   "WillLuke.nextjs.hasPrompted": true,
-  "prisma.pinToPrisma6": true
+  "prisma.pinToPrisma6": true,
+  "css.customData": [".vscode/tailwind.json"],
+  "css.validate": false
 }

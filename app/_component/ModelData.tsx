@@ -41,8 +41,6 @@ const ModelData = <ModelShape, Response extends Record<string, Query[keyof Query
   const [open, setOpen] = React.useState(false);
   return (
     <div className="flex flex-col h-full bg-muted/30">
-      {/* Breadcrumbs */}
-      <Breadcrumbs />
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
         <div className="mx-auto p-6 space-y-6">
@@ -55,22 +53,21 @@ const ModelData = <ModelShape, Response extends Record<string, Query[keyof Query
 
             {/* Primary Action */}
             {active && (
-               <RoleGate 
-                  module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
-                  resource={[`${modelName.toLowerCase()}`, "*"]}
-                  action={['create', '*']}
+              <RoleGate
+                module={[`${modelName.toUpperCase()}_MANAGEMENT`, 'SYSTEM']}
+                resource={[`${modelName.toLowerCase()}`, '*']}
+                action={['create', '*']}
+              >
+                <Button
+                  size="sm"
+                  variant={'default'}
+                  className="px-4 rounded-sm"
+                  onClick={() => setOpen(true)}
                 >
-
-                  <Button
-                    size="sm"
-                    variant={'default'}
-                    className="px-4 rounded-sm"
-                    onClick={() => setOpen(true)}
-                  >
-                    <Plus className="h-4 w-4" />
-                    Create New
-                  </Button>
-                </RoleGate>
+                  <Plus className="h-4 w-4" />
+                  Create New
+                </Button>
+              </RoleGate>
             )}
           </div>
 

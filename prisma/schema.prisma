@@ -198,6 +198,8 @@ model Company {
   jobLevels        JobLevel[]        @relation("CompanyJobLevels")
   auditLogs        AuditLog[]
   workInformations WorkInformation[]
+  scopeTypeId      String?           @db.ObjectId
+  scopeType        Type?             @relation("CompanyType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -216,6 +218,8 @@ model Department {
   company          Company?          @relation("CompanyDepartments", fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   auditLogs        AuditLog[]
   workInformations WorkInformation[]
+  scopeTypeId      String?           @db.ObjectId
+  scopeType        Type?             @relation("DepartmentType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   isActive  Boolean?  @default(true)
   createdAt DateTime? @default(now())
@@ -235,6 +239,8 @@ model Position {
   workInformations WorkInformation[]
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
+  scopeTypeId      String?           @db.ObjectId
+  scopeType        Type?             @relation("PositionType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   // ✅ Add indexes
   @@index([name]) // Search by name
@@ -269,6 +275,9 @@ model Type {
   employmentType  WorkInformation[] @relation("EmploymentType")
   workSetupType   WorkInformation[] @relation("WorkSetupType")
   industryType    GroupOfCompany[]  @relation("IndustryType")
+  companies       Company[]         @relation("CompanyType")
+  departments     Department[]      @relation("DepartmentType")
+  jobPositions    Position[]        @relation("PositionType")
   jobLevels       JobLevel[]        @relation("JobCodeType")
   actionType      AuditLog[]        @relation("ActionType")
   auditLogs       AuditLog[]
@@ -279,6 +288,7 @@ model Type {
   updatedAt DateTime? @updatedAt
 
   // ✅ Add indexes
+  @@unique([name, modelNameType])
   @@index([modelNameType]) // Filter by type
   @@index([name]) // Search by name
 }
@@ -389,20 +399,18 @@ model Role {
 }
 
 model Permission {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
-  name        String?
-  description String?
-  module      String? // "FINANCE" | "HR" | "PROCUREMENT" | "INVENTORY"
-  // Groups permissions by ERP module like SAP transaction codes
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  name         String?
+  description  String?
+  module       String?
+  resource     String?
+  action       String?
+  displayOrder Int?
 
-  resource String? // "request", "invoice", "employee"
-  action   String? // "create", "read", "update", "delete", "approve", "reject", "export"
-  // Note: ERP needs more than CRUD — approve/reject/export are common
+  isGlobal    Boolean @default(false)
+  isAdmin     Boolean @default(false)
+  globalLimit Int? // ✅ max number of users that can have this permission — null means unlimited
 
-  displayOrder Int? // for UI ordering in permission matrix
-
-  isGlobal        Boolean          @default(false)
-  isAdmin         Boolean          @default(false)
   rolePermissions RolePermission[]
   auditLogs       AuditLog[]
 

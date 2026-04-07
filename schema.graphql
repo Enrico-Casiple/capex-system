@@ -1114,6 +1114,12 @@ type Company {
   """(Optional) name field of Company. Type: String."""
   name: String
 
+  """(Optional) Related Type record linked to this Company."""
+  scopeType: Type
+
+  """(Optional) scopeTypeId field of Company. Type: String."""
+  scopeTypeId: String
+
   """(Required) updatedAt field of Company. Type: DateTime (ISO 8601)."""
   updatedAt: DateTime!
 
@@ -1201,6 +1207,12 @@ input CompanyCreateInput {
 
   """(Optional) The name of the new Company. Type: String."""
   name: String
+
+  """(Optional) Single Type relation."""
+  scopeType: TypeCreateOrConnectInput
+
+  """(Optional) The scopeTypeId of the new Company. Type: String."""
+  scopeTypeId: String
 
   """(Required) The updatedAt of the new Company. Type: DateTime."""
   updatedAt: DateTime!
@@ -1466,6 +1478,12 @@ input CompanyUpdateInput {
   """(Optional) Update the name of the Company. Type: String."""
   name: String
 
+  """(Optional) Single Type relation."""
+  scopeType: TypeUpdateOrConnectInput
+
+  """(Optional) Update the scopeTypeId of the Company. Type: String."""
+  scopeTypeId: String
+
   """(Optional) Update the updatedAt of the Company. Type: DateTime."""
   updatedAt: DateTime
 
@@ -1522,6 +1540,12 @@ type Department {
 
   """(Optional) name field of Department. Type: String."""
   name: String
+
+  """(Optional) Related Type record linked to this Department."""
+  scopeType: Type
+
+  """(Optional) scopeTypeId field of Department. Type: String."""
+  scopeTypeId: String
 
   """(Optional) updatedAt field of Department. Type: DateTime (ISO 8601)."""
   updatedAt: DateTime
@@ -1592,6 +1616,12 @@ input DepartmentCreateInput {
 
   """(Optional) The name of the new Department. Type: String."""
   name: String
+
+  """(Optional) Single Type relation."""
+  scopeType: TypeCreateOrConnectInput
+
+  """(Optional) The scopeTypeId of the new Department. Type: String."""
+  scopeTypeId: String
 
   """(Optional) The updatedAt of the new Department. Type: DateTime."""
   updatedAt: DateTime
@@ -1842,6 +1872,12 @@ input DepartmentUpdateInput {
 
   """(Optional) Update the name of the Department. Type: String."""
   name: String
+
+  """(Optional) Single Type relation."""
+  scopeType: TypeUpdateOrConnectInput
+
+  """(Optional) Update the scopeTypeId of the Department. Type: String."""
+  scopeTypeId: String
 
   """(Optional) Update the updatedAt of the Department. Type: DateTime."""
   updatedAt: DateTime
@@ -6016,6 +6052,9 @@ type Permission {
   """(Optional) displayOrder field of Permission. Type: Integer."""
   displayOrder: Int
 
+  """(Optional) globalLimit field of Permission. Type: Integer."""
+  globalLimit: Int
+
   """Unique identifier of the Permission record."""
   id: ID!
 
@@ -6097,6 +6136,9 @@ input PermissionCreateInput {
 
   """(Optional) The displayOrder of the new Permission. Type: Int."""
   displayOrder: Int
+
+  """(Optional) The globalLimit of the new Permission. Type: Int."""
+  globalLimit: Int
 
   """(Required) The isActive of the new Permission. Type: Boolean."""
   isActive: Boolean!
@@ -6354,6 +6396,9 @@ input PermissionUpdateInput {
   """(Optional) Update the displayOrder of the Permission. Type: Int."""
   displayOrder: Int
 
+  """(Optional) Update the globalLimit of the Permission. Type: Int."""
+  globalLimit: Int
+
   """(Optional) Update the id of the Permission. Type: String."""
   id: String
 
@@ -6412,6 +6457,12 @@ type Position {
 
   """(Optional) name field of Position. Type: String."""
   name: String
+
+  """(Optional) Related Type record linked to this Position."""
+  scopeType: Type
+
+  """(Optional) scopeTypeId field of Position. Type: String."""
+  scopeTypeId: String
 
   """(Required) updatedAt field of Position. Type: DateTime (ISO 8601)."""
   updatedAt: DateTime!
@@ -6473,6 +6524,12 @@ input PositionCreateInput {
 
   """(Optional) The name of the new Position. Type: String."""
   name: String
+
+  """(Optional) Single Type relation."""
+  scopeType: TypeCreateOrConnectInput
+
+  """(Optional) The scopeTypeId of the new Position. Type: String."""
+  scopeTypeId: String
 
   """(Required) The updatedAt of the new Position. Type: DateTime."""
   updatedAt: DateTime!
@@ -6714,6 +6771,12 @@ input PositionUpdateInput {
 
   """(Optional) Update the name of the Position. Type: String."""
   name: String
+
+  """(Optional) Single Type relation."""
+  scopeType: TypeUpdateOrConnectInput
+
+  """(Optional) Update the scopeTypeId of the Position. Type: String."""
+  scopeTypeId: String
 
   """(Optional) Update the updatedAt of the Position. Type: DateTime."""
   updatedAt: DateTime
@@ -8891,8 +8954,14 @@ type Type {
   """(Optional) List of related AuditLog records linked to this Type."""
   auditLogs: [AuditLog!]!
 
+  """(Optional) List of related Company records linked to this Type."""
+  companies: [Company!]!
+
   """(Optional) createdAt field of Type. Type: DateTime (ISO 8601)."""
   createdAt: DateTime
+
+  """(Optional) List of related Department records linked to this Type."""
+  departments: [Department!]!
 
   """
   (Optional) List of related WorkInformation records linked to this Type.
@@ -8910,6 +8979,9 @@ type Type {
 
   """(Optional) List of related JobLevel records linked to this Type."""
   jobLevels: [JobLevel!]!
+
+  """(Optional) List of related Position records linked to this Type."""
+  jobPositions: [Position!]!
 
   """(Optional) modelNameType field of Type. Type: String."""
   modelNameType: String
@@ -8972,8 +9044,14 @@ input TypeCreateInput {
   """(Optional) List of AuditLog relation."""
   auditLogs: [AuditLogCreateOrConnectInput!]
 
+  """(Optional) List of Company relation."""
+  companies: [CompanyCreateOrConnectInput!]
+
   """(Optional) The createdAt of the new Type. Type: DateTime."""
   createdAt: DateTime
+
+  """(Optional) List of Department relation."""
+  departments: [DepartmentCreateOrConnectInput!]
 
   """(Optional) List of WorkInformation relation."""
   employmentType: [WorkInformationCreateOrConnectInput!]
@@ -8986,6 +9064,9 @@ input TypeCreateInput {
 
   """(Optional) List of JobLevel relation."""
   jobLevels: [JobLevelCreateOrConnectInput!]
+
+  """(Optional) List of Position relation."""
+  jobPositions: [PositionCreateOrConnectInput!]
 
   """(Optional) The modelNameType of the new Type. Type: String."""
   modelNameType: String
@@ -9221,8 +9302,14 @@ input TypeUpdateInput {
   """(Optional) List of AuditLog relation."""
   auditLogs: [AuditLogUpdateOrConnectInput!]
 
+  """(Optional) List of Company relation."""
+  companies: [CompanyUpdateOrConnectInput!]
+
   """(Optional) Update the createdAt of the Type. Type: DateTime."""
   createdAt: DateTime
+
+  """(Optional) List of Department relation."""
+  departments: [DepartmentUpdateOrConnectInput!]
 
   """(Optional) List of WorkInformation relation."""
   employmentType: [WorkInformationUpdateOrConnectInput!]
@@ -9238,6 +9325,9 @@ input TypeUpdateInput {
 
   """(Optional) List of JobLevel relation."""
   jobLevels: [JobLevelUpdateOrConnectInput!]
+
+  """(Optional) List of Position relation."""
+  jobPositions: [PositionUpdateOrConnectInput!]
 
   """(Optional) Update the modelNameType of the Type. Type: String."""
   modelNameType: String

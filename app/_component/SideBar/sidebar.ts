@@ -11,6 +11,7 @@ export interface SidebarItem {
     resource: string;
     action: string;
   };
+  items?: SidebarItem[]; // 👈 recursive
 }
 
 export interface SidebarSection {

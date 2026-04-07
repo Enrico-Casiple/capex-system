@@ -5,7 +5,6 @@ config({ path: resolve(__dirname, '../.env') });
 
 import {
   GLOBAL_ACCESS_PERMISSION,
-  PermissionTemplate,
   roleManagementPermissions,
   userManagementPermissions,
 } from '@/app/_role/role';
@@ -25,32 +24,36 @@ const seedComplete = async () => {
     GLOBAL_ACCESS_PERMISSION,
   ];
 
-  for (const perm of allPermissions) {
+  for (const permission of allPermissions) {
+    const isGlobalAdminPermission = permission.isGlobal && permission.isAdmin;
+
     await prisma.permission.upsert({
       where: {
         module_resource_action: {
-          module: perm.module || '',
-          resource: perm.resource || '',
-          action: perm.action || '',
+          module: permission.module || '',
+          resource: permission.resource || '',
+          action: permission.action || '',
         },
       },
       update: {
-        name: perm.name,
-        description: perm.description,
-        displayOrder: perm.displayOrder,
-        isGlobal: perm.isGlobal || false,
-        isAdmin: perm.isAdmin || false,
+        name: permission.name,
+        description: permission.description,
+        displayOrder: permission.displayOrder,
+        isGlobal: permission.isGlobal || false,
+        isAdmin: permission.isAdmin || false,
+        globalLimit: isGlobalAdminPermission ? 3 : null, // ✅ max 3 global admins
         isActive: true,
       },
       create: {
-        module: perm.module,
-        resource: perm.resource,
-        action: perm.action,
-        name: perm.name,
-        description: perm.description,
-        displayOrder: perm.displayOrder,
-        isGlobal: perm.isGlobal || false,
-        isAdmin: perm.isAdmin || false,
+        module: permission.module,
+        resource: permission.resource,
+        action: permission.action,
+        name: permission.name,
+        description: permission.description,
+        displayOrder: permission.displayOrder,
+        isGlobal: permission.isGlobal || false,
+        isAdmin: permission.isAdmin || false,
+        globalLimit: isGlobalAdminPermission ? 3 : null, // ✅ max 3 global admins
         isActive: true,
       },
     });
@@ -63,7 +66,6 @@ const seedComplete = async () => {
   // ============================================
   console.log('\n👥 Creating roles...');
 
-  // Global Administrator (SYSTEM role)
   const adminRole =
     (await prisma.role.findFirst({
       where: { name: 'Global Administrator' },
@@ -78,12 +80,11 @@ const seedComplete = async () => {
       },
     }));
 
-  // Employee (SYSTEM role - default for new users)
-  const existingEmployee = await prisma.role.findFirst({
+  const existingEmployeeRole = await prisma.role.findFirst({
     where: { name: 'Employee' },
   });
 
-  if (!existingEmployee) {
+  if (!existingEmployeeRole) {
     await prisma.role.create({
       data: {
         name: 'Employee',
@@ -95,42 +96,55 @@ const seedComplete = async () => {
     });
   }
 
-  console.log('✅ Created 2 roles (Admin & Employee)');
+  console.log('✅ Created 2 roles (Global Administrator & Employee)');
 
   // ============================================
-  // 3. ASSIGN PERMISSIONS TO ROLES
+  // 3. ASSIGN PERMISSIONS TO GLOBAL ADMINISTRATOR
   // ============================================
-  console.log('\n🔗 Assigning permissions to roles...');
+  console.log('\n🔗 Assigning permissions to Global Administrator...');
 
-  // Get all permissions
-  const allPerms = await prisma.permission.findMany({
+  const allActivePermissions = await prisma.permission.findMany({
     where: { isActive: true },
   });
 
-  // 3.1 Global Administrator - ALL permissions
-  for (const perm of allPerms) {
-    const existing = await prisma.rolePermission.findFirst({
+  for (const permission of allActivePermissions) {
+    // Check global limit before assigning
+    if (permission.isGlobal && permission.isAdmin && permission.globalLimit) {
+      const currentGlobalAdminCount = await prisma.rolePermission.count({
+        where: {
+          permissionId: permission.id,
+          isActive: true,
+        },
+      });
+
+      if (currentGlobalAdminCount >= permission.globalLimit) {
+        console.log(
+          `⚠️  Skipping "${permission.name}" — global limit of ${permission.globalLimit} already reached`,
+        );
+        continue;
+      }
+    }
+
+    const existingRolePermission = await prisma.rolePermission.findFirst({
       where: {
         roleId: adminRole.id,
-        permissionId: perm.id,
+        permissionId: permission.id,
       },
     });
 
-    if (!existing) {
+    if (!existingRolePermission) {
       await prisma.rolePermission.create({
         data: {
           roleId: adminRole.id,
-          permissionId: perm.id,
+          permissionId: permission.id,
           isActive: true,
         },
       });
     }
   }
-  console.log(`✅ Assigned ${allPerms.length} permissions to Global Administrator`);
 
-  // 3.2 Employee - NO permissions (can be assigned later via UI)
+  console.log(`✅ Assigned ${allActivePermissions.length} permissions to Global Administrator`);
   console.log('✅ Employee role created with no permissions (assign via UI)');
-
   console.log('\n✅ Complete seed finished successfully!');
 };
 

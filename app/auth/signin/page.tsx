@@ -6,15 +6,15 @@ import CustomPasswordInput from '@/components/Forms/Inputs/CustomPasswordInput';
 import CustomTextInput from '@/components/Forms/Inputs/CustomTextInput';
 import { fail, ok } from '@/lib/util/reponseUtil';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import loginAction from '../_forms/action/login.action';
 import LoginSchema, { LoginType } from '../_forms/schema/Login';
+import useToast from '@/app/_hooks/useToast';
 
 const SignInPage = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const router = useRouter();
+  const toast = useToast();
   const form = useForm<LoginType>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
@@ -29,15 +29,26 @@ const SignInPage = () => {
   ): Promise<ReturnType<typeof ok> | ReturnType<typeof fail>> => {
     const login = await loginAction(data);
     if (login.code === 'SERVICE_LOGIN_OTP_SENDING') {
-      alert(`Login failed with code: ${login.code}, message: ${login.message}`);
+      toast.success({
+        message: 'OTP Sent!',
+        description:
+          'An OTP has been sent to your email. Please check and enter it to verify your account.',
+      });
+      setIsAuthOpen(true);
       return (setIsAuthOpen(false), fail(login.code, login.message));
     }
     if (!login.isSuccess) {
-      alert(`Login failed with code: ${login.code}, message: ${login.message}`);
+      toast.error({
+        message: `Login failed! ${login.message} (Code: ${login.code})`,
+        description: 'Please check your credentials and try again.',
+      });
       return fail(login.code, login.message);
     }
-    router.push('/home');
-    alert(`Login successful! Welcome back. Message: ${login.message} Code: ${login.code}`);
+    window.location.href = '/home';
+    toast.success({
+      message: 'Login successful!',
+      description: `Welcome back. Message: ${login.message} Code: ${login.code}`,
+    });
     return login;
   };
   return (
