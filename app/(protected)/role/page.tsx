@@ -1,23 +1,16 @@
 'use client';
 import ListPage from '@/app/_context/ListWrapper';
 import { Role } from '@/lib/generated/api/customHookAPI/graphql';
-import { ColumnDef } from '@tanstack/react-table';
 import ModelData from '../../_component/ModelData';
-import {
-  extraColumns,
-  initialColumnFilters,
-  initialColumnVisibility,
-  initialFilter,
-  MODEL_NAME,
-  showActions,
-} from './variables';
 import Action from '@/app/_component/Row/Action';
 import Method from './_form/Method';
 import { useCallback } from 'react';
 import { ActionType, PopupType } from '@/app/_component/Row/Action';
-
-const BULK_ACTIONS: React.ReactNode[] = [];
-const SEARCH_FIELDS = ['name', 'description', 'roleType'];
+import { roleTableConfig } from '../_config';
+import Import from '@/app/_component/List/Import';
+import Export from '@/app/_component/List/Export';
+import ImportForm from './_form/ImportForm';
+import ExportForm from './_form/ExportForm';
 
 const ModelPage = () => {
   const renderMethod = useCallback(
@@ -63,22 +56,40 @@ const ModelPage = () => {
     [],
   );
 
+  const BULK_ACTIONS: React.ReactNode[] = [];
+
+  const importForm = useCallback(
+    (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (
+      <ImportForm open={open} setOpen={setOpen} />
+    ),
+    [],
+  );
+
+  const exportForm = useCallback(
+    (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (
+      <ExportForm open={open} setOpen={setOpen} />
+    ),
+    [],
+  );
+
   return (
     <ListPage<Role>
-      modelName={MODEL_NAME}
-      extraColumns={extraColumns as ColumnDef<Role, unknown>[]}
-      initialColumnVisibility={initialColumnVisibility}
-      initialFilter={initialFilter}
-      showActions={showActions}
-      initialColumnFilters={initialColumnFilters}
+      modelName={roleTableConfig.modelName}
+      extraColumns={roleTableConfig.extraColumns}
+      initialColumnVisibility={roleTableConfig.initialColumnVisibility}
+      initialFilter={roleTableConfig.initialFilter}
+      showActions={roleTableConfig.showActions}
+      initialColumnFilters={roleTableConfig.initialColumnFilters}
       actionComponent={actionComponent}
-      initialSearchField={SEARCH_FIELDS}
+      initialSearchField={roleTableConfig.initialSearchField as Extract<keyof Role, string>[]}
     >
       <ModelData
-        title="Manage Roles"
-        description="Browse and manage all roles in your system. Use the actions column to view details, edit profiles, duplicate entries, archive, restore, or permanently delete roles."
+        title={roleTableConfig.listName}
+        description={roleTableConfig.description}
         newBulkAction={BULK_ACTIONS}
         createAction={createAction}
+        importComponent={<Import importFormComponent={importForm} />}
+        exportComponent={<Export exportFormComponent={exportForm} />}
       />
     </ListPage>
   );

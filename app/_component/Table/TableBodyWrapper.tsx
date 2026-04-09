@@ -13,7 +13,6 @@ const TableBodyWrapper = <Model,>({ table }: TableBodyWrapperProps<Model>) => {
 
   const shouldScroll = rows.length > 10;
 
-
   return (
     <TableBody
       ref={parentRef}
@@ -22,12 +21,11 @@ const TableBodyWrapper = <Model,>({ table }: TableBodyWrapperProps<Model>) => {
         height: '500px',
         overflow: shouldScroll ? 'auto' : 'visible',
       }}
-      className={`transition-opacity duration-300 ${isRefetching ? 'opacity-60 pointer-events-none' : ''}`}
+      className={`transition-opacity duration-300 ${isRefetching ? 'opacity-60' : ''}`}
     >
-
       {rows.map((row) => {
         if (!row) return null;
-        
+
         return (
           <TableRow
             key={row.id}
@@ -47,8 +45,6 @@ const TableBodyWrapper = <Model,>({ table }: TableBodyWrapperProps<Model>) => {
           </TableRow>
         );
       })}
-
-
     </TableBody>
   );
 };

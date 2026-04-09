@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client';
-
 export const WorkInformationFragment = gql`
 fragment WorkInformationFragment on WorkInformation {
   id

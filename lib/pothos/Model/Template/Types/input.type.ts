@@ -25,6 +25,7 @@ export type PaginationInput<PrismaModel extends Prisma.ModelName> = {
   pageSize: number;
   filter?: FindManyArgs<PrismaModel>['where'];
   search?: string;
+  searchFields?: (keyof PrismaTypes[PrismaModel]['Shape'])[]; // ← add this
 };
 export type CursorPaginationInput<PrismaModel extends Prisma.ModelName> = {
   isActive: boolean;

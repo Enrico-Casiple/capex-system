@@ -1,38 +1,5 @@
 import { gql } from '@apollo/client';
-
-export const UserRoleFragment = gql`
-  fragment UserRoleFragment on UserRole {
-    id
-    userId
-    roleId
-    scopeTypeId
-    scopeValues
-    conditionOverrides
-    assignedById
-    expiresAt
-    isActive
-    createdAt
-    updatedAt
-    role {
-      rolePermissions {
-        permission {
-          action
-          createdAt
-          description
-          displayOrder
-          id
-          isActive
-          isAdmin
-          isGlobal
-          module
-          name
-          resource
-          updatedAt
-        }
-      }
-    }
-  }
-`;
+import { UserRoleFragment } from '../custom/UserRoleFragment';
 
 export const UserRoleFindAllWithCursor = gql`
   query UserRoleFindAllWithCursor($cursorInput: UserRoleCursorPaginationInput!) {
@@ -40,9 +7,7 @@ export const UserRoleFindAllWithCursor = gql`
       isSuccess
       message
       code
-      data {
-        ...UserRoleFragment
-      }
+      data { ...UserRoleFragment }
       nextCursor
       prevCursor
       hasNextPage
@@ -58,9 +23,7 @@ export const UserRoleFindAll = gql`
       isSuccess
       message
       code
-      data {
-        ...UserRoleFragment
-      }
+      data { ...UserRoleFragment }
       allCount
       active
       inActive
@@ -94,9 +57,7 @@ export const UserRoleFindUnique = gql`
       isSuccess
       message
       code
-      data {
-        ...UserRoleFragment
-      }
+      data { ...UserRoleFragment }
     }
   }
   ${UserRoleFragment}
@@ -108,9 +69,7 @@ export const UserRoleFindBy = gql`
       isSuccess
       message
       code
-      data {
-        ...UserRoleFragment
-      }
+      data { ...UserRoleFragment }
     }
   }
   ${UserRoleFragment}
@@ -122,9 +81,7 @@ export const UserRoleFindFirst = gql`
       isSuccess
       message
       code
-      data {
-        ...UserRoleFragment
-      }
+      data { ...UserRoleFragment }
     }
   }
   ${UserRoleFragment}
@@ -136,9 +93,7 @@ export const UserRoleCreate = gql`
       isSuccess
       message
       code
-      data {
-        ...UserRoleFragment
-      }
+      data { ...UserRoleFragment }
     }
   }
   ${UserRoleFragment}
@@ -150,9 +105,7 @@ export const UserRoleCreateMany = gql`
       isSuccess
       message
       code
-      data {
-        ...UserRoleFragment
-      }
+      data { ...UserRoleFragment }
     }
   }
   ${UserRoleFragment}
@@ -164,9 +117,7 @@ export const UserRoleUpdate = gql`
       isSuccess
       message
       code
-      data {
-        ...UserRoleFragment
-      }
+      data { ...UserRoleFragment }
     }
   }
   ${UserRoleFragment}
@@ -178,9 +129,7 @@ export const UserRoleUpdateMany = gql`
       isSuccess
       message
       code
-      data {
-        ...UserRoleFragment
-      }
+      data { ...UserRoleFragment }
     }
   }
   ${UserRoleFragment}
@@ -192,9 +141,7 @@ export const UserRoleArchive = gql`
       isSuccess
       message
       code
-      data {
-        ...UserRoleFragment
-      }
+      data { ...UserRoleFragment }
     }
   }
   ${UserRoleFragment}
@@ -206,9 +153,7 @@ export const UserRoleArchiveMany = gql`
       isSuccess
       message
       code
-      data {
-        ...UserRoleFragment
-      }
+      data { ...UserRoleFragment }
     }
   }
   ${UserRoleFragment}
@@ -220,9 +165,7 @@ export const UserRoleRestore = gql`
       isSuccess
       message
       code
-      data {
-        ...UserRoleFragment
-      }
+      data { ...UserRoleFragment }
     }
   }
   ${UserRoleFragment}
@@ -234,9 +177,7 @@ export const UserRoleRestoreMany = gql`
       isSuccess
       message
       code
-      data {
-        ...UserRoleFragment
-      }
+      data { ...UserRoleFragment }
     }
   }
   ${UserRoleFragment}
@@ -270,9 +211,7 @@ export const UserRoleRemoveMany = gql`
 
 export const UserRoleSubscription = gql`
   subscription UserRoleSubscription {
-    UserRoleSubscription {
-      ...UserRoleFragment
-    }
+    UserRoleSubscription { ...UserRoleFragment }
   }
   ${UserRoleFragment}
 `;

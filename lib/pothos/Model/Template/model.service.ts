@@ -100,7 +100,11 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
   private mapCreateMany(
     data: CreateManyInput<PrismaModel>['data'],
   ): CreateManyArgs<PrismaModel>['data'] {
-    return (this.strategy.mapCreateMany ?? ((d) => d))(data);
+    const mapper = this.strategy.mapCreateMany as
+      | ((input: CreateManyInput<PrismaModel>['data']) => CreateManyArgs<PrismaModel>['data'])
+      | undefined;
+
+    return mapper ? mapper(data) : (data as CreateManyArgs<PrismaModel>['data']);
   }
 
   private mapUpdate(data: UpdateInput<PrismaModel>['data']): UpdateArgs<PrismaModel>['data'] {
@@ -219,6 +223,12 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
       isActive: input.isActive,
       ...(input.filter || {}),
     } as FindManyArgs<PrismaModel>['where'];
+
+    if (input.search?.trim() && input.searchFields?.length) {
+      where!.OR = input.searchFields.map((field) => ({
+        [field]: { contains: input.search, mode: 'insensitive' },
+      }));
+    }
 
     // ← fetch all if pageSize is 0 OR pageSize is 1 with currentPage 1
     const fetchAll = input.pageSize === 0 || (input.currentPage === 1 && input.pageSize === 1);

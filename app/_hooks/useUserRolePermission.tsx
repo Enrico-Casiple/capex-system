@@ -12,6 +12,7 @@ const normalizeToArray = (value: PermissionInput): string[] =>
 const useUserRolePermission = () => {
   const session = useSession();
   const currentUserId = session.data?.user?.id;
+  const sessionLoading = session.status === 'loading';
 
   const { data: userRoleData, loading: userRoleLoading } = useQuery<
     Pick<Query, 'UserRoleFindAll'>,
@@ -25,7 +26,7 @@ const useUserRolePermission = () => {
         filter: { userId: currentUserId || '' },
       },
     },
-    skip: !currentUserId,
+    skip: !currentUserId || sessionLoading,
   });
 
   // Extract all rolePermissions from all roles assigned to the current user
@@ -49,7 +50,7 @@ const useUserRolePermission = () => {
     [rolePermissions],
   );
 
-  const loading = userRoleLoading;
+  const loading = sessionLoading || userRoleLoading;
 
   // A global admin has isGlobal and isAdmin both true — they bypass all permission checks
   const isGlobalAdmin = useMemo(

@@ -49,49 +49,44 @@ const RoleGate = ({
 
   // Handle countdown and redirect
   useEffect(() => {
-    // Only run if not loading, no permission, redirect not disabled, no fallback, and hasn't redirected yet
-    if (!loading && !hasPermission && !disableRedirect && !fallback && !hasRedirected.current) {
-      // If countdown is already 0, redirect immediately
-      if (countdown === 0) {
-        hasRedirected.current = true;
-        router.push(redirectTo);
-        return;
-      }
+    if (loading || hasPermission || disableRedirect || fallback || hasRedirected.current) return;
 
-      // Start countdown timer
-      const timer = setTimeout(() => {
-        setCountdown((prev) => {
-          const newCount = prev - 1;
-          if (newCount <= 0) {
-            hasRedirected.current = true;
-            router.push(redirectTo);
-            return 0;
-          }
-          return newCount;
-        });
-      }, 1000);
-
-      // Cleanup timer
-      return () => clearTimeout(timer);
+    if (countdown === 0) {
+      hasRedirected.current = true;
+      router.push(redirectTo);
+      return;
     }
+
+    const timer = setTimeout(() => {
+      setCountdown((prev) => {
+        const next = prev - 1;
+        if (next <= 0) {
+          hasRedirected.current = true;
+          router.push(redirectTo);
+          return 0;
+        }
+        return next;
+      });
+    }, 1000);
+
+    return () => clearTimeout(timer);
   }, [loading, hasPermission, disableRedirect, fallback, countdown, redirectTo, router]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center p-8 h-screen w-screen">
-        <Spinner />
-      </div>
-    );
+    return <Spinner />;
   }
 
   if (!hasPermission) {
     if (fallback) return <>{fallback}</>;
+    // if (loading) {
+    //   return <Spinner />;
+    // }
 
     // Render based on style
     switch (style) {
       case 'compact':
         return (
-          <div className="rounded-xl bg-gradient-to-r from-red-50 via-orange-50 to-yellow-50 border border-red-200 p-6 shadow-sm h-screen w-screen">
+          <div className="rounded-xl bg-gradient-to-r from-red-50 via-orange-50 to-yellow-50 border border-red-200 p-6 shadow-sm h-[80vh] w-screen">
             <div className="flex items-start space-x-4">
               <div className="flex-shrink-0">
                 <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
@@ -128,7 +123,7 @@ const RoleGate = ({
 
       case 'minimal':
         return (
-          <div className="flex items-center justify-center p-8 h-screen w-screen">
+          <div className="flex items-center justify-center h-[80vh] w-screen p-4">
             <div className="text-center space-y-3">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100">
                 <svg
@@ -162,7 +157,7 @@ const RoleGate = ({
 
       case 'card':
         return (
-          <div className="flex items-center justify-center p-4 min-h-screen w-full">
+          <div className="flex items-center justify-center p-4 min-h-[80vh] w-full">
             <div className="relative overflow-hidden rounded-2xl bg-white shadow-xl border border-gray-100 max-w-sm w-full">
               <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-orange-500/5 to-yellow-500/5"></div>
               <div className="relative p-8 text-center">
@@ -213,7 +208,7 @@ const RoleGate = ({
 
       default:
         return (
-          <div className="flex items-center justify-center h-screen w-screen p-6">
+          <div className="flex items-center justify-center h-[80vh] w-full p-4">
             <div className="max-w-md w-full">
               <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-2xl shadow-lg border border-red-100 p-8 text-center">
                 <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">

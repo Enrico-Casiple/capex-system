@@ -4,7 +4,6 @@ import { Query } from '@/lib/generated/api/customHookAPI/graphql';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import Breadcrumbs from '@/app/_component/List/Breadcrumbs';
 import { useListContext } from '@/app/_context/ListContext/ListProvider';
 import ListAction from '@/app/_component/List/ListAction';
 import ListSearch from '@/app/_component/List/ListSearch';

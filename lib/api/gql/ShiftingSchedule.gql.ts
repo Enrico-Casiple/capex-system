@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client';
-
 export const ShiftingScheduleFragment = gql`
 fragment ShiftingScheduleFragment on ShiftingSchedule {
   id

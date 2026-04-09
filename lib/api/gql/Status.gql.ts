@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client';
-
 export const StatusFragment = gql`
 fragment StatusFragment on Status {
   id
