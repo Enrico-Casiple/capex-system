@@ -252,6 +252,44 @@ input AuditLogCreateOrConnectInput {
   where: AuditLogConnectInput
 }
 
+"""Pagination and filtering input for querying AuditLog records."""
+input AuditLogCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type AuditLogCsvExportResponse {
+  """
+  Operation result code for the AuditLog CSV export operation. e.g. 'AUDITLOG_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the AuditLog CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the AuditLog CSV export operation.
+  """
+  message: String
+}
+
 """Cursor-based pagination input for querying AuditLog records."""
 input AuditLogCursorPaginationInput {
   """Cursor from the last record."""
@@ -774,6 +812,46 @@ input BasicInformationCreateOrConnectInput {
   where: BasicInformationConnectInput
 }
 
+"""Pagination and filtering input for querying BasicInformation records."""
+input BasicInformationCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type BasicInformationCsvExportResponse {
+  """
+  Operation result code for the BasicInformation CSV export operation. e.g. 'BASICINFORMATION_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """
+  Indicates whether the BasicInformation CSV export operation was successful.
+  """
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the BasicInformation CSV export operation.
+  """
+  message: String
+}
+
 """Cursor-based pagination input for querying BasicInformation records."""
 input BasicInformationCursorPaginationInput {
   """Cursor from the last record."""
@@ -1252,6 +1330,44 @@ input CompanyCreateOrConnectInput {
   where: CompanyConnectInput
 }
 
+"""Pagination and filtering input for querying Company records."""
+input CompanyCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type CompanyCsvExportResponse {
+  """
+  Operation result code for the Company CSV export operation. e.g. 'COMPANY_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the Company CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Company CSV export operation.
+  """
+  message: String
+}
+
 """Cursor-based pagination input for querying Company records."""
 input CompanyCursorPaginationInput {
   """Cursor from the last record."""
@@ -1656,6 +1772,44 @@ input ConfigCreateOrConnectInput {
   where: ConfigConnectInput
 }
 
+"""Pagination and filtering input for querying Config records."""
+input ConfigCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type ConfigCsvExportResponse {
+  """
+  Operation result code for the Config CSV export operation. e.g. 'CONFIG_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the Config CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Config CSV export operation.
+  """
+  message: String
+}
+
 """Cursor-based pagination input for querying Config records."""
 input ConfigCursorPaginationInput {
   """Cursor from the last record."""
@@ -1914,6 +2068,20 @@ input ConfigUpdateOrConnectInput {
   update: ConfigUpdateInput
 }
 
+type CsvExportData {
+  """The CSV content of the exported file."""
+  csv: String
+
+  """The name of the exported CSV file."""
+  fileName: String
+
+  """The MIME type of the exported file, typically "text/csv"."""
+  mimeType: String
+
+  """The number of rows in the exported CSV file."""
+  rowCount: Int
+}
+
 """
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
@@ -2052,6 +2220,44 @@ input DepartmentCreateOrConnectInput {
 
   """Unique selector to locate an existing Department."""
   where: DepartmentConnectInput
+}
+
+"""Pagination and filtering input for querying Department records."""
+input DepartmentCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type DepartmentCsvExportResponse {
+  """
+  Operation result code for the Department CSV export operation. e.g. 'DEPARTMENT_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the Department CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Department CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying Department records."""
@@ -2462,6 +2668,46 @@ input GroupOfCompanyCreateOrConnectInput {
   where: GroupOfCompanyConnectInput
 }
 
+"""Pagination and filtering input for querying GroupOfCompany records."""
+input GroupOfCompanyCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type GroupOfCompanyCsvExportResponse {
+  """
+  Operation result code for the GroupOfCompany CSV export operation. e.g. 'GROUPOFCOMPANY_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """
+  Indicates whether the GroupOfCompany CSV export operation was successful.
+  """
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the GroupOfCompany CSV export operation.
+  """
+  message: String
+}
+
 """Cursor-based pagination input for querying GroupOfCompany records."""
 input GroupOfCompanyCursorPaginationInput {
   """Cursor from the last record."""
@@ -2829,6 +3075,44 @@ input HolidayCreateOrConnectInput {
 
   """Unique selector to locate an existing Holiday."""
   where: HolidayConnectInput
+}
+
+"""Pagination and filtering input for querying Holiday records."""
+input HolidayCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type HolidayCsvExportResponse {
+  """
+  Operation result code for the Holiday CSV export operation. e.g. 'HOLIDAY_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the Holiday CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Holiday CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying Holiday records."""
@@ -3202,6 +3486,44 @@ input JobLevelCreateOrConnectInput {
 
   """Unique selector to locate an existing JobLevel."""
   where: JobLevelConnectInput
+}
+
+"""Pagination and filtering input for querying JobLevel records."""
+input JobLevelCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type JobLevelCsvExportResponse {
+  """
+  Operation result code for the JobLevel CSV export operation. e.g. 'JOBLEVEL_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the JobLevel CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the JobLevel CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying JobLevel records."""
@@ -3583,6 +3905,44 @@ input LocationCreateOrConnectInput {
 
   """Unique selector to locate an existing Location."""
   where: LocationConnectInput
+}
+
+"""Pagination and filtering input for querying Location records."""
+input LocationCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type LocationCsvExportResponse {
+  """
+  Operation result code for the Location CSV export operation. e.g. 'LOCATION_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the Location CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Location CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying Location records."""
@@ -6766,6 +7126,44 @@ input PermissionCreateOrConnectInput {
   where: PermissionConnectInput
 }
 
+"""Pagination and filtering input for querying Permission records."""
+input PermissionCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type PermissionCsvExportResponse {
+  """
+  Operation result code for the Permission CSV export operation. e.g. 'PERMISSION_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the Permission CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Permission CSV export operation.
+  """
+  message: String
+}
+
 """Cursor-based pagination input for querying Permission records."""
 input PermissionCursorPaginationInput {
   """Cursor from the last record."""
@@ -7146,6 +7544,44 @@ input PositionCreateOrConnectInput {
   where: PositionConnectInput
 }
 
+"""Pagination and filtering input for querying Position records."""
+input PositionCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type PositionCsvExportResponse {
+  """
+  Operation result code for the Position CSV export operation. e.g. 'POSITION_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the Position CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Position CSV export operation.
+  """
+  message: String
+}
+
 """Cursor-based pagination input for querying Position records."""
 input PositionCursorPaginationInput {
   """Cursor from the last record."""
@@ -7401,6 +7837,7 @@ input PositionUpdateOrConnectInput {
 
 type Query {
   AuditLogCount(input: AuditLogCountInput!): AuditLogCountResponse
+  AuditLogExportCsv(input: AuditLogCsvExportInput!): AuditLogCsvExportResponse
 
   """
   Retrieve a paginated list of AuditLog records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7426,6 +7863,7 @@ type Query {
     id: String!
   ): AuditLogResponse
   BasicInformationCount(input: BasicInformationCountInput!): BasicInformationCountResponse
+  BasicInformationExportCsv(input: BasicInformationCsvExportInput!): BasicInformationCsvExportResponse
 
   """
   Retrieve a paginated list of BasicInformation records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7453,6 +7891,7 @@ type Query {
     id: String!
   ): BasicInformationResponse
   CompanyCount(input: CompanyCountInput!): CompanyCountResponse
+  CompanyExportCsv(input: CompanyCsvExportInput!): CompanyCsvExportResponse
 
   """
   Retrieve a paginated list of Company records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7478,6 +7917,7 @@ type Query {
     id: String!
   ): CompanyResponse
   ConfigCount(input: ConfigCountInput!): ConfigCountResponse
+  ConfigExportCsv(input: ConfigCsvExportInput!): ConfigCsvExportResponse
 
   """
   Retrieve a paginated list of Config records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7503,6 +7943,7 @@ type Query {
     id: String!
   ): ConfigResponse
   DepartmentCount(input: DepartmentCountInput!): DepartmentCountResponse
+  DepartmentExportCsv(input: DepartmentCsvExportInput!): DepartmentCsvExportResponse
 
   """
   Retrieve a paginated list of Department records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7528,6 +7969,7 @@ type Query {
     id: String!
   ): DepartmentResponse
   GroupOfCompanyCount(input: GroupOfCompanyCountInput!): GroupOfCompanyCountResponse
+  GroupOfCompanyExportCsv(input: GroupOfCompanyCsvExportInput!): GroupOfCompanyCsvExportResponse
 
   """
   Retrieve a paginated list of GroupOfCompany records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7555,6 +7997,7 @@ type Query {
     id: String!
   ): GroupOfCompanyResponse
   HolidayCount(input: HolidayCountInput!): HolidayCountResponse
+  HolidayExportCsv(input: HolidayCsvExportInput!): HolidayCsvExportResponse
 
   """
   Retrieve a paginated list of Holiday records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7580,6 +8023,7 @@ type Query {
     id: String!
   ): HolidayResponse
   JobLevelCount(input: JobLevelCountInput!): JobLevelCountResponse
+  JobLevelExportCsv(input: JobLevelCsvExportInput!): JobLevelCsvExportResponse
 
   """
   Retrieve a paginated list of JobLevel records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7605,6 +8049,7 @@ type Query {
     id: String!
   ): JobLevelResponse
   LocationCount(input: LocationCountInput!): LocationCountResponse
+  LocationExportCsv(input: LocationCsvExportInput!): LocationCsvExportResponse
 
   """
   Retrieve a paginated list of Location records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7630,6 +8075,7 @@ type Query {
     id: String!
   ): LocationResponse
   PermissionCount(input: PermissionCountInput!): PermissionCountResponse
+  PermissionExportCsv(input: PermissionCsvExportInput!): PermissionCsvExportResponse
 
   """
   Retrieve a paginated list of Permission records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7655,6 +8101,7 @@ type Query {
     id: String!
   ): PermissionResponse
   PositionCount(input: PositionCountInput!): PositionCountResponse
+  PositionExportCsv(input: PositionCsvExportInput!): PositionCsvExportResponse
 
   """
   Retrieve a paginated list of Position records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7680,6 +8127,7 @@ type Query {
     id: String!
   ): PositionResponse
   RoleCount(input: RoleCountInput!): RoleCountResponse
+  RoleExportCsv(input: RoleCsvExportInput!): RoleCsvExportResponse
 
   """
   Retrieve a paginated list of Role records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7705,6 +8153,7 @@ type Query {
     id: String!
   ): RoleResponse
   RolePermissionCount(input: RolePermissionCountInput!): RolePermissionCountResponse
+  RolePermissionExportCsv(input: RolePermissionCsvExportInput!): RolePermissionCsvExportResponse
 
   """
   Retrieve a paginated list of RolePermission records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7732,6 +8181,7 @@ type Query {
     id: String!
   ): RolePermissionResponse
   ShiftingScheduleCount(input: ShiftingScheduleCountInput!): ShiftingScheduleCountResponse
+  ShiftingScheduleExportCsv(input: ShiftingScheduleCsvExportInput!): ShiftingScheduleCsvExportResponse
 
   """
   Retrieve a paginated list of ShiftingSchedule records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7759,6 +8209,7 @@ type Query {
     id: String!
   ): ShiftingScheduleResponse
   StatusCount(input: StatusCountInput!): StatusCountResponse
+  StatusExportCsv(input: StatusCsvExportInput!): StatusCsvExportResponse
 
   """
   Retrieve a paginated list of Status records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7784,6 +8235,7 @@ type Query {
     id: String!
   ): StatusResponse
   TypeCount(input: TypeCountInput!): TypeCountResponse
+  TypeExportCsv(input: TypeCsvExportInput!): TypeCsvExportResponse
 
   """
   Retrieve a paginated list of Type records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7809,6 +8261,7 @@ type Query {
     id: String!
   ): TypeResponse
   UserCount(input: UserCountInput!): UserCountResponse
+  UserExportCsv(input: UserCsvExportInput!): UserCsvExportResponse
 
   """
   Retrieve a paginated list of User records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7834,6 +8287,7 @@ type Query {
     id: String!
   ): UserResponse
   UserRoleCount(input: UserRoleCountInput!): UserRoleCountResponse
+  UserRoleExportCsv(input: UserRoleCsvExportInput!): UserRoleCsvExportResponse
 
   """
   Retrieve a paginated list of UserRole records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7859,6 +8313,7 @@ type Query {
     id: String!
   ): UserRoleResponse
   WorkInformationCount(input: WorkInformationCountInput!): WorkInformationCountResponse
+  WorkInformationExportCsv(input: WorkInformationCsvExportInput!): WorkInformationCsvExportResponse
 
   """
   Retrieve a paginated list of WorkInformation records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -8020,6 +8475,44 @@ input RoleCreateOrConnectInput {
 
   """Unique selector to locate an existing Role."""
   where: RoleConnectInput
+}
+
+"""Pagination and filtering input for querying Role records."""
+input RoleCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type RoleCsvExportResponse {
+  """
+  Operation result code for the Role CSV export operation. e.g. 'ROLE_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the Role CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Role CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying Role records."""
@@ -8324,6 +8817,46 @@ input RolePermissionCreateOrConnectInput {
 
   """Unique selector to locate an existing RolePermission."""
   where: RolePermissionConnectInput
+}
+
+"""Pagination and filtering input for querying RolePermission records."""
+input RolePermissionCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type RolePermissionCsvExportResponse {
+  """
+  Operation result code for the RolePermission CSV export operation. e.g. 'ROLEPERMISSION_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """
+  Indicates whether the RolePermission CSV export operation was successful.
+  """
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the RolePermission CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying RolePermission records."""
@@ -8848,6 +9381,46 @@ input ShiftingScheduleCreateOrConnectInput {
   where: ShiftingScheduleConnectInput
 }
 
+"""Pagination and filtering input for querying ShiftingSchedule records."""
+input ShiftingScheduleCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type ShiftingScheduleCsvExportResponse {
+  """
+  Operation result code for the ShiftingSchedule CSV export operation. e.g. 'SHIFTINGSCHEDULE_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """
+  Indicates whether the ShiftingSchedule CSV export operation was successful.
+  """
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the ShiftingSchedule CSV export operation.
+  """
+  message: String
+}
+
 """Cursor-based pagination input for querying ShiftingSchedule records."""
 input ShiftingScheduleCursorPaginationInput {
   """Cursor from the last record."""
@@ -9251,6 +9824,44 @@ input StatusCreateOrConnectInput {
 
   """Unique selector to locate an existing Status."""
   where: StatusConnectInput
+}
+
+"""Pagination and filtering input for querying Status records."""
+input StatusCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type StatusCsvExportResponse {
+  """
+  Operation result code for the Status CSV export operation. e.g. 'STATUS_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the Status CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Status CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying Status records."""
@@ -9738,6 +10349,44 @@ input TypeCreateOrConnectInput {
   where: TypeConnectInput
 }
 
+"""Pagination and filtering input for querying Type records."""
+input TypeCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type TypeCsvExportResponse {
+  """
+  Operation result code for the Type CSV export operation. e.g. 'TYPE_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the Type CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Type CSV export operation.
+  """
+  message: String
+}
+
 """Cursor-based pagination input for querying Type records."""
 input TypeCursorPaginationInput {
   """Cursor from the last record."""
@@ -10160,6 +10809,44 @@ input UserCreateOrConnectInput {
   where: UserConnectInput
 }
 
+"""Pagination and filtering input for querying User records."""
+input UserCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type UserCsvExportResponse {
+  """
+  Operation result code for the User CSV export operation. e.g. 'USER_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the User CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the User CSV export operation.
+  """
+  message: String
+}
+
 """Cursor-based pagination input for querying User records."""
 input UserCursorPaginationInput {
   """Cursor from the last record."""
@@ -10513,6 +11200,44 @@ input UserRoleCreateOrConnectInput {
 
   """Unique selector to locate an existing UserRole."""
   where: UserRoleConnectInput
+}
+
+"""Pagination and filtering input for querying UserRole records."""
+input UserRoleCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type UserRoleCsvExportResponse {
+  """
+  Operation result code for the UserRole CSV export operation. e.g. 'USERROLE_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the UserRole CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the UserRole CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying UserRole records."""
@@ -11179,6 +11904,46 @@ input WorkInformationCreateOrConnectInput {
 
   """Unique selector to locate an existing WorkInformation."""
   where: WorkInformationConnectInput
+}
+
+"""Pagination and filtering input for querying WorkInformation records."""
+input WorkInformationCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type WorkInformationCsvExportResponse {
+  """
+  Operation result code for the WorkInformation CSV export operation. e.g. 'WORKINFORMATION_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """
+  Indicates whether the WorkInformation CSV export operation was successful.
+  """
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the WorkInformation CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying WorkInformation records."""

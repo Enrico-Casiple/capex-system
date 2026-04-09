@@ -12,6 +12,7 @@ export const updateInputSuffix = 'UpdateInput';
 export const pageInputSuffix = 'PageInput';
 export const cursorPaginationInputSuffix = 'CursorPaginationInput';
 export const updateOrConnectInputSuffix = 'UpdateOrConnectInput';
+const csvExportInputSuffix = 'CsvExportInput';
 export const updateOrConnectInputRefs: Record<string, ReturnType<typeof builder.inputRef>> = {};
 
 export type CreateInputRefsMap = {
@@ -28,6 +29,7 @@ export const pageInputRefs: Record<string, ReturnType<typeof builder.inputRef>> 
 export const cursorPaginationInputRefs: Record<string, ReturnType<typeof builder.inputRef>> = {};
 export const connectInputRefs: Record<string, ReturnType<typeof builder.inputRef>> = {};
 export const createOrConnectInputRefs: Record<string, ReturnType<typeof builder.inputRef>> = {};
+export const csvExportInputRefs: Record<string, ReturnType<typeof builder.inputRef>> = {};
 export const findByInputRefs = {} as Record<
   PrismaTypes[keyof PrismaTypes]['Name'],
   InputRef<{ key: string; value: string }>
@@ -369,5 +371,33 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
     });
   } catch (error) {
     console.error(`CountInput error for ${modelName}: ${error}`);
+  }
+});
+
+// ─── Step 11: PageInput ────────────────────────────────────────────────────────
+Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
+  try {
+    const ref = builder.inputRef(`${modelName}${csvExportInputSuffix}`);
+    csvExportInputRefs[modelName] = ref;
+    ref.implement({
+      description: `Pagination and filtering input for querying ${modelName} records.`,
+      fields: (t) => ({
+        isActive: t.boolean({ required: false, description: `Filter by active status.` }),
+        filter: t.field({ type: 'Json', required: false, description: `Advanced JSON filter.` }),
+        searchFields: t.field({
+          type: ['String'] as never,
+          required: false,
+          description: `Fields to search within.`,
+        }),
+        columns: t.field({
+          type: ['String'] as never,
+          required: false,
+          description: `Fields to include in the CSV export.`,
+        }),
+        search: t.string({ required: false, description: `Search keyword.` }),
+      }),
+    });
+  } catch (error) {
+    console.error(`CsvExportInput error for ${modelName}: ${error}`);
   }
 });

@@ -47,3 +47,12 @@ export type CursorPaginationResult<PrismaModel extends Prisma.ModelName> = {
   hasNextPage: boolean;
   hasPrevPage: boolean; // ← add this
 };
+
+export type ExportCsvInput<PrismaModel extends Prisma.ModelName> = {
+  isActive?: boolean;
+  filter?: FindManyArgs<PrismaModel>['where'];
+  search?: string;
+  searchFields?: (keyof PrismaTypes[PrismaModel]['Shape'])[];
+  columns?: string[];
+  fileName?: string;
+};

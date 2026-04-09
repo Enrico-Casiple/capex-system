@@ -52,6 +52,23 @@ export interface PAGINATION_RESPONSE {
   pageinfo: PAGE_INFO | null;
 }
 
+export interface CSV_EXPORT_DATA {
+  fileName: string;
+  mimeType: string;
+  csv: string;
+  rowCount: number;
+  excelFileName?: string;
+  excelMimeType?: string;
+  excelBase64?: string;
+}
+
+export interface CSV_EXPORT_RESPONSE {
+  code: string;
+  isSuccess: boolean;
+  message: string;
+  data: CSV_EXPORT_DATA | null;
+}
+
 export interface CURSOR_PAGINATION_RESPONSE {
   isSuccess: boolean;
   code: string;
@@ -68,6 +85,7 @@ export const responsePaginationSuffix = 'PaginationResponse';
 export const responseDeletedListSuffix = 'DeletedListResponse';
 export const responseCursorPaginationListSuffix = 'CursorPaginationResponse';
 export const responseCountSuffix = 'CountResponse';
+export const responseCsvExportSuffix = 'CsvExportResponse';
 
 export const responseRefs: Record<string, ReturnType<typeof builder.objectRef>> = {};
 export const responseListRefs: Record<string, ReturnType<typeof builder.objectRef>> = {};
@@ -75,6 +93,7 @@ export const paginationResponseRefs: Record<string, ReturnType<typeof builder.ob
 export const deletedListResponseRef: Record<string, ReturnType<typeof builder.objectRef>> = {};
 export const cursorPaginationResponseRef: Record<string, ReturnType<typeof builder.objectRef>> = {};
 export const countResponseRef: Record<string, ReturnType<typeof builder.objectRef>> = {};
+export const csvExportResponseRef: Record<string, ReturnType<typeof builder.objectRef>> = {};
 
 const PageInfo = builder.objectRef<PAGE_INFO>('PageInfo').implement({
   fields: (t) => ({
@@ -91,6 +110,35 @@ const DeletedItem = builder.objectRef<DELETED_ITEM_RESPONSE>('DeletedItem').impl
   fields: (t) => ({
     id: t.exposeString('id', {
       description: 'Unique identifier of the deleted record.',
+    }),
+  }),
+});
+
+const CsvExportData = builder.objectRef<CSV_EXPORT_DATA>('CsvExportData').implement({
+  fields: (t) => ({
+    fileName: t.exposeString('fileName', {
+      description: 'The name of the exported CSV file.',
+    }),
+    mimeType: t.exposeString('mimeType', {
+      description: 'The MIME type of the exported file, typically "text/csv".',
+    }),
+    csv: t.exposeString('csv', {
+      description: 'The CSV content of the exported file.',
+    }),
+    rowCount: t.exposeInt('rowCount', {
+      description: 'The number of rows in the exported CSV file.',
+    }),
+    excelFileName: t.exposeString('excelFileName', {
+      nullable: true,
+      description: 'The name of the Excel-compatible exported file.',
+    }),
+    excelMimeType: t.exposeString('excelMimeType', {
+      nullable: true,
+      description: 'The MIME type of the Excel-compatible export.',
+    }),
+    excelBase64: t.exposeString('excelBase64', {
+      nullable: true,
+      description: 'Base64 encoded Excel-compatible file content.',
     }),
   }),
 });
@@ -328,6 +376,38 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
       code: 'ERROR',
       isSuccess: false,
       message: `Failed to implement ${modelName}${responseCursorPaginationListSuffix}: ${error}`,
+    };
+  }
+});
+
+Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
+  try {
+    const ref = builder.objectRef<CSV_EXPORT_RESPONSE>(`${modelName}${responseCsvExportSuffix}`);
+    csvExportResponseRef[modelName] = ref;
+    ref.implement({
+      fields: (t) => ({
+        code: t.exposeString('code', {
+          description: `Operation result code for the ${modelName} CSV export operation. e.g. '${modelName.toUpperCase()}_CSV_EXPORT_SUCCESS'.`,
+        }),
+        isSuccess: t.exposeBoolean('isSuccess', {
+          description: `Indicates whether the ${modelName} CSV export operation was successful.`,
+        }),
+        message: t.exposeString('message', {
+          description: `Human-readable message describing the result of the ${modelName} CSV export operation.`,
+        }),
+        data: t.field({
+          type: CsvExportData,
+          nullable: true,
+          description: `The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.`,
+          resolve: (parent) => parent.data,
+        }),
+      }),
+    });
+  } catch (error) {
+    return {
+      code: 'ERROR',
+      isSuccess: false,
+      message: `Failed to implement ${modelName}${responseCsvExportSuffix}: ${error}`,
     };
   }
 });
