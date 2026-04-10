@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client';
-
 export const PositionFragment = gql`
 fragment PositionFragment on Position {
   id
@@ -8,6 +7,7 @@ fragment PositionFragment on Position {
   description
   createdAt
   updatedAt
+  scopeTypeId
 }
 `;
 

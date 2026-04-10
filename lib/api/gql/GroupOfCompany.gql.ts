@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client';
-
 export const GroupOfCompanyFragment = gql`
 fragment GroupOfCompanyFragment on GroupOfCompany {
   id

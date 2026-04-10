@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client';
-
 export const JobLevelFragment = gql`
 fragment JobLevelFragment on JobLevel {
   id

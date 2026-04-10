@@ -1,106 +1,111 @@
-import { PermissionPageInput, Query, RolePermissionPageInput, UserRolePageInput } from '@/lib/generated/api/customHookAPI/graphql'
-import { useQuery } from '@apollo/client/react'
-import { useSession } from 'next-auth/react'
-import { UserRoleFindAll } from '@/lib/api/gql/UserRole.gql'
-import { RolePermissionFindAll } from '@/lib/api/gql/RolePermission.gql'
-import { PermissionFindAll } from '@/lib/api/gql/Permission.gql'
-import { useMemo } from 'react'
+import { Query, UserRolePageInput } from '@/lib/generated/api/customHookAPI/graphql';
+import { useQuery } from '@apollo/client/react';
+import { useSession } from 'next-auth/react';
+import { UserRoleFindAll } from '@/lib/api/gql/UserRole.gql';
+import { useMemo } from 'react';
 
-type UserRolePermissionProps = {
-  module: string[]
-  resource: string[]
-  action: string[]
-}
+type PermissionInput = string | string[];
 
-const useUserRolePermission = (props: UserRolePermissionProps) => {
-  const session = useSession()
-  const currentUser = session.data?.user?.id
+const normalizeToArray = (value: PermissionInput): string[] =>
+  Array.isArray(value) ? value : [value];
 
-  // Find UserRole First
-  const {data: userRoleData, loading: userRoleLoading} = useQuery<Pick<Query, "UserRoleFindAll">, {paginationInput: UserRolePageInput}>(UserRoleFindAll, {
-   variables: {
+const useUserRolePermission = () => {
+  const session = useSession();
+  const currentUserId = session.data?.user?.id;
+  const sessionLoading = session.status === 'loading';
+
+  const { data: userRoleData, loading: userRoleLoading } = useQuery<
+    Pick<Query, 'UserRoleFindAll'>,
+    { paginationInput: UserRolePageInput }
+  >(UserRoleFindAll, {
+    variables: {
       paginationInput: {
         isActive: true,
         pageSize: 1,
         currentPage: 1,
-        filter: {
-          userId: currentUser || '',
-        }
-      }
-   },
-   skip: !currentUser // Skip if no user found
-  })
+        filter: { userId: currentUserId || '' },
+      },
+    },
+    skip: !currentUserId || sessionLoading,
+  });
 
-  // Find All RolePermission with roleId from UserRoleFindAll
-  const {data: rolePermissionData, loading: rolePermissionLoading} = useQuery<Pick<Query, 'RolePermissionFindAll'>, {paginationInput: RolePermissionPageInput}>(RolePermissionFindAll, {
-   variables: {
-      paginationInput: {
-        isActive: true,
-        pageSize: 1,
-        currentPage: 1,
-        filter: {
-          roleId: { in: userRoleData?.UserRoleFindAll?.data?.map(userRole => userRole.roleId) || [] }
-        }
-      }
-   },
-  })
+  // Extract all rolePermissions from all roles assigned to the current user
+  const rolePermissions = useMemo(
+    () =>
+      userRoleData?.UserRoleFindAll?.data
+        ?.flatMap((userRole) => userRole.role?.rolePermissions ?? [])
+        .filter(Boolean) ?? [],
+    [userRoleData],
+  );
 
-  // Find All Permission with resource and action from RolePermissionFindAll
-  const {data: permissionData, loading: permissionLoading} = useQuery<Pick<Query, "PermissionFindAll">, {paginationInput: PermissionPageInput}>(PermissionFindAll, {
-   variables: {
-      paginationInput: {
-        isActive: true,
-        pageSize: 1,
-        currentPage: 1,
-        filter: {
-          AND: [
-            { id: { in: rolePermissionData?.RolePermissionFindAll?.data?.map(rolePermission => rolePermission.permissionId) } },
-            { module: { in: props.module } },
-            { resource: { in: props.resource } },
-            { action: { in: props.action } }
-          ]
-        }
-      }
-   },
-  })
+  // Extract the actual permission details from each rolePermission
+  const permissions = useMemo(
+    () =>
+      rolePermissions
+        .map((rolePermission) => rolePermission.permission)
+        .filter(
+          (permission): permission is NonNullable<typeof permission> =>
+            permission !== null && permission !== undefined,
+        ),
+    [rolePermissions],
+  );
 
-  const permissions = useMemo(() => permissionData?.PermissionFindAll?.data || [], [permissionData]);
+  const loading = sessionLoading || userRoleLoading;
 
-  const loading = userRoleLoading || rolePermissionLoading || permissionLoading;
+  // A global admin has isGlobal and isAdmin both true — they bypass all permission checks
+  const isGlobalAdmin = useMemo(
+    () => permissions.some((permission) => permission.isGlobal && permission.isAdmin),
+    [permissions],
+  );
 
-  // Check if it a globalAdmin 
-  const isGlobalAdmin = permissions.find(permission => permission.isGlobal && permission.isAdmin)
+  // Check if the current user has a specific permission
+  const can = useMemo(
+    () =>
+      (module: PermissionInput, resource: PermissionInput, action: PermissionInput): boolean => {
+        const moduleList = normalizeToArray(module);
+        const resourceList = normalizeToArray(resource);
+        const actionList = normalizeToArray(action);
 
-  const hasPermission = useMemo(() => {
+        if (isGlobalAdmin) return true;
 
-    if(!rolePermissionData?.RolePermissionFindAll?.data?.length) return false // if no rolePermission found, return false
-    if(isGlobalAdmin) return true // if global admin, return true directly
-    if (!props.module.length && !props.resource.length && !props.action.length) return false; // if no permission, return false
+        return permissions.some(
+          (permission) =>
+            permission.module &&
+            moduleList.includes(permission.module) &&
+            permission.resource &&
+            resourceList.includes(permission.resource) &&
+            permission.action &&
+            actionList.includes(permission.action),
+        );
+      },
+    [isGlobalAdmin, permissions],
+  );
 
-    // Check if there is any permission that matches the module, resource and action
-    return  permissions.some(permission => {
-      const moduleMatch = permission.module && props.module.includes(permission.module);
-      const resourceMatch = permission.resource && props.resource.includes(permission.resource);
-      const actionMatch = permission.action && props.action.includes(permission.action);
-      
-      return moduleMatch && resourceMatch && actionMatch;
-    });
-  }, [isGlobalAdmin, permissions, props.module, props.resource, props.action, rolePermissionData]);
+  // Get the scope (which records the user is allowed to see) for a specific permission
+  const getScope = useMemo(
+    () => (module: string, resource: string, action: string) => {
+      const matchedPermission = permissions.find(
+        (permission) =>
+          permission.module === module &&
+          permission.resource === resource &&
+          permission.action === action,
+      );
 
-  // make a can function to check permission more easily
-  const can = (module: string, resource: string, action: string) => {
-    if(isGlobalAdmin) return true // if global admin, return true directly
-    return permissions.some(permission => {
-      const moduleMatch = permission.module === module;
-      const resourceMatch = permission.resource === resource;
-      const actionMatch = permission.action === action;
+      if (!matchedPermission) return null;
 
-      return moduleMatch && resourceMatch && actionMatch;
-    });
-  }
-    
+      const matchedRolePermission = rolePermissions.find(
+        (rolePermission) => rolePermission.permissionId === matchedPermission.id,
+      );
 
-  return { hasPermission, loading, can  };
-}
+      return {
+        scopeTypeId: matchedRolePermission?.scopeTypeId ?? null,
+        scopeValues: matchedRolePermission?.scopeValues ?? [],
+      };
+    },
+    [permissions, rolePermissions],
+  );
 
-export default useUserRolePermission
+  return { permissions, rolePermissions, isGlobalAdmin, can, getScope, loading };
+};
+
+export default useUserRolePermission;

@@ -57,6 +57,8 @@ interface ListContextValue<TQuery extends Record<string, Query[keyof Query]>, TM
   setNewItems: React.Dispatch<React.SetStateAction<TModel[]>>;
   columnVisibility: Record<string, boolean>;
   setColumnVisibility: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  rowSelection: Record<string, boolean>;
+  setRowSelection: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   columnFilters: ColumnFiltersState;
   columns: ColumnDef<TModel, unknown>[];
   hasNextPage: boolean;
@@ -102,7 +104,10 @@ interface ListProviderProps<
   modelName: string;
 }
 
-const MAX_TAKE = process.env.NODE_ENV === 'production'  ? Number(process.env.NEXTAUTH_MAX_TAKE) : Number(process.env.NEXT_PUBLIC_MAX_TAKE);
+const MAX_TAKE =
+  process.env.NODE_ENV === 'production'
+    ? Number(process.env.NEXTAUTH_MAX_TAKE)
+    : Number(process.env.NEXT_PUBLIC_MAX_TAKE);
 
 const ListProvider = <
   TQuery extends Record<string, Query[keyof Query]>,
@@ -174,7 +179,11 @@ const ListProvider = <
     onColumnFiltersChange: setColumnFilters,
     onRowSelectionChange: setRowSelection,
     enableRowSelection: true,
-    getRowId: (row) => (row as { id: string }).id,
+    autoResetAll: false,
+    getRowId: (row, index) => {
+      const id = (row as { id?: unknown }).id;
+      return typeof id === 'string' && id.length > 0 ? id : `row-${index}`;
+    },
     getCoreRowModel: coreRowModel,
     getFilteredRowModel: filteredRowModel,
     getSortedRowModel: sortedRowModel,
@@ -217,6 +226,8 @@ const ListProvider = <
       setCurrentPage,
       columnVisibility,
       setColumnVisibility,
+      rowSelection,
+      setRowSelection,
       columnFilters,
       setColumnFilters,
       columns: props.columns,
@@ -231,6 +242,7 @@ const ListProvider = <
       filter,
       take,
       newItems,
+      rowSelection,
       columnVisibility,
       columnFilters,
       searchItems,
@@ -251,25 +263,25 @@ const ListProvider = <
     ],
   );
 
-  if (returnQuery.loading && !allRecordData.length) {
-    return (
-      <div className="grid place-items-center h-screen">
-        <Spinner />
-      </div>
-    );
-  }
+  // if (returnQuery.loading && !allRecordData.length) {
+  //   return (
+  //     <div className="grid place-items-center h-screen">
+  //       <Spinner />
+  //     </div>
+  //   );
+  // }
 
   return (
     <ListContext.Provider
       value={value as unknown as ListContextValue<Record<string, Query[keyof Query]>, unknown>}
-    > 
-        <RoleGate 
-          module={[`${props.modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
-          resource={[`${props.modelName.toLowerCase()}`, "*"]}
-          action={['read', '*']}
-        >
-          {props.children}
-        </RoleGate>
+    >
+      <RoleGate
+        module={[`${props.modelName.toUpperCase()}_MANAGEMENT`, 'SYSTEM']}
+        resource={[`${props.modelName.toLowerCase()}`, '*']}
+        action={['read', '*']}
+      >
+        {props.children}
+      </RoleGate>
     </ListContext.Provider>
   );
 };

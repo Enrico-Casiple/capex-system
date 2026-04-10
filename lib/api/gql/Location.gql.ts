@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client';
-
 export const LocationFragment = gql`
 fragment LocationFragment on Location {
   id

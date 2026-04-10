@@ -1,17 +1,18 @@
-import { UserScalarFieldEnumSchema } from "@/lib/generated/zod/prisma-zod-types"
+import { Role, User } from '@/lib/generated/api/customHookAPI/graphql';
+import { createTableConfig, ListConfigItem } from './shared';
+import { role } from './role.config';
+import { user } from './user.config';
 
+type ListConfigMap = {
+  user: ListConfigItem<User>;
+  role: ListConfigItem<Role>;
+  // permission: ListConfigItem<Record<string, unknown>>;
+};
 
 export const listConfig = {
-  user: {
-    modelName: "User",
-    description: "Manage your users effectively with our user management system. View, edit, and organize user information seamlessly.",
-    extraColumns: UserScalarFieldEnumSchema.options.map((option) => ({
-      id: option,
-      header: option.charAt(0).toUpperCase() + option.slice(1),
-      accessorKey: option,
-    })),
-    initialColumnVisibility: {},
-    initialFilter: {},
-    showActions: true,
-  }
-}
+  user: user,
+  role: role,
+} satisfies ListConfigMap;
+
+export const userTableConfig = createTableConfig<User>(listConfig.user);
+export const roleTableConfig = createTableConfig<Role>(listConfig.role);

@@ -103,10 +103,10 @@ type AuditLog {
   workInformation: WorkInformation
 }
 
-"""Input to connect an existing AuditLog record by its unique ID."""
+"""Input to connect an existing AuditLog record by a unique field."""
 input AuditLogConnectInput {
-  """The unique identifier of the existing AuditLog record to connect."""
-  id: String!
+  """Unique field 'id' used to connect an existing AuditLog record."""
+  id: String
 }
 
 """Where input for counting AuditLog records."""
@@ -240,13 +240,54 @@ input AuditLogCreateInput {
   workInformation: WorkInformationCreateOrConnectInput
 }
 
-"""Either create a new AuditLog or connect to an existing one."""
+"""Prisma-style nested relation ops for AuditLog: where/create/connect."""
 input AuditLogCreateOrConnectInput {
-  """Connect an existing AuditLog record by its unique ID."""
+  """Connect an existing AuditLog by unique field(s)."""
   connect: AuditLogConnectInput
 
-  """Create a new AuditLog record and link it to the parent."""
+  """Create a new AuditLog and link it to the parent."""
   create: AuditLogCreateInput
+
+  """Unique selector to locate an existing AuditLog."""
+  where: AuditLogConnectInput
+}
+
+"""Pagination and filtering input for querying AuditLog records."""
+input AuditLogCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type AuditLogCsvExportResponse {
+  """
+  Operation result code for the AuditLog CSV export operation. e.g. 'AUDITLOG_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the AuditLog CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the AuditLog CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying AuditLog records."""
@@ -559,14 +600,18 @@ input AuditLogUpdateInput {
   workInformation: WorkInformationUpdateOrConnectInput
 }
 
-"""
-Either update an existing related AuditLog inline or reconnect to a different one.
-"""
+"""Prisma-style nested update ops for AuditLog."""
 input AuditLogUpdateOrConnectInput {
-  """Reconnect to a different existing AuditLog record by its unique ID."""
+  """Reconnect to an existing AuditLog by unique field(s)."""
   connect: AuditLogConnectInput
 
-  """Update the fields of the related AuditLog record inline."""
+  """Create a new related AuditLog record inline."""
+  create: AuditLogCreateInput
+
+  """Disconnect the current related AuditLog record."""
+  disconnect: Boolean
+
+  """Update fields of the related AuditLog record inline."""
   update: AuditLogUpdateInput
 }
 
@@ -648,12 +693,17 @@ type BasicInformation {
   workInformations: [WorkInformation!]!
 }
 
-"""Input to connect an existing BasicInformation record by its unique ID."""
+"""
+Input to connect an existing BasicInformation record by a unique field.
+"""
 input BasicInformationConnectInput {
+  """Unique field 'id' used to connect an existing BasicInformation record."""
+  id: String
+
   """
-  The unique identifier of the existing BasicInformation record to connect.
+  Unique field 'userId' used to connect an existing BasicInformation record.
   """
-  id: String!
+  userId: String
 }
 
 """Where input for counting BasicInformation records."""
@@ -748,13 +798,58 @@ input BasicInformationCreateInput {
   workInformations: [WorkInformationCreateOrConnectInput!]
 }
 
-"""Either create a new BasicInformation or connect to an existing one."""
+"""
+Prisma-style nested relation ops for BasicInformation: where/create/connect.
+"""
 input BasicInformationCreateOrConnectInput {
-  """Connect an existing BasicInformation record by its unique ID."""
+  """Connect an existing BasicInformation by unique field(s)."""
   connect: BasicInformationConnectInput
 
-  """Create a new BasicInformation record and link it to the parent."""
+  """Create a new BasicInformation and link it to the parent."""
   create: BasicInformationCreateInput
+
+  """Unique selector to locate an existing BasicInformation."""
+  where: BasicInformationConnectInput
+}
+
+"""Pagination and filtering input for querying BasicInformation records."""
+input BasicInformationCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type BasicInformationCsvExportResponse {
+  """
+  Operation result code for the BasicInformation CSV export operation. e.g. 'BASICINFORMATION_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """
+  Indicates whether the BasicInformation CSV export operation was successful.
+  """
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the BasicInformation CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying BasicInformation records."""
@@ -1054,16 +1149,18 @@ input BasicInformationUpdateInput {
   workInformations: [WorkInformationUpdateOrConnectInput!]
 }
 
-"""
-Either update an existing related BasicInformation inline or reconnect to a different one.
-"""
+"""Prisma-style nested update ops for BasicInformation."""
 input BasicInformationUpdateOrConnectInput {
-  """
-  Reconnect to a different existing BasicInformation record by its unique ID.
-  """
+  """Reconnect to an existing BasicInformation by unique field(s)."""
   connect: BasicInformationConnectInput
 
-  """Update the fields of the related BasicInformation record inline."""
+  """Create a new related BasicInformation record inline."""
+  create: BasicInformationCreateInput
+
+  """Disconnect the current related BasicInformation record."""
+  disconnect: Boolean
+
+  """Update fields of the related BasicInformation record inline."""
   update: BasicInformationUpdateInput
 }
 
@@ -1114,6 +1211,12 @@ type Company {
   """(Optional) name field of Company. Type: String."""
   name: String
 
+  """(Optional) Related Type record linked to this Company."""
+  scopeType: Type
+
+  """(Optional) scopeTypeId field of Company. Type: String."""
+  scopeTypeId: String
+
   """(Required) updatedAt field of Company. Type: DateTime (ISO 8601)."""
   updatedAt: DateTime!
 
@@ -1123,10 +1226,10 @@ type Company {
   workInformations: [WorkInformation!]!
 }
 
-"""Input to connect an existing Company record by its unique ID."""
+"""Input to connect an existing Company record by a unique field."""
 input CompanyConnectInput {
-  """The unique identifier of the existing Company record to connect."""
-  id: String!
+  """Unique field 'id' used to connect an existing Company record."""
+  id: String
 }
 
 """Where input for counting Company records."""
@@ -1169,8 +1272,8 @@ input CompanyCreateInput {
   """(Optional) The conctactNumber of the new Company. Type: String."""
   conctactNumber: String
 
-  """(Required) The createdAt of the new Company. Type: DateTime."""
-  createdAt: DateTime!
+  """(Optional) The createdAt of the new Company. Type: DateTime."""
+  createdAt: DateTime
 
   """(Optional) List of Department relation."""
   departments: [DepartmentCreateOrConnectInput!]
@@ -1202,20 +1305,67 @@ input CompanyCreateInput {
   """(Optional) The name of the new Company. Type: String."""
   name: String
 
-  """(Required) The updatedAt of the new Company. Type: DateTime."""
-  updatedAt: DateTime!
+  """(Optional) Single Type relation."""
+  scopeType: TypeCreateOrConnectInput
+
+  """(Optional) The scopeTypeId of the new Company. Type: String."""
+  scopeTypeId: String
+
+  """(Optional) The updatedAt of the new Company. Type: DateTime."""
+  updatedAt: DateTime
 
   """(Optional) List of WorkInformation relation."""
   workInformations: [WorkInformationCreateOrConnectInput!]
 }
 
-"""Either create a new Company or connect to an existing one."""
+"""Prisma-style nested relation ops for Company: where/create/connect."""
 input CompanyCreateOrConnectInput {
-  """Connect an existing Company record by its unique ID."""
+  """Connect an existing Company by unique field(s)."""
   connect: CompanyConnectInput
 
-  """Create a new Company record and link it to the parent."""
+  """Create a new Company and link it to the parent."""
   create: CompanyCreateInput
+
+  """Unique selector to locate an existing Company."""
+  where: CompanyConnectInput
+}
+
+"""Pagination and filtering input for querying Company records."""
+input CompanyCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type CompanyCsvExportResponse {
+  """
+  Operation result code for the Company CSV export operation. e.g. 'COMPANY_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the Company CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Company CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying Company records."""
@@ -1466,6 +1616,12 @@ input CompanyUpdateInput {
   """(Optional) Update the name of the Company. Type: String."""
   name: String
 
+  """(Optional) Single Type relation."""
+  scopeType: TypeUpdateOrConnectInput
+
+  """(Optional) Update the scopeTypeId of the Company. Type: String."""
+  scopeTypeId: String
+
   """(Optional) Update the updatedAt of the Company. Type: DateTime."""
   updatedAt: DateTime
 
@@ -1473,15 +1629,457 @@ input CompanyUpdateInput {
   workInformations: [WorkInformationUpdateOrConnectInput!]
 }
 
-"""
-Either update an existing related Company inline or reconnect to a different one.
-"""
+"""Prisma-style nested update ops for Company."""
 input CompanyUpdateOrConnectInput {
-  """Reconnect to a different existing Company record by its unique ID."""
+  """Reconnect to an existing Company by unique field(s)."""
   connect: CompanyConnectInput
 
-  """Update the fields of the related Company record inline."""
+  """Create a new related Company record inline."""
+  create: CompanyCreateInput
+
+  """Disconnect the current related Company record."""
+  disconnect: Boolean
+
+  """Update fields of the related Company record inline."""
   update: CompanyUpdateInput
+}
+
+"""Represents a Config record in the database."""
+type Config {
+  """(Optional) code field of Config. Type: String."""
+  code: String
+
+  """(Optional) codeKey field of Config. Type: String."""
+  codeKey: String
+
+  """(Optional) codeLabel field of Config. Type: String."""
+  codeLabel: String
+
+  """(Optional) createdAt field of Config. Type: DateTime (ISO 8601)."""
+  createdAt: DateTime
+
+  """(Required) group field of Config. Type: String."""
+  group: String!
+
+  """Unique identifier of the Config record."""
+  id: ID!
+
+  """(Optional) isActive field of Config. Type: Boolean."""
+  isActive: Boolean
+
+  """(Optional) modelId field of Config. Type: String."""
+  modelId: String
+
+  """(Optional) modelName field of Config. Type: String."""
+  modelName: String
+
+  """(Optional) Related RolePermission record linked to this Config."""
+  rolePermission: RolePermission
+
+  """(Optional) sortOrder field of Config. Type: Integer."""
+  sortOrder: Int
+
+  """(Optional) updatedAt field of Config. Type: DateTime (ISO 8601)."""
+  updatedAt: DateTime
+
+  """(Optional) value field of Config. Type: JSON object."""
+  value: Json
+}
+
+"""Input to connect an existing Config record by a unique field."""
+input ConfigConnectInput {
+  """Unique field 'id' used to connect an existing Config record."""
+  id: String
+}
+
+"""Where input for counting Config records."""
+input ConfigCountInput {
+  """Prisma where clause."""
+  where: Json!
+}
+
+"""
+Count response wrapper for Config. Returns the count of Config records matching the criteria.
+"""
+type ConfigCountResponse {
+  """
+  Operation result code for the Config count operation. e.g. 'CONFIG_COUNT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The count of Config records matching the criteria. Null if the operation failed.
+  """
+  data: Int
+
+  """Indicates whether the Config count operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Config count operation.
+  """
+  message: String
+}
+
+"""Input fields required to create a new Config record."""
+input ConfigCreateInput {
+  """(Optional) The code of the new Config. Type: String."""
+  code: String
+
+  """(Optional) The codeKey of the new Config. Type: String."""
+  codeKey: String
+
+  """(Optional) The codeLabel of the new Config. Type: String."""
+  codeLabel: String
+
+  """(Optional) The createdAt of the new Config. Type: DateTime."""
+  createdAt: DateTime
+
+  """(Optional) The group of the new Config. Type: String."""
+  group: String
+
+  """(Optional) The isActive of the new Config. Type: Boolean."""
+  isActive: Boolean
+
+  """(Optional) The modelId of the new Config. Type: String."""
+  modelId: String
+
+  """(Optional) The modelName of the new Config. Type: String."""
+  modelName: String
+
+  """(Optional) Single RolePermission relation."""
+  rolePermission: RolePermissionCreateOrConnectInput
+
+  """(Optional) The sortOrder of the new Config. Type: Int."""
+  sortOrder: Int
+
+  """(Optional) The updatedAt of the new Config. Type: DateTime."""
+  updatedAt: DateTime
+
+  """(Optional) The value of the new Config. Type: Json."""
+  value: Json
+}
+
+"""Prisma-style nested relation ops for Config: where/create/connect."""
+input ConfigCreateOrConnectInput {
+  """Connect an existing Config by unique field(s)."""
+  connect: ConfigConnectInput
+
+  """Create a new Config and link it to the parent."""
+  create: ConfigCreateInput
+
+  """Unique selector to locate an existing Config."""
+  where: ConfigConnectInput
+}
+
+"""Pagination and filtering input for querying Config records."""
+input ConfigCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type ConfigCsvExportResponse {
+  """
+  Operation result code for the Config CSV export operation. e.g. 'CONFIG_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the Config CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Config CSV export operation.
+  """
+  message: String
+}
+
+"""Cursor-based pagination input for querying Config records."""
+input ConfigCursorPaginationInput {
+  """Cursor from the last record."""
+  cursor: String
+
+  """Pagination direction."""
+  direction: ConfigPaginationDirection
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean!
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+
+  """Number of records to return."""
+  take: Int!
+}
+
+"""
+Paginated response wrapper for Config. Returns a paged list of Config records with pagination metadata and counts.
+"""
+type ConfigCursorPaginationResponse {
+  """
+  Operation result code for the Config pagination query. e.g. 'CONFIG_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of Config records. Null if the query failed."""
+  data: [Config!]
+
+  """Indicates if there is a next page of Config records available."""
+  hasNextPage: Boolean
+
+  """Indicates if there is a previous page of Config records available."""
+  hasPrevPage: Boolean
+
+  """Indicates whether the Config pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Config pagination query.
+  """
+  message: String
+
+  """
+  Cursor for fetching the next page of Config records. Null if there are no more pages.
+  """
+  nextCursor: String
+
+  """
+  Cursor for fetching the previous page of Config records. Null if there are no previous pages.
+  """
+  prevCursor: String
+}
+
+"""
+Paginated response wrapper for Config. Returns a paged list of Config records with pagination metadata and counts.
+"""
+type ConfigDeletedListResponse {
+  """
+  Operation result code for the Config pagination query. e.g. 'CONFIG_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of Config records. Null if the query failed."""
+  data: [DeletedItem!]
+
+  """Indicates whether the Config pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Config pagination query.
+  """
+  message: String
+}
+
+"""Dynamic field lookup input for Config."""
+input ConfigFindByInput {
+  """Field name to search by."""
+  key: String!
+
+  """Value to match."""
+  value: String!
+}
+
+"""Where input for finding the first matching Config record."""
+input ConfigFindFirstInput {
+  """Prisma where clause."""
+  where: Json!
+}
+
+"""
+List response wrapper for Config. Returns multiple Config records along with operation status.
+"""
+type ConfigListResponse {
+  """
+  Operation result code for the Config list operation. e.g. 'CONFIG_CREATE_MANY_SUCCESS'.
+  """
+  code: String
+
+  """
+  Array of Config records returned from the operation. Null if the operation failed.
+  """
+  data: [Config!]
+
+  """Indicates whether the Config list operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Config list operation.
+  """
+  message: String
+}
+
+"""Pagination and filtering input for querying Config records."""
+input ConfigPageInput {
+  """Page number. Starts at 1."""
+  currentPage: Int!
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean!
+
+  """Number of records per page."""
+  pageSize: Int!
+
+  """Search keyword."""
+  search: String
+}
+
+enum ConfigPaginationDirection {
+  backward
+  forward
+}
+
+"""
+Paginated response wrapper for Config. Returns a paged list of Config records with pagination metadata and counts.
+"""
+type ConfigPaginationResponse {
+  """Total number of active (isActive: true) Config records."""
+  active: Int
+
+  """Total number of Config records in the database regardless of filters."""
+  allCount: Int
+
+  """
+  Operation result code for the Config pagination query. e.g. 'CONFIG_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of Config records. Null if the query failed."""
+  data: [Config!]
+
+  """Total number of inactive (isActive: false) Config records."""
+  inActive: Int
+
+  """Indicates whether the Config pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Config pagination query.
+  """
+  message: String
+
+  """
+  Pagination metadata including current page, total pages, and navigation flags for Config.
+  """
+  pageinfo: PageInfo
+}
+
+"""
+Single record response wrapper for Config. Returns the created/updated/deleted Config record along with operation status.
+"""
+type ConfigResponse {
+  """
+  Operation result code for Config. e.g. 'CONFIG_CREATE_SUCCESS' or 'CONFIG_NOT_FOUND'.
+  """
+  code: String
+
+  """
+  The Config record returned from the operation. Null if the operation failed.
+  """
+  data: Config
+
+  """Indicates whether the Config operation was successful."""
+  isSuccess: Boolean
+
+  """Human-readable message describing the result of the Config operation."""
+  message: String
+}
+
+"""
+Input fields to update an existing Config record. All fields are optional.
+"""
+input ConfigUpdateInput {
+  """(Optional) Update the code of the Config. Type: String."""
+  code: String
+
+  """(Optional) Update the codeKey of the Config. Type: String."""
+  codeKey: String
+
+  """(Optional) Update the codeLabel of the Config. Type: String."""
+  codeLabel: String
+
+  """(Optional) Update the createdAt of the Config. Type: DateTime."""
+  createdAt: DateTime
+
+  """(Optional) Update the group of the Config. Type: String."""
+  group: String
+
+  """(Optional) Update the id of the Config. Type: String."""
+  id: String
+
+  """(Optional) Update the isActive of the Config. Type: Boolean."""
+  isActive: Boolean
+
+  """(Optional) Update the modelId of the Config. Type: String."""
+  modelId: String
+
+  """(Optional) Update the modelName of the Config. Type: String."""
+  modelName: String
+
+  """(Optional) Single RolePermission relation."""
+  rolePermission: RolePermissionUpdateOrConnectInput
+
+  """(Optional) Update the sortOrder of the Config. Type: Int."""
+  sortOrder: Int
+
+  """(Optional) Update the updatedAt of the Config. Type: DateTime."""
+  updatedAt: DateTime
+
+  """(Optional) Update the value of the Config. Type: Json."""
+  value: Json
+}
+
+"""Prisma-style nested update ops for Config."""
+input ConfigUpdateOrConnectInput {
+  """Reconnect to an existing Config by unique field(s)."""
+  connect: ConfigConnectInput
+
+  """Create a new related Config record inline."""
+  create: ConfigCreateInput
+
+  """Disconnect the current related Config record."""
+  disconnect: Boolean
+
+  """Update fields of the related Config record inline."""
+  update: ConfigUpdateInput
+}
+
+type CsvExportData {
+  """The CSV content of the exported file."""
+  csv: String
+
+  """The name of the exported CSV file."""
+  fileName: String
+
+  """The MIME type of the exported file, typically "text/csv"."""
+  mimeType: String
+
+  """The number of rows in the exported CSV file."""
+  rowCount: Int
 }
 
 """
@@ -1523,6 +2121,12 @@ type Department {
   """(Optional) name field of Department. Type: String."""
   name: String
 
+  """(Optional) Related Type record linked to this Department."""
+  scopeType: Type
+
+  """(Optional) scopeTypeId field of Department. Type: String."""
+  scopeTypeId: String
+
   """(Optional) updatedAt field of Department. Type: DateTime (ISO 8601)."""
   updatedAt: DateTime
 
@@ -1532,10 +2136,10 @@ type Department {
   workInformations: [WorkInformation!]!
 }
 
-"""Input to connect an existing Department record by its unique ID."""
+"""Input to connect an existing Department record by a unique field."""
 input DepartmentConnectInput {
-  """The unique identifier of the existing Department record to connect."""
-  id: String!
+  """Unique field 'id' used to connect an existing Department record."""
+  id: String
 }
 
 """Where input for counting Department records."""
@@ -1593,6 +2197,12 @@ input DepartmentCreateInput {
   """(Optional) The name of the new Department. Type: String."""
   name: String
 
+  """(Optional) Single Type relation."""
+  scopeType: TypeCreateOrConnectInput
+
+  """(Optional) The scopeTypeId of the new Department. Type: String."""
+  scopeTypeId: String
+
   """(Optional) The updatedAt of the new Department. Type: DateTime."""
   updatedAt: DateTime
 
@@ -1600,13 +2210,54 @@ input DepartmentCreateInput {
   workInformations: [WorkInformationCreateOrConnectInput!]
 }
 
-"""Either create a new Department or connect to an existing one."""
+"""Prisma-style nested relation ops for Department: where/create/connect."""
 input DepartmentCreateOrConnectInput {
-  """Connect an existing Department record by its unique ID."""
+  """Connect an existing Department by unique field(s)."""
   connect: DepartmentConnectInput
 
-  """Create a new Department record and link it to the parent."""
+  """Create a new Department and link it to the parent."""
   create: DepartmentCreateInput
+
+  """Unique selector to locate an existing Department."""
+  where: DepartmentConnectInput
+}
+
+"""Pagination and filtering input for querying Department records."""
+input DepartmentCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type DepartmentCsvExportResponse {
+  """
+  Operation result code for the Department CSV export operation. e.g. 'DEPARTMENT_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the Department CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Department CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying Department records."""
@@ -1843,6 +2494,12 @@ input DepartmentUpdateInput {
   """(Optional) Update the name of the Department. Type: String."""
   name: String
 
+  """(Optional) Single Type relation."""
+  scopeType: TypeUpdateOrConnectInput
+
+  """(Optional) Update the scopeTypeId of the Department. Type: String."""
+  scopeTypeId: String
+
   """(Optional) Update the updatedAt of the Department. Type: DateTime."""
   updatedAt: DateTime
 
@@ -1850,14 +2507,18 @@ input DepartmentUpdateInput {
   workInformations: [WorkInformationUpdateOrConnectInput!]
 }
 
-"""
-Either update an existing related Department inline or reconnect to a different one.
-"""
+"""Prisma-style nested update ops for Department."""
 input DepartmentUpdateOrConnectInput {
-  """Reconnect to a different existing Department record by its unique ID."""
+  """Reconnect to an existing Department by unique field(s)."""
   connect: DepartmentConnectInput
 
-  """Update the fields of the related Department record inline."""
+  """Create a new related Department record inline."""
+  create: DepartmentCreateInput
+
+  """Disconnect the current related Department record."""
+  disconnect: Boolean
+
+  """Update fields of the related Department record inline."""
   update: DepartmentUpdateInput
 }
 
@@ -1916,12 +2577,10 @@ type GroupOfCompany {
   workInformations: [WorkInformation!]!
 }
 
-"""Input to connect an existing GroupOfCompany record by its unique ID."""
+"""Input to connect an existing GroupOfCompany record by a unique field."""
 input GroupOfCompanyConnectInput {
-  """
-  The unique identifier of the existing GroupOfCompany record to connect.
-  """
-  id: String!
+  """Unique field 'id' used to connect an existing GroupOfCompany record."""
+  id: String
 }
 
 """Where input for counting GroupOfCompany records."""
@@ -1995,13 +2654,58 @@ input GroupOfCompanyCreateInput {
   workInformations: [WorkInformationCreateOrConnectInput!]
 }
 
-"""Either create a new GroupOfCompany or connect to an existing one."""
+"""
+Prisma-style nested relation ops for GroupOfCompany: where/create/connect.
+"""
 input GroupOfCompanyCreateOrConnectInput {
-  """Connect an existing GroupOfCompany record by its unique ID."""
+  """Connect an existing GroupOfCompany by unique field(s)."""
   connect: GroupOfCompanyConnectInput
 
-  """Create a new GroupOfCompany record and link it to the parent."""
+  """Create a new GroupOfCompany and link it to the parent."""
   create: GroupOfCompanyCreateInput
+
+  """Unique selector to locate an existing GroupOfCompany."""
+  where: GroupOfCompanyConnectInput
+}
+
+"""Pagination and filtering input for querying GroupOfCompany records."""
+input GroupOfCompanyCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type GroupOfCompanyCsvExportResponse {
+  """
+  Operation result code for the GroupOfCompany CSV export operation. e.g. 'GROUPOFCOMPANY_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """
+  Indicates whether the GroupOfCompany CSV export operation was successful.
+  """
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the GroupOfCompany CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying GroupOfCompany records."""
@@ -2260,16 +2964,18 @@ input GroupOfCompanyUpdateInput {
   workInformations: [WorkInformationUpdateOrConnectInput!]
 }
 
-"""
-Either update an existing related GroupOfCompany inline or reconnect to a different one.
-"""
+"""Prisma-style nested update ops for GroupOfCompany."""
 input GroupOfCompanyUpdateOrConnectInput {
-  """
-  Reconnect to a different existing GroupOfCompany record by its unique ID.
-  """
+  """Reconnect to an existing GroupOfCompany by unique field(s)."""
   connect: GroupOfCompanyConnectInput
 
-  """Update the fields of the related GroupOfCompany record inline."""
+  """Create a new related GroupOfCompany record inline."""
+  create: GroupOfCompanyCreateInput
+
+  """Disconnect the current related GroupOfCompany record."""
+  disconnect: Boolean
+
+  """Update fields of the related GroupOfCompany record inline."""
   update: GroupOfCompanyUpdateInput
 }
 
@@ -2300,10 +3006,10 @@ type Holiday {
   updatedAt: DateTime!
 }
 
-"""Input to connect an existing Holiday record by its unique ID."""
+"""Input to connect an existing Holiday record by a unique field."""
 input HolidayConnectInput {
-  """The unique identifier of the existing Holiday record to connect."""
-  id: String!
+  """Unique field 'id' used to connect an existing Holiday record."""
+  id: String
 }
 
 """Where input for counting Holiday records."""
@@ -2340,32 +3046,73 @@ input HolidayCreateInput {
   """(Optional) List of AuditLog relation."""
   auditLogs: [AuditLogCreateOrConnectInput!]
 
-  """(Required) The createdAt of the new Holiday. Type: DateTime."""
-  createdAt: DateTime!
+  """(Optional) The createdAt of the new Holiday. Type: DateTime."""
+  createdAt: DateTime
 
-  """(Required) The date of the new Holiday. Type: DateTime."""
-  date: DateTime!
+  """(Optional) The date of the new Holiday. Type: DateTime."""
+  date: DateTime
 
-  """(Required) The description of the new Holiday. Type: String."""
-  description: String!
+  """(Optional) The description of the new Holiday. Type: String."""
+  description: String
 
-  """(Required) The isRecurring of the new Holiday. Type: Boolean."""
-  isRecurring: Boolean!
+  """(Optional) The isRecurring of the new Holiday. Type: Boolean."""
+  isRecurring: Boolean
 
-  """(Required) The name of the new Holiday. Type: String."""
-  name: String!
+  """(Optional) The name of the new Holiday. Type: String."""
+  name: String
 
-  """(Required) The updatedAt of the new Holiday. Type: DateTime."""
-  updatedAt: DateTime!
+  """(Optional) The updatedAt of the new Holiday. Type: DateTime."""
+  updatedAt: DateTime
 }
 
-"""Either create a new Holiday or connect to an existing one."""
+"""Prisma-style nested relation ops for Holiday: where/create/connect."""
 input HolidayCreateOrConnectInput {
-  """Connect an existing Holiday record by its unique ID."""
+  """Connect an existing Holiday by unique field(s)."""
   connect: HolidayConnectInput
 
-  """Create a new Holiday record and link it to the parent."""
+  """Create a new Holiday and link it to the parent."""
   create: HolidayCreateInput
+
+  """Unique selector to locate an existing Holiday."""
+  where: HolidayConnectInput
+}
+
+"""Pagination and filtering input for querying Holiday records."""
+input HolidayCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type HolidayCsvExportResponse {
+  """
+  Operation result code for the Holiday CSV export operation. e.g. 'HOLIDAY_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the Holiday CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Holiday CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying Holiday records."""
@@ -2596,14 +3343,18 @@ input HolidayUpdateInput {
   updatedAt: DateTime
 }
 
-"""
-Either update an existing related Holiday inline or reconnect to a different one.
-"""
+"""Prisma-style nested update ops for Holiday."""
 input HolidayUpdateOrConnectInput {
-  """Reconnect to a different existing Holiday record by its unique ID."""
+  """Reconnect to an existing Holiday by unique field(s)."""
   connect: HolidayConnectInput
 
-  """Update the fields of the related Holiday record inline."""
+  """Create a new related Holiday record inline."""
+  create: HolidayCreateInput
+
+  """Disconnect the current related Holiday record."""
+  disconnect: Boolean
+
+  """Update fields of the related Holiday record inline."""
   update: HolidayUpdateInput
 }
 
@@ -2651,10 +3402,10 @@ type JobLevel {
   workInformations: [WorkInformation!]!
 }
 
-"""Input to connect an existing JobLevel record by its unique ID."""
+"""Input to connect an existing JobLevel record by a unique field."""
 input JobLevelConnectInput {
-  """The unique identifier of the existing JobLevel record to connect."""
-  id: String!
+  """Unique field 'id' used to connect an existing JobLevel record."""
+  id: String
 }
 
 """Where input for counting JobLevel records."""
@@ -2725,13 +3476,54 @@ input JobLevelCreateInput {
   workInformations: [WorkInformationCreateOrConnectInput!]
 }
 
-"""Either create a new JobLevel or connect to an existing one."""
+"""Prisma-style nested relation ops for JobLevel: where/create/connect."""
 input JobLevelCreateOrConnectInput {
-  """Connect an existing JobLevel record by its unique ID."""
+  """Connect an existing JobLevel by unique field(s)."""
   connect: JobLevelConnectInput
 
-  """Create a new JobLevel record and link it to the parent."""
+  """Create a new JobLevel and link it to the parent."""
   create: JobLevelCreateInput
+
+  """Unique selector to locate an existing JobLevel."""
+  where: JobLevelConnectInput
+}
+
+"""Pagination and filtering input for querying JobLevel records."""
+input JobLevelCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type JobLevelCsvExportResponse {
+  """
+  Operation result code for the JobLevel CSV export operation. e.g. 'JOBLEVEL_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the JobLevel CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the JobLevel CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying JobLevel records."""
@@ -2981,14 +3773,18 @@ input JobLevelUpdateInput {
   workInformations: [WorkInformationUpdateOrConnectInput!]
 }
 
-"""
-Either update an existing related JobLevel inline or reconnect to a different one.
-"""
+"""Prisma-style nested update ops for JobLevel."""
 input JobLevelUpdateOrConnectInput {
-  """Reconnect to a different existing JobLevel record by its unique ID."""
+  """Reconnect to an existing JobLevel by unique field(s)."""
   connect: JobLevelConnectInput
 
-  """Update the fields of the related JobLevel record inline."""
+  """Create a new related JobLevel record inline."""
+  create: JobLevelCreateInput
+
+  """Disconnect the current related JobLevel record."""
+  disconnect: Boolean
+
+  """Update fields of the related JobLevel record inline."""
   update: JobLevelUpdateInput
 }
 
@@ -3034,10 +3830,10 @@ type Location {
   workInformations: [WorkInformation!]!
 }
 
-"""Input to connect an existing Location record by its unique ID."""
+"""Input to connect an existing Location record by a unique field."""
 input LocationConnectInput {
-  """The unique identifier of the existing Location record to connect."""
-  id: String!
+  """Unique field 'id' used to connect an existing Location record."""
+  id: String
 }
 
 """Where input for counting Location records."""
@@ -3099,13 +3895,54 @@ input LocationCreateInput {
   workInformations: [WorkInformationCreateOrConnectInput!]
 }
 
-"""Either create a new Location or connect to an existing one."""
+"""Prisma-style nested relation ops for Location: where/create/connect."""
 input LocationCreateOrConnectInput {
-  """Connect an existing Location record by its unique ID."""
+  """Connect an existing Location by unique field(s)."""
   connect: LocationConnectInput
 
-  """Create a new Location record and link it to the parent."""
+  """Create a new Location and link it to the parent."""
   create: LocationCreateInput
+
+  """Unique selector to locate an existing Location."""
+  where: LocationConnectInput
+}
+
+"""Pagination and filtering input for querying Location records."""
+input LocationCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type LocationCsvExportResponse {
+  """
+  Operation result code for the Location CSV export operation. e.g. 'LOCATION_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the Location CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Location CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying Location records."""
@@ -3346,14 +4183,18 @@ input LocationUpdateInput {
   workInformations: [WorkInformationUpdateOrConnectInput!]
 }
 
-"""
-Either update an existing related Location inline or reconnect to a different one.
-"""
+"""Prisma-style nested update ops for Location."""
 input LocationUpdateOrConnectInput {
-  """Reconnect to a different existing Location record by its unique ID."""
+  """Reconnect to an existing Location by unique field(s)."""
   connect: LocationConnectInput
 
-  """Update the fields of the related Location record inline."""
+  """Create a new related Location record inline."""
+  create: LocationCreateInput
+
+  """Disconnect the current related Location record."""
+  disconnect: Boolean
+
+  """Update fields of the related Location record inline."""
   update: LocationUpdateInput
 }
 
@@ -3797,6 +4638,150 @@ type Mutation {
     """
     data: [CompanyUpdateInput!]!
   ): CompanyListResponse
+
+  """
+  Soft-delete a Config record by setting it as inactive. The record is not permanently removed. Triggers a real-time subscription event on success.
+  """
+  ConfigArchive(
+    """
+    (Optional) The ID of the user performing the archive. Defaults to 'system' if not provided.
+    """
+    currentUserId: String
+
+    """The unique identifier of the Config record to archive."""
+    id: String!
+  ): ConfigResponse
+
+  """
+  Soft-delete multiple Config records by setting them as inactive. Each archived record triggers an individual real-time subscription event.
+  """
+  ConfigArchiveMany(
+    """
+    (Optional) The ID of the user performing the bulk archive. Defaults to 'system' if not provided.
+    """
+    currentUserId: String
+
+    """Array of unique identifiers of the Config records to archive."""
+    ids: [String!]!
+  ): ConfigListResponse
+
+  """
+  Create a new Config record. Triggers a real-time subscription event on success.
+  """
+  ConfigCreate(
+    """
+    (Optional) The ID of the user performing the create operation. Defaults to 'system' if not provided.
+    """
+    currentUserId: String
+
+    """The input fields required to create a new Config record."""
+    data: ConfigCreateInput!
+  ): ConfigResponse
+
+  """
+  Create multiple Config records in a single operation. Each created record triggers an individual real-time subscription event.
+  """
+  ConfigCreateMany(
+    """
+    (Optional) The ID of the user performing the bulk create. Defaults to 'system' if not provided.
+    """
+    currentUserId: String
+
+    """Array of input objects to create multiple Config records at once."""
+    data: [ConfigCreateInput!]!
+  ): ConfigListResponse
+
+  """
+  Permanently delete a Config record by ID. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  ConfigRemove(
+    """
+    (Optional) The ID of the user performing the delete. Defaults to 'system' if not provided.
+    """
+    currentUserId: String
+
+    """The unique identifier of the Config record to permanently delete."""
+    id: String!
+  ): ConfigResponse
+
+  """
+  Permanently delete all Config records. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  ConfigRemoveAll: ConfigResponse
+
+  """
+  Permanently delete multiple Config records by their IDs. This action is irreversible. Each removed record triggers an individual real-time subscription event.
+  """
+  ConfigRemoveMany(
+    """
+    (Optional) The ID of the user performing the bulk delete. Defaults to 'system' if not provided.
+    """
+    currentUserId: String
+
+    """
+    Comma-separated or array of unique identifiers of the Config records to permanently delete.
+    """
+    ids: [String!]!
+  ): ConfigDeletedListResponse
+
+  """
+  Restore a previously archived Config record by setting it back to active. Triggers a real-time subscription event on success.
+  """
+  ConfigRestore(
+    """
+    (Optional) The ID of the user performing the restore. Defaults to 'system' if not provided.
+    """
+    currentUserId: String
+
+    """The unique identifier of the Config record to restore."""
+    id: String!
+  ): ConfigResponse
+
+  """
+  Restore multiple previously archived Config records back to active. Each restored record triggers an individual real-time subscription event.
+  """
+  ConfigRestoreMany(
+    """
+    (Optional) The ID of the user performing the bulk restore. Defaults to 'system' if not provided.
+    """
+    currentUserId: String
+
+    """Array of unique identifiers of the Config records to restore."""
+    ids: [String!]!
+  ): ConfigListResponse
+
+  """
+  Update an existing Config record by ID. Only provided fields will be changed. Triggers a real-time subscription event on success.
+  """
+  ConfigUpdate(
+    """
+    (Optional) The ID of the user performing the update. Defaults to 'system' if not provided.
+    """
+    currentUserId: String
+
+    """
+    The fields to update on the Config record. Omitted fields remain unchanged.
+    """
+    data: ConfigUpdateInput!
+
+    """The unique identifier of the Config record to update."""
+    id: String!
+  ): ConfigResponse
+
+  """
+  Update multiple Config records in a single operation. Each updated record triggers an individual real-time subscription event.
+  """
+  ConfigUpdateMany(
+    """
+    (Optional) The ID of the user performing the bulk update. Defaults to 'system' if not provided.
+    """
+    currentUserId: String
+
+    """
+    Array of update input objects. Each must include the record ID and the fields to change.
+    """
+    data: [ConfigUpdateInput!]!
+  ): ConfigListResponse
 
   """
   Soft-delete a Department record by setting it as inactive. The record is not permanently removed. Triggers a real-time subscription event on success.
@@ -6007,8 +6992,8 @@ type Permission {
   """(Optional) List of related AuditLog records linked to this Permission."""
   auditLogs: [AuditLog!]!
 
-  """(Required) createdAt field of Permission. Type: DateTime (ISO 8601)."""
-  createdAt: DateTime!
+  """(Optional) createdAt field of Permission. Type: DateTime (ISO 8601)."""
+  createdAt: DateTime
 
   """(Optional) description field of Permission. Type: String."""
   description: String
@@ -6016,11 +7001,14 @@ type Permission {
   """(Optional) displayOrder field of Permission. Type: Integer."""
   displayOrder: Int
 
+  """(Optional) globalLimit field of Permission. Type: Integer."""
+  globalLimit: Int
+
   """Unique identifier of the Permission record."""
   id: ID!
 
-  """(Required) isActive field of Permission. Type: Boolean."""
-  isActive: Boolean!
+  """(Optional) isActive field of Permission. Type: Boolean."""
+  isActive: Boolean
 
   """(Required) isAdmin field of Permission. Type: Boolean."""
   isAdmin: Boolean!
@@ -6042,14 +7030,14 @@ type Permission {
   """
   rolePermissions: [RolePermission!]!
 
-  """(Required) updatedAt field of Permission. Type: DateTime (ISO 8601)."""
-  updatedAt: DateTime!
+  """(Optional) updatedAt field of Permission. Type: DateTime (ISO 8601)."""
+  updatedAt: DateTime
 }
 
-"""Input to connect an existing Permission record by its unique ID."""
+"""Input to connect an existing Permission record by a unique field."""
 input PermissionConnectInput {
-  """The unique identifier of the existing Permission record to connect."""
-  id: String!
+  """Unique field 'id' used to connect an existing Permission record."""
+  id: String
 }
 
 """Where input for counting Permission records."""
@@ -6089,8 +7077,8 @@ input PermissionCreateInput {
   """(Optional) List of AuditLog relation."""
   auditLogs: [AuditLogCreateOrConnectInput!]
 
-  """(Required) The createdAt of the new Permission. Type: DateTime."""
-  createdAt: DateTime!
+  """(Optional) The createdAt of the new Permission. Type: DateTime."""
+  createdAt: DateTime
 
   """(Optional) The description of the new Permission. Type: String."""
   description: String
@@ -6098,14 +7086,17 @@ input PermissionCreateInput {
   """(Optional) The displayOrder of the new Permission. Type: Int."""
   displayOrder: Int
 
-  """(Required) The isActive of the new Permission. Type: Boolean."""
-  isActive: Boolean!
+  """(Optional) The globalLimit of the new Permission. Type: Int."""
+  globalLimit: Int
 
-  """(Required) The isAdmin of the new Permission. Type: Boolean."""
-  isAdmin: Boolean!
+  """(Optional) The isActive of the new Permission. Type: Boolean."""
+  isActive: Boolean
 
-  """(Required) The isGlobal of the new Permission. Type: Boolean."""
-  isGlobal: Boolean!
+  """(Optional) The isAdmin of the new Permission. Type: Boolean."""
+  isAdmin: Boolean
+
+  """(Optional) The isGlobal of the new Permission. Type: Boolean."""
+  isGlobal: Boolean
 
   """(Optional) The module of the new Permission. Type: String."""
   module: String
@@ -6119,17 +7110,58 @@ input PermissionCreateInput {
   """(Optional) List of RolePermission relation."""
   rolePermissions: [RolePermissionCreateOrConnectInput!]
 
-  """(Required) The updatedAt of the new Permission. Type: DateTime."""
-  updatedAt: DateTime!
+  """(Optional) The updatedAt of the new Permission. Type: DateTime."""
+  updatedAt: DateTime
 }
 
-"""Either create a new Permission or connect to an existing one."""
+"""Prisma-style nested relation ops for Permission: where/create/connect."""
 input PermissionCreateOrConnectInput {
-  """Connect an existing Permission record by its unique ID."""
+  """Connect an existing Permission by unique field(s)."""
   connect: PermissionConnectInput
 
-  """Create a new Permission record and link it to the parent."""
+  """Create a new Permission and link it to the parent."""
   create: PermissionCreateInput
+
+  """Unique selector to locate an existing Permission."""
+  where: PermissionConnectInput
+}
+
+"""Pagination and filtering input for querying Permission records."""
+input PermissionCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type PermissionCsvExportResponse {
+  """
+  Operation result code for the Permission CSV export operation. e.g. 'PERMISSION_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the Permission CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Permission CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying Permission records."""
@@ -6354,6 +7386,9 @@ input PermissionUpdateInput {
   """(Optional) Update the displayOrder of the Permission. Type: Int."""
   displayOrder: Int
 
+  """(Optional) Update the globalLimit of the Permission. Type: Int."""
+  globalLimit: Int
+
   """(Optional) Update the id of the Permission. Type: String."""
   id: String
 
@@ -6382,14 +7417,18 @@ input PermissionUpdateInput {
   updatedAt: DateTime
 }
 
-"""
-Either update an existing related Permission inline or reconnect to a different one.
-"""
+"""Prisma-style nested update ops for Permission."""
 input PermissionUpdateOrConnectInput {
-  """Reconnect to a different existing Permission record by its unique ID."""
+  """Reconnect to an existing Permission by unique field(s)."""
   connect: PermissionConnectInput
 
-  """Update the fields of the related Permission record inline."""
+  """Create a new related Permission record inline."""
+  create: PermissionCreateInput
+
+  """Disconnect the current related Permission record."""
+  disconnect: Boolean
+
+  """Update fields of the related Permission record inline."""
   update: PermissionUpdateInput
 }
 
@@ -6413,6 +7452,12 @@ type Position {
   """(Optional) name field of Position. Type: String."""
   name: String
 
+  """(Optional) Related Type record linked to this Position."""
+  scopeType: Type
+
+  """(Optional) scopeTypeId field of Position. Type: String."""
+  scopeTypeId: String
+
   """(Required) updatedAt field of Position. Type: DateTime (ISO 8601)."""
   updatedAt: DateTime!
 
@@ -6422,10 +7467,10 @@ type Position {
   workInformations: [WorkInformation!]!
 }
 
-"""Input to connect an existing Position record by its unique ID."""
+"""Input to connect an existing Position record by a unique field."""
 input PositionConnectInput {
-  """The unique identifier of the existing Position record to connect."""
-  id: String!
+  """Unique field 'id' used to connect an existing Position record."""
+  id: String
 }
 
 """Where input for counting Position records."""
@@ -6465,8 +7510,8 @@ input PositionCreateInput {
   """(Optional) List of AuditLog relation."""
   auditLogs: [AuditLogCreateOrConnectInput!]
 
-  """(Required) The createdAt of the new Position. Type: DateTime."""
-  createdAt: DateTime!
+  """(Optional) The createdAt of the new Position. Type: DateTime."""
+  createdAt: DateTime
 
   """(Optional) The description of the new Position. Type: String."""
   description: String
@@ -6474,20 +7519,67 @@ input PositionCreateInput {
   """(Optional) The name of the new Position. Type: String."""
   name: String
 
-  """(Required) The updatedAt of the new Position. Type: DateTime."""
-  updatedAt: DateTime!
+  """(Optional) Single Type relation."""
+  scopeType: TypeCreateOrConnectInput
+
+  """(Optional) The scopeTypeId of the new Position. Type: String."""
+  scopeTypeId: String
+
+  """(Optional) The updatedAt of the new Position. Type: DateTime."""
+  updatedAt: DateTime
 
   """(Optional) List of WorkInformation relation."""
   workInformations: [WorkInformationCreateOrConnectInput!]
 }
 
-"""Either create a new Position or connect to an existing one."""
+"""Prisma-style nested relation ops for Position: where/create/connect."""
 input PositionCreateOrConnectInput {
-  """Connect an existing Position record by its unique ID."""
+  """Connect an existing Position by unique field(s)."""
   connect: PositionConnectInput
 
-  """Create a new Position record and link it to the parent."""
+  """Create a new Position and link it to the parent."""
   create: PositionCreateInput
+
+  """Unique selector to locate an existing Position."""
+  where: PositionConnectInput
+}
+
+"""Pagination and filtering input for querying Position records."""
+input PositionCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type PositionCsvExportResponse {
+  """
+  Operation result code for the Position CSV export operation. e.g. 'POSITION_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the Position CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Position CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying Position records."""
@@ -6715,6 +7807,12 @@ input PositionUpdateInput {
   """(Optional) Update the name of the Position. Type: String."""
   name: String
 
+  """(Optional) Single Type relation."""
+  scopeType: TypeUpdateOrConnectInput
+
+  """(Optional) Update the scopeTypeId of the Position. Type: String."""
+  scopeTypeId: String
+
   """(Optional) Update the updatedAt of the Position. Type: DateTime."""
   updatedAt: DateTime
 
@@ -6722,19 +7820,24 @@ input PositionUpdateInput {
   workInformations: [WorkInformationUpdateOrConnectInput!]
 }
 
-"""
-Either update an existing related Position inline or reconnect to a different one.
-"""
+"""Prisma-style nested update ops for Position."""
 input PositionUpdateOrConnectInput {
-  """Reconnect to a different existing Position record by its unique ID."""
+  """Reconnect to an existing Position by unique field(s)."""
   connect: PositionConnectInput
 
-  """Update the fields of the related Position record inline."""
+  """Create a new related Position record inline."""
+  create: PositionCreateInput
+
+  """Disconnect the current related Position record."""
+  disconnect: Boolean
+
+  """Update fields of the related Position record inline."""
   update: PositionUpdateInput
 }
 
 type Query {
   AuditLogCount(input: AuditLogCountInput!): AuditLogCountResponse
+  AuditLogExportCsv(input: AuditLogCsvExportInput!): AuditLogCsvExportResponse
 
   """
   Retrieve a paginated list of AuditLog records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -6760,6 +7863,7 @@ type Query {
     id: String!
   ): AuditLogResponse
   BasicInformationCount(input: BasicInformationCountInput!): BasicInformationCountResponse
+  BasicInformationExportCsv(input: BasicInformationCsvExportInput!): BasicInformationCsvExportResponse
 
   """
   Retrieve a paginated list of BasicInformation records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -6787,6 +7891,7 @@ type Query {
     id: String!
   ): BasicInformationResponse
   CompanyCount(input: CompanyCountInput!): CompanyCountResponse
+  CompanyExportCsv(input: CompanyCsvExportInput!): CompanyCsvExportResponse
 
   """
   Retrieve a paginated list of Company records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -6811,7 +7916,34 @@ type Query {
     """The unique identifier of the Company record to retrieve."""
     id: String!
   ): CompanyResponse
+  ConfigCount(input: ConfigCountInput!): ConfigCountResponse
+  ConfigExportCsv(input: ConfigCsvExportInput!): ConfigCsvExportResponse
+
+  """
+  Retrieve a paginated list of Config records. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  ConfigFindAll(
+    """Pagination and filter options for the Config list query."""
+    paginationInput: ConfigPageInput!
+  ): ConfigPaginationResponse
+
+  """
+  Retrieve a paginated list of Config records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  ConfigFindAllWithCursor(
+    """Cursor pagination and filter options for the Config list query."""
+    cursorInput: ConfigCursorPaginationInput!
+  ): ConfigCursorPaginationResponse
+  ConfigFindBy(input: ConfigFindByInput!): ConfigResponse
+  ConfigFindFirst(input: ConfigFindFirstInput!): ConfigResponse
+
+  """Retrieve a single Config record by its unique ID."""
+  ConfigFindUnique(
+    """The unique identifier of the Config record to retrieve."""
+    id: String!
+  ): ConfigResponse
   DepartmentCount(input: DepartmentCountInput!): DepartmentCountResponse
+  DepartmentExportCsv(input: DepartmentCsvExportInput!): DepartmentCsvExportResponse
 
   """
   Retrieve a paginated list of Department records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -6837,6 +7969,7 @@ type Query {
     id: String!
   ): DepartmentResponse
   GroupOfCompanyCount(input: GroupOfCompanyCountInput!): GroupOfCompanyCountResponse
+  GroupOfCompanyExportCsv(input: GroupOfCompanyCsvExportInput!): GroupOfCompanyCsvExportResponse
 
   """
   Retrieve a paginated list of GroupOfCompany records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -6864,6 +7997,7 @@ type Query {
     id: String!
   ): GroupOfCompanyResponse
   HolidayCount(input: HolidayCountInput!): HolidayCountResponse
+  HolidayExportCsv(input: HolidayCsvExportInput!): HolidayCsvExportResponse
 
   """
   Retrieve a paginated list of Holiday records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -6889,6 +8023,7 @@ type Query {
     id: String!
   ): HolidayResponse
   JobLevelCount(input: JobLevelCountInput!): JobLevelCountResponse
+  JobLevelExportCsv(input: JobLevelCsvExportInput!): JobLevelCsvExportResponse
 
   """
   Retrieve a paginated list of JobLevel records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -6914,6 +8049,7 @@ type Query {
     id: String!
   ): JobLevelResponse
   LocationCount(input: LocationCountInput!): LocationCountResponse
+  LocationExportCsv(input: LocationCsvExportInput!): LocationCsvExportResponse
 
   """
   Retrieve a paginated list of Location records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -6939,6 +8075,7 @@ type Query {
     id: String!
   ): LocationResponse
   PermissionCount(input: PermissionCountInput!): PermissionCountResponse
+  PermissionExportCsv(input: PermissionCsvExportInput!): PermissionCsvExportResponse
 
   """
   Retrieve a paginated list of Permission records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -6964,6 +8101,7 @@ type Query {
     id: String!
   ): PermissionResponse
   PositionCount(input: PositionCountInput!): PositionCountResponse
+  PositionExportCsv(input: PositionCsvExportInput!): PositionCsvExportResponse
 
   """
   Retrieve a paginated list of Position records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -6989,6 +8127,7 @@ type Query {
     id: String!
   ): PositionResponse
   RoleCount(input: RoleCountInput!): RoleCountResponse
+  RoleExportCsv(input: RoleCsvExportInput!): RoleCsvExportResponse
 
   """
   Retrieve a paginated list of Role records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7014,6 +8153,7 @@ type Query {
     id: String!
   ): RoleResponse
   RolePermissionCount(input: RolePermissionCountInput!): RolePermissionCountResponse
+  RolePermissionExportCsv(input: RolePermissionCsvExportInput!): RolePermissionCsvExportResponse
 
   """
   Retrieve a paginated list of RolePermission records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7041,6 +8181,7 @@ type Query {
     id: String!
   ): RolePermissionResponse
   ShiftingScheduleCount(input: ShiftingScheduleCountInput!): ShiftingScheduleCountResponse
+  ShiftingScheduleExportCsv(input: ShiftingScheduleCsvExportInput!): ShiftingScheduleCsvExportResponse
 
   """
   Retrieve a paginated list of ShiftingSchedule records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7068,6 +8209,7 @@ type Query {
     id: String!
   ): ShiftingScheduleResponse
   StatusCount(input: StatusCountInput!): StatusCountResponse
+  StatusExportCsv(input: StatusCsvExportInput!): StatusCsvExportResponse
 
   """
   Retrieve a paginated list of Status records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7093,6 +8235,7 @@ type Query {
     id: String!
   ): StatusResponse
   TypeCount(input: TypeCountInput!): TypeCountResponse
+  TypeExportCsv(input: TypeCsvExportInput!): TypeCsvExportResponse
 
   """
   Retrieve a paginated list of Type records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7118,6 +8261,7 @@ type Query {
     id: String!
   ): TypeResponse
   UserCount(input: UserCountInput!): UserCountResponse
+  UserExportCsv(input: UserCsvExportInput!): UserCsvExportResponse
 
   """
   Retrieve a paginated list of User records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7143,6 +8287,7 @@ type Query {
     id: String!
   ): UserResponse
   UserRoleCount(input: UserRoleCountInput!): UserRoleCountResponse
+  UserRoleExportCsv(input: UserRoleCsvExportInput!): UserRoleCsvExportResponse
 
   """
   Retrieve a paginated list of UserRole records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7168,6 +8313,7 @@ type Query {
     id: String!
   ): UserRoleResponse
   WorkInformationCount(input: WorkInformationCountInput!): WorkInformationCountResponse
+  WorkInformationExportCsv(input: WorkInformationCsvExportInput!): WorkInformationCsvExportResponse
 
   """
   Retrieve a paginated list of WorkInformation records. Supports filtering by active status, keyword search, and advanced JSON filters.
@@ -7205,8 +8351,8 @@ type Role {
   """(Optional) List of related Role records linked to this Role."""
   childRoles: [Role!]!
 
-  """(Required) createdAt field of Role. Type: DateTime (ISO 8601)."""
-  createdAt: DateTime!
+  """(Optional) createdAt field of Role. Type: DateTime (ISO 8601)."""
+  createdAt: DateTime
 
   """(Optional) description field of Role. Type: String."""
   description: String
@@ -7214,8 +8360,8 @@ type Role {
   """Unique identifier of the Role record."""
   id: ID!
 
-  """(Required) isActive field of Role. Type: Boolean."""
-  isActive: Boolean!
+  """(Optional) isActive field of Role. Type: Boolean."""
+  isActive: Boolean
 
   """(Required) isDefault field of Role. Type: Boolean."""
   isDefault: Boolean!
@@ -7235,17 +8381,17 @@ type Role {
   """(Optional) roleType field of Role. Type: String."""
   roleType: String
 
-  """(Required) updatedAt field of Role. Type: DateTime (ISO 8601)."""
-  updatedAt: DateTime!
+  """(Optional) updatedAt field of Role. Type: DateTime (ISO 8601)."""
+  updatedAt: DateTime
 
   """(Optional) List of related UserRole records linked to this Role."""
   userRoles: [UserRole!]!
 }
 
-"""Input to connect an existing Role record by its unique ID."""
+"""Input to connect an existing Role record by a unique field."""
 input RoleConnectInput {
-  """The unique identifier of the existing Role record to connect."""
-  id: String!
+  """Unique field 'id' used to connect an existing Role record."""
+  id: String
 }
 
 """Where input for counting Role records."""
@@ -7285,17 +8431,17 @@ input RoleCreateInput {
   """(Optional) List of Role relation."""
   childRoles: [RoleCreateOrConnectInput!]
 
-  """(Required) The createdAt of the new Role. Type: DateTime."""
-  createdAt: DateTime!
+  """(Optional) The createdAt of the new Role. Type: DateTime."""
+  createdAt: DateTime
 
   """(Optional) The description of the new Role. Type: String."""
   description: String
 
-  """(Required) The isActive of the new Role. Type: Boolean."""
-  isActive: Boolean!
+  """(Optional) The isActive of the new Role. Type: Boolean."""
+  isActive: Boolean
 
-  """(Required) The isDefault of the new Role. Type: Boolean."""
-  isDefault: Boolean!
+  """(Optional) The isDefault of the new Role. Type: Boolean."""
+  isDefault: Boolean
 
   """(Optional) The name of the new Role. Type: String."""
   name: String
@@ -7312,20 +8458,61 @@ input RoleCreateInput {
   """(Optional) The roleType of the new Role. Type: String."""
   roleType: String
 
-  """(Required) The updatedAt of the new Role. Type: DateTime."""
-  updatedAt: DateTime!
+  """(Optional) The updatedAt of the new Role. Type: DateTime."""
+  updatedAt: DateTime
 
   """(Optional) List of UserRole relation."""
   userRoles: [UserRoleCreateOrConnectInput!]
 }
 
-"""Either create a new Role or connect to an existing one."""
+"""Prisma-style nested relation ops for Role: where/create/connect."""
 input RoleCreateOrConnectInput {
-  """Connect an existing Role record by its unique ID."""
+  """Connect an existing Role by unique field(s)."""
   connect: RoleConnectInput
 
-  """Create a new Role record and link it to the parent."""
+  """Create a new Role and link it to the parent."""
   create: RoleCreateInput
+
+  """Unique selector to locate an existing Role."""
+  where: RoleConnectInput
+}
+
+"""Pagination and filtering input for querying Role records."""
+input RoleCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type RoleCsvExportResponse {
+  """
+  Operation result code for the Role CSV export operation. e.g. 'ROLE_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the Role CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Role CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying Role records."""
@@ -7513,19 +8700,21 @@ type RolePermission {
   """
   auditLogs: [AuditLog!]!
 
-  """(Optional) conditions field of RolePermission. Type: JSON object."""
-  conditions: Json
+  """
+  (Optional) List of related Config records linked to this RolePermission.
+  """
+  conditions: [Config!]!
 
   """
-  (Required) createdAt field of RolePermission. Type: DateTime (ISO 8601).
+  (Optional) createdAt field of RolePermission. Type: DateTime (ISO 8601).
   """
-  createdAt: DateTime!
+  createdAt: DateTime
 
   """Unique identifier of the RolePermission record."""
   id: ID!
 
-  """(Required) isActive field of RolePermission. Type: Boolean."""
-  isActive: Boolean!
+  """(Optional) isActive field of RolePermission. Type: Boolean."""
+  isActive: Boolean
 
   """(Optional) Related Permission record linked to this RolePermission."""
   permission: Permission
@@ -7539,27 +8728,19 @@ type RolePermission {
   """(Optional) roleId field of RolePermission. Type: String."""
   roleId: String
 
-  """(Optional) Related Type record linked to this RolePermission."""
-  scopeType: Type
-
-  """(Optional) scopeTypeId field of RolePermission. Type: String."""
-  scopeTypeId: String
-
   """(Required) scopeValues field of RolePermission. Type: String[]."""
   scopeValues: [String!]!
 
   """
-  (Required) updatedAt field of RolePermission. Type: DateTime (ISO 8601).
+  (Optional) updatedAt field of RolePermission. Type: DateTime (ISO 8601).
   """
-  updatedAt: DateTime!
+  updatedAt: DateTime
 }
 
-"""Input to connect an existing RolePermission record by its unique ID."""
+"""Input to connect an existing RolePermission record by a unique field."""
 input RolePermissionConnectInput {
-  """
-  The unique identifier of the existing RolePermission record to connect.
-  """
-  id: String!
+  """Unique field 'id' used to connect an existing RolePermission record."""
+  id: String
 }
 
 """Where input for counting RolePermission records."""
@@ -7596,14 +8777,14 @@ input RolePermissionCreateInput {
   """(Optional) List of AuditLog relation."""
   auditLogs: [AuditLogCreateOrConnectInput!]
 
-  """(Optional) The conditions of the new RolePermission. Type: Json."""
-  conditions: Json
+  """(Optional) List of Config relation."""
+  conditions: [ConfigCreateOrConnectInput!]
 
-  """(Required) The createdAt of the new RolePermission. Type: DateTime."""
-  createdAt: DateTime!
+  """(Optional) The createdAt of the new RolePermission. Type: DateTime."""
+  createdAt: DateTime
 
-  """(Required) The isActive of the new RolePermission. Type: Boolean."""
-  isActive: Boolean!
+  """(Optional) The isActive of the new RolePermission. Type: Boolean."""
+  isActive: Boolean
 
   """(Optional) Single Permission relation."""
   permission: PermissionCreateOrConnectInput
@@ -7617,26 +8798,65 @@ input RolePermissionCreateInput {
   """(Optional) The roleId of the new RolePermission. Type: String."""
   roleId: String
 
-  """(Optional) Single Type relation."""
-  scopeType: TypeCreateOrConnectInput
+  """(Optional) The scopeValues of the new RolePermission. Type: String[]."""
+  scopeValues: [String!]
 
-  """(Optional) The scopeTypeId of the new RolePermission. Type: String."""
-  scopeTypeId: String
-
-  """(Required) The scopeValues of the new RolePermission. Type: String[]."""
-  scopeValues: [String!]!
-
-  """(Required) The updatedAt of the new RolePermission. Type: DateTime."""
-  updatedAt: DateTime!
+  """(Optional) The updatedAt of the new RolePermission. Type: DateTime."""
+  updatedAt: DateTime
 }
 
-"""Either create a new RolePermission or connect to an existing one."""
+"""
+Prisma-style nested relation ops for RolePermission: where/create/connect.
+"""
 input RolePermissionCreateOrConnectInput {
-  """Connect an existing RolePermission record by its unique ID."""
+  """Connect an existing RolePermission by unique field(s)."""
   connect: RolePermissionConnectInput
 
-  """Create a new RolePermission record and link it to the parent."""
+  """Create a new RolePermission and link it to the parent."""
   create: RolePermissionCreateInput
+
+  """Unique selector to locate an existing RolePermission."""
+  where: RolePermissionConnectInput
+}
+
+"""Pagination and filtering input for querying RolePermission records."""
+input RolePermissionCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type RolePermissionCsvExportResponse {
+  """
+  Operation result code for the RolePermission CSV export operation. e.g. 'ROLEPERMISSION_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """
+  Indicates whether the RolePermission CSV export operation was successful.
+  """
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the RolePermission CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying RolePermission records."""
@@ -7851,8 +9071,8 @@ input RolePermissionUpdateInput {
   """(Optional) List of AuditLog relation."""
   auditLogs: [AuditLogUpdateOrConnectInput!]
 
-  """(Optional) Update the conditions of the RolePermission. Type: Json."""
-  conditions: Json
+  """(Optional) List of Config relation."""
+  conditions: [ConfigUpdateOrConnectInput!]
 
   """(Optional) Update the createdAt of the RolePermission. Type: DateTime."""
   createdAt: DateTime
@@ -7877,12 +9097,6 @@ input RolePermissionUpdateInput {
   """(Optional) Update the roleId of the RolePermission. Type: String."""
   roleId: String
 
-  """(Optional) Single Type relation."""
-  scopeType: TypeUpdateOrConnectInput
-
-  """(Optional) Update the scopeTypeId of the RolePermission. Type: String."""
-  scopeTypeId: String
-
   """
   (Optional) Update the scopeValues of the RolePermission. Type: String[].
   """
@@ -7892,16 +9106,18 @@ input RolePermissionUpdateInput {
   updatedAt: DateTime
 }
 
-"""
-Either update an existing related RolePermission inline or reconnect to a different one.
-"""
+"""Prisma-style nested update ops for RolePermission."""
 input RolePermissionUpdateOrConnectInput {
-  """
-  Reconnect to a different existing RolePermission record by its unique ID.
-  """
+  """Reconnect to an existing RolePermission by unique field(s)."""
   connect: RolePermissionConnectInput
 
-  """Update the fields of the related RolePermission record inline."""
+  """Create a new related RolePermission record inline."""
+  create: RolePermissionCreateInput
+
+  """Disconnect the current related RolePermission record."""
+  disconnect: Boolean
+
+  """Update fields of the related RolePermission record inline."""
   update: RolePermissionUpdateInput
 }
 
@@ -7973,14 +9189,18 @@ input RoleUpdateInput {
   userRoles: [UserRoleUpdateOrConnectInput!]
 }
 
-"""
-Either update an existing related Role inline or reconnect to a different one.
-"""
+"""Prisma-style nested update ops for Role."""
 input RoleUpdateOrConnectInput {
-  """Reconnect to a different existing Role record by its unique ID."""
+  """Reconnect to an existing Role by unique field(s)."""
   connect: RoleConnectInput
 
-  """Update the fields of the related Role record inline."""
+  """Create a new related Role record inline."""
+  create: RoleCreateInput
+
+  """Disconnect the current related Role record."""
+  disconnect: Boolean
+
+  """Update fields of the related Role record inline."""
   update: RoleUpdateInput
 }
 
@@ -8055,12 +9275,17 @@ type ShiftingSchedule {
   workInformationId: String
 }
 
-"""Input to connect an existing ShiftingSchedule record by its unique ID."""
+"""
+Input to connect an existing ShiftingSchedule record by a unique field.
+"""
 input ShiftingScheduleConnectInput {
+  """Unique field 'id' used to connect an existing ShiftingSchedule record."""
+  id: String
+
   """
-  The unique identifier of the existing ShiftingSchedule record to connect.
+  Unique field 'workInformationId' used to connect an existing ShiftingSchedule record.
   """
-  id: String!
+  workInformationId: String
 }
 
 """Where input for counting ShiftingSchedule records."""
@@ -8097,41 +9322,41 @@ input ShiftingScheduleCreateInput {
   """(Optional) List of AuditLog relation."""
   auditLogs: [AuditLogCreateOrConnectInput!]
 
-  """(Required) The breakEnd of the new ShiftingSchedule. Type: DateTime."""
-  breakEnd: DateTime!
+  """(Optional) The breakEnd of the new ShiftingSchedule. Type: DateTime."""
+  breakEnd: DateTime
 
-  """(Required) The breakStart of the new ShiftingSchedule. Type: DateTime."""
-  breakStart: DateTime!
+  """(Optional) The breakStart of the new ShiftingSchedule. Type: DateTime."""
+  breakStart: DateTime
 
-  """(Required) The createdAt of the new ShiftingSchedule. Type: DateTime."""
-  createdAt: DateTime!
+  """(Optional) The createdAt of the new ShiftingSchedule. Type: DateTime."""
+  createdAt: DateTime
 
-  """(Required) The description of the new ShiftingSchedule. Type: String."""
-  description: String!
+  """(Optional) The description of the new ShiftingSchedule. Type: String."""
+  description: String
 
-  """(Required) The endTime of the new ShiftingSchedule. Type: DateTime."""
-  endTime: DateTime!
+  """(Optional) The endTime of the new ShiftingSchedule. Type: DateTime."""
+  endTime: DateTime
 
-  """(Required) The lunchEnd of the new ShiftingSchedule. Type: DateTime."""
-  lunchEnd: DateTime!
+  """(Optional) The lunchEnd of the new ShiftingSchedule. Type: DateTime."""
+  lunchEnd: DateTime
 
-  """(Required) The lunchStart of the new ShiftingSchedule. Type: DateTime."""
-  lunchStart: DateTime!
+  """(Optional) The lunchStart of the new ShiftingSchedule. Type: DateTime."""
+  lunchStart: DateTime
 
-  """(Required) The name of the new ShiftingSchedule. Type: String."""
-  name: String!
+  """(Optional) The name of the new ShiftingSchedule. Type: String."""
+  name: String
 
-  """(Required) The restDays of the new ShiftingSchedule. Type: Int[]."""
-  restDays: [String!]!
+  """(Optional) The restDays of the new ShiftingSchedule. Type: Int[]."""
+  restDays: [String!]
 
-  """(Required) The startTime of the new ShiftingSchedule. Type: DateTime."""
-  startTime: DateTime!
+  """(Optional) The startTime of the new ShiftingSchedule. Type: DateTime."""
+  startTime: DateTime
 
-  """(Required) The updatedAt of the new ShiftingSchedule. Type: DateTime."""
-  updatedAt: DateTime!
+  """(Optional) The updatedAt of the new ShiftingSchedule. Type: DateTime."""
+  updatedAt: DateTime
 
-  """(Required) The workDays of the new ShiftingSchedule. Type: Int[]."""
-  workDays: [String!]!
+  """(Optional) The workDays of the new ShiftingSchedule. Type: Int[]."""
+  workDays: [String!]
 
   """(Optional) Single WorkInformation relation."""
   workInformation: WorkInformationCreateOrConnectInput
@@ -8142,13 +9367,58 @@ input ShiftingScheduleCreateInput {
   workInformationId: String
 }
 
-"""Either create a new ShiftingSchedule or connect to an existing one."""
+"""
+Prisma-style nested relation ops for ShiftingSchedule: where/create/connect.
+"""
 input ShiftingScheduleCreateOrConnectInput {
-  """Connect an existing ShiftingSchedule record by its unique ID."""
+  """Connect an existing ShiftingSchedule by unique field(s)."""
   connect: ShiftingScheduleConnectInput
 
-  """Create a new ShiftingSchedule record and link it to the parent."""
+  """Create a new ShiftingSchedule and link it to the parent."""
   create: ShiftingScheduleCreateInput
+
+  """Unique selector to locate an existing ShiftingSchedule."""
+  where: ShiftingScheduleConnectInput
+}
+
+"""Pagination and filtering input for querying ShiftingSchedule records."""
+input ShiftingScheduleCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type ShiftingScheduleCsvExportResponse {
+  """
+  Operation result code for the ShiftingSchedule CSV export operation. e.g. 'SHIFTINGSCHEDULE_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """
+  Indicates whether the ShiftingSchedule CSV export operation was successful.
+  """
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the ShiftingSchedule CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying ShiftingSchedule records."""
@@ -8441,16 +9711,18 @@ input ShiftingScheduleUpdateInput {
   workInformationId: String
 }
 
-"""
-Either update an existing related ShiftingSchedule inline or reconnect to a different one.
-"""
+"""Prisma-style nested update ops for ShiftingSchedule."""
 input ShiftingScheduleUpdateOrConnectInput {
-  """
-  Reconnect to a different existing ShiftingSchedule record by its unique ID.
-  """
+  """Reconnect to an existing ShiftingSchedule by unique field(s)."""
   connect: ShiftingScheduleConnectInput
 
-  """Update the fields of the related ShiftingSchedule record inline."""
+  """Create a new related ShiftingSchedule record inline."""
+  create: ShiftingScheduleCreateInput
+
+  """Disconnect the current related ShiftingSchedule record."""
+  disconnect: Boolean
+
+  """Update fields of the related ShiftingSchedule record inline."""
   update: ShiftingScheduleUpdateInput
 }
 
@@ -8483,10 +9755,10 @@ type Status {
   workInformations: [WorkInformation!]!
 }
 
-"""Input to connect an existing Status record by its unique ID."""
+"""Input to connect an existing Status record by a unique field."""
 input StatusConnectInput {
-  """The unique identifier of the existing Status record to connect."""
-  id: String!
+  """Unique field 'id' used to connect an existing Status record."""
+  id: String
 }
 
 """Where input for counting Status records."""
@@ -8542,13 +9814,54 @@ input StatusCreateInput {
   workInformations: [WorkInformationCreateOrConnectInput!]
 }
 
-"""Either create a new Status or connect to an existing one."""
+"""Prisma-style nested relation ops for Status: where/create/connect."""
 input StatusCreateOrConnectInput {
-  """Connect an existing Status record by its unique ID."""
+  """Connect an existing Status by unique field(s)."""
   connect: StatusConnectInput
 
-  """Create a new Status record and link it to the parent."""
+  """Create a new Status and link it to the parent."""
   create: StatusCreateInput
+
+  """Unique selector to locate an existing Status."""
+  where: StatusConnectInput
+}
+
+"""Pagination and filtering input for querying Status records."""
+input StatusCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type StatusCsvExportResponse {
+  """
+  Operation result code for the Status CSV export operation. e.g. 'STATUS_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the Status CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Status CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying Status records."""
@@ -8779,14 +10092,18 @@ input StatusUpdateInput {
   workInformations: [WorkInformationUpdateOrConnectInput!]
 }
 
-"""
-Either update an existing related Status inline or reconnect to a different one.
-"""
+"""Prisma-style nested update ops for Status."""
 input StatusUpdateOrConnectInput {
-  """Reconnect to a different existing Status record by its unique ID."""
+  """Reconnect to an existing Status by unique field(s)."""
   connect: StatusConnectInput
 
-  """Update the fields of the related Status record inline."""
+  """Create a new related Status record inline."""
+  create: StatusCreateInput
+
+  """Disconnect the current related Status record."""
+  disconnect: Boolean
+
+  """Update fields of the related Status record inline."""
   update: StatusUpdateInput
 }
 
@@ -8805,6 +10122,11 @@ type Subscription {
   Real-time subscription for Company changes. Emits an event whenever a Company record is created, updated, archived, restored, or deleted.
   """
   CompanySubscription: Company
+
+  """
+  Real-time subscription for Config changes. Emits an event whenever a Config record is created, updated, archived, restored, or deleted.
+  """
+  ConfigSubscription: Config
 
   """
   Real-time subscription for Department changes. Emits an event whenever a Department record is created, updated, archived, restored, or deleted.
@@ -8891,8 +10213,14 @@ type Type {
   """(Optional) List of related AuditLog records linked to this Type."""
   auditLogs: [AuditLog!]!
 
+  """(Optional) List of related Company records linked to this Type."""
+  companies: [Company!]!
+
   """(Optional) createdAt field of Type. Type: DateTime (ISO 8601)."""
   createdAt: DateTime
+
+  """(Optional) List of related Department records linked to this Type."""
+  departments: [Department!]!
 
   """
   (Optional) List of related WorkInformation records linked to this Type.
@@ -8911,14 +10239,14 @@ type Type {
   """(Optional) List of related JobLevel records linked to this Type."""
   jobLevels: [JobLevel!]!
 
+  """(Optional) List of related Position records linked to this Type."""
+  jobPositions: [Position!]!
+
   """(Optional) modelNameType field of Type. Type: String."""
   modelNameType: String
 
   """(Optional) name field of Type. Type: String."""
   name: String
-
-  """(Optional) List of related RolePermission records linked to this Type."""
-  rolePermissions: [RolePermission!]!
 
   """(Optional) updatedAt field of Type. Type: DateTime (ISO 8601)."""
   updatedAt: DateTime
@@ -8929,10 +10257,10 @@ type Type {
   workSetupType: [WorkInformation!]!
 }
 
-"""Input to connect an existing Type record by its unique ID."""
+"""Input to connect an existing Type record by a unique field."""
 input TypeConnectInput {
-  """The unique identifier of the existing Type record to connect."""
-  id: String!
+  """Unique field 'id' used to connect an existing Type record."""
+  id: String
 }
 
 """Where input for counting Type records."""
@@ -8972,8 +10300,14 @@ input TypeCreateInput {
   """(Optional) List of AuditLog relation."""
   auditLogs: [AuditLogCreateOrConnectInput!]
 
+  """(Optional) List of Company relation."""
+  companies: [CompanyCreateOrConnectInput!]
+
   """(Optional) The createdAt of the new Type. Type: DateTime."""
   createdAt: DateTime
+
+  """(Optional) List of Department relation."""
+  departments: [DepartmentCreateOrConnectInput!]
 
   """(Optional) List of WorkInformation relation."""
   employmentType: [WorkInformationCreateOrConnectInput!]
@@ -8987,14 +10321,14 @@ input TypeCreateInput {
   """(Optional) List of JobLevel relation."""
   jobLevels: [JobLevelCreateOrConnectInput!]
 
+  """(Optional) List of Position relation."""
+  jobPositions: [PositionCreateOrConnectInput!]
+
   """(Optional) The modelNameType of the new Type. Type: String."""
   modelNameType: String
 
   """(Optional) The name of the new Type. Type: String."""
   name: String
-
-  """(Optional) List of RolePermission relation."""
-  rolePermissions: [RolePermissionCreateOrConnectInput!]
 
   """(Optional) The updatedAt of the new Type. Type: DateTime."""
   updatedAt: DateTime
@@ -9003,13 +10337,54 @@ input TypeCreateInput {
   workSetupType: [WorkInformationCreateOrConnectInput!]
 }
 
-"""Either create a new Type or connect to an existing one."""
+"""Prisma-style nested relation ops for Type: where/create/connect."""
 input TypeCreateOrConnectInput {
-  """Connect an existing Type record by its unique ID."""
+  """Connect an existing Type by unique field(s)."""
   connect: TypeConnectInput
 
-  """Create a new Type record and link it to the parent."""
+  """Create a new Type and link it to the parent."""
   create: TypeCreateInput
+
+  """Unique selector to locate an existing Type."""
+  where: TypeConnectInput
+}
+
+"""Pagination and filtering input for querying Type records."""
+input TypeCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type TypeCsvExportResponse {
+  """
+  Operation result code for the Type CSV export operation. e.g. 'TYPE_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the Type CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the Type CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying Type records."""
@@ -9221,8 +10596,14 @@ input TypeUpdateInput {
   """(Optional) List of AuditLog relation."""
   auditLogs: [AuditLogUpdateOrConnectInput!]
 
+  """(Optional) List of Company relation."""
+  companies: [CompanyUpdateOrConnectInput!]
+
   """(Optional) Update the createdAt of the Type. Type: DateTime."""
   createdAt: DateTime
+
+  """(Optional) List of Department relation."""
+  departments: [DepartmentUpdateOrConnectInput!]
 
   """(Optional) List of WorkInformation relation."""
   employmentType: [WorkInformationUpdateOrConnectInput!]
@@ -9239,14 +10620,14 @@ input TypeUpdateInput {
   """(Optional) List of JobLevel relation."""
   jobLevels: [JobLevelUpdateOrConnectInput!]
 
+  """(Optional) List of Position relation."""
+  jobPositions: [PositionUpdateOrConnectInput!]
+
   """(Optional) Update the modelNameType of the Type. Type: String."""
   modelNameType: String
 
   """(Optional) Update the name of the Type. Type: String."""
   name: String
-
-  """(Optional) List of RolePermission relation."""
-  rolePermissions: [RolePermissionUpdateOrConnectInput!]
 
   """(Optional) Update the updatedAt of the Type. Type: DateTime."""
   updatedAt: DateTime
@@ -9255,14 +10636,18 @@ input TypeUpdateInput {
   workSetupType: [WorkInformationUpdateOrConnectInput!]
 }
 
-"""
-Either update an existing related Type inline or reconnect to a different one.
-"""
+"""Prisma-style nested update ops for Type."""
 input TypeUpdateOrConnectInput {
-  """Reconnect to a different existing Type record by its unique ID."""
+  """Reconnect to an existing Type by unique field(s)."""
   connect: TypeConnectInput
 
-  """Update the fields of the related Type record inline."""
+  """Create a new related Type record inline."""
+  create: TypeCreateInput
+
+  """Disconnect the current related Type record."""
+  disconnect: Boolean
+
+  """Update fields of the related Type record inline."""
   update: TypeUpdateInput
 }
 
@@ -9320,10 +10705,16 @@ type User {
   userRoles: [UserRole!]!
 }
 
-"""Input to connect an existing User record by its unique ID."""
+"""Input to connect an existing User record by a unique field."""
 input UserConnectInput {
-  """The unique identifier of the existing User record to connect."""
-  id: String!
+  """Unique field 'email' used to connect an existing User record."""
+  email: String
+
+  """Unique field 'id' used to connect an existing User record."""
+  id: String
+
+  """Unique field 'userName' used to connect an existing User record."""
+  userName: String
 }
 
 """Where input for counting User records."""
@@ -9406,13 +10797,54 @@ input UserCreateInput {
   userRoles: [UserRoleCreateOrConnectInput!]
 }
 
-"""Either create a new User or connect to an existing one."""
+"""Prisma-style nested relation ops for User: where/create/connect."""
 input UserCreateOrConnectInput {
-  """Connect an existing User record by its unique ID."""
+  """Connect an existing User by unique field(s)."""
   connect: UserConnectInput
 
-  """Create a new User record and link it to the parent."""
+  """Create a new User and link it to the parent."""
   create: UserCreateInput
+
+  """Unique selector to locate an existing User."""
+  where: UserConnectInput
+}
+
+"""Pagination and filtering input for querying User records."""
+input UserCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type UserCsvExportResponse {
+  """
+  Operation result code for the User CSV export operation. e.g. 'USER_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the User CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the User CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying User records."""
@@ -9641,8 +11073,8 @@ type UserRole {
   """(Optional) conditionOverrides field of UserRole. Type: JSON object."""
   conditionOverrides: Json
 
-  """(Required) createdAt field of UserRole. Type: DateTime (ISO 8601)."""
-  createdAt: DateTime!
+  """(Optional) createdAt field of UserRole. Type: DateTime (ISO 8601)."""
+  createdAt: DateTime
 
   """(Optional) expiresAt field of UserRole. Type: DateTime (ISO 8601)."""
   expiresAt: DateTime
@@ -9665,8 +11097,8 @@ type UserRole {
   """(Required) scopeValues field of UserRole. Type: String[]."""
   scopeValues: [String!]!
 
-  """(Required) updatedAt field of UserRole. Type: DateTime (ISO 8601)."""
-  updatedAt: DateTime!
+  """(Optional) updatedAt field of UserRole. Type: DateTime (ISO 8601)."""
+  updatedAt: DateTime
 
   """(Optional) Related User record linked to this UserRole."""
   user: User
@@ -9678,10 +11110,10 @@ type UserRole {
   userId: String
 }
 
-"""Input to connect an existing UserRole record by its unique ID."""
+"""Input to connect an existing UserRole record by a unique field."""
 input UserRoleConnectInput {
-  """The unique identifier of the existing UserRole record to connect."""
-  id: String!
+  """Unique field 'id' used to connect an existing UserRole record."""
+  id: String
 }
 
 """Where input for counting UserRole records."""
@@ -9724,14 +11156,14 @@ input UserRoleCreateInput {
   """(Optional) The conditionOverrides of the new UserRole. Type: Json."""
   conditionOverrides: Json
 
-  """(Required) The createdAt of the new UserRole. Type: DateTime."""
-  createdAt: DateTime!
+  """(Optional) The createdAt of the new UserRole. Type: DateTime."""
+  createdAt: DateTime
 
   """(Optional) The expiresAt of the new UserRole. Type: DateTime."""
   expiresAt: DateTime
 
-  """(Required) The isActive of the new UserRole. Type: Boolean."""
-  isActive: Boolean!
+  """(Optional) The isActive of the new UserRole. Type: Boolean."""
+  isActive: Boolean
 
   """(Optional) Single Role relation."""
   role: RoleCreateOrConnectInput
@@ -9742,11 +11174,11 @@ input UserRoleCreateInput {
   """(Optional) The scopeTypeId of the new UserRole. Type: String."""
   scopeTypeId: String
 
-  """(Required) The scopeValues of the new UserRole. Type: String[]."""
-  scopeValues: [String!]!
+  """(Optional) The scopeValues of the new UserRole. Type: String[]."""
+  scopeValues: [String!]
 
-  """(Required) The updatedAt of the new UserRole. Type: DateTime."""
-  updatedAt: DateTime!
+  """(Optional) The updatedAt of the new UserRole. Type: DateTime."""
+  updatedAt: DateTime
 
   """(Optional) Single User relation."""
   user: UserCreateOrConnectInput
@@ -9758,13 +11190,54 @@ input UserRoleCreateInput {
   userId: String
 }
 
-"""Either create a new UserRole or connect to an existing one."""
+"""Prisma-style nested relation ops for UserRole: where/create/connect."""
 input UserRoleCreateOrConnectInput {
-  """Connect an existing UserRole record by its unique ID."""
+  """Connect an existing UserRole by unique field(s)."""
   connect: UserRoleConnectInput
 
-  """Create a new UserRole record and link it to the parent."""
+  """Create a new UserRole and link it to the parent."""
   create: UserRoleCreateInput
+
+  """Unique selector to locate an existing UserRole."""
+  where: UserRoleConnectInput
+}
+
+"""Pagination and filtering input for querying UserRole records."""
+input UserRoleCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type UserRoleCsvExportResponse {
+  """
+  Operation result code for the UserRole CSV export operation. e.g. 'USERROLE_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """Indicates whether the UserRole CSV export operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the UserRole CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying UserRole records."""
@@ -10020,14 +11493,18 @@ input UserRoleUpdateInput {
   userId: String
 }
 
-"""
-Either update an existing related UserRole inline or reconnect to a different one.
-"""
+"""Prisma-style nested update ops for UserRole."""
 input UserRoleUpdateOrConnectInput {
-  """Reconnect to a different existing UserRole record by its unique ID."""
+  """Reconnect to an existing UserRole by unique field(s)."""
   connect: UserRoleConnectInput
 
-  """Update the fields of the related UserRole record inline."""
+  """Create a new related UserRole record inline."""
+  create: UserRoleCreateInput
+
+  """Disconnect the current related UserRole record."""
+  disconnect: Boolean
+
+  """Update fields of the related UserRole record inline."""
   update: UserRoleUpdateInput
 }
 
@@ -10089,14 +11566,18 @@ input UserUpdateInput {
   userRoles: [UserRoleUpdateOrConnectInput!]
 }
 
-"""
-Either update an existing related User inline or reconnect to a different one.
-"""
+"""Prisma-style nested update ops for User."""
 input UserUpdateOrConnectInput {
-  """Reconnect to a different existing User record by its unique ID."""
+  """Reconnect to an existing User by unique field(s)."""
   connect: UserConnectInput
 
-  """Update the fields of the related User record inline."""
+  """Create a new related User record inline."""
+  create: UserCreateInput
+
+  """Disconnect the current related User record."""
+  disconnect: Boolean
+
+  """Update fields of the related User record inline."""
   update: UserUpdateInput
 }
 
@@ -10239,12 +11720,15 @@ type WorkInformation {
   workSetupTypeId: String
 }
 
-"""Input to connect an existing WorkInformation record by its unique ID."""
+"""Input to connect an existing WorkInformation record by a unique field."""
 input WorkInformationConnectInput {
   """
-  The unique identifier of the existing WorkInformation record to connect.
+  Unique field 'employeeNumber' used to connect an existing WorkInformation record.
   """
-  id: String!
+  employeeNumber: String
+
+  """Unique field 'id' used to connect an existing WorkInformation record."""
+  id: String
 }
 
 """Where input for counting WorkInformation records."""
@@ -10408,13 +11892,58 @@ input WorkInformationCreateInput {
   workSetupTypeId: String
 }
 
-"""Either create a new WorkInformation or connect to an existing one."""
+"""
+Prisma-style nested relation ops for WorkInformation: where/create/connect.
+"""
 input WorkInformationCreateOrConnectInput {
-  """Connect an existing WorkInformation record by its unique ID."""
+  """Connect an existing WorkInformation by unique field(s)."""
   connect: WorkInformationConnectInput
 
-  """Create a new WorkInformation record and link it to the parent."""
+  """Create a new WorkInformation and link it to the parent."""
   create: WorkInformationCreateInput
+
+  """Unique selector to locate an existing WorkInformation."""
+  where: WorkInformationConnectInput
+}
+
+"""Pagination and filtering input for querying WorkInformation records."""
+input WorkInformationCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type WorkInformationCsvExportResponse {
+  """
+  Operation result code for the WorkInformation CSV export operation. e.g. 'WORKINFORMATION_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """
+  Indicates whether the WorkInformation CSV export operation was successful.
+  """
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the WorkInformation CSV export operation.
+  """
+  message: String
 }
 
 """Cursor-based pagination input for querying WorkInformation records."""
@@ -10767,15 +12296,17 @@ input WorkInformationUpdateInput {
   workSetupTypeId: String
 }
 
-"""
-Either update an existing related WorkInformation inline or reconnect to a different one.
-"""
+"""Prisma-style nested update ops for WorkInformation."""
 input WorkInformationUpdateOrConnectInput {
-  """
-  Reconnect to a different existing WorkInformation record by its unique ID.
-  """
+  """Reconnect to an existing WorkInformation by unique field(s)."""
   connect: WorkInformationConnectInput
 
-  """Update the fields of the related WorkInformation record inline."""
+  """Create a new related WorkInformation record inline."""
+  create: WorkInformationCreateInput
+
+  """Disconnect the current related WorkInformation record."""
+  disconnect: Boolean
+
+  """Update fields of the related WorkInformation record inline."""
   update: WorkInformationUpdateInput
 }

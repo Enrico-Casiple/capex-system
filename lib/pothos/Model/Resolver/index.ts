@@ -5,6 +5,7 @@ import { builder } from '../../builder';
 import {
   countInputRefs,
   createInputRefs,
+  csvExportInputRefs,
   cursorPaginationInputRefs,
   findByInputRefs,
   findFirstInputRefs,
@@ -14,6 +15,7 @@ import {
 import { getDatamodel } from '../../pothos-prisma-types';
 import {
   countResponseRef,
+  csvExportResponseRef,
   cursorPaginationResponseRef,
   deletedListResponseRef,
   paginationResponseRefs,
@@ -43,6 +45,10 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   const model = modelName as Prisma.ModelName;
   const service = services[model];
   const subscriptionPublishName = `${modelName}Subscription`;
+  const createInputRef = createInputRefs[model];
+  const updateInputRef = updateInputRefs[model];
+  const csvExportInputRef = csvExportInputRefs[model];
+  const csvExportResponseType = csvExportResponseRef[model];
 
   if (!paginationResponseRefs[model] || !pageInputRefs[model]) return;
 
@@ -198,8 +204,25 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
     }),
   );
 
+  // ───  QUERY: export  ─────────────────────────────────
+  if (csvExportInputRef && csvExportResponseType) {
+    builder.queryField(`${modelName}ExportCsv`, (t) =>
+      t.field({
+        type: csvExportResponseType,
+        args: {
+          input: t.arg({ type: csvExportInputRef, required: true }),
+        },
+        resolve: async (_parent, args, ctx) => {
+          const middlewareError = await middlewareCheck(ctx, modelName);
+          if (middlewareError) return middlewareError;
+          return await service.exportCsv(args.input as never);
+        },
+      }),
+    );
+  }
+
   // ─── MUTATION: create ─────────────────────────────────────────
-  if (!createInputRefs[model]) return;
+  if (!createInputRef || !updateInputRef) return;
 
   builder.mutationField(`${modelName}Create`, (t) =>
     t.field({
@@ -207,7 +230,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
       description: `Create a new ${modelName} record. Triggers a real-time subscription event on success.`,
       args: {
         data: t.arg({
-          type: createInputRefs[model],
+          type: createInputRef,
           required: true,
           description: `The input fields required to create a new ${modelName} record.`,
         }),
@@ -231,14 +254,13 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   );
 
   // ─── MUTATION: createMany ─────────────────────────────────────
-  if (!createInputRefs[model]) return;
   builder.mutationField(`${modelName}CreateMany`, (t) =>
     t.field({
       type: responseListRefs[model],
       description: `Create multiple ${modelName} records in a single operation. Each created record triggers an individual real-time subscription event.`,
       args: {
         data: t.arg({
-          type: [createInputRefs[model]],
+          type: [createInputRef],
           required: true,
           description: `Array of input objects to create multiple ${modelName} records at once.`,
         }),
@@ -281,7 +303,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           description: `The unique identifier of the ${modelName} record to update.`,
         }),
         data: t.arg({
-          type: updateInputRefs[model],
+          type: updateInputRef,
           required: true,
           description: `The fields to update on the ${modelName} record. Omitted fields remain unchanged.`,
         }),
@@ -311,7 +333,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
       description: `Update multiple ${modelName} records in a single operation. Each updated record triggers an individual real-time subscription event.`,
       args: {
         data: t.arg({
-          type: [updateInputRefs[model]],
+          type: [updateInputRef],
           required: true,
           description: `Array of update input objects. Each must include the record ID and the fields to change.`,
         }),

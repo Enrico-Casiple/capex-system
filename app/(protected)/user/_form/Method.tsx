@@ -110,7 +110,7 @@ const Method = ({ rowId, actionType, popupType, setOpen }: MethodProps) => {
     [role],
   );
 
-  const form = useForm({ defaultValues });
+  const form = useForm<RoleCreateInput>({ defaultValues });
 
   // Fix useEffect — form is stable so safe to include
   useEffect(() => {
@@ -175,23 +175,18 @@ const Method = ({ rowId, actionType, popupType, setOpen }: MethodProps) => {
                 <Controller
                   name="isDefault"
                   control={form.control}
-                  render={({ field }) => {
-                    const checkedState: React.ComponentProps<typeof Checkbox>['checked'] =
-                      field.value ?? undefined;
-
-                    return (
-                      <div className="flex flex-col gap-2">
-                        <Label htmlFor="isDefault" className="text-sm cursor-pointer">
-                          Auto-assign to new users
-                        </Label>
-                        <Checkbox
-                          id="isDefault"
-                          checked={checkedState}
-                          onCheckedChange={(checked) => field.onChange(checked === true)}
-                        />
-                      </div>
-                    );
-                  }}
+                  render={({ field }) => (
+                    <div className="flex flex-col gap-2">
+                      <Label htmlFor="isDefault" className="text-sm cursor-pointer">
+                        Auto-assign to new users
+                      </Label>
+                      <Checkbox
+                        id="isDefault"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </div>
+                  )}
                 />
               </div>
               <div className="col-span-4">

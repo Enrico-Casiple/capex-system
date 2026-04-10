@@ -12,7 +12,7 @@ const config: CodegenConfig = {
     },
     //  ─── Custom API client (optional) ─────────────────────────────
     'lib/generated/api/customHookAPI/': {
-      documents: ['lib/api/**/*.gql.ts', 'app/**/*.tsx'],
+      documents: ['lib/api/**/*.gql.ts', 'lib/api/custom/**/*.ts', 'app/**/*.tsx'],
       preset: 'client',
       plugins: [],
     },

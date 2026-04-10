@@ -14,17 +14,17 @@ const prismaInstance = new PrismaClient({
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 const c = {
-  reset:  '\x1b[0m',
-  bold:   '\x1b[1m',
-  dim:    '\x1b[2m',
-  cyan:   '\x1b[36m',
-  blue:   '\x1b[34m',
+  reset: '\x1b[0m',
+  bold: '\x1b[1m',
+  dim: '\x1b[2m',
+  cyan: '\x1b[36m',
+  blue: '\x1b[34m',
   yellow: '\x1b[33m',
-  red:    '\x1b[31m',
-  green:  '\x1b[32m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
   purple: '\x1b[35m',
-  gray:   '\x1b[90m',
-  white:  '\x1b[97m',
+  gray: '\x1b[90m',
+  white: '\x1b[97m',
 };
 
 const W = 64;
@@ -45,19 +45,16 @@ function colorDuration(ms: number): string {
 
 function formatTime(ts: Date): string {
   const hms = ts.toLocaleTimeString('en-US', { hour12: false });
-  const ms  = String(ts.getMilliseconds()).padStart(3, '0');
+  const ms = String(ts.getMilliseconds()).padStart(3, '0');
   return `${hms}.${ms}`;
 }
 
 function tryParseJSON(str: string): unknown {
-  try { return JSON.parse(str); } catch { return null; }
-}
-
-function prettyJSON(color: string, value: unknown): string {
-  return JSON.stringify(value, null, 2)
-    .split('\n')
-    .map(l => `${pad(color)} ${color}${c.dim}${l}${c.reset}`)
-    .join('\n');
+  try {
+    return JSON.parse(str);
+  } catch {
+    return null;
+  }
 }
 
 function extractMongo(query: string): { collection: string; op: string } {
@@ -71,13 +68,99 @@ function extractPipeline(query: string): unknown {
   return tryParseJSON(m[1]);
 }
 
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function extractObjectIdList(query: string): string[] {
+  const ids = [...query.matchAll(/ObjectId\("([a-fA-F0-9]{24})"\)/g)].map((m) => m[1]);
+  return [...new Set(ids)];
+}
+
+function extractProjectKeysFromRawQuery(query: string): string[] {
+  const projectMatch = query.match(/\$project\s*:\s*\{([\s\S]*?)\}\s*(?:,|\])/);
+  if (!projectMatch) return [];
+
+  const body = projectMatch[1];
+  const keys = [...body.matchAll(/([A-Za-z_][\w]*)\s*:/g)].map((m) => m[1]);
+  return [...new Set(keys)];
+}
+
+function extractModelNameFilters(rawQuery: string): string[] {
+  const fromLiteral = [
+    ...rawQuery.matchAll(/\$eq:\s*\[\s*"\$modelName"\s*,\s*\{\s*\$literal:\s*"([^"]+)"/g),
+  ].map((m) => m[1]);
+
+  const fromDirect = [...rawQuery.matchAll(/modelName\s*:\s*"([^"]+)"/g)].map((m) => m[1]);
+
+  return [...new Set([...fromLiteral, ...fromDirect])];
+}
+
+function prettyJSONLines(color: string, value: unknown): string[] {
+  return JSON.stringify(value, null, 2)
+    .split('\n')
+    .map((line) => `${pad(color)} ${c.white}${line}${c.reset}`);
+}
+
+function summarizePipeline(pipeline: unknown, rawQuery: string): Record<string, unknown> {
+  const summary: Record<string, unknown> = {};
+  const ids = extractObjectIdList(rawQuery);
+  const modelNameFilters = extractModelNameFilters(rawQuery);
+
+  if (ids.length > 0) {
+    summary.idFilter = {
+      total: ids.length,
+      preview: ids.slice(0, 10),
+      hasMore: ids.length > 10,
+    };
+  }
+
+  if (modelNameFilters.length > 0) {
+    summary.modelNameFilter = modelNameFilters;
+  }
+
+  if (Array.isArray(pipeline)) {
+    const stageNames = pipeline
+      .map((stage) => (isObject(stage) ? Object.keys(stage)[0] : null))
+      .filter((s): s is string => Boolean(s));
+
+    if (stageNames.length) {
+      summary.stages = stageNames;
+    }
+
+    const projectStage = pipeline.find((stage) => isObject(stage) && isObject(stage.$project)) as
+      | { $project?: Record<string, unknown> }
+      | undefined;
+
+    if (projectStage?.$project) {
+      const keys = Object.keys(projectStage.$project);
+      if (keys.length) {
+        summary.fields = keys;
+      }
+    }
+  } else {
+    const keys = extractProjectKeysFromRawQuery(rawQuery);
+    if (keys.length) {
+      summary.fields = keys;
+    }
+  }
+
+  if (rawQuery.includes('$match')) {
+    summary.match = true;
+  }
+
+  return summary;
+}
+
 // ─── Query Log ───────────────────────────────────────────────────────────────
 prismaInstance.$on('query', (e: QueryEvent) => {
   const { collection, op } = extractMongo(e.query);
-  const pipeline  = extractPipeline(e.query);
-  const params    = tryParseJSON(e.params);
+  const pipeline = extractPipeline(e.query);
+  const params = tryParseJSON(e.params);
   const hasParams = e.params !== '[]';
-  const color     = c.cyan;
+  const color = c.cyan;
+  const summary = summarizePipeline(pipeline, e.query);
+  const hasSummary = Object.keys(summary).length > 0;
 
   const out: string[] = [
     '',
@@ -87,15 +170,19 @@ prismaInstance.$on('query', (e: QueryEvent) => {
     row(color, '📦 Model:   ', `${c.white}${c.bold}${collection}${c.reset}`),
     row(color, '🕐 Time:    ', `${c.gray}${formatTime(new Date(e.timestamp))}${c.reset}`),
     row(color, '⏱  Duration:', colorDuration(e.duration)),
-    pad(color),
-    `${pad(color)} ${color}${c.bold}Pipeline:${c.reset}`,
-    pipeline ? prettyJSON(color, pipeline) : `${pad(color)} ${c.purple}${e.query}${c.reset}`,
+    ...(hasSummary
+      ? [
+          pad(color),
+          `${pad(color)} ${color}${c.bold}Summary:${c.reset}`,
+          ...prettyJSONLines(color, summary),
+        ]
+      : []),
   ];
 
   if (hasParams && params) {
     out.push(pad(color));
     out.push(`${pad(color)} ${color}${c.bold}Params:${c.reset}`);
-    out.push(prettyJSON(color, params));
+    out.push(...prettyJSONLines(color, params));
   }
 
   out.push(pad(color));
@@ -106,37 +193,43 @@ prismaInstance.$on('query', (e: QueryEvent) => {
 // ─── Info Log ────────────────────────────────────────────────────────────────
 prismaInstance.$on('info', (e: LogEvent) => {
   const color = c.blue;
-  console.log([
-    '',
-    top(color, 'Prisma Info'),
-    row(color, '🕐', `${c.gray}${formatTime(new Date(e.timestamp))}${c.reset}`),
-    row(color, 'ℹ️ ', e.message),
-    bot(color),
-  ].join('\n'));
+  console.log(
+    [
+      '',
+      top(color, 'Prisma Info'),
+      row(color, '🕐', `${c.gray}${formatTime(new Date(e.timestamp))}${c.reset}`),
+      row(color, 'ℹ️ ', e.message),
+      bot(color),
+    ].join('\n'),
+  );
 });
 
 // ─── Warn Log ────────────────────────────────────────────────────────────────
 prismaInstance.$on('warn', (e: LogEvent) => {
   const color = c.yellow;
-  console.warn([
-    '',
-    top(color, 'Prisma Warn'),
-    row(color, '🕐', `${c.gray}${formatTime(new Date(e.timestamp))}${c.reset}`),
-    row(color, '⚠️ ', e.message),
-    bot(color),
-  ].join('\n'));
+  console.warn(
+    [
+      '',
+      top(color, 'Prisma Warn'),
+      row(color, '🕐', `${c.gray}${formatTime(new Date(e.timestamp))}${c.reset}`),
+      row(color, '⚠️ ', e.message),
+      bot(color),
+    ].join('\n'),
+  );
 });
 
 // ─── Error Log ───────────────────────────────────────────────────────────────
 prismaInstance.$on('error', (e: LogEvent) => {
   const color = c.red;
-  console.error([
-    '',
-    top(color, 'Prisma Error'),
-    row(color, '🕐', `${c.gray}${formatTime(new Date(e.timestamp))}${c.reset}`),
-    row(color, '❌ ', e.message),
-    bot(color),
-  ].join('\n'));
+  console.error(
+    [
+      '',
+      top(color, 'Prisma Error'),
+      row(color, '🕐', `${c.gray}${formatTime(new Date(e.timestamp))}${c.reset}`),
+      row(color, '❌ ', e.message),
+      bot(color),
+    ].join('\n'),
+  );
 });
 
 export const prisma = globalForPrisma.prisma || prismaInstance;

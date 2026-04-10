@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client';
-
 export const RoleFragment = gql`
 fragment RoleFragment on Role {
   id

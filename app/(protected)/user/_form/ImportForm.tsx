@@ -1,26 +1,17 @@
 // app/(protected)/user/Form/ImportForm.tsx
 import ImportFormWrapper from '@/app/_component/Form/ImportFormWrapper';
-import { UserCreateInput } from '@/lib/generated/api/customHookAPI/graphql';
-
-type UserCSVRow = {
-  name: string;
-  email: string;
-  password: string;
-  userName: string;
-  isTwoFactorAuthEnabled: string | boolean;
-  isActive: string | boolean;
-}
+import { User, UserCreateInput } from '@/lib/generated/api/customHookAPI/graphql';
 
 type ImportFormProps = {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}
+};
 
 const ImportForm = (props: ImportFormProps) => {
   return (
-    <ImportFormWrapper<UserCSVRow, UserCreateInput>
+    <ImportFormWrapper<User, UserCreateInput>
       {...props}
-      transformRow={(row: UserCSVRow) => ({
+      transformRow={(row: User) => ({
         name: row.name,
         email: row.email,
         password: row.password,
@@ -34,7 +25,7 @@ const ImportForm = (props: ImportFormProps) => {
         { key: 'userName', label: 'Username' },
       ]}
     />
-  )
-}
+  );
+};
 
-export default ImportForm
+export default ImportForm;

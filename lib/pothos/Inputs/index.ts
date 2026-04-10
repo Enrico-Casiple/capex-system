@@ -1,4 +1,4 @@
-import { Prisma } from '@/lib/generated/prisma/browser';
+import { Prisma } from '@/lib/generated/prisma/client';
 import { GenericInputFieldRef, InputRef } from '@pothos/core';
 import { builder } from '../builder';
 import PrismaTypes, { getDatamodel } from '../pothos-prisma-types';
@@ -12,13 +12,24 @@ export const updateInputSuffix = 'UpdateInput';
 export const pageInputSuffix = 'PageInput';
 export const cursorPaginationInputSuffix = 'CursorPaginationInput';
 export const updateOrConnectInputSuffix = 'UpdateOrConnectInput';
+const csvExportInputSuffix = 'CsvExportInput';
 export const updateOrConnectInputRefs: Record<string, ReturnType<typeof builder.inputRef>> = {};
-export const updateInputRefs: Record<string, ReturnType<typeof builder.inputRef>> = {};
-export const createInputRefs: Record<string, ReturnType<typeof builder.inputRef>> = {};
+
+export type CreateInputRefsMap = {
+  [M in Prisma.ModelName]?: InputRef<Record<string, unknown>>;
+};
+
+export type UpdateInputRefsMap = {
+  [M in Prisma.ModelName]?: InputRef<Record<string, unknown>>;
+};
+
+export const updateInputRefs = {} as UpdateInputRefsMap;
+export const createInputRefs = {} as CreateInputRefsMap;
 export const pageInputRefs: Record<string, ReturnType<typeof builder.inputRef>> = {};
 export const cursorPaginationInputRefs: Record<string, ReturnType<typeof builder.inputRef>> = {};
 export const connectInputRefs: Record<string, ReturnType<typeof builder.inputRef>> = {};
 export const createOrConnectInputRefs: Record<string, ReturnType<typeof builder.inputRef>> = {};
+export const csvExportInputRefs: Record<string, ReturnType<typeof builder.inputRef>> = {};
 export const findByInputRefs = {} as Record<
   PrismaTypes[keyof PrismaTypes]['Name'],
   InputRef<{ key: string; value: string }>
@@ -40,9 +51,10 @@ const countInputSuffix = 'CountInput';
 const buildScalarField = (
   t: Parameters<Parameters<ReturnType<typeof builder.inputRef>['implement']>[0]['fields']>[0],
   field: { name: string; type: string; isList: boolean },
-  required: boolean,
+  _required: boolean,
   description: string,
 ): GenericInputFieldRef => {
+  const required = false;
   if (field.isList) {
     return t.field({ type: ['String'] as never, required, description });
   }
@@ -65,19 +77,46 @@ const buildScalarField = (
   }
 };
 
+const getUniqueScalarFields = (modelName: string) => {
+  const model = prismaDataModel.datamodel.models[modelName];
+  if (!model) return [] as Array<{ name: string; type: string; isList: boolean }>;
+
+  return model.fields.filter(
+    (field) =>
+      field.kind === 'scalar' && !field.name.startsWith('_') && (field.isId || field.isUnique),
+  ) as Array<{ name: string; type: string; isList: boolean }>;
+};
+
 // ─── Step 1: ConnectInput ─────────────────────────────────────────────────────
 Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   try {
     const ref = builder.inputRef(`${modelName}${connectInputSuffix}`);
     connectInputRefs[modelName] = ref;
     ref.implement({
-      description: `Input to connect an existing ${modelName} record by its unique ID.`,
-      fields: (t) => ({
-        id: t.string({
-          required: true,
-          description: `The unique identifier of the existing ${modelName} record to connect.`,
-        }),
-      }),
+      description: `Input to connect an existing ${modelName} record by a unique field.`,
+      fields: (t) => {
+        const uniqueFields = getUniqueScalarFields(modelName);
+        const fields: Record<string, GenericInputFieldRef> = {};
+
+        uniqueFields.forEach((field) => {
+          fields[field.name] = buildScalarField(
+            t,
+            field,
+            false,
+            `Unique field '${field.name}' used to connect an existing ${modelName} record.`,
+          );
+        });
+
+        // Fallback to id for safety if metadata doesn't report unique fields.
+        if (Object.keys(fields).length === 0) {
+          fields.id = t.string({
+            required: false,
+            description: `Unique identifier of the existing ${modelName} record to connect.`,
+          });
+        }
+
+        return fields as never;
+      },
     });
   } catch (error) {
     console.error(`ConnectInput error for ${modelName}: ${error}`);
@@ -90,17 +129,22 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
     const ref = builder.inputRef(`${modelName}${createOrConnectInputSuffix}`);
     createOrConnectInputRefs[modelName] = ref;
     ref.implement({
-      description: `Either create a new ${modelName} or connect to an existing one.`,
+      description: `Prisma-style nested relation ops for ${modelName}: where/create/connect.`,
       fields: (t) => ({
+        where: t.field({
+          type: `${modelName}${connectInputSuffix}` as never,
+          required: false,
+          description: `Unique selector to locate an existing ${modelName}.`,
+        }),
         create: t.field({
           type: `${modelName}${createInputSuffix}` as never,
           required: false,
-          description: `Create a new ${modelName} record and link it to the parent.`,
+          description: `Create a new ${modelName} and link it to the parent.`,
         }),
         connect: t.field({
           type: `${modelName}${connectInputSuffix}` as never,
           required: false,
-          description: `Connect an existing ${modelName} record by its unique ID.`,
+          description: `Connect an existing ${modelName} by unique field(s).`,
         }),
       }),
     });
@@ -109,11 +153,46 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   }
 });
 
-// ─── Step 3: CreateInput ──────────────────────────────────────────────────────
+// ─── Step 3: UpdateOrConnectInput ────────────────────────────────────────────
 Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   try {
-    const ref = builder.inputRef(`${modelName}${createInputSuffix}`);
-    createInputRefs[modelName] = ref;
+    const ref = builder.inputRef(`${modelName}${updateOrConnectInputSuffix}`);
+    updateOrConnectInputRefs[modelName] = ref;
+    ref.implement({
+      description: `Prisma-style nested update ops for ${modelName}.`,
+      fields: (t) => ({
+        update: t.field({
+          type: `${modelName}${updateInputSuffix}` as never,
+          required: false,
+          description: `Update fields of the related ${modelName} record inline.`,
+        }),
+        create: t.field({
+          type: `${modelName}${createInputSuffix}` as never,
+          required: false,
+          description: `Create a new related ${modelName} record inline.`,
+        }),
+        connect: t.field({
+          type: `${modelName}${connectInputSuffix}` as never,
+          required: false,
+          description: `Reconnect to an existing ${modelName} by unique field(s).`,
+        }),
+        disconnect: t.boolean({
+          required: false,
+          description: `Disconnect the current related ${modelName} record.`,
+        }),
+      }),
+    });
+  } catch (error) {
+    console.error(`UpdateOrConnectInput error for ${modelName}: ${error}`);
+  }
+});
+
+// ─── Step 4: CreateInput ──────────────────────────────────────────────────────
+Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
+  try {
+    const typedModel = modelName as Prisma.ModelName;
+    const ref = builder.inputRef<Record<string, unknown>>(`${modelName}${createInputSuffix}`);
+    createInputRefs[typedModel] = ref;
     ref.implement({
       description: `Input fields required to create a new ${modelName} record.`,
       fields: (t) => {
@@ -124,8 +203,8 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           if (field.name === 'id' || field.name.startsWith('_')) return;
 
           if (field.kind === 'scalar') {
-            const required = field.isRequired;
-            const note = required ? '(Required)' : '(Optional)';
+            const required = false;
+            const note = '(Optional)';
             const description = `${note} The ${field.name} of the new ${modelName}. Type: ${field.type}${field.isList ? '[]' : ''}.`;
             fields[field.name] = buildScalarField(t, field, required, description);
           }
@@ -142,7 +221,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           }
         });
 
-        return fields;
+        return fields as never;
       },
     });
   } catch (error) {
@@ -150,36 +229,12 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   }
 });
 
-// ─── Step 4: UpdateOrConnectInput ────────────────────────────────────────────
-Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
-  try {
-    const ref = builder.inputRef(`${modelName}${updateOrConnectInputSuffix}`);
-    updateOrConnectInputRefs[modelName] = ref;
-    ref.implement({
-      description: `Either update an existing related ${modelName} inline or reconnect to a different one.`,
-      fields: (t) => ({
-        update: t.field({
-          type: `${modelName}${updateInputSuffix}` as never,
-          required: false,
-          description: `Update the fields of the related ${modelName} record inline.`,
-        }),
-        connect: t.field({
-          type: `${modelName}${connectInputSuffix}` as never,
-          required: false,
-          description: `Reconnect to a different existing ${modelName} record by its unique ID.`,
-        }),
-      }),
-    });
-  } catch (error) {
-    console.error(`UpdateOrConnectInput error for ${modelName}: ${error}`);
-  }
-});
-
 // ─── Step 5: UpdateInput ──────────────────────────────────────────────────────
 Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   try {
-    const ref = builder.inputRef(`${modelName}${updateInputSuffix}`);
-    updateInputRefs[modelName] = ref;
+    const typedModel = modelName as Prisma.ModelName;
+    const ref = builder.inputRef<Record<string, unknown>>(`${modelName}${updateInputSuffix}`);
+    updateInputRefs[typedModel] = ref;
     ref.implement({
       description: `Input fields to update an existing ${modelName} record. All fields are optional.`,
       fields: (t) => {
@@ -204,7 +259,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           }
         });
 
-        return fields;
+        return fields as never;
       },
     });
   } catch (error) {
@@ -286,7 +341,6 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
 // ─── Step 9: FindFirstInput ───────────────────────────────────────────────────
 Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   try {
-    // Step 9
     const ref = builder.inputRef<{ where?: { [key: string]: unknown | null | undefined } | null }>(
       `${modelName}${findFirstInputSuffix}`,
     );
@@ -305,7 +359,6 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
 // ─── Step 10: CountInput ──────────────────────────────────────────────────────
 Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   try {
-    // Step 10
     const ref = builder.inputRef<{ where?: { [key: string]: unknown | null | undefined } | null }>(
       `${modelName}${countInputSuffix}`,
     );
@@ -318,5 +371,33 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
     });
   } catch (error) {
     console.error(`CountInput error for ${modelName}: ${error}`);
+  }
+});
+
+// ─── Step 11: PageInput ────────────────────────────────────────────────────────
+Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
+  try {
+    const ref = builder.inputRef(`${modelName}${csvExportInputSuffix}`);
+    csvExportInputRefs[modelName] = ref;
+    ref.implement({
+      description: `Pagination and filtering input for querying ${modelName} records.`,
+      fields: (t) => ({
+        isActive: t.boolean({ required: false, description: `Filter by active status.` }),
+        filter: t.field({ type: 'Json', required: false, description: `Advanced JSON filter.` }),
+        searchFields: t.field({
+          type: ['String'] as never,
+          required: false,
+          description: `Fields to search within.`,
+        }),
+        columns: t.field({
+          type: ['String'] as never,
+          required: false,
+          description: `Fields to include in the CSV export.`,
+        }),
+        search: t.string({ required: false, description: `Search keyword.` }),
+      }),
+    });
+  } catch (error) {
+    console.error(`CsvExportInput error for ${modelName}: ${error}`);
   }
 });

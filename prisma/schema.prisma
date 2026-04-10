@@ -26,7 +26,7 @@ generator zod {
   writeBarrelFiles          = false
   createInputTypes          = true // DISABLE - don't create regular input types
   createModelTypes          = true // DISABLE - don't create model types
-  addInputTypeValidation    = false
+  addInputTypeValidation    = true
   addIncludeType            = false
   addSelectType             = false
   validateWhereUniqueInput  = false
@@ -198,6 +198,8 @@ model Company {
   jobLevels        JobLevel[]        @relation("CompanyJobLevels")
   auditLogs        AuditLog[]
   workInformations WorkInformation[]
+  scopeTypeId      String?           @db.ObjectId
+  scopeType        Type?             @relation("CompanyType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -216,6 +218,8 @@ model Department {
   company          Company?          @relation("CompanyDepartments", fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   auditLogs        AuditLog[]
   workInformations WorkInformation[]
+  scopeTypeId      String?           @db.ObjectId
+  scopeType        Type?             @relation("DepartmentType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   isActive  Boolean?  @default(true)
   createdAt DateTime? @default(now())
@@ -235,6 +239,8 @@ model Position {
   workInformations WorkInformation[]
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
+  scopeTypeId      String?           @db.ObjectId
+  scopeType        Type?             @relation("PositionType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   // ✅ Add indexes
   @@index([name]) // Search by name
@@ -264,23 +270,49 @@ model JobLevel {
 model Type {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  name            String?
-  modelNameType   String?
-  employmentType  WorkInformation[] @relation("EmploymentType")
-  workSetupType   WorkInformation[] @relation("WorkSetupType")
-  industryType    GroupOfCompany[]  @relation("IndustryType")
-  jobLevels       JobLevel[]        @relation("JobCodeType")
-  actionType      AuditLog[]        @relation("ActionType")
-  auditLogs       AuditLog[]
-  rolePermissions RolePermission[]  @relation("PermissionScopeType")
+  name           String?
+  modelNameType  String?
+  employmentType WorkInformation[] @relation("EmploymentType")
+  workSetupType  WorkInformation[] @relation("WorkSetupType")
+  industryType   GroupOfCompany[]  @relation("IndustryType")
+  companies      Company[]         @relation("CompanyType")
+  departments    Department[]      @relation("DepartmentType")
+  jobPositions   Position[]        @relation("PositionType")
+  jobLevels      JobLevel[]        @relation("JobCodeType")
+  actionType     AuditLog[]        @relation("ActionType")
+  auditLogs      AuditLog[]
 
   isActive  Boolean?  @default(true)
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
   // ✅ Add indexes
+  @@unique([name, modelNameType])
   @@index([modelNameType]) // Filter by type
   @@index([name]) // Search by name
+}
+
+model Config {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  modelId   String? @db.ObjectId // ID of the related record, null if it's a global config not tied to a specific record
+  modelName String? // e.g. "User", "Company", etc. "Role"
+  group     String // e.g. "ApproverStatus", "ConditionOperator", "ApproverType" "RolePermissionScope"
+  codeKey   String? // e.g. "maxLoginAttempts", "passwordPolicy", etc "scopeValues", "conditionOperator", "approverType"
+  code      String? // e.g. "MAX_LOGIN_ATTEMPTS", "PASSWORD_POLICY", etc. for easy reference in code "SCOPE_VALUES", "CONDITION_OPERATOR", "APPROVER_TYPE"
+  codeLabel String? // e.g. "Max Login Attempts", "Password Policy", etc. for display in admin UI "Scope Values", "Condition Operator", "Approver Type"
+  value     Json? // JSON string of the config value, can be any type (string, number, boolean, object, array) "["VALUE1", "VALUE2"]", "{ "operator": ">", "value": 10000 }", etc.
+
+  rolePermission RolePermission? @relation("PermissionScopeView", fields: [modelId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  sortOrder Int?
+  isActive  Boolean?  @default(true)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  @@unique([modelName, modelId, group, codeKey])
+  @@index([modelName, modelId])
+  @@index([group, codeKey])
 }
 
 model Status {
@@ -380,35 +412,33 @@ model Role {
   userRoles       UserRole[]
   auditLogs       AuditLog[]
 
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isActive  Boolean?  @default(true)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
 
   @@index([name])
   @@index([roleType])
 }
 
 model Permission {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
-  name        String?
-  description String?
-  module      String? // "FINANCE" | "HR" | "PROCUREMENT" | "INVENTORY"
-  // Groups permissions by ERP module like SAP transaction codes
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  name         String?
+  description  String?
+  module       String?
+  resource     String?
+  action       String?
+  displayOrder Int?
 
-  resource String? // "request", "invoice", "employee"
-  action   String? // "create", "read", "update", "delete", "approve", "reject", "export"
-  // Note: ERP needs more than CRUD — approve/reject/export are common
+  isGlobal    Boolean @default(false)
+  isAdmin     Boolean @default(false)
+  globalLimit Int? // ✅ max number of users that can have this permission — null means unlimited
 
-  displayOrder Int? // for UI ordering in permission matrix
-
-  isGlobal        Boolean          @default(false)
-  isAdmin         Boolean          @default(false)
   rolePermissions RolePermission[]
   auditLogs       AuditLog[]
 
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isActive  Boolean?  @default(true)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
 
   @@unique([module, resource, action], name: "module_resource_action")
   @@index([name])
@@ -421,27 +451,22 @@ model RolePermission {
   roleId       String? @db.ObjectId
   permissionId String? @db.ObjectId
 
-  scopeTypeId String?  @db.ObjectId
-  scopeType   Type?    @relation("PermissionScopeType", fields: [scopeTypeId], references: [id], onDelete: SetNull)
   scopeValues String[]
+  conditions  Config[] @relation("PermissionScopeView")
 
-  conditions Json?
-  // Stores PermissionConditions type above
-  // evaluated at runtime in your GraphQL resolvers
-
-  isActive Boolean @default(true)
+  isActive Boolean? @default(true)
 
   role       Role?       @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permission Permission? @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   auditLogs AuditLog[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  createdAt DateTime?  @default(now())
+  updatedAt DateTime?  @updatedAt
 
-  @@unique([roleId, permissionId, scopeTypeId])
+  @@unique([roleId, permissionId, scopeValues])
   @@index([roleId])
   @@index([permissionId])
-  @@index([scopeTypeId])
+  @@index([scopeValues])
   @@index([isActive])
 }
 
@@ -470,8 +495,8 @@ model UserRole {
 
   auditLogs AuditLog[]
   isActive  Boolean    @default(true)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  createdAt DateTime?  @default(now())
+  updatedAt DateTime?  @updatedAt
 
   @@unique([userId, roleId, scopeTypeId])
   @@index([userId])

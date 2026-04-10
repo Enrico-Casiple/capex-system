@@ -1,38 +1,21 @@
-// lib/scripts/generateGQLFiles.ts
-import { existsSync, mkdirSync, readdirSync, unlinkSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
 import { print } from 'graphql';
 import { generateFragment } from '../api/fragments.ts';
 import { getDatamodel } from '../pothos/pothos-prisma-types';
 
 const prismaDataModel = getDatamodel();
 const outputDir = 'lib/api/gql';
+const customDir = 'lib/api/custom';
+
 mkdirSync(outputDir, { recursive: true });
-const force = process.argv.includes('--force');
 
 const activeModels = Object.keys(prismaDataModel.datamodel.models);
-
-// ─── Cleanup deleted models ─────────────────────────────
 const existingFiles = readdirSync(outputDir).filter((f) => f.endsWith('.gql.ts'));
 
-existingFiles.forEach((file) => {
-  const modelName = file.replace('.gql.ts', '');
-  if (!activeModels.includes(modelName)) {
-    unlinkSync(`${outputDir}/${file}`);
-    console.log(`🗑️  Deleted ${file} (model no longer exists in Prisma)`);
-  }
-});
-
-// ─── Generate active models ─────────────────────────────
-activeModels.forEach((modelName) => {
-  const { fragment, fragmentName } = generateFragment(modelName);
-  const fragmentString = print(fragment);
-
-  const content = `
+const buildModelFile = (modelName: string, fragmentConst: string, fragmentBlock: string): string =>
+  `
 import { gql } from '@apollo/client';
-
-export const ${fragmentName} = gql\`
-${fragmentString}
-\`;
+${fragmentBlock}
 
 export const ${modelName}FindAllWithCursor = gql\`
   query ${modelName}FindAllWithCursor($cursorInput: ${modelName}CursorPaginationInput!) {
@@ -40,14 +23,14 @@ export const ${modelName}FindAllWithCursor = gql\`
       isSuccess
       message
       code
-      data { ...${fragmentName} }
+      data { ...${fragmentConst} }
       nextCursor
       prevCursor
       hasNextPage
       hasPrevPage
     }
   }
-  \${${fragmentName}}
+  \${${fragmentConst}}
 \`;
 
 export const ${modelName}FindAll = gql\`
@@ -56,7 +39,7 @@ export const ${modelName}FindAll = gql\`
       isSuccess
       message
       code
-      data { ...${fragmentName} }
+      data { ...${fragmentConst} }
       allCount
       active
       inActive
@@ -70,7 +53,7 @@ export const ${modelName}FindAll = gql\`
       }
     }
   }
-  \${${fragmentName}}
+  \${${fragmentConst}}
 \`;
 
 export const ${modelName}Count = gql\`
@@ -90,10 +73,10 @@ export const ${modelName}FindUnique = gql\`
       isSuccess
       message
       code
-      data { ...${fragmentName} }
+      data { ...${fragmentConst} }
     }
   }
-  \${${fragmentName}}
+  \${${fragmentConst}}
 \`;
 
 export const ${modelName}FindBy = gql\`
@@ -102,10 +85,10 @@ export const ${modelName}FindBy = gql\`
       isSuccess
       message
       code
-      data { ...${fragmentName} }
+      data { ...${fragmentConst} }
     }
   }
-  \${${fragmentName}}
+  \${${fragmentConst}}
 \`;
 
 export const ${modelName}FindFirst = gql\`
@@ -114,10 +97,10 @@ export const ${modelName}FindFirst = gql\`
       isSuccess
       message
       code
-      data { ...${fragmentName} }
+      data { ...${fragmentConst} }
     }
   }
-  \${${fragmentName}}
+  \${${fragmentConst}}
 \`;
 
 export const ${modelName}Create = gql\`
@@ -126,10 +109,10 @@ export const ${modelName}Create = gql\`
       isSuccess
       message
       code
-      data { ...${fragmentName} }
+      data { ...${fragmentConst} }
     }
   }
-  \${${fragmentName}}
+  \${${fragmentConst}}
 \`;
 
 export const ${modelName}CreateMany = gql\`
@@ -138,10 +121,10 @@ export const ${modelName}CreateMany = gql\`
       isSuccess
       message
       code
-      data { ...${fragmentName} }
+      data { ...${fragmentConst} }
     }
   }
-  \${${fragmentName}}
+  \${${fragmentConst}}
 \`;
 
 export const ${modelName}Update = gql\`
@@ -150,10 +133,10 @@ export const ${modelName}Update = gql\`
       isSuccess
       message
       code
-      data { ...${fragmentName} }
+      data { ...${fragmentConst} }
     }
   }
-  \${${fragmentName}}
+  \${${fragmentConst}}
 \`;
 
 export const ${modelName}UpdateMany = gql\`
@@ -162,10 +145,10 @@ export const ${modelName}UpdateMany = gql\`
       isSuccess
       message
       code
-      data { ...${fragmentName} }
+      data { ...${fragmentConst} }
     }
   }
-  \${${fragmentName}}
+  \${${fragmentConst}}
 \`;
 
 export const ${modelName}Archive = gql\`
@@ -174,10 +157,10 @@ export const ${modelName}Archive = gql\`
       isSuccess
       message
       code
-      data { ...${fragmentName} }
+      data { ...${fragmentConst} }
     }
   }
-  \${${fragmentName}}
+  \${${fragmentConst}}
 \`;
 
 export const ${modelName}ArchiveMany = gql\`
@@ -186,10 +169,10 @@ export const ${modelName}ArchiveMany = gql\`
       isSuccess
       message
       code
-      data { ...${fragmentName} }
+      data { ...${fragmentConst} }
     }
   }
-  \${${fragmentName}}
+  \${${fragmentConst}}
 \`;
 
 export const ${modelName}Restore = gql\`
@@ -198,10 +181,10 @@ export const ${modelName}Restore = gql\`
       isSuccess
       message
       code
-      data { ...${fragmentName} }
+      data { ...${fragmentConst} }
     }
   }
-  \${${fragmentName}}
+  \${${fragmentConst}}
 \`;
 
 export const ${modelName}RestoreMany = gql\`
@@ -210,10 +193,10 @@ export const ${modelName}RestoreMany = gql\`
       isSuccess
       message
       code
-      data { ...${fragmentName} }
+      data { ...${fragmentConst} }
     }
   }
-  \${${fragmentName}}
+  \${${fragmentConst}}
 \`;
 
 export const ${modelName}Remove = gql\`
@@ -244,22 +227,48 @@ export const ${modelName}RemoveMany = gql\`
 
 export const ${modelName}Subscription = gql\`
   subscription ${modelName}Subscription {
-    ${modelName}Subscription { ...${fragmentName} }
+    ${modelName}Subscription { ...${fragmentConst} }
   }
-  \${${fragmentName}}
+  \${${fragmentConst}}
 \`;
 `.trim();
 
-  const filePath = `${outputDir}/${modelName}.gql.ts`;
+// Delete files for removed models
+existingFiles.forEach((file) => {
+  const modelName = file.replace('.gql.ts', '');
+  if (!activeModels.includes(modelName)) {
+    unlinkSync(`${outputDir}/${file}`);
+    console.log(`Deleted ${file} (model removed)`);
+  }
+});
 
-  // ─── Skip if file exists and not forced ───────────────
-  if (existsSync(filePath) && !force) {
-    console.log(`⏭️  Skipped ${modelName}.gql.ts (already exists, use --force to overwrite)`);
+activeModels.forEach((modelName) => {
+  const fragmentConst = `${modelName}Fragment`;
+  const customFragmentPath = `${customDir}/${fragmentConst}.ts`;
+  const hasCustomFragment = existsSync(customFragmentPath);
+
+  const fragmentBlock = hasCustomFragment
+    ? `import { ${fragmentConst} } from '../custom/${fragmentConst}';`
+    : (() => {
+        const generated = generateFragment(modelName);
+        const generatedFragmentString = print(generated.fragment);
+        return `export const ${fragmentConst} = gql\`
+${generatedFragmentString}
+\`;`;
+      })();
+
+  const content = buildModelFile(modelName, fragmentConst, fragmentBlock);
+  const filePath = `${outputDir}/${modelName}.gql.ts`;
+  const fileExists = existsSync(filePath);
+  const prev = fileExists ? readFileSync(filePath, 'utf8') : '';
+
+  if (prev === content) {
+    console.log(`Skipped ${modelName}.gql.ts (no changes)`);
     return;
   }
 
   writeFileSync(filePath, content);
-  console.log(`✅ Generated ${modelName}.gql.ts`);
+  console.log(`${fileExists ? 'Updated' : 'Generated'} ${modelName}.gql.ts`);
 });
 
-console.log(`\n🎉 Done — ${activeModels.length} files generated in ${outputDir}`);
+console.log(`Done - processed ${activeModels.length} models`);

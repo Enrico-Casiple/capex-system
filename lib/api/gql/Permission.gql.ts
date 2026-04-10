@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client';
-
 export const PermissionFragment = gql`
 fragment PermissionFragment on Permission {
   id
@@ -11,6 +10,7 @@ fragment PermissionFragment on Permission {
   displayOrder
   isGlobal
   isAdmin
+  globalLimit
   isActive
   createdAt
   updatedAt

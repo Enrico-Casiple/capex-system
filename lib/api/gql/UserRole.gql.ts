@@ -1,20 +1,5 @@
 import { gql } from '@apollo/client';
-
-export const UserRoleFragment = gql`
-fragment UserRoleFragment on UserRole {
-  id
-  userId
-  roleId
-  scopeTypeId
-  scopeValues
-  conditionOverrides
-  assignedById
-  expiresAt
-  isActive
-  createdAt
-  updatedAt
-}
-`;
+import { UserRoleFragment } from '../custom/UserRoleFragment';
 
 export const UserRoleFindAllWithCursor = gql`
   query UserRoleFindAllWithCursor($cursorInput: UserRoleCursorPaginationInput!) {

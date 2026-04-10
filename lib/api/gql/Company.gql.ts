@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client';
-
 export const CompanyFragment = gql`
 fragment CompanyFragment on Company {
   id
@@ -11,6 +10,7 @@ fragment CompanyFragment on Company {
   conctactNumber
   email
   logo
+  scopeTypeId
   createdAt
   updatedAt
 }

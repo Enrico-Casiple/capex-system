@@ -25,6 +25,7 @@ export type PaginationInput<PrismaModel extends Prisma.ModelName> = {
   pageSize: number;
   filter?: FindManyArgs<PrismaModel>['where'];
   search?: string;
+  searchFields?: (keyof PrismaTypes[PrismaModel]['Shape'])[]; // ← add this
 };
 export type CursorPaginationInput<PrismaModel extends Prisma.ModelName> = {
   isActive: boolean;
@@ -45,4 +46,13 @@ export type CursorPaginationResult<PrismaModel extends Prisma.ModelName> = {
   prevCursor: string | null; // ← add this
   hasNextPage: boolean;
   hasPrevPage: boolean; // ← add this
+};
+
+export type ExportCsvInput<PrismaModel extends Prisma.ModelName> = {
+  isActive?: boolean;
+  filter?: FindManyArgs<PrismaModel>['where'];
+  search?: string;
+  searchFields?: (keyof PrismaTypes[PrismaModel]['Shape'])[];
+  columns?: string[];
+  fileName?: string;
 };

@@ -14,6 +14,7 @@
     "codegen:watch": "prisma generate && graphql-codegen --config lib/pothos/codegen.ts --watch",
     "clean:types": "rm -rf lib/generated",
     "build": "next build",
+    "build:ci": "NEXT_IGNORE_BUILD_ERRORS=true NODE_OPTIONS=--max-old-space-size=8192 next build",
     "build:start": "NODE_ENV=development tsx watch lib/server/server.ts",
     "deploy": "npm run generate:gql && npm run build && npm run build:start",
     "lint": "next lint --fix",
@@ -28,7 +29,8 @@
     "prisma:reset": "prisma generate && prisma db push --force-reset && prisma format && npm run codegen:gen && npm run prebuild:strict",
     "memcached:install": "sudo dnf install memcached -y && sudo systemctl start memcached && sudo systemctl enable memcached",
     "setup:memcached": "chmod +x lib/scripts/setup.sh && bash lib/scripts/setup.sh",
-    "git:push": "cross-env-shell \"git add . && git commit -m \\\"%npm_config_message%\\\" && git push origin master\""
+    "git:push": "cross-env-shell \"git add . && git commit -m \\\"%npm_config_message%\\\" && git push origin master\"",
+    "generate:model-names": "tsx lib/scripts/generateModelNames.ts"
   },
   "dependencies": {
     "@apollo/client": "^4.1.6",

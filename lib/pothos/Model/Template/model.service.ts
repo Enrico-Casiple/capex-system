@@ -18,6 +18,7 @@
  */
 
 import { formatInTimeZone } from 'date-fns-tz';
+import Papa from 'papaparse';
 import { fail, ok } from '../../../../lib/util/reponseUtil';
 import { Prisma, PrismaClient } from '../../../generated/prisma/client';
 import { getPrismaErrorMessage } from '../../../util/getPrismaErrorMessage';
@@ -31,6 +32,7 @@ import {
   CreateInput,
   CreateManyInput,
   CursorPaginationInput,
+  ExportCsvInput,
   PaginationInput,
   RemoveInput,
   RemoveManyInput,
@@ -100,7 +102,11 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
   private mapCreateMany(
     data: CreateManyInput<PrismaModel>['data'],
   ): CreateManyArgs<PrismaModel>['data'] {
-    return (this.strategy.mapCreateMany ?? ((d) => d))(data);
+    const mapper = this.strategy.mapCreateMany as
+      | ((input: CreateManyInput<PrismaModel>['data']) => CreateManyArgs<PrismaModel>['data'])
+      | undefined;
+
+    return mapper ? mapper(data) : (data as CreateManyArgs<PrismaModel>['data']);
   }
 
   private mapUpdate(data: UpdateInput<PrismaModel>['data']): UpdateArgs<PrismaModel>['data'] {
@@ -212,6 +218,164 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
     });
   }
 
+  private escapeCsvValue(value: unknown): string {
+    if (value === null || value === undefined) return '';
+    if (value instanceof Date) return value.toISOString();
+    if (typeof value === 'object') return JSON.stringify(value);
+    const s = String(value);
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  }
+
+  private getValueByPath(record: Record<string, unknown>, path: string): unknown {
+    if (!path) return null;
+    const parts = path.split('.').filter(Boolean);
+    if (!parts.length) return null;
+
+    const resolvePath = (current: unknown, index: number): unknown => {
+      if (index >= parts.length) return current;
+      if (current === null || current === undefined) return null;
+
+      if (Array.isArray(current)) {
+        return current.map((item) => resolvePath(item, index));
+      }
+
+      if (typeof current === 'object') {
+        const key = parts[index];
+        return resolvePath((current as Record<string, unknown>)[key], index + 1);
+      }
+
+      return null;
+    };
+
+    return resolvePath(record, 0);
+  }
+
+  private normalizeCsvPathValue(value: unknown): unknown {
+    if (!Array.isArray(value)) return value;
+
+    const flattened = value.flat(Infinity).filter((v) => v !== undefined && v !== null);
+    if (!flattened.length) return '';
+
+    const hasComplex = flattened.some((v) => typeof v === 'object' && !(v instanceof Date));
+    if (hasComplex) return flattened;
+
+    return flattened.map((v) => (v instanceof Date ? v.toISOString() : String(v))).join(' | ');
+  }
+
+  private toTabularValue(value: unknown): string | number | boolean {
+    if (value === null || value === undefined) return '';
+    if (value instanceof Date) return value.toISOString();
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      return value;
+    }
+    return JSON.stringify(value);
+  }
+
+  private escapeHtml(value: unknown): string {
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  private buildExcelBase64(
+    columns: string[],
+    records: Array<Record<string, string | number | boolean>>,
+  ): string {
+    const headerCells = columns.map((column) => `<th>${this.escapeHtml(column)}</th>`).join('');
+    const bodyRows = records
+      .map((record) => {
+        const cells = columns
+          .map((column) => `<td>${this.escapeHtml(record[column] ?? '')}</td>`)
+          .join('');
+        return `<tr>${cells}</tr>`;
+      })
+      .join('');
+
+    const html = [
+      '<html>',
+      '<head><meta charset="UTF-8" /></head>',
+      '<body>',
+      `<table><thead><tr>${headerCells}</tr></thead><tbody>${bodyRows}</tbody></table>`,
+      '</body>',
+      '</html>',
+    ].join('');
+
+    return Buffer.from(html, 'utf8').toString('base64');
+  }
+
+  private isPlainObject(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+  }
+
+  private buildCsvIncludeFromColumns(columns?: string[]): Record<string, unknown> | undefined {
+    if (!columns?.length) return undefined;
+
+    const include: Record<string, unknown> = {};
+
+    for (const column of columns) {
+      const parts = String(column)
+        .split('.')
+        .map((p) => p.trim())
+        .filter(Boolean);
+
+      // No dot-path means top-level field; no relation include needed.
+      if (parts.length < 2) continue;
+
+      let current = include;
+
+      for (let i = 0; i < parts.length - 1; i += 1) {
+        const relationKey = parts[i];
+        const isLastRelation = i === parts.length - 2;
+        const existing = current[relationKey];
+
+        if (isLastRelation) {
+          current[relationKey] = true;
+          break;
+        }
+
+        if (existing === true || !this.isPlainObject(existing)) {
+          current[relationKey] = { include: {} };
+        }
+
+        const relationConfig = current[relationKey] as Record<string, unknown>;
+        if (!this.isPlainObject(relationConfig.include)) {
+          relationConfig.include = {};
+        }
+
+        current = relationConfig.include as Record<string, unknown>;
+      }
+    }
+
+    return Object.keys(include).length ? include : undefined;
+  }
+
+  private mergeIncludeTrees(
+    base: unknown,
+    extra: Record<string, unknown> | undefined,
+  ): FindManyArgs<PrismaModel>['include'] {
+    if (!extra) return base as FindManyArgs<PrismaModel>['include'];
+    if (!this.isPlainObject(base)) return extra as FindManyArgs<PrismaModel>['include'];
+
+    const merged: Record<string, unknown> = { ...base };
+
+    for (const [key, extraValue] of Object.entries(extra)) {
+      const baseValue = merged[key];
+
+      if (this.isPlainObject(baseValue) && this.isPlainObject(extraValue)) {
+        merged[key] = this.mergeIncludeTrees(baseValue, extraValue as Record<string, unknown>);
+      } else if (extraValue === true) {
+        merged[key] = baseValue ?? true;
+      } else {
+        merged[key] = extraValue;
+      }
+    }
+
+    return merged as FindManyArgs<PrismaModel>['include'];
+  }
+
   // ─── Public Methods ────────────────────────────────────────
   async findAll(input: PaginationInput<PrismaModel>) {
     console.log(`📝 FindAll ${this.modelName}`, input);
@@ -219,6 +383,12 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
       isActive: input.isActive,
       ...(input.filter || {}),
     } as FindManyArgs<PrismaModel>['where'];
+
+    if (input.search?.trim() && input.searchFields?.length) {
+      where!.OR = input.searchFields.map((field) => ({
+        [field]: { contains: input.search, mode: 'insensitive' },
+      }));
+    }
 
     // ← fetch all if pageSize is 0 OR pageSize is 1 with currentPage 1
     const fetchAll = input.pageSize === 0 || (input.currentPage === 1 && input.pageSize === 1);
@@ -902,6 +1072,80 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
         this.code('RESTORE_MANY_FAILED'),
         `Failed to restoreMany ${this.modelName}: ${message}`,
       );
+    }
+  }
+
+  async exportCsv(input: ExportCsvInput<PrismaModel>) {
+    try {
+      const columnInclude = this.buildCsvIncludeFromColumns(input.columns);
+      const include = this.mergeIncludeTrees(this.include, columnInclude);
+
+      const where = {
+        ...(typeof input.isActive === 'boolean' ? { isActive: input.isActive } : {}),
+        ...(input.filter || {}),
+      } as FindManyArgs<PrismaModel>['where'];
+
+      if (input.search?.trim() && input.searchFields?.length) {
+        (where as Record<string, unknown>).OR = input.searchFields.map((field) => ({
+          [field]: { contains: input.search, mode: 'insensitive' },
+        }));
+      }
+
+      const rows = (await this.delegate.findMany({
+        where,
+        orderBy: this.orderBy,
+        include,
+      })) as Array<Record<string, unknown>>;
+
+      const excelFileName = (input.fileName ?? `${this.prismaModel}.csv`).replace(
+        /\.csv$/i,
+        '.xls',
+      );
+      const excelMimeType = 'application/vnd.ms-excel';
+
+      if (!rows.length) {
+        return ok(this.code('EXPORT_CSV_SUCCESS'), `No ${this.modelName} data`, {
+          fileName: input.fileName ?? `${this.prismaModel}.csv`,
+          mimeType: 'text/csv',
+          csv: '',
+          rowCount: 0,
+          excelFileName,
+          excelMimeType,
+          excelBase64: '',
+        });
+      }
+
+      const columns =
+        (input.columns?.map(String) as string[] | undefined) ??
+        Object.keys(rows[0]).filter((k) => !['password', 'otpCode'].includes(k));
+
+      const records = rows.map((row) => {
+        const mapped = columns.map((column) => {
+          const raw = this.normalizeCsvPathValue(this.getValueByPath(row, column));
+          return [column, this.toTabularValue(raw)] as const;
+        });
+
+        return Object.fromEntries(mapped) as Record<string, string | number | boolean>;
+      });
+
+      const csv = Papa.unparse(records, {
+        columns,
+        header: true,
+      });
+      const excelBase64 = this.buildExcelBase64(columns, records);
+
+      return ok(this.code('EXPORT_CSV_SUCCESS'), `Exported ${rows.length} ${this.modelName} rows`, {
+        fileName: input.fileName ?? `${this.prismaModel}.csv`,
+        mimeType: 'text/csv',
+        csv,
+        rowCount: rows.length,
+        excelFileName,
+        excelMimeType,
+        excelBase64,
+      });
+    } catch (error) {
+      const { message } = getPrismaErrorMessage(error);
+      return fail(this.code('EXPORT_CSV_FAILED'), `Failed to export CSV: ${message}`);
     }
   }
 }

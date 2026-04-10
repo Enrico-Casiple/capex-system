@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client';
-
 export const AuditLogFragment = gql`
 fragment AuditLogFragment on AuditLog {
   id
