@@ -107,6 +107,26 @@ export const BasicInformationFindFirst = gql`
   ${BasicInformationFragment}
 `;
 
+export const BasicInformationExportCsv = gql`
+  query BasicInformationExportCsv($input: BasicInformationCsvExportInput!) {
+    BasicInformationExportCsv(input: $input) {
+      code
+      data {
+        csv
+        excelBase64
+        excelFileName
+        excelMimeType
+        fileName
+        mimeType
+        rowCount
+      }
+      isSuccess
+      message
+    }
+  }
+`;
+
+
 export const BasicInformationCreate = gql`
   mutation BasicInformationCreate($data: BasicInformationCreateInput!, $currentUserId: String) {
     BasicInformationCreate(data: $data, currentUserId: $currentUserId) {

@@ -97,6 +97,26 @@ export const HolidayFindFirst = gql`
   ${HolidayFragment}
 `;
 
+export const HolidayExportCsv = gql`
+  query HolidayExportCsv($input: HolidayCsvExportInput!) {
+    HolidayExportCsv(input: $input) {
+      code
+      data {
+        csv
+        excelBase64
+        excelFileName
+        excelMimeType
+        fileName
+        mimeType
+        rowCount
+      }
+      isSuccess
+      message
+    }
+  }
+`;
+
+
 export const HolidayCreate = gql`
   mutation HolidayCreate($data: HolidayCreateInput!, $currentUserId: String) {
     HolidayCreate(data: $data, currentUserId: $currentUserId) {

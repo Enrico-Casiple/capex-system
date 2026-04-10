@@ -97,6 +97,26 @@ export const RolePermissionFindFirst = gql`
   ${RolePermissionFragment}
 `;
 
+export const RolePermissionExportCsv = gql`
+  query RolePermissionExportCsv($input: RolePermissionCsvExportInput!) {
+    RolePermissionExportCsv(input: $input) {
+      code
+      data {
+        csv
+        excelBase64
+        excelFileName
+        excelMimeType
+        fileName
+        mimeType
+        rowCount
+      }
+      isSuccess
+      message
+    }
+  }
+`;
+
+
 export const RolePermissionCreate = gql`
   mutation RolePermissionCreate($data: RolePermissionCreateInput!, $currentUserId: String) {
     RolePermissionCreate(data: $data, currentUserId: $currentUserId) {

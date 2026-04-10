@@ -207,8 +207,7 @@ interface Extra {
 
 // 1. Create Droplet → Ubuntu → set SSH key
 // 2. ssh root@your_droplet_ip
-// 3. sudo apt update && sudo apt install -y nodejs npm git
-// 4. scp your-project.zip root@your_droplet_ip:/root/ && unzip it
+// 3. sudo apt update && sudo apt install -y nodej     root@your_droplet_ip:/root/ && unzip it
 // 5. Create .env: NODE_ENV=production HOST=0.0.0.0 PORT=3000 AUTH_SECRET=xxx
 // 6. npm install && npm run build && npm start
 // 7. (Optional) pm2: npm i -g pm2 && pm2 start npm -- start && pm2 save && pm2 startup

@@ -96,6 +96,26 @@ export const TypeFindFirst = gql`
   ${TypeFragment}
 `;
 
+export const TypeExportCsv = gql`
+  query TypeExportCsv($input: TypeCsvExportInput!) {
+    TypeExportCsv(input: $input) {
+      code
+      data {
+        csv
+        excelBase64
+        excelFileName
+        excelMimeType
+        fileName
+        mimeType
+        rowCount
+      }
+      isSuccess
+      message
+    }
+  }
+`;
+
+
 export const TypeCreate = gql`
   mutation TypeCreate($data: TypeCreateInput!, $currentUserId: String) {
     TypeCreate(data: $data, currentUserId: $currentUserId) {

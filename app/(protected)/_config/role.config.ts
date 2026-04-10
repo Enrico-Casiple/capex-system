@@ -19,6 +19,7 @@ const roleExtraColumns: SearchableColumnDef<Role>[] = [
     cell: ({ getValue }: CellContext<Role, unknown>) => (getValue() ? 'Yes' : 'No'),
     meta: { searchable: false }, // important
   },
+ 
 ];
 
 export const role = {

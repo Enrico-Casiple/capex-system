@@ -1,20 +1,15 @@
 'use client';
 
-import {
-  Combobox,
-  ComboboxChip,
-  ComboboxChips,
-  ComboboxChipsInput,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxItem,
-} from '@/components/ui/combobox';
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useQuery } from '@apollo/client/react';
 import { DocumentNode } from 'graphql';
+import { Check, ChevronsUpDown, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
+import { cn } from '@/lib/utils';
 
 // ─── Types ──────────────────────────────────────────────────
 export type ComboboxOption = { label: string; value: string };
@@ -175,15 +170,15 @@ const CustomMultipleSelectInput = <TFormValues extends FieldValues>({
   findAllGQL,
   placeholder = 'Select...',
   searchPlaceholder = 'Search...',
-  emptyAllSelectedMessage = 'All selected.',
   emptyMessage = 'No results found.',
-  maxVisible = 1,
+  maxVisible = 2,
   cursorVariables,
   countVariables,
   allIdsVariables,
   mapOption,
 }: CustomMultipleSelectInputProps<TFormValues>) => {
   const [search, setSearch] = useState('');
+  const [open, setOpen] = useState(false);
   const [selectAllEnabled, setSelectAllEnabled] = useState(false);
   const debouncedSearch = useDebounce(search, 400);
 
@@ -222,15 +217,15 @@ const CustomMultipleSelectInput = <TFormValues extends FieldValues>({
       control={control}
       render={({ field, fieldState }) => {
         const selectedValues = (field.value ?? []) as string[];
-        const unselectedOptions = comboData.allOptions.filter(
-          (opt) => !selectedValues.includes(opt.value),
-        );
         const allSelected = totalCount > 0 && selectedValues.length >= totalCount;
+        const selectedOptions = comboData.allOptions.filter((opt) =>
+          selectedValues.includes(opt.value),
+        );
 
         return (
           <Field data-invalid={fieldState.invalid}>
             {/* ─── Label + Select All ──────────────── */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-2">
               <FieldLabel htmlFor={String(name)}>{label}</FieldLabel>
               {totalCount > 0 && (
                 <button
@@ -262,94 +257,126 @@ const CustomMultipleSelectInput = <TFormValues extends FieldValues>({
               )}
             </div>
 
-            <Combobox
-              multiple
-              items={unselectedOptions}
-              value={selectedValues}
-              onValueChange={(val: string[]) => {
-                field.onChange(val);
-                field.onBlur();
-              }}
-            >
-              {/* ─── Chips ───────────────────────────── */}
-              <ComboboxChips
-                aria-invalid={fieldState.invalid}
-                className={fieldState.invalid ? 'has-aria-invalid:border-destructive' : ''}
-              >
-                {selectedValues.slice(0, maxVisible).map((id) => {
-                  const chipLabel =
-                    comboData.allOptions.find((opt) => opt.value === id)?.label ?? id;
-                  return <ComboboxChip key={id}>{chipLabel}</ComboboxChip>;
-                })}
-                {selectedValues.length > maxVisible && (
-                  <span className="flex h-[calc(--spacing(5.25))] items-center rounded-none bg-muted px-1.5 text-xs font-medium text-foreground">
-                    +{selectedValues.length - maxVisible} more
+            {/* ─── Selected Chips ──────────────────────── */}
+            {selectedOptions.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-2">
+                {selectedOptions.slice(0, maxVisible).map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => {
+                      const newValues = selectedValues.filter((val) => val !== opt.value);
+                      field.onChange(newValues);
+                      field.onBlur();
+                    }}
+                    className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    {opt.label}
+                    <X className="h-3 w-3" />
+                  </button>
+                ))}
+                {selectedOptions.length > maxVisible && (
+                  <span className="inline-flex items-center px-2 py-1 text-xs rounded-md bg-muted text-foreground">
+                    +{selectedOptions.length - maxVisible} more
                   </span>
                 )}
-                <ComboboxChipsInput placeholder={selectedValues.length === 0 ? placeholder : ''} />
-              </ComboboxChips>
+              </div>
+            )}
 
-              <ComboboxContent className="max-h-60 overflow-y-auto">
-                {/* ─── Search ──────────────────────── */}
-                <div className="sticky top-0 z-10 bg-popover p-2">
-                  <Input
-                    placeholder={searchPlaceholder}
-                    value={search}
-                    onChange={(e) => {
-                      setSearch(e.target.value);
-                      comboData.resetSearch();
-                    }}
-                  />
-                  {search !== debouncedSearch && (
-                    <p className="mt-1 text-xs text-muted-foreground">Searching...</p>
+            {/* ─── Popover + Command ──────────────────────── */}
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <button
+                  id={String(name)}
+                  className={cn(
+                    'h-8 justify-between w-full px-3 py-2 text-sm bg-background border border-input rounded-md shadow-sm hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center',
+                    fieldState.invalid && 'border-destructive'
                   )}
-                </div>
-
-                <ComboboxEmpty>
-                  {comboData.isLoading
-                    ? 'Loading...'
-                    : unselectedOptions.length === 0 && selectedValues.length > 0
-                      ? emptyAllSelectedMessage
-                      : comboData.allOptions.length === 0
-                        ? emptyMessage
-                        : 'Please select.'}
-                </ComboboxEmpty>
-
-                {unselectedOptions.map((item) => (
-                  <ComboboxItem key={item.value} value={item.value}>
-                    {item.label}
-                  </ComboboxItem>
-                ))}
-
-                {/* ─── Footer ──────────────────────── */}
-                {comboData.activeCursor && !comboData.isLoading && (
-                  <div
-                    ref={comboData.sentinelRef}
-                    className="py-2 text-center text-xs text-muted-foreground"
-                  >
-                    ↓ Scroll for more
+                  onClick={() => setOpen(!open)}
+                >
+                  <span className={selectedValues.length > 0 ? '' : 'text-muted-foreground'}>
+                    {selectedValues.length > 0
+                      ? `${selectedValues.length} selected`
+                      : placeholder}
+                  </span>
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0" align="start">
+                <Command shouldFilter={false} className="w-full">
+                  {/* ─── Search Input ────────────────────────── */}
+                  <div className="border-b w-full">
+                    <Input
+                      placeholder={searchPlaceholder}
+                      value={search}
+                      onChange={(e) => {
+                        setSearch(e.target.value);
+                        comboData.resetSearch();
+                      }}
+                      className="border-0 rounded-none focus-visible:ring-0 focus-visible:outline-none"
+                    />
+                    {search !== debouncedSearch && (
+                      <p className="px-2 py-1 text-xs text-muted-foreground">Searching...</p>
+                    )}
                   </div>
-                )}
-                {comboData.hasReachedMax && !comboData.isLoading && (
-                  <div className="py-2 text-center text-xs text-muted-foreground">
-                    Showing {comboData.totalLoaded} results — search to narrow down
-                  </div>
-                )}
-                {comboData.isLoading && (
-                  <div className="py-2 text-center text-xs text-muted-foreground animate-pulse">
-                    Loading...
-                  </div>
-                )}
-                {!comboData.activeCursor &&
-                  !comboData.hasReachedMax &&
-                  !comboData.isLoading &&
-                  unselectedOptions.length > 0 && (
-                    <div className="py-2 text-center text-xs text-muted-foreground">
-                      {unselectedOptions.length} remaining · {selectedValues.length} selected
-                    </div>
-                  )}
-              </ComboboxContent>
-            </Combobox>
+
+                  <CommandList className="w-full max-h-[300px]">
+                    <CommandEmpty className="py-2 text-center text-sm text-muted-foreground">
+                      {comboData.isLoading ? 'Loading...' : emptyMessage}
+                    </CommandEmpty>
+
+                    {comboData.allOptions.length > 0 && (
+                      <CommandGroup className="w-full">
+                        {comboData.allOptions.map((item: ComboboxOption) => (
+                          <CommandItem
+                            key={item.value}
+                            value={item.value}
+                            onSelect={() => {
+                              const newValues = selectedValues.includes(item.value)
+                                ? selectedValues.filter((val) => val !== item.value)
+                                : [...selectedValues, item.value];
+                              field.onChange(newValues);
+                              field.onBlur();
+                            }}
+                            className="cursor-pointer"
+                          >
+                            <Check
+                              className={cn(
+                                'mr-2 h-5 w-5 transition-all rounded-full p-0.5 border-2 border-input opacity-100',
+                                selectedValues.includes(item.value)
+                                  ? 'text-green-600 bg-green-100 border-green-600'
+                                  : 'text-muted-foreground'
+                              )}
+                            />
+                            {item.label}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    )}
+
+                    {/* ─── Load More Sentinel ────────────────────────── */}
+                    {comboData.activeCursor && !comboData.isLoading && (
+                      <div
+                        ref={comboData.sentinelRef}
+                        className="py-2 text-center text-xs text-muted-foreground"
+                      >
+                        ↓ Scroll for more
+                      </div>
+                    )}
+                    {comboData.hasReachedMax && !comboData.isLoading && (
+                      <div className="py-2 text-center text-xs text-muted-foreground">
+                        Showing {comboData.totalLoaded} results — search to narrow down
+                      </div>
+                    )}
+                    {comboData.isLoading && (
+                      <div className="py-2 text-center text-xs text-muted-foreground animate-pulse">
+                        Loading...
+                      </div>
+                    )}
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
 
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>

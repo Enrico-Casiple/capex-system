@@ -104,6 +104,26 @@ export const ShiftingScheduleFindFirst = gql`
   ${ShiftingScheduleFragment}
 `;
 
+export const ShiftingScheduleExportCsv = gql`
+  query ShiftingScheduleExportCsv($input: ShiftingScheduleCsvExportInput!) {
+    ShiftingScheduleExportCsv(input: $input) {
+      code
+      data {
+        csv
+        excelBase64
+        excelFileName
+        excelMimeType
+        fileName
+        mimeType
+        rowCount
+      }
+      isSuccess
+      message
+    }
+  }
+`;
+
+
 export const ShiftingScheduleCreate = gql`
   mutation ShiftingScheduleCreate($data: ShiftingScheduleCreateInput!, $currentUserId: String) {
     ShiftingScheduleCreate(data: $data, currentUserId: $currentUserId) {

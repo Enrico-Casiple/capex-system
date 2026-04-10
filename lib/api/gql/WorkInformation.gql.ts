@@ -113,6 +113,26 @@ export const WorkInformationFindFirst = gql`
   ${WorkInformationFragment}
 `;
 
+export const WorkInformationExportCsv = gql`
+  query WorkInformationExportCsv($input: WorkInformationCsvExportInput!) {
+    WorkInformationExportCsv(input: $input) {
+      code
+      data {
+        csv
+        excelBase64
+        excelFileName
+        excelMimeType
+        fileName
+        mimeType
+        rowCount
+      }
+      isSuccess
+      message
+    }
+  }
+`;
+
+
 export const WorkInformationCreate = gql`
   mutation WorkInformationCreate($data: WorkInformationCreateInput!, $currentUserId: String) {
     WorkInformationCreate(data: $data, currentUserId: $currentUserId) {

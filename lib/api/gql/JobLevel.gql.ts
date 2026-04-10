@@ -99,6 +99,26 @@ export const JobLevelFindFirst = gql`
   ${JobLevelFragment}
 `;
 
+export const JobLevelExportCsv = gql`
+  query JobLevelExportCsv($input: JobLevelCsvExportInput!) {
+    JobLevelExportCsv(input: $input) {
+      code
+      data {
+        csv
+        excelBase64
+        excelFileName
+        excelMimeType
+        fileName
+        mimeType
+        rowCount
+      }
+      isSuccess
+      message
+    }
+  }
+`;
+
+
 export const JobLevelCreate = gql`
   mutation JobLevelCreate($data: JobLevelCreateInput!, $currentUserId: String) {
     JobLevelCreate(data: $data, currentUserId: $currentUserId) {

@@ -96,6 +96,26 @@ export const StatusFindFirst = gql`
   ${StatusFragment}
 `;
 
+export const StatusExportCsv = gql`
+  query StatusExportCsv($input: StatusCsvExportInput!) {
+    StatusExportCsv(input: $input) {
+      code
+      data {
+        csv
+        excelBase64
+        excelFileName
+        excelMimeType
+        fileName
+        mimeType
+        rowCount
+      }
+      isSuccess
+      message
+    }
+  }
+`;
+
+
 export const StatusCreate = gql`
   mutation StatusCreate($data: StatusCreateInput!, $currentUserId: String) {
     StatusCreate(data: $data, currentUserId: $currentUserId) {

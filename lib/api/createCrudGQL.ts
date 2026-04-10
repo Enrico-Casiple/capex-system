@@ -125,6 +125,25 @@ export class CrudGQLBuilder {
     `;
   }
 
+  get exportData() {
+    return gql`query ${this.entityName}ExportCsv($input: ${this.entityName}CsvExportInput!) {
+      ${this.entityName}ExportCsv(input: $input) {
+        code
+        data {
+          csv
+          excelBase64
+          excelFileName
+          excelMimeType
+          fileName
+          mimeType
+          rowCount
+        }
+        isSuccess
+        message
+      }
+    }`;
+  }
+
   // ─── Mutations ─────────────────────────────────────────────
 
   get create() {

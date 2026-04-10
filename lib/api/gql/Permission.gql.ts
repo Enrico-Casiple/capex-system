@@ -103,6 +103,26 @@ export const PermissionFindFirst = gql`
   ${PermissionFragment}
 `;
 
+export const PermissionExportCsv = gql`
+  query PermissionExportCsv($input: PermissionCsvExportInput!) {
+    PermissionExportCsv(input: $input) {
+      code
+      data {
+        csv
+        excelBase64
+        excelFileName
+        excelMimeType
+        fileName
+        mimeType
+        rowCount
+      }
+      isSuccess
+      message
+    }
+  }
+`;
+
+
 export const PermissionCreate = gql`
   mutation PermissionCreate($data: PermissionCreateInput!, $currentUserId: String) {
     PermissionCreate(data: $data, currentUserId: $currentUserId) {

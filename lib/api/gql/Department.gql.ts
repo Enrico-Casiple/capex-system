@@ -99,6 +99,26 @@ export const DepartmentFindFirst = gql`
   ${DepartmentFragment}
 `;
 
+export const DepartmentExportCsv = gql`
+  query DepartmentExportCsv($input: DepartmentCsvExportInput!) {
+    DepartmentExportCsv(input: $input) {
+      code
+      data {
+        csv
+        excelBase64
+        excelFileName
+        excelMimeType
+        fileName
+        mimeType
+        rowCount
+      }
+      isSuccess
+      message
+    }
+  }
+`;
+
+
 export const DepartmentCreate = gql`
   mutation DepartmentCreate($data: DepartmentCreateInput!, $currentUserId: String) {
     DepartmentCreate(data: $data, currentUserId: $currentUserId) {

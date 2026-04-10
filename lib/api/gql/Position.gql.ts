@@ -97,6 +97,26 @@ export const PositionFindFirst = gql`
   ${PositionFragment}
 `;
 
+export const PositionExportCsv = gql`
+  query PositionExportCsv($input: PositionCsvExportInput!) {
+    PositionExportCsv(input: $input) {
+      code
+      data {
+        csv
+        excelBase64
+        excelFileName
+        excelMimeType
+        fileName
+        mimeType
+        rowCount
+      }
+      isSuccess
+      message
+    }
+  }
+`;
+
+
 export const PositionCreate = gql`
   mutation PositionCreate($data: PositionCreateInput!, $currentUserId: String) {
     PositionCreate(data: $data, currentUserId: $currentUserId) {

@@ -87,6 +87,26 @@ export const UserFindFirst = gql`
   ${UserFragment}
 `;
 
+export const UserExportCsv = gql`
+  query UserExportCsv($input: UserCsvExportInput!) {
+    UserExportCsv(input: $input) {
+      code
+      data {
+        csv
+        excelBase64
+        excelFileName
+        excelMimeType
+        fileName
+        mimeType
+        rowCount
+      }
+      isSuccess
+      message
+    }
+  }
+`;
+
+
 export const UserCreate = gql`
   mutation UserCreate($data: UserCreateInput!, $currentUserId: String) {
     UserCreate(data: $data, currentUserId: $currentUserId) {

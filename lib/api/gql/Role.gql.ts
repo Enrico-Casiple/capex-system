@@ -99,6 +99,26 @@ export const RoleFindFirst = gql`
   ${RoleFragment}
 `;
 
+export const RoleExportCsv = gql`
+  query RoleExportCsv($input: RoleCsvExportInput!) {
+    RoleExportCsv(input: $input) {
+      code
+      data {
+        csv
+        excelBase64
+        excelFileName
+        excelMimeType
+        fileName
+        mimeType
+        rowCount
+      }
+      isSuccess
+      message
+    }
+  }
+`;
+
+
 export const RoleCreate = gql`
   mutation RoleCreate($data: RoleCreateInput!, $currentUserId: String) {
     RoleCreate(data: $data, currentUserId: $currentUserId) {

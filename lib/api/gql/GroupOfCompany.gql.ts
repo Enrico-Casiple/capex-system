@@ -99,6 +99,26 @@ export const GroupOfCompanyFindFirst = gql`
   ${GroupOfCompanyFragment}
 `;
 
+export const GroupOfCompanyExportCsv = gql`
+  query GroupOfCompanyExportCsv($input: GroupOfCompanyCsvExportInput!) {
+    GroupOfCompanyExportCsv(input: $input) {
+      code
+      data {
+        csv
+        excelBase64
+        excelFileName
+        excelMimeType
+        fileName
+        mimeType
+        rowCount
+      }
+      isSuccess
+      message
+    }
+  }
+`;
+
+
 export const GroupOfCompanyCreate = gql`
   mutation GroupOfCompanyCreate($data: GroupOfCompanyCreateInput!, $currentUserId: String) {
     GroupOfCompanyCreate(data: $data, currentUserId: $currentUserId) {

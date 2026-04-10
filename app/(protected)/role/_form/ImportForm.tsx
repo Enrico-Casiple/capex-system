@@ -29,10 +29,14 @@ const ImportForm = (props: ImportFormProps) => {
         isActive: Boolean(row.isActive),
       })}
       previewColumns={[
-        { key: 'name', label: 'Name' },
-        { key: 'email', label: 'Email' },
-        { key: 'userName', label: 'Username' },
+        { key: 'name', label: 'Name', default: 'FullName' },
+        { key: 'email', label: 'Email', default: 'WorkEmail@email.com' },
+        { key: 'userName', label: 'Username', default: 'WorkEmail' },
+        {key: 'password', label: 'Password', default: 'password123'},
+        { key: 'isTwoFactorAuthEnabled', label: 'Two-Factor Authentication', default: false },
+        { key: 'isActive', label: 'Active', default: false }
       ]}
+       autoGenerateColumns={true}
     />
   )
 }

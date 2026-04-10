@@ -129,7 +129,6 @@ const PermissionSelector = ({
                   className="ml-4 mr-2"
                 />
                 <AccordionTrigger
-                  hideIcon
                   className="px-4 py-3 hover:bg-muted/50 hover:no-underline bg-muted/20"
                 >
                   <div className="flex items-center gap-3 flex-1">

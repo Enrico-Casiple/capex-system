@@ -11,31 +11,45 @@ import { FileSpreadsheet, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DocumentNode } from 'graphql';
 import useToast from '@/app/_hooks/useToast';
+import RoleGate from '../RoleGate/RoleGate';
+
+export type PreviewColumn<TRow extends Record<string, unknown>> = { 
+  key: keyof TRow; 
+  label: string;
+  default?: string | number | boolean;
+};
 
 type ImportFormWrapperProps<TRow extends Record<string, unknown>, TInput> = {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   transformRow: (row: TRow) => TInput;
-  previewColumns: { key: keyof TRow; label: string }[];
+  previewColumns?: PreviewColumn<TRow>[];
   mutationGQL?: DocumentNode;
   additionalVariables?: Record<string, unknown>;
+  autoGenerateColumns?: boolean;
 }
 
 const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({ 
   setOpen, 
   transformRow,
-  previewColumns,
+  previewColumns: providedColumns,
   mutationGQL,
-  additionalVariables = {}
+  additionalVariables = {},
+  autoGenerateColumns = false
 }: ImportFormWrapperProps<TRow, TInput>) => {
   const session = useSession();
   const toast = useToast();
-  const { modelGQL, model } = useListContext();
+  const { modelGQL, model, modelName } = useListContext();
   const [fileName, setFileName] = useState<string | null>(null);
   const [schema, setSchema] = useState<TRow[]>([]);
+  const [generatedColumns, setGeneratedColumns] = useState<PreviewColumn<TRow>[]>([]);
+  
   const form = useForm<{schema: TRow[]}>({
     defaultValues: {schema: []}
   })
+
+  // Use provided columns or auto-generated ones
+  const previewColumns = providedColumns || generatedColumns;
 
   const handleDrop = (acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
@@ -43,12 +57,34 @@ const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({
       Papa.parse<TRow>(acceptedFiles[0], {
         header: true,
         complete: (results) => {
-          form.setValue('schema', results.data);
+          const columns = providedColumns || (autoGenerateColumns && results.data.length > 0 ? Object.keys(results.data[0]).map(key => ({
+            key: key as keyof TRow,
+            label: key.charAt(0).toUpperCase() + key.slice(1)
+          })) : []) as PreviewColumn<TRow>[];
+          
+          // Apply default values to rows with missing data
+          const enrichedData = results.data.map(row => {
+            const enrichedRow = { ...row };
+            columns.forEach(col => {
+              if ((enrichedRow[col.key] === '' || enrichedRow[col.key] === null || enrichedRow[col.key] === undefined) && col.default !== undefined) {
+                enrichedRow[col.key] = col.default as TRow[keyof TRow];
+              }
+            });
+            return enrichedRow;
+          });
+          
+          form.setValue('schema', enrichedData);
+          setSchema(enrichedData);
+          
+          // Auto-generate columns if enabled and not provided
+          if (autoGenerateColumns && !providedColumns && results.data.length > 0) {
+            setGeneratedColumns(columns);
+          }
+          
           toast.success({
             message: 'CSV file parsed successfully',
             description: `The file "${acceptedFiles[0].name}" has been parsed and is ready for import.`,
           })
-          setSchema(results.data);
         },
         error: (error) => {
           console.error('CSV parse error:', error);
@@ -65,7 +101,70 @@ const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({
   const handleRemoveFile = () => {
     setFileName(null);
     setSchema([]);
+    setGeneratedColumns([]);
     form.setValue('schema', []);
+  };
+
+  const handleDownloadTemplate = () => {
+    if (previewColumns.length === 0) {
+      toast.error({
+        message: 'No columns available',
+        description: 'Please provide preview columns or auto-generate them first.',
+      });
+      return;
+    }
+
+    // Create Excel HTML table with headers showing default values
+    const headers = previewColumns.map(col => {
+      const defaultText = col.default !== undefined ? ` (default: ${col.default})` : '';
+      return `<th style="background-color: #f2f2f2; border: 1px solid #000; padding: 8px; font-weight: bold; text-align: left;">${col.label}${defaultText}</th>`;
+    }).join('');
+    
+    // Create rows with default values populated
+    const exampleRows = Array(3).fill(null).map(() => 
+      `<tr>${previewColumns.map(col => {
+        const cellValue = col.default !== undefined ? String(col.default) : '';
+        const bgColor = col.default !== undefined ? 'background-color: #f0f0f0;' : '';
+        return `<td style="border: 1px solid #000; padding: 8px; ${bgColor}">${cellValue}</td>`;
+      }).join('')}</tr>`
+    ).join('');
+    
+    const htmlContent = `
+      <html xmlns="http://www.w3.org/1999/xhtml">
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: Arial, sans-serif; }
+            table { border-collapse: collapse; width: 100%; }
+            th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+          </style>
+        </head>
+        <body>
+          <table>
+            <thead><tr>${headers}</tr></thead>
+            <tbody>${exampleRows}</tbody>
+          </table>
+        </body>
+      </html>
+    `;
+    
+    // Create blob and download as Excel
+    const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `template-${model || 'import'}.xls`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success({
+      message: 'Template downloaded',
+      description: 'Excel template has been downloaded.',
+    });
   };
 // PerformanceImprovementPlan-WorkInfo
   const { execute, executing } = useMutationActions({
@@ -95,6 +194,25 @@ const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({
   return (
     <FormTemplate title='' description='' isHaveBorder={false} form={form} handleToSubmit={handleToSubmit} isFullWidth={true}>
       <div className='space-y-3 p-4 rounded -mt-10'>
+        <div className='flex justify-end mb-2'>
+         <RoleGate
+            module={[`${modelName.toUpperCase()}_MANAGEMENT`, 'SYSTEM']}
+            resource={[`${modelName.toLowerCase()}`, '*']}
+            action={['download_template', '*']}
+          >
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={handleDownloadTemplate}
+              type='button'
+              className='text-xs gap-2'
+            >
+              <FileSpreadsheet className='size-3' />
+              Download Template
+            </Button>
+          </RoleGate>
+        </div>
+
         <Dropzone
           accept={{ "text/csv": [".csv"] }}
           maxFiles={1}

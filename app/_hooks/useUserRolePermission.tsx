@@ -82,30 +82,30 @@ const useUserRolePermission = () => {
   );
 
   // Get the scope (which records the user is allowed to see) for a specific permission
-  const getScope = useMemo(
-    () => (module: string, resource: string, action: string) => {
-      const matchedPermission = permissions.find(
-        (permission) =>
-          permission.module === module &&
-          permission.resource === resource &&
-          permission.action === action,
-      );
+  // const getScope = useMemo(
+  //   () => (module: string, resource: string, action: string) => {
+  //     const matchedPermission = permissions.find(
+  //       (permission) =>
+  //         permission.module === module &&
+  //         permission.resource === resource &&
+  //         permission.action === action,
+  //     );
 
-      if (!matchedPermission) return null;
+  //     if (!matchedPermission) return null;
 
-      const matchedRolePermission = rolePermissions.find(
-        (rolePermission) => rolePermission.permissionId === matchedPermission.id,
-      );
+  //     const matchedRolePermission = rolePermissions.find(
+  //       (rolePermission) => rolePermission.permissionId === matchedPermission.id,
+  //     );
 
-      return {
-        scopeTypeId: matchedRolePermission?.scopeTypeId ?? null,
-        scopeValues: matchedRolePermission?.scopeValues ?? [],
-      };
-    },
-    [permissions, rolePermissions],
-  );
+  //     return {
+  //       scopeTypeId: matchedRolePermission?.scopeTypeId ?? null,
+  //       scopeValues: matchedRolePermission?.scopeValues ?? [],
+  //     };
+  //   },
+  //   [permissions, rolePermissions],
+  // );
 
-  return { permissions, rolePermissions, isGlobalAdmin, can, getScope, loading };
+  return { permissions, rolePermissions, isGlobalAdmin, can, loading };
 };
 
 export default useUserRolePermission;

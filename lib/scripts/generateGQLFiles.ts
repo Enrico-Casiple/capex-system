@@ -103,6 +103,26 @@ export const ${modelName}FindFirst = gql\`
   \${${fragmentConst}}
 \`;
 
+export const ${modelName}ExportCsv = gql\`
+  query ${modelName}ExportCsv($input: ${modelName}CsvExportInput!) {
+    ${modelName}ExportCsv(input: $input) {
+      code
+      data {
+        csv
+        excelBase64
+        excelFileName
+        excelMimeType
+        fileName
+        mimeType
+        rowCount
+      }
+      isSuccess
+      message
+    }
+  }
+\`;
+
+
 export const ${modelName}Create = gql\`
   mutation ${modelName}Create($data: ${modelName}CreateInput!, $currentUserId: String) {
     ${modelName}Create(data: $data, currentUserId: $currentUserId) {

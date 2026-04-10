@@ -56,7 +56,9 @@ const ModelPage = () => {
     [],
   );
 
-  const BULK_ACTIONS: React.ReactNode[] = [];
+  const BULK_ACTIONS: React.ReactNode[] = [
+    
+  ];
 
   const importForm = useCallback(
     (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (

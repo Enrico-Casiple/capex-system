@@ -2072,6 +2072,15 @@ type CsvExportData {
   """The CSV content of the exported file."""
   csv: String
 
+  """Base64 encoded Excel-compatible file content."""
+  excelBase64: String
+
+  """The name of the Excel-compatible exported file."""
+  excelFileName: String
+
+  """The MIME type of the Excel-compatible export."""
+  excelMimeType: String
+
   """The name of the exported CSV file."""
   fileName: String
 

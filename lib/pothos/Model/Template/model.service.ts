@@ -355,9 +355,9 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
   private mergeIncludeTrees(
     base: unknown,
     extra: Record<string, unknown> | undefined,
-  ): FindManyArgs<PrismaModel>['include'] {
-    if (!extra) return base as FindManyArgs<PrismaModel>['include'];
-    if (!this.isPlainObject(base)) return extra as FindManyArgs<PrismaModel>['include'];
+  ): Record<string, unknown> | undefined {
+    if (!extra) return base as Record<string, unknown> | undefined;
+    if (!this.isPlainObject(base)) return extra as Record<string, unknown> | undefined;
 
     const merged: Record<string, unknown> = { ...base };
 
@@ -373,7 +373,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
       }
     }
 
-    return merged as FindManyArgs<PrismaModel>['include'];
+    return merged as Record<string, unknown> | undefined;
   }
 
   // ─── Public Methods ────────────────────────────────────────
@@ -1078,7 +1078,10 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
   async exportCsv(input: ExportCsvInput<PrismaModel>) {
     try {
       const columnInclude = this.buildCsvIncludeFromColumns(input.columns);
-      const include = this.mergeIncludeTrees(this.include, columnInclude);
+      const include = this.mergeIncludeTrees(
+        this.include,
+        columnInclude,
+      )
 
       const where = {
         ...(typeof input.isActive === 'boolean' ? { isActive: input.isActive } : {}),

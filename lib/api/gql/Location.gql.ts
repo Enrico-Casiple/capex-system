@@ -96,6 +96,26 @@ export const LocationFindFirst = gql`
   ${LocationFragment}
 `;
 
+export const LocationExportCsv = gql`
+  query LocationExportCsv($input: LocationCsvExportInput!) {
+    LocationExportCsv(input: $input) {
+      code
+      data {
+        csv
+        excelBase64
+        excelFileName
+        excelMimeType
+        fileName
+        mimeType
+        rowCount
+      }
+      isSuccess
+      message
+    }
+  }
+`;
+
+
 export const LocationCreate = gql`
   mutation LocationCreate($data: LocationCreateInput!, $currentUserId: String) {
     LocationCreate(data: $data, currentUserId: $currentUserId) {

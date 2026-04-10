@@ -2,7 +2,7 @@ import { ActionType, PopupType } from '@/app/_component/Row/Action';
 import FormTemplate from '@/components/Forms/FormTemplate';
 import CustomTextAreaInput from '@/components/Forms/Inputs/CustomTextAreaInput';
 import CustomTextInput from '@/components/Forms/Inputs/CustomTextInput';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import CustomStaticSelectInput from '../../../../components/Forms/Inputs/CustomStaticSelectInput';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -13,13 +13,17 @@ import PermissionSelector from '../_components/PermissionSelector';
 import {
   PermissionPageInput,
   Query,
-  RoleCreateInput,
   RolePermissionPageInput,
 } from '@/lib/generated/api/customHookAPI/graphql';
 import CustomButton from '@/components/Forms/Inputs/CustomButton';
 import { Spinner } from '@/app/_context/ListContext/ListProvider';
 import { RoleFindUnique } from '@/lib/api/gql/Role.gql';
 import { RolePermissionFindAll } from '@/lib/api/gql/RolePermission.gql';
+import { Button } from '@/components/ui/button';
+import useToast from '@/app/_hooks/useToast';
+import { PlusIcon } from 'lucide-react';
+import ArrayMethod, { MODEL_NAME_OPTIONS } from './ArrayMethod';
+import { useSession } from 'next-auth/react';
 
 type MethodProps = {
   rowId?: string | null;
@@ -36,7 +40,32 @@ const ROLE_TYPE_OPTIONS = [
   { label: 'Template', value: 'TEMPLATE' },
 ];
 
+
+
+export interface Condition {
+  modelName: string;
+  group: string;
+  codeKey: string;
+  code: string;
+  codeLabel: string;
+  value: {
+    stringValue: string;
+  };
+}
+
+export interface RoleFormValues {
+  name: string;
+  description: string;
+  roleType: string;
+  isDefault: boolean;
+  conditions: Condition[];
+}
+
+
+
 const Method = ({ rowId, actionType, popupType, setOpen }: MethodProps) => {
+  const toast = useToast();
+  const session = useSession()
   const { data: role, loading: loadingRole } = useQuery<
     Pick<Query, 'RoleFindUnique'>,
     { id: string }
@@ -100,32 +129,110 @@ const Method = ({ rowId, actionType, popupType, setOpen }: MethodProps) => {
     () => permissionsData?.PermissionFindAll?.data ?? [],
     [permissionsData],
   );
+
+
   const defaultValues = useMemo(
     () => ({
       name: role?.RoleFindUnique?.data?.name ?? '',
       description: role?.RoleFindUnique?.data?.description ?? '',
       roleType: role?.RoleFindUnique?.data?.roleType ?? 'CUSTOM',
       isDefault: role?.RoleFindUnique?.data?.isDefault ?? false,
+      conditions: [{
+        modelName: 'RolePermission',
+        group: 'RolePermissionsScopeView',
+        codeKey: '',
+        code: '',
+        codeLabel: '',
+        value: {
+           stringValue: '',
+        }
+      }], // You can populate this based on your actual data structure
     }),
-    [role],
+    [role?.RoleFindUnique?.data?.description, role?.RoleFindUnique?.data?.isDefault, role?.RoleFindUnique?.data?.name, role?.RoleFindUnique?.data?.roleType],
   );
 
-  const form = useForm({ defaultValues });
+  const form = useForm<RoleFormValues>({ defaultValues });
+
+  const fieldArray = useFieldArray({
+    control: form.control,
+    name: 'conditions',
+  })
+
+  const addField = () => {
+    const newField = {
+      modelName: 'RolePermission',
+      group: 'RolePermissionsScopeView',
+      codeKey: '',
+      code: '',
+      codeLabel: '',
+      value: {
+          stringValue: '',
+      }
+    }
+    const optionLength = MODEL_NAME_OPTIONS.length;
+    if(fieldArray.fields.length < optionLength) {
+      fieldArray.append(newField);
+    } else {
+      return toast.error({
+        message: 'You have reached the maximum number of fields',
+        description: `You can only add up to ${optionLength} fields.`,
+      })
+    }
+    
+  }
+
+  const removeField = (index: number) => {
+    // Remain the first field if it's the only one left to prevent having an empty state
+    if (fieldArray.fields.length === 1) {
+      fieldArray.update(0, {
+        modelName: 'RolePermission',
+        group: 'RolePermissionsScopeView',
+        codeKey: '',
+        code: '',
+        codeLabel: '',
+        value: {
+           stringValue: '',
+        }
+      });
+    } else {
+      fieldArray.remove(index);
+    }
+  }
 
   // Fix useEffect — form is stable so safe to include
   useEffect(() => {
     form.reset(defaultValues);
   }, [form, defaultValues]);
 
-  const handleToSubmit = async (data: RoleCreateInput) => {
+
+
+  const handleToSubmit = async (data: RoleFormValues) => {
+    const rolePermissions = selectedPermissions.map((permId) => ({
+      create: {
+        permissionId: permId,
+        isActive: true,
+        scopeValues: data.conditions.map((cond) => cond.value.stringValue).filter(Boolean),
+        conditions: data.conditions.map((cond) => ({
+          create: {
+            code: cond.code,
+            codeKey: cond.codeKey,
+            codeLabel: cond.codeLabel,
+            group: cond.group,
+            modelName: cond.modelName,
+          }
+        }))
+      }
+    })); // You can populate this based on your actual data structure
     const payload = {
-      ...data,
-      rolePermissions: selectedPermissions.map((permId) => ({
-        create: {
-          permissionId: permId,
-          isActive: true,
-        },
-      })),
+      data: {
+        name: data.name,
+        description: data.description,
+        roleType: data.roleType,
+        isDefault: data.isDefault,
+        isActive: true,
+        rolePermissions: rolePermissions
+      },
+      currentUserId: session.data?.user?.id // TODO: Get from auth context
     };
 
     console.log('Payload:', payload);
@@ -148,6 +255,7 @@ const Method = ({ rowId, actionType, popupType, setOpen }: MethodProps) => {
     );
   }
 
+
   return (
     <div className="-mt-8">
       <FormTemplate
@@ -168,7 +276,6 @@ const Method = ({ rowId, actionType, popupType, setOpen }: MethodProps) => {
               inputPropsCancel={{ onClick: () => setOpen?.(false) }}
             />
           </div>
-          {/* <pre>{JSON.stringify(permissionIds, null, 2)}</pre> */}
           <div className="space-y-3">
             <div className="grid grid-cols-7 gap-3">
               <div className="col-span-1">
@@ -200,6 +307,9 @@ const Method = ({ rowId, actionType, popupType, setOpen }: MethodProps) => {
                   name="name"
                   label="Name"
                   placeholder="Enter role name"
+                  inputProps={{
+                    required: true
+                  }}
                 />
               </div>
               <div className="col-span-2">
@@ -209,6 +319,8 @@ const Method = ({ rowId, actionType, popupType, setOpen }: MethodProps) => {
                   label="Type"
                   options={ROLE_TYPE_OPTIONS}
                   placeholder="Select role type"
+                  
+                  
                 />
               </div>
             </div>
@@ -217,6 +329,21 @@ const Method = ({ rowId, actionType, popupType, setOpen }: MethodProps) => {
               name="description"
               label="Description"
               placeholder="Enter role description"
+            />
+
+            {/* Scope for View */}
+             <div className='flex justify-between items-center'>
+                <Label className='text-sm'>Scope for View</Label>
+                <Button variant={'default'} onClick={() => addField()}>
+                  <PlusIcon className='size-4' />
+                  Add new condition
+                </Button>
+              </div>
+            <ArrayMethod 
+              form={form} 
+              fieldArray={fieldArray}
+              addField={addField}
+              removeField={removeField}
             />
           </div>
           <PermissionSelector

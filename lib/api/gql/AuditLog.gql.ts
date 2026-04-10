@@ -103,6 +103,26 @@ export const AuditLogFindFirst = gql`
   ${AuditLogFragment}
 `;
 
+export const AuditLogExportCsv = gql`
+  query AuditLogExportCsv($input: AuditLogCsvExportInput!) {
+    AuditLogExportCsv(input: $input) {
+      code
+      data {
+        csv
+        excelBase64
+        excelFileName
+        excelMimeType
+        fileName
+        mimeType
+        rowCount
+      }
+      isSuccess
+      message
+    }
+  }
+`;
+
+
 export const AuditLogCreate = gql`
   mutation AuditLogCreate($data: AuditLogCreateInput!, $currentUserId: String) {
     AuditLogCreate(data: $data, currentUserId: $currentUserId) {

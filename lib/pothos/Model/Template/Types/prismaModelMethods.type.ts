@@ -12,24 +12,24 @@ import {
 export type PrismaModelMethods<PrismaModel extends Prisma.ModelName> = {
   findUnique: (args: {
     where: FindUniqueArgs<PrismaModel>['where'];
-    include?: FindUniqueArgs<PrismaModel>['include'];
+    include?: Prisma.Args<PrismaModel, 'findUnique'>['include'];
   }) => Promise<PrismaTypes[keyof PrismaTypes]['Shape'] | null>;
   findFirst: (args: {
     where?: FindManyArgs<PrismaModel>['where'];
     orderBy?: FindManyArgs<PrismaModel>['orderBy'];
-    include?: FindManyArgs<PrismaModel>['include'];
+    include?:Prisma.Args<PrismaModel, 'findFirst'>['include'];
   }) => Promise<PrismaTypes[PrismaModel]['Shape'] | null>;
   findMany: (args: {
     where?: FindManyArgs<PrismaModel>['where'];
     orderBy?: FindManyArgs<PrismaModel>['orderBy'];
     skip?: FindManyArgs<PrismaModel>['skip'];
     take?: FindManyArgs<PrismaModel>['take'];
-    include?: FindManyArgs<PrismaModel>['include'];
+    include?: Prisma.Args<PrismaModel, 'findMany'>['include'];
   }) => Promise<PrismaTypes[PrismaModel]['Shape'][] | null>;
   count: (args?: { where?: FindManyArgs<PrismaModel>['where'] }) => Promise<number>;
   create: (args: {
     data: CreateArgs<PrismaModel>['data'];
-    include?: CreateArgs<PrismaModel>['include'];
+    include?: Prisma.Args<PrismaModel, 'create'>['include'];
   }) => Promise<PrismaTypes[keyof PrismaTypes]['Shape'] | null>;
   createMany: (args: {
     data: CreateManyArgs<PrismaModel>['data'];
@@ -38,7 +38,7 @@ export type PrismaModelMethods<PrismaModel extends Prisma.ModelName> = {
   update: (args: {
     where: UpdateArgs<PrismaModel>['where'];
     data: UpdateArgs<PrismaModel>['data'];
-    include?: UpdateArgs<PrismaModel>['include'];
+    include?: Prisma.Args<PrismaModel, 'update'>['include'];
   }) => Promise<PrismaTypes[PrismaModel]['Shape'] | null>;
   updateMany: (args: {
     where: UpdateManyArgs<PrismaModel>['where'];

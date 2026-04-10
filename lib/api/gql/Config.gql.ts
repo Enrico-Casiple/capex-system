@@ -2,13 +2,13 @@ import { gql } from '@apollo/client';
 export const ConfigFragment = gql`
 fragment ConfigFragment on Config {
   id
-  modelId
   modelName
   group
   codeKey
   code
   codeLabel
   value
+  modelId
   sortOrder
   isActive
   createdAt
@@ -101,6 +101,26 @@ export const ConfigFindFirst = gql`
   }
   ${ConfigFragment}
 `;
+
+export const ConfigExportCsv = gql`
+  query ConfigExportCsv($input: ConfigCsvExportInput!) {
+    ConfigExportCsv(input: $input) {
+      code
+      data {
+        csv
+        excelBase64
+        excelFileName
+        excelMimeType
+        fileName
+        mimeType
+        rowCount
+      }
+      isSuccess
+      message
+    }
+  }
+`;
+
 
 export const ConfigCreate = gql`
   mutation ConfigCreate($data: ConfigCreateInput!, $currentUserId: String) {

@@ -102,6 +102,26 @@ export const CompanyFindFirst = gql`
   ${CompanyFragment}
 `;
 
+export const CompanyExportCsv = gql`
+  query CompanyExportCsv($input: CompanyCsvExportInput!) {
+    CompanyExportCsv(input: $input) {
+      code
+      data {
+        csv
+        excelBase64
+        excelFileName
+        excelMimeType
+        fileName
+        mimeType
+        rowCount
+      }
+      isSuccess
+      message
+    }
+  }
+`;
+
+
 export const CompanyCreate = gql`
   mutation CompanyCreate($data: CompanyCreateInput!, $currentUserId: String) {
     CompanyCreate(data: $data, currentUserId: $currentUserId) {
