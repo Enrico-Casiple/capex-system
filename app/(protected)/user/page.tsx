@@ -1,12 +1,12 @@
 'use client';
 import ListPage from '@/app/_context/ListWrapper';
-import { Role, RoleCreateInput } from '@/lib/generated/api/customHookAPI/graphql';
+import { User, UserCreateInput } from '@/lib/generated/api/customHookAPI/graphql';
 import ModelData from '../../_component/ModelData';
 import Action from '@/app/_component/Row/Action';
 import Method from './_form/Method';
 import { useCallback } from 'react';
 import { ActionType, PopupType } from '@/app/_component/Row/Action';
-import { roleTableConfig } from '../_config';
+import { userTableConfig } from '../_config';
 import Import from '@/app/_component/List/Import';
 import Export from '@/app/_component/List/Export';
 import ImportForm from './_form/ImportForm';
@@ -33,7 +33,7 @@ const ModelPage = () => {
   );
 
   const actionComponent = useCallback(
-    (row: Role) => <Action rowId={row.id} component={renderMethod} />,
+    (row: User) => <Action rowId={row.id} component={renderMethod} />,
     [renderMethod],
   );
 
@@ -60,14 +60,14 @@ const ModelPage = () => {
     
   ];
 
-  const importForm = useCallback<(open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => React.ReactNode>(
+  const importForm = useCallback(
     (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (
-      <ImportForm<Role, RoleCreateInput> open={open} setOpen={setOpen} />
+      <ImportForm<User, UserCreateInput> open={open} setOpen={setOpen} />
     ),
     [],
   );
 
-  const exportForm = useCallback<(open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => React.ReactNode>(
+  const exportForm = useCallback(
     (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (
       <ExportForm open={open} setOpen={setOpen} />
     ),
@@ -75,19 +75,19 @@ const ModelPage = () => {
   );
 
   return (
-    <ListPage<Role>
-      modelName={roleTableConfig.modelName}
-      extraColumns={roleTableConfig.extraColumns}
-      initialColumnVisibility={roleTableConfig.initialColumnVisibility}
-      initialFilter={roleTableConfig.initialFilter}
-      showActions={roleTableConfig.showActions}
-      initialColumnFilters={roleTableConfig.initialColumnFilters}
+    <ListPage<User>
+      modelName={userTableConfig.modelName}
+      extraColumns={userTableConfig.extraColumns}
+      initialColumnVisibility={userTableConfig.initialColumnVisibility}
+      initialFilter={userTableConfig.initialFilter}
+      showActions={userTableConfig.showActions}
+      initialColumnFilters={userTableConfig.initialColumnFilters}
       actionComponent={actionComponent}
-      initialSearchField={roleTableConfig.initialSearchField as Extract<keyof Role, string>[]}
+      initialSearchField={userTableConfig.initialSearchField as Extract<keyof User, string>[]}
     >
       <ModelData
-        title={roleTableConfig.listName}
-        description={roleTableConfig.description}
+        title={userTableConfig.listName}
+        description={userTableConfig.description}
         newBulkAction={BULK_ACTIONS}
         createAction={createAction}
         importComponent={<Import importFormComponent={importForm} />}

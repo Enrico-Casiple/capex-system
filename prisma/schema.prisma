@@ -60,6 +60,10 @@ model User {
   actions                AuditLog[]        @relation("UserAsActor")
   userRoles              UserRole[]
   userAssignedBy         UserRole[]        @relation("UserAsRoleAssigner")
+  emails                 Email[]           // Emails sent to this user
+  emailOTPs              EmailOTP[]        // OTP codes for this user
+  emailOtpExpiresAt     DateTime?         // OTP expiration time
+  incrementalLoginAttempts Int?              @default(0) // For rate limiting login attempts
 
   isActive  Boolean?  @default(true)
   createdAt DateTime? @default(now())
@@ -551,3 +555,61 @@ model AuditLog {
   @@index([isActive]) // Filter active logs
 }
 
+model Email {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  from         String   // Sender email
+  to           String[] // Recipients
+  cc           String[] @default([])
+  bcc          String[] @default([])
+  subject      String
+  htmlContent  String? // HTML template content
+  textContent  String? // Plain text content
+  status       String   @default("pending") // pending, sent, failed, bounced, opened, clicked
+  messageId    String? @unique // MailerSend message ID
+  error        String? // Error message if failed
+
+  userId       String?  @db.ObjectId // User who initiated email
+  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  emailType    String? // e.g., "otp", "welcome", "password-reset", "retake-notification"
+  relatedId    String?  @db.ObjectId // Related record ID (e.g., User ID for OTP emails)
+  metadata     Json? // Additional data stored as JSON
+
+  sentAt       DateTime?
+  openedAt     DateTime?
+  clickedAt    DateTime?
+
+  isActive     Boolean? @default(true)
+  createdAt    DateTime? @default(now())
+  updatedAt    DateTime? @updatedAt
+
+  @@index([status])
+  @@index([userId])
+  @@index([emailType])
+  @@index([createdAt])
+  @@index([sentAt])
+}
+
+model EmailOTP {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  email       String
+  code        String   @unique // 6-digit OTP
+  purpose     String   // "login", "verification", "password-reset"
+  isUsed      Boolean  @default(false)
+  usedAt      DateTime?
+  expiresAt   DateTime
+
+  userId      String?  @db.ObjectId
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  attempts    Int      @default(0) // Failed attempts
+  maxAttempts Int      @default(5)
+
+  isActive    Boolean? @default(true)
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
+
+  @@index([email])
+  @@index([expiresAt])
+  @@index([purpose])
+}

@@ -43,4 +43,3 @@ next-env.d.ts
 /lib/generated
 /lib/generated/prisma
 /lib/zod/prisma-zod-types
-/lib/types

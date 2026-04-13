@@ -1,42 +1,36 @@
-// app/(protected)/user/Form/ImportForm.tsx
-import ImportFormWrapper from '@/app/_component/Form/ImportFormWrapper';
-import { UserCreateInput } from '@/lib/generated/api/customHookAPI/graphql';
-
-type UserCSVRow = {
-  name: string;
-  email: string;
-  password: string;
-  userName: string;
-  isTwoFactorAuthEnabled: string | boolean;
-  isActive: string | boolean;
-}
+// app/(protected)/role/_form/ImportForm.tsx
+import ImportFormWrapper from '@/app/_component/Form/ImportFormWrapper'
 
 type ImportFormProps = {
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  open: boolean
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const ImportForm = (props: ImportFormProps) => {
+const ImportForm = <
+  TModel extends Record<string, unknown>,
+  TCreateInput extends Record<string, unknown>
+>(props: ImportFormProps) => {
   return (
-    <ImportFormWrapper<UserCSVRow, UserCreateInput>
+    <ImportFormWrapper<TModel, TCreateInput>
       {...props}
-      transformRow={(row: UserCSVRow) => ({
-        name: row.name,
-        email: row.email,
-        password: row.password,
-        userName: row.userName,
-        isTwoFactorAuthEnabled: Boolean(row.isTwoFactorAuthEnabled),
-        isActive: Boolean(row.isActive),
-      })}
+      transformRow={(row: TModel) => {
+        const model = row as unknown as Record<string, unknown>
+        return {
+          name: model.name,
+          description: model.description,
+          roleType: model.roleType,
+          isDefault: Boolean(model.isDefault),
+          isActive: Boolean(model.isActive),
+        } as unknown as TCreateInput
+      }}
       previewColumns={[
-        { key: 'name', label: 'Name', default: 'FullName' },
-        { key: 'email', label: 'Email', default: 'WorkEmail@email.com' },
-        { key: 'userName', label: 'Username', default: 'WorkEmail' },
-        {key: 'password', label: 'Password', default: 'password123'},
-        { key: 'isTwoFactorAuthEnabled', label: 'Two-Factor Authentication', default: false },
-        { key: 'isActive', label: 'Active', default: false }
+        { key: 'name', label: 'Name', default: 'Custom Role' },
+        { key: 'description', label: 'Description', default: 'Role description here' },
+        { key: 'roleType', label: 'Type', default: 'CUSTOM' },
+        { key: 'isDefault', label: 'Is Default', default: false },
+        { key: 'isActive', label: 'Active', default: true },
       ]}
-       autoGenerateColumns={true}
+      autoGenerateColumns={true}
     />
   )
 }

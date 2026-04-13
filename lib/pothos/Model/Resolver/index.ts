@@ -219,6 +219,21 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         },
       }),
     );
+
+    // Also expose as ExportExcel for Excel format exports
+    builder.queryField(`${modelName}ExportExcel`, (t) =>
+      t.field({
+        type: csvExportResponseType,
+        args: {
+          input: t.arg({ type: csvExportInputRef, required: true }),
+        },
+        resolve: async (_parent, args, ctx) => {
+          const middlewareError = await middlewareCheck(ctx, modelName);
+          if (middlewareError) return middlewareError;
+          return await service.exportCsv(args.input as never);
+        },
+      }),
+    );
   }
 
   // ─── MUTATION: create ─────────────────────────────────────────

@@ -1,4 +1,5 @@
 'use client';
+import useToast from '@/app/_hooks/useToast';
 import FormTemplate from '@/components/Forms/FormTemplate';
 import CustomButton from '@/components/Forms/Inputs/CustomButton';
 import CustomOTPInput from '@/components/Forms/Inputs/CustomOTPInput';
@@ -10,7 +11,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import loginAction from '../_forms/action/login.action';
 import LoginSchema, { LoginType } from '../_forms/schema/Login';
-import useToast from '@/app/_hooks/useToast';
 
 const SignInPage = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -29,13 +29,13 @@ const SignInPage = () => {
   ): Promise<ReturnType<typeof ok> | ReturnType<typeof fail>> => {
     const login = await loginAction(data);
     if (login.code === 'SERVICE_LOGIN_OTP_SENDING') {
+      setIsAuthOpen(true);
       toast.success({
         message: 'OTP Sent!',
         description:
           'An OTP has been sent to your email. Please check and enter it to verify your account.',
       });
-      setIsAuthOpen(true);
-      return (setIsAuthOpen(false), fail(login.code, login.message));
+      return fail(login.code, login.message);
     }
     if (!login.isSuccess) {
       toast.error({

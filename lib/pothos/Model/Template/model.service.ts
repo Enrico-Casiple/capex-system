@@ -259,7 +259,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
     const hasComplex = flattened.some((v) => typeof v === 'object' && !(v instanceof Date));
     if (hasComplex) return flattened;
 
-    return flattened.map((v) => (v instanceof Date ? v.toISOString() : String(v))).join(' | ');
+    return flattened.map((v) => (v instanceof Date ? v.toISOString() : String(v))).join('\n');
   }
 
   private toTabularValue(value: unknown): string | number | boolean {

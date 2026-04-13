@@ -2,6 +2,8 @@ import { RateLimiterMemory, RateLimiterRes } from 'rate-limiter-flexible';
 import LoginSchema, { LoginType } from '../../../../../../app/auth/_forms/schema/Login';
 import { fail, ok } from '../../../../../../lib/util/reponseUtil';
 import { prisma } from '../../../../../prisma/prisma';
+import { getSendEmailService } from '../../../../../sendEmail';
+import { verifyPassword } from '../../../../../util/bcryptjs';
 import { generateOtpCode } from '../../../../../util/generateOtpCode';
 import { getPrismaErrorMessage } from '../../../../../util/getPrismaErrorMessage';
 
@@ -59,7 +61,7 @@ export const login = async (input: LoginType) => {
       return fail('SERVICE_LOGIN_USER_NOT_FOUND', 'User not found with the provided account.');
     }
 
-    const isPasswordValid = password === user.password; // Replace with real hash comparison in production
+    const isPasswordValid = await verifyPassword(user.password as string, password); // Replace with real hash comparison in production
     if (!isPasswordValid) {
       console.warn(`Invalid password attempt for user: ${account} from IP: ${ipAddress}`);
       return fail('SERVICE_LOGIN_INVALID_PASSWORD', 'Please check your credentials and try again.');
@@ -73,39 +75,77 @@ export const login = async (input: LoginType) => {
       return ok('SERVICE_LOGIN_SUCCESS', `Login successful. Welcome back, ${user.name}.`, user);
     }
 
-    // ✅ 2FA enabled: Generate OTP only if needed
+    // ✅ 2FA enabled: Generate and send OTP via email
     if (!otp) {
-      const code = await generateOtpCode(6);
+      const generateOTP = await generateOtpCode(6); // Replace with real OTP generation logic
+      const result = await getSendEmailService().sendOtpEmail({
+        purpose: 'Login',
+        otp_code: generateOTP,
+        expires_in: '5 minutes', // make this a 5mins
+        bcc: [user.email as string],
+      });
 
-      // ✅ Update OTP asynchronously (non-blocking)
-      prisma.user
-        .update({
+      if (result.isSuccess) {
+        console.log(`OTP sent successfully to ${user.email} for account: ${account} from IP: ${ipAddress}`);
+        // Save OTP to database with expiration (not implemented here, but should be done in production)
+        await prisma.user.update({
           where: { id: user.id },
-          data: { otpCode: code },
-        })
-        .catch((err) => console.error('OTP update failed:', err));
+          data: {
+            otpCode: generateOTP,
+            emailOtpExpiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes from now
+          }
+        });
 
-      // TODO: Send OTP via email/SMS
-      console.log(`🟢 TODO: Send OTP to ${user.email}. OTP: ${code}`);
-      return fail(
-        'SERVICE_LOGIN_OTP_SENDING',
-        'Sending your OTP code. Please check your email and enter the code to complete login.',
-      );
+        return fail(
+          'SERVICE_LOGIN_OTP_SENDING',
+          'OTP has been sent to your email. Please check and enter the code to complete login.',
+        );
+      } else {
+        return fail(
+          'SERVICE_LOGIN_OTP_SEND_FAILED',
+          'Failed to send OTP. Please try again later.',
+        );
+      }
     }
 
-    // ✅ Validate OTP
-    if (otp !== user.otpCode) {
-      return fail('SERVICE_LOGIN_INVALID_OTP', 'Invalid OTP code. Please try again.');
+    // ✅ Verify OTP
+    const isOtpInvalid = otp !== user.otpCode || !user.emailOtpExpiresAt || user.emailOtpExpiresAt < new Date();
+
+    if (isOtpInvalid) {
+      const attempts = (user.incrementalLoginAttempts ?? 0) + 1;
+      const maxAttempts = 3;
+      const shouldLock = attempts >= maxAttempts;
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          otpCode: null,
+          emailOtpExpiresAt: null,
+          incrementalLoginAttempts: attempts,
+          isActive: !shouldLock, // Deactivate after max attempts
+        }
+      });
+
+      if (shouldLock) {
+        return fail('SERVICE_LOGIN_ACCOUNT_LOCKED', `Account locked after ${maxAttempts} failed OTP attempts. Please contact support.`);
+      }
+
+      return fail('SERVICE_LOGIN_INVALID_OTP', `Invalid or expired OTP code. Attempts remaining: ${maxAttempts - attempts}`);
     }
 
-    // ✅ Clear OTP on success
+
+    // ✅ OTP verified successfully, mark user as logged in
+    // Reset rate limit and clear OTP data
+    await rateLimiter.delete(rateLimitKey).catch(() => {});
+
     await prisma.user.update({
       where: { id: user.id },
-      data: { otpCode: null },
+      data: {
+        otpCode: null,
+        emailOtpExpiresAt: null,
+        incrementalLoginAttempts: 0, // Reset attempts on successful login
+      }
     });
-
-    // Reset rate limit
-    await rateLimiter.delete(rateLimitKey).catch(() => {});
 
     return ok('SERVICE_LOGIN_SUCCESS', `Login successful. Welcome back, ${user.name}.`, user);
   } catch (error) {

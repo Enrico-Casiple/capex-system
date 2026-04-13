@@ -1,20 +1,20 @@
+import { useListContext } from '@/app/_context/ListContext/ListProvider';
+import useMutationActions from '@/app/_hooks/useBulkActions';
+import useToast from '@/app/_hooks/useToast';
 import FormTemplate from '@/components/Forms/FormTemplate';
 import CustomButton from '@/components/Forms/Inputs/CustomButton';
 import { Dropzone, DropzoneContent, DropzoneEmptyState } from "@/components/kibo-ui/dropzone";
-import React, { useState } from 'react'
-import { useForm } from 'react-hook-form';
-import Papa from 'papaparse';
-import useMutationActions from '@/app/_hooks/useBulkActions';
-import { useListContext } from '@/app/_context/ListContext/ListProvider';
-import { useSession } from 'next-auth/react';
-import { FileSpreadsheet, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DocumentNode } from 'graphql';
-import useToast from '@/app/_hooks/useToast';
+import { FileSpreadsheet, X } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import Papa from 'papaparse';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import RoleGate from '../RoleGate/RoleGate';
 
-export type PreviewColumn<TRow extends Record<string, unknown>> = { 
-  key: keyof TRow; 
+export type PreviewColumn<TRow extends Record<string, unknown>> = {
+  key: keyof TRow;
   label: string;
   default?: string | number | boolean;
 };
@@ -22,34 +22,30 @@ export type PreviewColumn<TRow extends Record<string, unknown>> = {
 type ImportFormWrapperProps<TRow extends Record<string, unknown>, TInput> = {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  transformRow: (row: TRow) => TInput;
-  previewColumns?: PreviewColumn<TRow>[];
+  transformRow: (row: TRow) => Promise<TInput> | TInput;
+  previewColumns: PreviewColumn<TRow>[];
   mutationGQL?: DocumentNode;
   additionalVariables?: Record<string, unknown>;
-  autoGenerateColumns?: boolean;
+  applyDefaults?: boolean; // If true: apply defaults to missing values
 }
 
-const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({ 
-  setOpen, 
+const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({
+  setOpen,
   transformRow,
-  previewColumns: providedColumns,
+  previewColumns,
   mutationGQL,
   additionalVariables = {},
-  autoGenerateColumns = false
+  applyDefaults = false,
 }: ImportFormWrapperProps<TRow, TInput>) => {
   const session = useSession();
   const toast = useToast();
   const { modelGQL, model, modelName } = useListContext();
   const [fileName, setFileName] = useState<string | null>(null);
   const [schema, setSchema] = useState<TRow[]>([]);
-  const [generatedColumns, setGeneratedColumns] = useState<PreviewColumn<TRow>[]>([]);
-  
+
   const form = useForm<{schema: TRow[]}>({
     defaultValues: {schema: []}
   })
-
-  // Use provided columns or auto-generated ones
-  const previewColumns = providedColumns || generatedColumns;
 
   const handleDrop = (acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
@@ -57,30 +53,19 @@ const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({
       Papa.parse<TRow>(acceptedFiles[0], {
         header: true,
         complete: (results) => {
-          const columns = providedColumns || (autoGenerateColumns && results.data.length > 0 ? Object.keys(results.data[0]).map(key => ({
-            key: key as keyof TRow,
-            label: key.charAt(0).toUpperCase() + key.slice(1)
-          })) : []) as PreviewColumn<TRow>[];
-          
-          // Apply default values to rows with missing data
-          const enrichedData = results.data.map(row => {
-            const enrichedRow = { ...row };
-            columns.forEach(col => {
-              if ((enrichedRow[col.key] === '' || enrichedRow[col.key] === null || enrichedRow[col.key] === undefined) && col.default !== undefined) {
-                enrichedRow[col.key] = col.default as TRow[keyof TRow];
-              }
-            });
-            return enrichedRow;
-          });
-          
+          // Only use provided columns - no auto-generation
+
+          // Filter out completely empty rows and don't apply defaults
+          const enrichedData = results.data
+            .filter((row: Record<string, unknown>) => {
+              // Keep row if it has at least one non-empty value
+              return Object.values(row).some(value => value !== '' && value !== null && value !== undefined);
+            })
+            .map((row: Record<string, unknown>) => row as TRow);
+
           form.setValue('schema', enrichedData);
           setSchema(enrichedData);
-          
-          // Auto-generate columns if enabled and not provided
-          if (autoGenerateColumns && !providedColumns && results.data.length > 0) {
-            setGeneratedColumns(columns);
-          }
-          
+
           toast.success({
             message: 'CSV file parsed successfully',
             description: `The file "${acceptedFiles[0].name}" has been parsed and is ready for import.`,
@@ -101,34 +86,33 @@ const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({
   const handleRemoveFile = () => {
     setFileName(null);
     setSchema([]);
-    setGeneratedColumns([]);
     form.setValue('schema', []);
   };
 
   const handleDownloadTemplate = () => {
-    if (previewColumns.length === 0) {
+    if (!previewColumns || previewColumns.length === 0) {
       toast.error({
-        message: 'No columns available',
-        description: 'Please provide preview columns or auto-generate them first.',
+        message: 'No columns configured',
+        description: 'Please provide column definitions via previewColumns prop to enable template download.',
       });
       return;
     }
 
     // Create Excel HTML table with headers showing default values
     const headers = previewColumns.map(col => {
-      const defaultText = col.default !== undefined ? ` (default: ${col.default})` : '';
-      return `<th style="background-color: #f2f2f2; border: 1px solid #000; padding: 8px; font-weight: bold; text-align: left;">${col.label}${defaultText}</th>`;
+      // const defaultText = col.default !== undefined ? ` (default: ${col.default})` : '';
+      return `<th style="background-color: #f2f2f2; border: 1px solid #000; padding: 8px; font-weight: bold; text-align: left;">${String(col.key)}</th>`;
     }).join('');
-    
-    // Create rows with default values populated
-    const exampleRows = Array(3).fill(null).map(() => 
+
+    // Create rows with default values populated (only show if applyDefaults is true)
+    const exampleRows = Array(3).fill(null).map(() =>
       `<tr>${previewColumns.map(col => {
-        const cellValue = col.default !== undefined ? String(col.default) : '';
-        const bgColor = col.default !== undefined ? 'background-color: #f0f0f0;' : '';
+        const cellValue = applyDefaults && col.default !== undefined ? String(col.default) : '';
+        const bgColor = applyDefaults && col.default !== undefined ? 'background-color: #f0f0f0;' : '';
         return `<td style="border: 1px solid #000; padding: 8px; ${bgColor}">${cellValue}</td>`;
       }).join('')}</tr>`
     ).join('');
-    
+
     const htmlContent = `
       <html xmlns="http://www.w3.org/1999/xhtml">
         <head>
@@ -147,20 +131,20 @@ const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({
         </body>
       </html>
     `;
-    
+
     // Create blob and download as Excel
     const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
-    
+
     link.setAttribute('href', url);
     link.setAttribute('download', `template-${model || 'import'}.xls`);
     link.style.visibility = 'hidden';
-    
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     toast.success({
       message: 'Template downloaded',
       description: 'Excel template has been downloaded.',
@@ -176,14 +160,22 @@ const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({
   })
 
   const handleToSubmit = async () => {
-    const rawData = form.getValues('schema');
-    const payload = rawData.map(transformRow);
-        
+    const rawData =  form.getValues('schema');
+    const payload = await Promise.all(rawData.map(transformRow));
+    console.log('Transformed payload for import:', payload);
+
     await execute({
       variables: {
         data: payload,
         currentUserId: session.data?.user?.id || '',
         ...additionalVariables
+      },
+      onError(error) {
+        console.error('Error during import mutation:', error);
+        toast.error({
+          message: 'Import failed',
+          description: `An error occurred during import. Please check the data and try again. Error details: ${error.message}`,
+        });
       },
     });
 
@@ -292,7 +284,7 @@ const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({
 
         <div className='flex justify-end pt-2'>
           <CustomButton
-            name='Import' 
+            name='Import'
             loading={executing}
             type='submit'
             isSolo={false}
