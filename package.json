@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently --names \"DEV\" --prefix \"[{name}]\" --prefix-colors \"blue\" \"NODE_ENV=development tsx watch lib/server/server.ts\"",
-    "dev:windows": "npm run generate:model-names && npm run codegen:gen && npm run generate:gql && npx cross-env NODE_ENV=development tsx watch lib/server/server.ts && npx prisma studio",
+    "dev:windows": "npm run generate:model-names && npm run codegen:gen && npm run generate:gql && cross-env NODE_ENV=development tsx watch lib/server/server.ts && npx prisma studio",
     "server": "npm run generate:gql && concurrently --names \"CODEGEN,DEV,STUDIO\" --prefix \"[{name}]\" --prefix-colors \"blue,green,yellow\" \"npm run codegen:watch\" \"npm run dev\" \"npm run prisma:studio\"",
     "role:dev": "dotenv -e .env -- npx tsx prisma/seed-permissions.ts",
     "generate:gql": "tsx lib/scripts/generateGQLFiles.ts",
@@ -15,7 +15,7 @@
     "clean:types": "rm -rf lib/generated",
     "build": "next build",
     "build:ci": "NEXT_IGNORE_BUILD_ERRORS=true NODE_OPTIONS=--max-old-space-size=8192 next build",
-    "build:start": "NODE_ENV=development tsx watch lib/server/server.ts",
+    "build:start": "cross-env NODE_ENV=development tsx watch lib/server/server.ts",
     "deploy": "npm run generate:gql && npm run build && npm run build:start",
     "lint": "next lint --fix",
     "lint:check": "next lint",

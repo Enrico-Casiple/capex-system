@@ -30,7 +30,7 @@ const ImportForm = <
         { key: 'isDefault', label: 'Is Default', default: false },
         { key: 'isActive', label: 'Active', default: true },
       ]}
-      autoGenerateColumns={true}
+      applyDefaults={true}
     />
   )
 }
