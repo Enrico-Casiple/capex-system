@@ -1,13 +1,13 @@
 'use client';
 import FormTemplate from '@/components/Forms/FormTemplate';
+import CustomDateInput from '@/components/Forms/Inputs/CustomDateInput';
+import CustomDateRangeInput from '@/components/Forms/Inputs/CustomDateRangeInput';
 import { Button } from '@/components/ui/button';
+import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
 import { fail, ok } from '@/lib/util/reponseUtil';
 import { zodResolver } from '@hookform/resolvers/zod';
-import z from 'zod';
-import CustomDateRangeInput from '@/components/Forms/Inputs/CustomDateRangeInput';
-import CustomDateInput from '@/components/Forms/Inputs/CustomDateInput';
 import { useForm } from 'react-hook-form';
-import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
+import z from 'zod';
 
 export const Schema = z.object({
   startDate: z.date({ error: 'Please select a start date' }),
@@ -68,7 +68,7 @@ const form = useForm<SchemaType>({
       </FormTemplate>
       <Drawer>
         <DrawerTrigger asChild>
-          <Button>Open</Button>
+          <Button>Opens</Button>
         </DrawerTrigger>
         <DrawerContent>
           <DrawerHeader>
