@@ -118,7 +118,7 @@ export const HolidayExportCsv = gql`
 
 
 export const HolidayCreate = gql`
-  mutation HolidayCreate($data: HolidayCreateInput!, $currentUserId: String) {
+  mutation HolidayCreate($data: Json!, $currentUserId: String) {
     HolidayCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -130,7 +130,7 @@ export const HolidayCreate = gql`
 `;
 
 export const HolidayCreateMany = gql`
-  mutation HolidayCreateMany($data: [HolidayCreateInput!]!, $currentUserId: String) {
+  mutation HolidayCreateMany($data: [Json!]!, $currentUserId: String) {
     HolidayCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -142,7 +142,7 @@ export const HolidayCreateMany = gql`
 `;
 
 export const HolidayUpdate = gql`
-  mutation HolidayUpdate($id: String!, $data: HolidayUpdateInput!, $currentUserId: String) {
+  mutation HolidayUpdate($id: String!, $data: Json!, $currentUserId: String) {
     HolidayUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -154,7 +154,7 @@ export const HolidayUpdate = gql`
 `;
 
 export const HolidayUpdateMany = gql`
-  mutation HolidayUpdateMany($data: [HolidayUpdateInput!]!, $currentUserId: String) {
+  mutation HolidayUpdateMany($data: [Json!]!, $currentUserId: String) {
     HolidayUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

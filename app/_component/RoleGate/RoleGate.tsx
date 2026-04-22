@@ -1,10 +1,10 @@
 // app/_component/RoleGate/RoleGate.tsx
 'use client';
 
+import { Spinner } from '@/app/_component/Spinner';
 import useUserRolePermission from '@/app/_hooks/useUserRolePermission';
-import React, { ReactNode, useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Spinner } from '@/app/_context/ListContext/ListProvider';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 
 type UnauthorizedStyle = 'default' | 'compact' | 'minimal' | 'card';
 
@@ -285,7 +285,8 @@ const RoleGate = ({
     }
   }
 
-  return <>{children}</>;
+  return <React.Fragment>
+    {children}</React.Fragment>;
 };
 
 export default RoleGate;

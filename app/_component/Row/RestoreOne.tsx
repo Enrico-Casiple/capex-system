@@ -1,11 +1,12 @@
-import { Spinner, useListContext } from '@/app/_context/ListContext/ListProvider';
+import { useListContext } from '@/app/_context/ListContext/ListProvider';
+import { Spinner } from '@/app/_component/Spinner';
 import useMutationActions from '@/app/_hooks/useBulkActions';
 import { Button } from '@/components/ui/button';
 import { useSession } from 'next-auth/react';
 import React from 'react'
 
 type RestoreOneProps = {
-  rowId: string;
+  rowId: string | null;
   setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 

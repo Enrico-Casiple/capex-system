@@ -124,7 +124,7 @@ export const PermissionExportCsv = gql`
 
 
 export const PermissionCreate = gql`
-  mutation PermissionCreate($data: PermissionCreateInput!, $currentUserId: String) {
+  mutation PermissionCreate($data: Json!, $currentUserId: String) {
     PermissionCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -136,7 +136,7 @@ export const PermissionCreate = gql`
 `;
 
 export const PermissionCreateMany = gql`
-  mutation PermissionCreateMany($data: [PermissionCreateInput!]!, $currentUserId: String) {
+  mutation PermissionCreateMany($data: [Json!]!, $currentUserId: String) {
     PermissionCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -148,7 +148,7 @@ export const PermissionCreateMany = gql`
 `;
 
 export const PermissionUpdate = gql`
-  mutation PermissionUpdate($id: String!, $data: PermissionUpdateInput!, $currentUserId: String) {
+  mutation PermissionUpdate($id: String!, $data: Json!, $currentUserId: String) {
     PermissionUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -160,7 +160,7 @@ export const PermissionUpdate = gql`
 `;
 
 export const PermissionUpdateMany = gql`
-  mutation PermissionUpdateMany($data: [PermissionUpdateInput!]!, $currentUserId: String) {
+  mutation PermissionUpdateMany($data: [Json!]!, $currentUserId: String) {
     PermissionUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

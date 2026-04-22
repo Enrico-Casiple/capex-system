@@ -4,7 +4,6 @@ import RoleGate from '@/app/_component/RoleGate/RoleGate';
 import useToast from '@/app/_hooks/useToast';
 import { ModelGQLMap } from '@/lib/api/crud.gql';
 import { Query, Subscription } from '@/lib/generated/api/customHookAPI/graphql';
-import { cn } from '@/lib/utils';
 import { OperationVariables } from '@apollo/client';
 import { useQuery, useSubscription } from '@apollo/client/react';
 import {
@@ -15,10 +14,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { LoaderIcon } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import React, { useMemo, useState } from 'react';
-
 interface ListContextValue<TQuery extends Record<string, Query[keyof Query]>, TModel = unknown> {
   singleKey: keyof Query;
   cursorKey: keyof Query;
@@ -287,19 +284,3 @@ const ListProvider = <
 };
 
 export default ListProvider;
-
-type SpinnerProps = React.ComponentProps<'svg'> & { containerClassName?: string };
-
-export const Spinner = ({ className, containerClassName, ...props }: SpinnerProps) => (
-  <div
-    className={cn('flex items-center justify-center w-full h-full', containerClassName)}
-    style={{ minHeight: 80 }}
-  >
-    <LoaderIcon
-      role="status"
-      aria-label="Loading"
-      className={cn('size-4 animate-spin', className)}
-      {...props}
-    />
-  </div>
-);

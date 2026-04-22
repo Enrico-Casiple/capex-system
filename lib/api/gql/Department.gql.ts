@@ -120,7 +120,7 @@ export const DepartmentExportCsv = gql`
 
 
 export const DepartmentCreate = gql`
-  mutation DepartmentCreate($data: DepartmentCreateInput!, $currentUserId: String) {
+  mutation DepartmentCreate($data: Json!, $currentUserId: String) {
     DepartmentCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -132,7 +132,7 @@ export const DepartmentCreate = gql`
 `;
 
 export const DepartmentCreateMany = gql`
-  mutation DepartmentCreateMany($data: [DepartmentCreateInput!]!, $currentUserId: String) {
+  mutation DepartmentCreateMany($data: [Json!]!, $currentUserId: String) {
     DepartmentCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -144,7 +144,7 @@ export const DepartmentCreateMany = gql`
 `;
 
 export const DepartmentUpdate = gql`
-  mutation DepartmentUpdate($id: String!, $data: DepartmentUpdateInput!, $currentUserId: String) {
+  mutation DepartmentUpdate($id: String!, $data: Json!, $currentUserId: String) {
     DepartmentUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -156,7 +156,7 @@ export const DepartmentUpdate = gql`
 `;
 
 export const DepartmentUpdateMany = gql`
-  mutation DepartmentUpdateMany($data: [DepartmentUpdateInput!]!, $currentUserId: String) {
+  mutation DepartmentUpdateMany($data: [Json!]!, $currentUserId: String) {
     DepartmentUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

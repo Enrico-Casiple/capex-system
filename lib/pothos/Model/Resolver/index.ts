@@ -1,5 +1,6 @@
 import authenticate from '../../../../lib/util/authenticate';
 import { checkAuthentication } from '../../../../lib/util/checkAuthentication';
+import { enforceRateLimit } from '../../../../lib/util/enforceRateLimit';
 import { Prisma } from '../../../generated/prisma/client';
 import { builder } from '../../builder';
 import {
@@ -34,8 +35,8 @@ const middlewareCheck = async (
   isNeeded: boolean = true,
 ) => {
   if (!isNeeded) return;
-  // const rateLimitError = await enforceRateLimit(ctx, modelName);
-  // if (rateLimitError) return rateLimitError;
+  const rateLimitError = await enforceRateLimit(ctx, modelName);
+  if (rateLimitError) return rateLimitError;
   const authError = await checkAuthentication(ctx, modelName, skipForUserModel);
   if (authError) return authError;
 };
@@ -237,21 +238,21 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   }
 
   // ─── MUTATION: create ─────────────────────────────────────────
-  if (!createInputRef || !updateInputRef) return;
+  if (!updateInputRef) return;
 
   builder.mutationField(`${modelName}Create`, (t) =>
     t.field({
       type: responseRefs[model],
-      description: `Create a new ${modelName} record. Triggers a real-time subscription event on success.`,
+      description: `Create a new ${modelName} record using Prisma ${modelName}CreateInput format. Triggers a real-time subscription event on success.`,
       args: {
         data: t.arg({
-          type: createInputRef,
+          type: 'Json',
           required: true,
-          description: `The input fields required to create a new ${modelName} record.`,
+          description: `JSON object matching Prisma.${modelName}CreateInput structure. Accepts: scalars, nested create/connect/connectOrCreate, and list operations.`,
         }),
         currentUserId: t.arg.string({
           required: false,
-          description: `(Optional) The ID of the user performing the create operation. Defaults to 'system' if not provided.`,
+          description: `(Optional) The ID of the user performing the create operation. Defaults to current session user.`,
         }),
       },
       resolve: async (_parent, args, ctx) => {
@@ -260,7 +261,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         if (middlewareError) return middlewareError;
         const result = await service.create({
           data: args.data,
-          currentUserId: (ctx.session?.user?.id as string) ?? ctx.session?.user?.id,
+          currentUserId: (ctx.session?.user?.id as string) ?? 'system',
         } as never);
         ctx.pubsub.publish(subscriptionPublishName, result.data);
         return result;
@@ -272,16 +273,16 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   builder.mutationField(`${modelName}CreateMany`, (t) =>
     t.field({
       type: responseListRefs[model],
-      description: `Create multiple ${modelName} records in a single operation. Each created record triggers an individual real-time subscription event.`,
+      description: `Create multiple ${modelName} records in a single operation. Each record must match Prisma ${modelName}CreateInput. Each created record triggers an individual real-time subscription event.`,
       args: {
         data: t.arg({
-          type: [createInputRef],
+          type: ['Json'],
           required: true,
-          description: `Array of input objects to create multiple ${modelName} records at once.`,
+          description: `Array of JSON objects, each matching Prisma.${modelName}CreateInput structure.`,
         }),
         currentUserId: t.arg.string({
           required: false,
-          description: `(Optional) The ID of the user performing the bulk create. Defaults to 'system' if not provided.`,
+          description: `(Optional) The ID of the user performing the bulk create. Defaults to current session user.`,
         }),
       },
       resolve: async (_parent, args, ctx) => {
@@ -311,26 +312,37 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   builder.mutationField(`${modelName}Update`, (t) =>
     t.field({
       type: responseRefs[model],
-      description: `Update an existing ${modelName} record by ID. Only provided fields will be changed. Triggers a real-time subscription event on success.`,
+      description: `Update an existing ${modelName} record by ID. Data must match Prisma ${modelName}UpdateInput structure. Triggers a real-time subscription event on success.`,
       args: {
         id: t.arg.string({
           required: true,
           description: `The unique identifier of the ${modelName} record to update.`,
         }),
         data: t.arg({
-          type: updateInputRef,
+          type: 'Json',
           required: true,
-          description: `The fields to update on the ${modelName} record. Omitted fields remain unchanged.`,
+          description: `JSON object matching Prisma.${modelName}UpdateInput structure. All fields are optional. Supports nested update/connect/connectOrCreate/upsert.`,
         }),
         currentUserId: t.arg.string({
           required: false,
-          description: `(Optional) The ID of the user performing the update. Defaults to 'system' if not provided.`,
+          description: `(Optional) The ID of the user performing the update. Defaults to current session user.`,
         }),
       },
       resolve: async (_parent, args, ctx) => {
         console.log(`✏️ ${modelName}: Update - Received update request for id:`, args.id);
         const middlewareError = await middlewareCheck(ctx, modelName);
         if (middlewareError) return middlewareError;
+
+        // removing the deleteMany and delete
+        if(args.data.deleteMany || args.data.delete) {
+          return {
+            isSuccess: false,
+            message: `Direct delete operations are not allowed in update. Please use the dedicated archive or remove mutations.`,
+            code: `${modelName.toUpperCase()}_UPDATE_FAILED`,
+            data: null,
+          };
+        }
+
         const result = await service.update({
           data: { ...args.data, id: args.id },
           currentUserId: (ctx.session?.user?.id as string) ?? 'system',
@@ -345,16 +357,16 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   builder.mutationField(`${modelName}UpdateMany`, (t) =>
     t.field({
       type: responseListRefs[model],
-      description: `Update multiple ${modelName} records in a single operation. Each updated record triggers an individual real-time subscription event.`,
+      description: `Update multiple ${modelName} records in a single operation. Each record must include the ID and fields to update. Each updated record triggers an individual real-time subscription event.`,
       args: {
         data: t.arg({
-          type: [updateInputRef],
+          type: ['Json'],
           required: true,
-          description: `Array of update input objects. Each must include the record ID and the fields to change.`,
+          description: `Array of JSON objects matching Prisma.${modelName}UpdateInput. Each must include 'id' field.`,
         }),
         currentUserId: t.arg.string({
           required: false,
-          description: `(Optional) The ID of the user performing the bulk update. Defaults to 'system' if not provided.`,
+          description: `(Optional) The ID of the user performing the bulk update. Defaults to current session user.`,
         }),
       },
       resolve: async (_parent, args, ctx) => {
@@ -364,6 +376,16 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         );
         const middlewareError = await middlewareCheck(ctx, modelName);
         if (middlewareError) return middlewareError;
+
+        if(args.data.some((item: any) => item.deleteMany || item.delete)) {
+          return {
+            isSuccess: false,
+            message: `Direct delete operations are not allowed in update. Please use the dedicated archive or remove mutations.`,
+            code: `${modelName.toUpperCase()}_BULK_UPDATE_FAILED`,
+            data: null,
+          };
+        }
+
         const result = await service.updateMany({
           data: args.data,
           currentUserId: (ctx.session?.user?.id as string) ?? 'system',

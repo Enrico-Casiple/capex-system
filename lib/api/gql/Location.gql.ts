@@ -117,7 +117,7 @@ export const LocationExportCsv = gql`
 
 
 export const LocationCreate = gql`
-  mutation LocationCreate($data: LocationCreateInput!, $currentUserId: String) {
+  mutation LocationCreate($data: Json!, $currentUserId: String) {
     LocationCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -129,7 +129,7 @@ export const LocationCreate = gql`
 `;
 
 export const LocationCreateMany = gql`
-  mutation LocationCreateMany($data: [LocationCreateInput!]!, $currentUserId: String) {
+  mutation LocationCreateMany($data: [Json!]!, $currentUserId: String) {
     LocationCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -141,7 +141,7 @@ export const LocationCreateMany = gql`
 `;
 
 export const LocationUpdate = gql`
-  mutation LocationUpdate($id: String!, $data: LocationUpdateInput!, $currentUserId: String) {
+  mutation LocationUpdate($id: String!, $data: Json!, $currentUserId: String) {
     LocationUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -153,7 +153,7 @@ export const LocationUpdate = gql`
 `;
 
 export const LocationUpdateMany = gql`
-  mutation LocationUpdateMany($data: [LocationUpdateInput!]!, $currentUserId: String) {
+  mutation LocationUpdateMany($data: [Json!]!, $currentUserId: String) {
     LocationUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

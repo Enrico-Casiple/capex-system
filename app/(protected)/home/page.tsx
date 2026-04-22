@@ -9,11 +9,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
 
-export const Schema = z.object({
+const Schema = z.object({
   startDate: z.date({ error: 'Please select a start date' }),
   endDate: z.date({ error: 'Please select an end date' }),
 });
-
 
 export type SchemaType = z.infer<typeof Schema>;
 

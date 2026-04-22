@@ -118,7 +118,7 @@ export const RolePermissionExportCsv = gql`
 
 
 export const RolePermissionCreate = gql`
-  mutation RolePermissionCreate($data: RolePermissionCreateInput!, $currentUserId: String) {
+  mutation RolePermissionCreate($data: Json!, $currentUserId: String) {
     RolePermissionCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -130,7 +130,7 @@ export const RolePermissionCreate = gql`
 `;
 
 export const RolePermissionCreateMany = gql`
-  mutation RolePermissionCreateMany($data: [RolePermissionCreateInput!]!, $currentUserId: String) {
+  mutation RolePermissionCreateMany($data: [Json!]!, $currentUserId: String) {
     RolePermissionCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -142,7 +142,7 @@ export const RolePermissionCreateMany = gql`
 `;
 
 export const RolePermissionUpdate = gql`
-  mutation RolePermissionUpdate($id: String!, $data: RolePermissionUpdateInput!, $currentUserId: String) {
+  mutation RolePermissionUpdate($id: String!, $data: Json!, $currentUserId: String) {
     RolePermissionUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -154,7 +154,7 @@ export const RolePermissionUpdate = gql`
 `;
 
 export const RolePermissionUpdateMany = gql`
-  mutation RolePermissionUpdateMany($data: [RolePermissionUpdateInput!]!, $currentUserId: String) {
+  mutation RolePermissionUpdateMany($data: [Json!]!, $currentUserId: String) {
     RolePermissionUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

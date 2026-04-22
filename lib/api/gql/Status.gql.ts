@@ -117,7 +117,7 @@ export const StatusExportCsv = gql`
 
 
 export const StatusCreate = gql`
-  mutation StatusCreate($data: StatusCreateInput!, $currentUserId: String) {
+  mutation StatusCreate($data: Json!, $currentUserId: String) {
     StatusCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -129,7 +129,7 @@ export const StatusCreate = gql`
 `;
 
 export const StatusCreateMany = gql`
-  mutation StatusCreateMany($data: [StatusCreateInput!]!, $currentUserId: String) {
+  mutation StatusCreateMany($data: [Json!]!, $currentUserId: String) {
     StatusCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -141,7 +141,7 @@ export const StatusCreateMany = gql`
 `;
 
 export const StatusUpdate = gql`
-  mutation StatusUpdate($id: String!, $data: StatusUpdateInput!, $currentUserId: String) {
+  mutation StatusUpdate($id: String!, $data: Json!, $currentUserId: String) {
     StatusUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -153,7 +153,7 @@ export const StatusUpdate = gql`
 `;
 
 export const StatusUpdateMany = gql`
-  mutation StatusUpdateMany($data: [StatusUpdateInput!]!, $currentUserId: String) {
+  mutation StatusUpdateMany($data: [Json!]!, $currentUserId: String) {
     StatusUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

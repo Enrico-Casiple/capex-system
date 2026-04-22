@@ -123,7 +123,7 @@ export const ConfigExportCsv = gql`
 
 
 export const ConfigCreate = gql`
-  mutation ConfigCreate($data: ConfigCreateInput!, $currentUserId: String) {
+  mutation ConfigCreate($data: Json!, $currentUserId: String) {
     ConfigCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -135,7 +135,7 @@ export const ConfigCreate = gql`
 `;
 
 export const ConfigCreateMany = gql`
-  mutation ConfigCreateMany($data: [ConfigCreateInput!]!, $currentUserId: String) {
+  mutation ConfigCreateMany($data: [Json!]!, $currentUserId: String) {
     ConfigCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -147,7 +147,7 @@ export const ConfigCreateMany = gql`
 `;
 
 export const ConfigUpdate = gql`
-  mutation ConfigUpdate($id: String!, $data: ConfigUpdateInput!, $currentUserId: String) {
+  mutation ConfigUpdate($id: String!, $data: Json!, $currentUserId: String) {
     ConfigUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -159,7 +159,7 @@ export const ConfigUpdate = gql`
 `;
 
 export const ConfigUpdateMany = gql`
-  mutation ConfigUpdateMany($data: [ConfigUpdateInput!]!, $currentUserId: String) {
+  mutation ConfigUpdateMany($data: [Json!]!, $currentUserId: String) {
     ConfigUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

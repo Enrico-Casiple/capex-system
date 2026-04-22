@@ -1,4 +1,5 @@
-import { Spinner, useListContext } from '@/app/_context/ListContext/ListProvider';
+import { Spinner } from '@/app/_component/Spinner';
+import { useListContext } from '@/app/_context/ListContext/ListProvider';
 import useMutationActions from '@/app/_hooks/useBulkActions';
 import useToast from '@/app/_hooks/useToast';
 import CustomDialog from '@/components/custom/CustomDialog';

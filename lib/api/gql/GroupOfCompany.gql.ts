@@ -120,7 +120,7 @@ export const GroupOfCompanyExportCsv = gql`
 
 
 export const GroupOfCompanyCreate = gql`
-  mutation GroupOfCompanyCreate($data: GroupOfCompanyCreateInput!, $currentUserId: String) {
+  mutation GroupOfCompanyCreate($data: Json!, $currentUserId: String) {
     GroupOfCompanyCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -132,7 +132,7 @@ export const GroupOfCompanyCreate = gql`
 `;
 
 export const GroupOfCompanyCreateMany = gql`
-  mutation GroupOfCompanyCreateMany($data: [GroupOfCompanyCreateInput!]!, $currentUserId: String) {
+  mutation GroupOfCompanyCreateMany($data: [Json!]!, $currentUserId: String) {
     GroupOfCompanyCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -144,7 +144,7 @@ export const GroupOfCompanyCreateMany = gql`
 `;
 
 export const GroupOfCompanyUpdate = gql`
-  mutation GroupOfCompanyUpdate($id: String!, $data: GroupOfCompanyUpdateInput!, $currentUserId: String) {
+  mutation GroupOfCompanyUpdate($id: String!, $data: Json!, $currentUserId: String) {
     GroupOfCompanyUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -156,7 +156,7 @@ export const GroupOfCompanyUpdate = gql`
 `;
 
 export const GroupOfCompanyUpdateMany = gql`
-  mutation GroupOfCompanyUpdateMany($data: [GroupOfCompanyUpdateInput!]!, $currentUserId: String) {
+  mutation GroupOfCompanyUpdateMany($data: [Json!]!, $currentUserId: String) {
     GroupOfCompanyUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

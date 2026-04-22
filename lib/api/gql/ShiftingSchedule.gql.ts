@@ -125,7 +125,7 @@ export const ShiftingScheduleExportCsv = gql`
 
 
 export const ShiftingScheduleCreate = gql`
-  mutation ShiftingScheduleCreate($data: ShiftingScheduleCreateInput!, $currentUserId: String) {
+  mutation ShiftingScheduleCreate($data: Json!, $currentUserId: String) {
     ShiftingScheduleCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -137,7 +137,7 @@ export const ShiftingScheduleCreate = gql`
 `;
 
 export const ShiftingScheduleCreateMany = gql`
-  mutation ShiftingScheduleCreateMany($data: [ShiftingScheduleCreateInput!]!, $currentUserId: String) {
+  mutation ShiftingScheduleCreateMany($data: [Json!]!, $currentUserId: String) {
     ShiftingScheduleCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -149,7 +149,7 @@ export const ShiftingScheduleCreateMany = gql`
 `;
 
 export const ShiftingScheduleUpdate = gql`
-  mutation ShiftingScheduleUpdate($id: String!, $data: ShiftingScheduleUpdateInput!, $currentUserId: String) {
+  mutation ShiftingScheduleUpdate($id: String!, $data: Json!, $currentUserId: String) {
     ShiftingScheduleUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -161,7 +161,7 @@ export const ShiftingScheduleUpdate = gql`
 `;
 
 export const ShiftingScheduleUpdateMany = gql`
-  mutation ShiftingScheduleUpdateMany($data: [ShiftingScheduleUpdateInput!]!, $currentUserId: String) {
+  mutation ShiftingScheduleUpdateMany($data: [Json!]!, $currentUserId: String) {
     ShiftingScheduleUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

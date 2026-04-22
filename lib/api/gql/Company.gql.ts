@@ -11,6 +11,7 @@ fragment CompanyFragment on Company {
   email
   logo
   scopeTypeId
+  isActive
   createdAt
   updatedAt
 }
@@ -123,7 +124,7 @@ export const CompanyExportCsv = gql`
 
 
 export const CompanyCreate = gql`
-  mutation CompanyCreate($data: CompanyCreateInput!, $currentUserId: String) {
+  mutation CompanyCreate($data: Json!, $currentUserId: String) {
     CompanyCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -135,7 +136,7 @@ export const CompanyCreate = gql`
 `;
 
 export const CompanyCreateMany = gql`
-  mutation CompanyCreateMany($data: [CompanyCreateInput!]!, $currentUserId: String) {
+  mutation CompanyCreateMany($data: [Json!]!, $currentUserId: String) {
     CompanyCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -147,7 +148,7 @@ export const CompanyCreateMany = gql`
 `;
 
 export const CompanyUpdate = gql`
-  mutation CompanyUpdate($id: String!, $data: CompanyUpdateInput!, $currentUserId: String) {
+  mutation CompanyUpdate($id: String!, $data: Json!, $currentUserId: String) {
     CompanyUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -159,7 +160,7 @@ export const CompanyUpdate = gql`
 `;
 
 export const CompanyUpdateMany = gql`
-  mutation CompanyUpdateMany($data: [CompanyUpdateInput!]!, $currentUserId: String) {
+  mutation CompanyUpdateMany($data: [Json!]!, $currentUserId: String) {
     CompanyUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

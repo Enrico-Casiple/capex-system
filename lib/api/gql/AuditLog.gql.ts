@@ -124,7 +124,7 @@ export const AuditLogExportCsv = gql`
 
 
 export const AuditLogCreate = gql`
-  mutation AuditLogCreate($data: AuditLogCreateInput!, $currentUserId: String) {
+  mutation AuditLogCreate($data: Json!, $currentUserId: String) {
     AuditLogCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -136,7 +136,7 @@ export const AuditLogCreate = gql`
 `;
 
 export const AuditLogCreateMany = gql`
-  mutation AuditLogCreateMany($data: [AuditLogCreateInput!]!, $currentUserId: String) {
+  mutation AuditLogCreateMany($data: [Json!]!, $currentUserId: String) {
     AuditLogCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -148,7 +148,7 @@ export const AuditLogCreateMany = gql`
 `;
 
 export const AuditLogUpdate = gql`
-  mutation AuditLogUpdate($id: String!, $data: AuditLogUpdateInput!, $currentUserId: String) {
+  mutation AuditLogUpdate($id: String!, $data: Json!, $currentUserId: String) {
     AuditLogUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -160,7 +160,7 @@ export const AuditLogUpdate = gql`
 `;
 
 export const AuditLogUpdateMany = gql`
-  mutation AuditLogUpdateMany($data: [AuditLogUpdateInput!]!, $currentUserId: String) {
+  mutation AuditLogUpdateMany($data: [Json!]!, $currentUserId: String) {
     AuditLogUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

@@ -46,22 +46,27 @@ datasource db {
 }
 
 model User {
-  id                     String            @id @default(auto()) @map("_id") @db.ObjectId
-  name                   String?
-  email                  String?           @unique
-  password               String?
-  userName               String?           @unique
-  emailVerified          DateTime?
-  image                  String?
-  basicInformations      BasicInformation?
-  isTwoFactorAuthEnabled Boolean?          @default(false)
-  otpCode                String?
-  auditLogs              AuditLog[]
-  actions                AuditLog[]        @relation("UserAsActor")
-  userRoles              UserRole[]
-  userAssignedBy         UserRole[]        @relation("UserAsRoleAssigner")
-  emailOtpExpiresAt     DateTime?         // OTP expiration time
+  id                       String            @id @default(auto()) @map("_id") @db.ObjectId
+  name                     String?
+  email                    String?           @unique
+  password                 String?
+  userName                 String?           @unique
+  emailVerified            DateTime?
+  image                    String?
+  basicInformations        BasicInformation?
+  isTwoFactorAuthEnabled   Boolean?          @default(false)
+  otpCode                  String?
+  auditLogs                AuditLog[]
+  actions                  AuditLog[]        @relation("UserAsActor")
+  userRoles                UserRole[]
+  userAssignedBy           UserRole[]        @relation("UserAsRoleAssigner")
+  emailOtpExpiresAt        DateTime? // OTP expiration time
   incrementalLoginAttempts Int?              @default(0) // For rate limiting login attempts
+
+  workFlowStepTemplate WorkFlowStepTemplate[] @relation("StepAssignedToUser")
+  workFlowInstanceStep WorkFlowInstanceStep[] @relation("StepAssignedToUser")
+  requester            Request[]              @relation("RequestRequester")
+  budgetRequester      Budget[]               @relation("BudgetRequester")
 
   isActive  Boolean?  @default(true)
   createdAt DateTime? @default(now())
@@ -179,57 +184,64 @@ model GroupOfCompany {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
+  @@unique([name, acronym]) // Ensure unique group of company names
   // ✅ Add indexes
-  @@index([name]) // Search by name
   @@index([industryTypeId]) // Filter by industry
 }
 
 model Company {
-  id               String            @id @default(auto()) @map("_id") @db.ObjectId
+  id               String                  @id @default(auto()) @map("_id") @db.ObjectId
   name             String?
   acronym          String?
   description      String? // Description of the company
-  groupOfCompanyId String?           @db.ObjectId
-  groupOfCompany   GroupOfCompany?   @relation(fields: [groupOfCompanyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  locationsid      String?           @db.ObjectId
-  locations        Location?         @relation("CompaniesLocation", fields: [locationsid], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  groupOfCompanyId String?                 @db.ObjectId
+  groupOfCompany   GroupOfCompany?         @relation(fields: [groupOfCompanyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  locationsid      String?                 @db.ObjectId
+  locations        Location?               @relation("CompaniesLocation", fields: [locationsid], references: [id], onDelete: SetNull, onUpdate: Cascade)
   conctactNumber   String?
   email            String?
-  departments      Department[]      @relation("CompanyDepartments")
+  departments      Department[]            @relation("CompanyDepartments")
   logo             String?
-  jobLevels        JobLevel[]        @relation("CompanyJobLevels")
+  jobLevels        JobLevel[]              @relation("CompanyJobLevels")
   auditLogs        AuditLog[]
   workInformations WorkInformation[]
-  scopeTypeId      String?           @db.ObjectId
-  scopeType        Type?             @relation("CompanyType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  scopeTypeId      String?                 @db.ObjectId
+  scopeType        Type?                   @relation("CompanyType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  request          Request[]
+  budget           Budget[]
+  crfCompany       CapitalRecoveryFactor[] @relation("CRFCompany")
+  isActive         Boolean?                @default(true)
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
 
   // ✅ Add indexes
+  @@unique([name, acronym])
   @@index([groupOfCompanyId]) // Filter by group
-  @@index([name]) // Search by name
 }
 
 model Department {
-  id               String            @id @default(auto()) @map("_id") @db.ObjectId
-  name             String?
-  acronym          String?
-  description      String?
-  companyId        String?           @db.ObjectId
-  company          Company?          @relation("CompanyDepartments", fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  auditLogs        AuditLog[]
-  workInformations WorkInformation[]
-  scopeTypeId      String?           @db.ObjectId
-  scopeType        Type?             @relation("DepartmentType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  id                          String                  @id @default(auto()) @map("_id") @db.ObjectId
+  name                        String?
+  acronym                     String?
+  description                 String?
+  companyId                   String?                 @db.ObjectId
+  company                     Company?                @relation("CompanyDepartments", fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  auditLogs                   AuditLog[]
+  workInformations            WorkInformation[]
+  scopeTypeId                 String?                 @db.ObjectId
+  scopeType                   Type?                   @relation("DepartmentType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  request                     Request[]
+  budget                      Budget[]
+  requestResponsibilityCenter Request[]               @relation("RequestResponsibilityCenter")
+  crfDepartment               CapitalRecoveryFactor[] @relation("CRFDepartment")
 
   isActive  Boolean?  @default(true)
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
+  @@unique([name, acronym]) // Department names should be unique within a company
   // ✅ Add indexes
   @@index([companyId]) // Lookup by company
-  @@index([name]) // Search by name
 }
 
 model Position {
@@ -239,13 +251,14 @@ model Position {
   description      String?
   auditLogs        AuditLog[]
   workInformations WorkInformation[]
+  isActive         Boolean?          @default(true)
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   scopeTypeId      String?           @db.ObjectId
   scopeType        Type?             @relation("PositionType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   // ✅ Add indexes
-  @@index([name]) // Search by name
+  @@unique([name, acronym]) // Ensure unique position names
 }
 
 model JobLevel {
@@ -264,74 +277,9 @@ model JobLevel {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
+  @@unique([name, acronym]) // Job level names should be unique within a company
   // ✅ Add indexes
   @@index([companyId]) // Lookup by company
-  @@index([name]) // Search by name
-}
-
-model Type {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-
-  name           String?
-  modelNameType  String?
-  employmentType WorkInformation[] @relation("EmploymentType")
-  workSetupType  WorkInformation[] @relation("WorkSetupType")
-  industryType   GroupOfCompany[]  @relation("IndustryType")
-  companies      Company[]         @relation("CompanyType")
-  departments    Department[]      @relation("DepartmentType")
-  jobPositions   Position[]        @relation("PositionType")
-  jobLevels      JobLevel[]        @relation("JobCodeType")
-  actionType     AuditLog[]        @relation("ActionType")
-  auditLogs      AuditLog[]
-
-  isActive  Boolean?  @default(true)
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
-
-  // ✅ Add indexes
-  @@unique([name, modelNameType])
-  @@index([modelNameType]) // Filter by type
-  @@index([name]) // Search by name
-}
-
-model Config {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-
-  modelName String? // e.g. "User", "Company", etc. "Role"
-  group     String // e.g. "ApproverStatus", "ConditionOperator", "ApproverType" "RolePermissionScope"
-  codeKey   String? // e.g. "maxLoginAttempts", "passwordPolicy", etc "scopeValues", "conditionOperator", "approverType"
-  code      String? // e.g. "MAX_LOGIN_ATTEMPTS", "PASSWORD_POLICY", etc. for easy reference in code "SCOPE_VALUES", "CONDITION_OPERATOR", "APPROVER_TYPE"
-  codeLabel String? // e.g. "Max Login Attempts", "Password Policy", etc. for display in admin UI "Scope Values", "Condition Operator", "Approver Type"
-  value     Json? // JSON string of the config value, can be any type (string, number, boolean, object, array) "["VALUE1", "VALUE2"]", "{ "operator": ">", "value": 10000 }", etc.
-
-  modelId   String? @db.ObjectId // ID of the related record, null if it's a global config not tied to a specific record
-  rolePermission RolePermission? @relation("PermissionScopeView", fields: [modelId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-
-  sortOrder Int?
-  isActive  Boolean?  @default(true)
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
-
-  @@unique([modelName, modelId, group, codeKey])
-  @@index([modelName, modelId])
-  @@index([group, codeKey])
-}
-
-model Status {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-
-  name             String?
-  modelNameType    String?
-  workInformations WorkInformation[] @relation("EmploymentStatus")
-  auditLogs        AuditLog[]
-
-  isActive  Boolean?  @default(true)
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
-
-  // ✅ Add indexes
-  @@index([modelNameType]) // Filter by type
-  @@index([name]) // Search by name
 }
 
 model Location {
@@ -442,7 +390,7 @@ model Permission {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
-  @@unique([module, resource, action], name: "module_resource_action")
+  @@unique([module, resource, action])
   @@index([name])
   @@index([module])
   @@index([resource, action])
@@ -519,27 +467,40 @@ model AuditLog {
   oldDetails   Json? // JSON string of the record before the change
   newDetails   Json? // JSON string of the record after the change
 
-  holiday          Holiday?          @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  shiftSchedule    ShiftingSchedule? @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  position         Position?         @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  jobLevel         JobLevel?         @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  type             Type?             @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  status           Status?           @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  location         Location?         @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  user             User?             @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  basicInformation BasicInformation? @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  workInformation  WorkInformation?  @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  groupOfCompany   GroupOfCompany?   @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  company          Company?          @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  department       Department?       @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  userRole         UserRole?         @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  rolePermission   RolePermission?   @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  permission       Permission?       @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  role             Role?             @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-
-  parentId  String?    @db.ObjectId // For hierarchical logs (e.g. a batch of changes)
-  parent    AuditLog?  @relation("ParentLog", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  auditLogs AuditLog[] @relation("ParentLog")
+  holiday               Holiday?               @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  shiftSchedule         ShiftingSchedule?      @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  position              Position?              @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  jobLevel              JobLevel?              @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  type                  Type?                  @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  status                Status?                @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  location              Location?              @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  user                  User?                  @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  basicInformation      BasicInformation?      @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  workInformation       WorkInformation?       @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  groupOfCompany        GroupOfCompany?        @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  company               Company?               @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  department            Department?            @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  userRole              UserRole?              @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  rolePermission        RolePermission?        @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  permission            Permission?            @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  role                  Role?                  @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  workFlowTemplate      WorkFlowTemplate?      @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  configCondition       ConfigCondition?       @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  config                Config?                @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  workFlowStepTemplate  WorkFlowStepTemplate?  @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  workFlowInstance      WorkFlowInstance?      @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  workFlowInstanceStep  WorkFlowInstanceStep?  @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  signature             Signature?             @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  workFlowTemplateScope WorkFlowTemplateScope? @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  requestItem           RequestItem?           @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  budgetSnapshot        BudgetSnapshot?        @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  budgetLedger          BudgetLedger?          @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  budget                Budget?                @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  request               Request?               @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  category              Category?              @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  parentId              String?                @db.ObjectId // For hierarchical logs (e.g. a batch of changes)
+  parent                AuditLog?              @relation("ParentLog", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  auditLogs             AuditLog[]             @relation("ParentLog")
 
   isActive  Boolean?  @default(true)
   createdAt DateTime? @default(now())
@@ -551,4 +512,538 @@ model AuditLog {
   @@index([actorId]) // Find who made changes
   @@index([modelId]) // Find changes to specific record
   @@index([isActive]) // Filter active logs
+}
+
+model WorkFlowTemplate {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String?
+  description String?
+
+  isGlobal Boolean? @default(false)
+
+  version Int? @default(1)
+
+  scope WorkFlowTemplateScope[]
+  steps WorkFlowStepTemplate[]
+
+  workFlowInstance WorkFlowInstance[]
+  request          Request[]
+  budget           Budget[]
+
+  auditLogs AuditLog[]
+  isActive  Boolean?   @default(true)
+  createdAt DateTime?  @default(now())
+  updatedAt DateTime?  @updatedAt
+
+  @@index([name])
+}
+
+model WorkFlowTemplateScope {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  templateId String?           @db.ObjectId
+  template   WorkFlowTemplate? @relation(fields: [templateId], references: [id])
+
+  scopeTypeId      String? @db.ObjectId
+  scopeType        Type?   @relation("ScopeType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  scopeReferenceId String? @db.ObjectId
+
+  priority Int? @default(0)
+
+  auditLogs AuditLog[]
+  isActive  Boolean?   @default(true)
+  createdAt DateTime?  @default(now())
+  updatedAt DateTime?  @updatedAt
+
+  @@index([templateId])
+  @@index([scopeTypeId, scopeReferenceId])
+}
+
+model WorkFlowStepTemplate {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  workflowTemplateId String?           @db.ObjectId
+  workflowTemplate   WorkFlowTemplate? @relation(fields: [workflowTemplateId], references: [id])
+
+  stepNumber       Int?
+  assignmentTypeId String? @db.ObjectId
+  assignmentType   Type?   @relation("StepAssignmentType", fields: [assignmentTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  // STATIC
+  assignedToUserId String? @db.ObjectId
+  assignedToUser   User?   @relation("StepAssignedToUser", fields: [assignedToUserId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  // DYNAMIC
+  assignmentRules Json?
+
+  // CONDITIONS (skip or include step)
+  conditions Config[] @relation("StepConditions")
+
+  // PARALLEL APPROVAL
+  isParallel        Boolean? @default(false)
+  requiredApprovals Int? // e.g. 2 out of 3 approvers
+
+  // SLA + ESCALATION
+  slaHours           Int?
+  escalationRules    Json?
+  // SECURITY + COMPLIANCE
+  esignatureRequired Boolean? @default(false)
+  attachmentRequired Boolean? @default(false)
+
+  workFlowInstanceStep WorkFlowInstanceStep[]
+
+  auditLogs AuditLog[]
+  isActive  Boolean?   @default(true)
+  createdAt DateTime?  @default(now())
+  updatedAt DateTime?  @updatedAt
+
+  @@unique([workflowTemplateId, stepNumber])
+  @@index([workflowTemplateId])
+}
+
+model WorkFlowInstance {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  templateId String?           @db.ObjectId
+  template   WorkFlowTemplate? @relation(fields: [templateId], references: [id])
+
+  title       String? // e.g. "Expense Approval - John Doe"
+  description String?
+
+  statusId    String? @db.ObjectId
+  status      Status? @relation(fields: [statusId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  currentStep Int?    @default(1)
+
+  referenceTypeId String? @db.ObjectId // e.g. "ExpenseReport", "LeaveRequest", etc.
+  referenceType   Type?   @relation("ReferenceType", fields: [referenceTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  steps      WorkFlowInstanceStep[]
+  signatures Signature[]
+  requestId  String?                @unique @db.ObjectId
+  request    Request?               @relation(fields: [requestId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  budgetId   String?                @unique @db.ObjectId
+  budget     Budget?                @relation(fields: [budgetId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  auditLogs AuditLog[]
+  isActive  Boolean?   @default(true)
+  createdAt DateTime?  @default(now())
+  updatedAt DateTime?  @updatedAt
+  // @@index([referenceId])
+
+  @@index([templateId])
+  @@index([statusId])
+}
+
+model WorkFlowInstanceStep {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  instanceId String?           @db.ObjectId
+  instance   WorkFlowInstance? @relation(fields: [instanceId], references: [id])
+
+  stepTemplateId String?               @db.ObjectId
+  stepTemplate   WorkFlowStepTemplate? @relation(fields: [stepTemplateId], references: [id])
+
+  stepNumber Int?
+
+  statusId String? @db.ObjectId
+  status   Status? @relation(fields: [statusId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  assignedToUserId String?   @db.ObjectId
+  assignedToUser   User?     @relation("StepAssignedToUser", fields: [assignedToUserId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  startedAt        DateTime? @default(now())
+  actionAt         DateTime?
+
+  comments   String?
+  isEditable Boolean? @default(false)
+  source     String? // e.g. "COPIED_FROM_TEMPLATE", "AUTO_RESOLVED_FROM_RULE", "email"
+
+  isRequired Boolean?    @default(true)
+  signature  Signature[]
+
+  auditLogs AuditLog[]
+  isActive  Boolean?   @default(true)
+  createdAt DateTime?  @default(now())
+  updatedAt DateTime?  @updatedAt
+
+  @@index([instanceId])
+  @@index([assignedToUserId])
+}
+
+model Signature {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  instanceId String?           @db.ObjectId
+  instance   WorkFlowInstance? @relation(fields: [instanceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  stepId        String?               @db.ObjectId
+  step          WorkFlowInstanceStep? @relation(fields: [stepId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  attachmentUrl String?
+
+  userId String? @db.ObjectId
+
+  signatureHash String? // cryptographic hash
+  payload       Json? // what was signed
+
+  ipAddress String?
+  userAgent String?
+
+  auditLogs AuditLog[]
+  isActive  Boolean?   @default(true)
+  createdAt DateTime?  @default(now())
+  updatedAt DateTime?  @updatedAt
+
+  @@index([instanceId])
+  @@index([userId])
+}
+
+// =================================================================================================
+//                                 CONFIG MODELS
+// =================================================================================================
+
+model Type {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name           String?
+  description    String?
+  modelNameType  String?
+  employmentType WorkInformation[] @relation("EmploymentType")
+  workSetupType  WorkInformation[] @relation("WorkSetupType")
+  industryType   GroupOfCompany[]  @relation("IndustryType")
+  companies      Company[]         @relation("CompanyType")
+  departments    Department[]      @relation("DepartmentType")
+  jobPositions   Position[]        @relation("PositionType")
+  jobLevels      JobLevel[]        @relation("JobCodeType")
+  actionType     AuditLog[]        @relation("ActionType")
+  auditLogs      AuditLog[]
+
+  workFlowTemplateScope WorkFlowTemplateScope[] @relation("ScopeType")
+  stepAssignmentType    WorkFlowStepTemplate[]  @relation("StepAssignmentType")
+  workFlowInstance      WorkFlowInstance[]      @relation("ReferenceType")
+  budgetMovementType    BudgetLedger[]          @relation("BudgetMovementType")
+  sourceDocumentType    BudgetLedger[]          @relation("SourceDocumentType")
+
+  isActive  Boolean?  @default(true)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // ✅ Add indexes
+  @@unique([name, modelNameType])
+  @@index([modelNameType]) // Filter by type
+  @@index([name]) // Search by name
+}
+
+model Category {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  description   String?
+  acronym       String?
+  modelNameType String?
+
+  budget      Budget[]
+  crfCategory CapitalRecoveryFactor[] @relation("CRFCategory")
+  auditLogs   AuditLog[]
+
+  isActive  Boolean?  @default(true)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  @@unique([name, acronym, modelNameType])
+  @@index([name])
+}
+
+model ConfigCondition {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  configId String? @db.ObjectId
+  config   Config? @relation("Config", fields: [configId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  // RULE or GROUP
+  nodeType String? // "RULE" | "GROUP"
+
+  // GROUP only
+  logicalOperator String? // "AND" | "OR" | "XOR" | "NOT"
+
+  // RULE only
+  field    String?
+  operator String? // GT, EQ, IN, etc.
+  value    Json?
+
+  // TREE STRUCTURE
+  parentConditionId String?           @db.ObjectId
+  parentCondition   ConfigCondition?  @relation("ConditionTree", fields: [parentConditionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subConditions     ConfigCondition[] @relation("ConditionTree")
+  auditLogs         AuditLog[]
+  isActive          Boolean?          @default(true)
+  createdAt         DateTime?         @default(now())
+  updatedAt         DateTime?         @updatedAt
+
+  @@index([configId])
+  @@index([parentConditionId])
+}
+
+model Config {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  modelName            String? // e.g. "User", "Company", etc. "Role"
+  group                String // e.g. "ApproverStatus", "ConditionOperator", "ApproverType" "RolePermissionScope"
+  codeKey              String? // e.g. "maxLoginAttempts", "passwordPolicy", etc "scopeValues", "conditionOperator", "approverType"
+  code                 String? // e.g. "MAX_LOGIN_ATTEMPTS", "PASSWORD_POLICY", etc. for easy reference in code "SCOPE_VALUES", "CONDITION_OPERATOR", "APPROVER_TYPE"
+  codeLabel            String? // e.g. "Max Login Attempts", "Password Policy", etc. for display in admin UI "Scope Values", "Condition Operator", "Approver Type"
+  value                Json? // JSON string of the config value, can be any type (string, number, boolean, object, array) "["VALUE1", "VALUE2"]", "{ "operator": ">", "value": 10000 }", etc.
+  conditions           ConfigCondition[]     @relation("Config")
+  modelId              String?               @db.ObjectId // ID of the related record, null if it's a global config not tied to a specific record
+  rolePermission       RolePermission?       @relation("PermissionScopeView", fields: [modelId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  workFlowStepTemplate WorkFlowStepTemplate? @relation("StepConditions", fields: [modelId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  sortOrder Int?
+  auditLogs AuditLog[]
+  isActive  Boolean?   @default(true)
+  createdAt DateTime?  @default(now())
+  updatedAt DateTime?  @updatedAt
+
+  @@unique([modelName, modelId, group, codeKey])
+  @@index([modelName, modelId])
+  @@index([group, codeKey])
+}
+
+model Status {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name                  String?
+  modelNameType         String?
+  workInformations      WorkInformation[]       @relation("EmploymentStatus")
+  workFlowInstanceSteps WorkFlowInstanceStep[]
+  workFlowInstances     WorkFlowInstance[]
+  request               Request[]
+  requestItems          RequestItem[]
+  auditLogs             AuditLog[]
+  budget                Budget[]                @relation("BudgetStatus")
+  crfStatus             CapitalRecoveryFactor[] @relation("CRFStatus")
+
+  isActive  Boolean?  @default(true)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  @@unique([name, modelNameType])
+  // ✅ Add indexes
+  @@index([modelNameType]) // Filter by type
+  @@index([name]) // Search by name
+}
+
+//
+
+model Request {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  title         String?
+  description   String?
+  requestNumber String? @unique // "REQ-2025-00001"
+
+  requesterId            String?     @db.ObjectId
+  requester              User?       @relation("RequestRequester", fields: [requesterId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  companyId              String?     @db.ObjectId
+  company                Company?    @relation(fields: [companyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  departmentId           String?     @db.ObjectId
+  department             Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  dateNeeded             DateTime?
+  responsibilityCenterId String?     @db.ObjectId
+  responsibilityCenter   Department? @relation("RequestResponsibilityCenter", fields: [responsibilityCenterId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  // Request a budget If not have a Budget Id yet
+  requestedCRF   CapitalRecoveryFactor? // For requesting a budget when creating a request, if the request is directly linked to an existing budget then this will be null and the budgetId field in Request will be used instead
+  requestItems   RequestItem[]
+  quotationUrl   String?
+  quotationAmount Float?
+  currency       String?                 @default("PHP")
+
+  workflowTemplateId String?           @db.ObjectId
+  workflowTemplate   WorkFlowTemplate? @relation(fields: [workflowTemplateId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  workFlowInstance   WorkFlowInstance? // For approval workflow
+
+  approvedAt DateTime?
+  statusId   String?    @db.ObjectId
+  status     Status?    @relation(fields: [statusId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  auditLogs  AuditLog[]
+  isActive   Boolean?   @default(true)
+  createdAt  DateTime?  @default(now())
+  updatedAt  DateTime?  @updatedAt
+}
+
+// Budget <= => Request -> Many to Many Relationship
+model CapitalRecoveryFactor {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name           String?
+  description    String?
+  crfReferenceNo String? // "CRF-2025-00001"
+
+  statusId        String?     @db.ObjectId
+  status          Status?     @relation("CRFStatus", fields: [statusId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  companyId       String?     @db.ObjectId
+  company         Company?    @relation("CRFCompany", fields: [companyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  departmentId    String?     @db.ObjectId
+  department      Department? @relation("CRFDepartment", fields: [departmentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  categoryId      String?     @db.ObjectId
+  category        Category?   @relation("CRFCategory", fields: [categoryId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  utilizedBudget  Float? // percentage of the budget that this request will consume, e.g. 0.25 means 25% of the budget
+  approvedAmount Float? // the amount that was approved for this request, used for reporting and forecasting
+  requestedAmount Float? // the actual amount that this request is asking for, used for approval and reporting
+  projectedBudget Float? // the projected budget amount that this request is asking for, used for forecasting and reporting
+
+  requestId String?  @db.ObjectId @unique
+  request   Request? @relation(fields: [requestId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  budget  Budget[]
+
+  isActive  Boolean?  @default(true)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  @@index([crfReferenceNo])
+}
+
+model Budget {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+
+  crfId        String?     @db.ObjectId
+  crf          CapitalRecoveryFactor? @relation(fields: [crfId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  fiscalYear   String? // Date Range June 1,  - May 31 // No Year since this are recurring every year,
+  statusId     String? @db.ObjectId // DRAFT | FOR_APPROVAL | APPROVED | REJECTED | CLOSED | VERIFIED
+  statusBudget Status? @relation("BudgetStatus", fields: [statusId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  budgetRefNo  String? @unique // "2025(AB - Approved, AX- Not Approved)-(Company)-00001"
+
+  companyId    String?     @db.ObjectId
+  company      Company?    @relation(fields: [companyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  departmentId String?     @db.ObjectId
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  categoryId   String?     @db.ObjectId
+  category     Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  requesterId  String?     @db.ObjectId
+  requester    User?       @relation("BudgetRequester", fields: [requesterId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  purpose  String?
+  specs    String?
+  quantity Int?
+  remark   Json? // Provided Specs During AOP and Provied purpose During AOP
+
+  workflowTemplateId String?           @db.ObjectId
+  workflowTemplate   WorkFlowTemplate? @relation(fields: [workflowTemplateId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  workflowInstance   WorkFlowInstance?
+
+  submittedAt DateTime?
+  approvedAt  DateTime?
+  rejectedAt  DateTime?
+
+  requestedAmount Float?
+  approvedAmount  Float?
+  currency        String? @default("PHP")
+
+  budgetLedgers  BudgetLedger[]
+  budgetSnapshot BudgetSnapshot[]
+
+  isFrozen     Boolean?   @default(false)
+  freezeReason String?
+  frozenAt     DateTime?
+  auditLogs    AuditLog[]
+  isActive     Boolean?   @default(true)
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  @@index([companyId])
+  @@index([departmentId])
+  @@index([fiscalYear])
+  @@index([workflowTemplateId])
+}
+
+model BudgetLedger {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // =========================================
+  // RELATION
+  // =========================================
+
+  budgetId String? @db.ObjectId
+  budget   Budget? @relation(fields: [budgetId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  // =========================================
+  // MOVEMENT TYPE (SAP POSTING TYPES)
+  // =========================================
+
+  typeId String? @db.ObjectId
+  type   Type?   @relation("BudgetMovementType", fields: [typeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  // Examples of movement types:
+  // COMMITMENT   (PO created)
+  // ACTUAL       (invoice paid)
+  // RESERVATION  (pre-check)
+  // RELEASE      (cancellation)
+  // ADJUSTMENT   (manual correction)
+
+  amount   Float
+  currency String? @default("PHP")
+
+  // =========================================
+  // SOURCE DOCUMENT (NETSUITE STYLE)
+  // =========================================
+
+  sourceTypeId String? @db.ObjectId
+  sourceType   Type?   @relation("SourceDocumentType", fields: [sourceTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  // Examples of source document types:
+  // PURCHASE_REQUEST | PURCHASE_ORDER | INVOICE | JOURNAL | MANUAL
+
+  sourceId    String?
+  referenceNo String?
+  remark      String?
+  auditLogs   AuditLog[]
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([budgetId])
+  @@index([typeId])
+  @@index([sourceTypeId])
+}
+
+model BudgetSnapshot {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  budgetId String? @db.ObjectId
+  budget   Budget? @relation(fields: [budgetId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  approvedAmount  Float?
+  committedAmount Float? @default(0)
+  actualAmount    Float? @default(0)
+
+  availableAmount Float? // computed snapshot
+  currency        String? @default("PHP")
+
+  auditLogs AuditLog[]
+  isActive  Boolean?   @default(true)
+  createdAt DateTime?  @default(now())
+  updatedAt DateTime?  @updatedAt
+}
+
+model RequestItem {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  requestId String?  @db.ObjectId
+  request   Request? @relation(fields: [requestId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  statusId  String?  @db.ObjectId
+  status    Status?  @relation(fields: [statusId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  description   String?
+  quantity      Int?
+  unitPrice     Float?
+  totalPrice    Float?
+  attachmentUrl String?
+  auditLogs     AuditLog[]
+  isActive      Boolean?   @default(true)
+  createdAt     DateTime?  @default(now())
+  updatedAt     DateTime?  @updatedAt
+
+  @@index([requestId])
 }

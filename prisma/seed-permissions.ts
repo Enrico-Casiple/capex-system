@@ -7,8 +7,8 @@ import {
   GLOBAL_ACCESS_PERMISSION,
   roleManagementPermissions,
   userManagementPermissions,
-} from '@/app/_role/role';
-import { prisma } from '@/lib/prisma/prisma';
+} from '../app/_role/role';
+import { prisma } from '../lib/prisma/prisma';
 
 const seedComplete = async () => {
   console.log('🌱 Starting complete seed...');
@@ -150,11 +150,11 @@ const seedComplete = async () => {
 
 seedComplete()
   .then(() => {
-    console.log('\n🎉 All done!');
+    console.log('\n🎉 Permissions seed completed successfully');
     process.exit(0);
   })
   .catch((error) => {
-    console.error('\n❌ Seed failed:', error);
+    console.error('\n❌ Permissions seed failed:', error);
     process.exit(1);
   })
   .finally(async () => {

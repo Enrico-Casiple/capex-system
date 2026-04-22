@@ -120,7 +120,7 @@ export const RoleExportCsv = gql`
 
 
 export const RoleCreate = gql`
-  mutation RoleCreate($data: RoleCreateInput!, $currentUserId: String) {
+  mutation RoleCreate($data: Json!, $currentUserId: String) {
     RoleCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -132,7 +132,7 @@ export const RoleCreate = gql`
 `;
 
 export const RoleCreateMany = gql`
-  mutation RoleCreateMany($data: [RoleCreateInput!]!, $currentUserId: String) {
+  mutation RoleCreateMany($data: [Json!]!, $currentUserId: String) {
     RoleCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -144,7 +144,7 @@ export const RoleCreateMany = gql`
 `;
 
 export const RoleUpdate = gql`
-  mutation RoleUpdate($id: String!, $data: RoleUpdateInput!, $currentUserId: String) {
+  mutation RoleUpdate($id: String!, $data: Json!, $currentUserId: String) {
     RoleUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -156,7 +156,7 @@ export const RoleUpdate = gql`
 `;
 
 export const RoleUpdateMany = gql`
-  mutation RoleUpdateMany($data: [RoleUpdateInput!]!, $currentUserId: String) {
+  mutation RoleUpdateMany($data: [Json!]!, $currentUserId: String) {
     RoleUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

@@ -4,12 +4,12 @@ import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from '@
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 import { useQuery } from '@apollo/client/react';
 import { DocumentNode } from 'graphql';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
-import { cn } from '@/lib/utils';
 
 // ─── Types ──────────────────────────────────────────────────
 export type ComboboxOption = { label: string; value: string };
@@ -47,6 +47,8 @@ const useComboboxData = ({
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [totalLoaded, setTotalLoaded] = useState(INITIAL_TAKE);
   const observerRef = useRef<IntersectionObserver | null>(null);
+
+
 
   const { loading, fetchMore, data } = useQuery<Record<string, unknown>>(gql, {
     variables: cursorVariables(debouncedSearch, null, INITIAL_TAKE),
@@ -158,8 +160,9 @@ type CustomSingleSelectInputProps<TFormValues extends FieldValues> = {
   emptyMessage?: string;
   cursorVariables: (search: string, cursor: string | null, take: number) => Record<string, unknown>;
   uniqueVariables: (id: string) => Record<string, unknown>;
-  mapOption: (item: unknown) => ComboboxOption;
+  mapOption: (item: unknown) => ComboboxOption ;
   mapDefaultOption: (data: unknown) => ComboboxOption | null;
+  disabled?: boolean;
 };
 
 // ─── Component ──────────────────────────────────────────────
@@ -177,10 +180,13 @@ const CustomSingleSelectInput = <TFormValues extends FieldValues>({
   uniqueVariables,
   mapOption,
   mapDefaultOption,
+  disabled = false,
 }: CustomSingleSelectInputProps<TFormValues>) => {
   const [search, setSearch] = useState('');
   const [open, setOpen] = useState(false);
   const debouncedSearch = useDebounce(search, 400);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [triggerWidth, setTriggerWidth] = useState<number | undefined>();
 
   const comboData = useComboboxData({
     debouncedSearch,
@@ -218,12 +224,19 @@ const CustomSingleSelectInput = <TFormValues extends FieldValues>({
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <button
+                  disabled={disabled}
+                  ref={triggerRef}
                   id={String(name)}
                   className={cn(
                     'h-8 justify-between w-full px-3 py-2 text-sm bg-background border border-input rounded-md shadow-sm hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center',
                     fieldState.invalid && 'border-destructive'
                   )}
-                  onClick={() => setOpen(!open)}
+                  onClick={() => {
+                    setOpen(!open)
+                    if (triggerRef.current) {
+                      setTriggerWidth(triggerRef.current.offsetWidth);
+                    }
+                  }}
                 >
                   <span className={selectedOption ? '' : 'text-muted-foreground'}>
                     {selectedOption ? selectedOption.label : placeholder}
@@ -231,7 +244,7 @@ const CustomSingleSelectInput = <TFormValues extends FieldValues>({
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="w-full p-0 overflow-hidden" align="start">
+              <PopoverContent className="w-full p-0 overflow-hidden" align="start" style={{ width: triggerWidth ? `${triggerWidth}px` : '100%' }}>
                 <Command shouldFilter={false} className="w-full">
                   {/* ─── Search Input ────────────────────────── */}
                   <div className="border-b w-full">
@@ -711,5 +724,3 @@ export default CustomSingleSelectInput;
 // //             };
 // //           }}
 // //         />
-
-

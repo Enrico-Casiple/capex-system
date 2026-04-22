@@ -16,7 +16,19 @@ const config: CodegenConfig = {
       preset: 'client',
       plugins: [],
     },
-
+    // ─── Zod for the Client (optional) ─────────────────────────────
+    'lib/generated/zod/client.ts': {
+      plugins: ['typescript', 'typescript-validation-schema'],
+      config: {
+        schema: 'zodv4',
+        strictScalars: false,
+        scalars: {
+          DateTime: 'string | Date',
+          Json: 'Record<string, unknown>',
+          ID: 'string',
+        },
+      }
+    },
     // ─── TypeScript types ─────────────────────────────────────
     'lib/generated/types/generated/types.ts': {
       plugins: ['typescript', 'typescript-operations'],
@@ -28,6 +40,28 @@ const config: CodegenConfig = {
         },
       },
     },
+     // ─── FORM TYPES (Pure TypeScript - Simple Scalars) ─────
+    // 'lib/generated/types/form-input.ts': {
+    //   plugins: ['typescript'],
+    //   config: {
+    //     scalars: {
+    //       DateTime: 'string',
+    //       Json: 'Record<string, unknown>',
+    //       ID: 'string',
+    //       String: 'string',
+    //       Boolean: 'boolean',
+    //       Int: 'number',
+    //       Float: 'number',
+    //     },
+    //     useTypeImports: true,
+    //     declarationKind: 'type',
+    //     avoidOptionals: false,
+    //     enumsAsConst: true,
+    //     strictScalars: true,
+    //     typesPrefix: '',
+    //     typesSuffix: '',
+    //   },
+    // },
   },
 };
 

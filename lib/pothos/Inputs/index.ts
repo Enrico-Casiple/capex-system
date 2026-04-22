@@ -63,6 +63,8 @@ const buildScalarField = (
       return t.string({ required, description });
     case 'Int':
       return t.int({ required, description });
+    case 'Float':
+      return t.float({ required, description });
     case 'Boolean':
       return t.boolean({ required, description });
     case 'DateTime':
@@ -399,5 +401,58 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
     });
   } catch (error) {
     console.error(`CsvExportInput error for ${modelName}: ${error}`);
+  }
+});
+
+// ─── FormInput: Complete form-friendly inputs with all fields and relations ───────────────────
+Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
+  try {
+    // const typedModel = modelName as Prisma.ModelName;
+    const ref = builder.inputRef<Record<string, unknown>>(`${modelName}FormInput`);
+    ref.implement({
+      description: `Complete input fields for ${modelName} form. Includes all scalars and relations optimized for forms.`,
+      fields: (t) => {
+        const model = prismaDataModel.datamodel.models[modelName];
+        const fields: Record<string, GenericInputFieldRef> = {};
+
+        model.fields.forEach((field) => {
+          // Skip only internal system fields
+          if (field.name.startsWith('_')) return;
+
+          // ✅ Include ALL scalar fields (id, timestamps, strings, numbers, booleans, dates, json)
+          if (field.kind === 'scalar') {
+            const description = `(Optional) The ${field.name} of the ${modelName}. Type: ${field.type}${field.isList ? '[]' : ''}.`;
+            fields[field.name] = buildScalarField(t, field, false, description);
+          }
+
+          // ✅ Include BOTH foreign key ID field AND nested relation object
+          if (field.kind === 'object') {
+            // 1️⃣ Add the foreign key ID field (e.g., userId)
+            const idField = model.fields.find(
+              (f) => f.name === `${field.name}Id` && f.kind === 'scalar'
+            );
+
+            if (idField) {
+              const description = `(Optional) Foreign key to connect a ${field.type} record.`;
+              fields[idField.name] = buildScalarField(t, idField, false, description);
+            }
+
+            // 2️⃣ Add the direct relation input (no recursive CreateOrConnect)
+            const relationDescription = `(Optional) ${field.isList ? 'List of' : 'Single'} ${field.type} relation for direct nested operations.`;
+            fields[field.name] = t.field({
+              type: field.isList
+                ? ([`${field.type}FormInput`] as never)
+                : (`${field.type}FormInput` as never),
+              required: false,
+              description: relationDescription,
+            });
+          }
+        });
+
+        return fields as never;
+      },
+    });
+  } catch (error) {
+    console.error(`FormInput error for ${modelName}: ${error}`);
   }
 });

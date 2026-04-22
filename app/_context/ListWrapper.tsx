@@ -7,7 +7,7 @@ import useColumns from '../_hooks/useColumns';
 
 const modelAPI = modelGQL;
 
-type ListPageProps<ModelShape extends { id: string }> = {
+type ListPageProps<ModelShape extends { id?: string | null }> = {
   modelName: string;
   children: React.ReactNode;
   extraColumns?: ColumnDef<ModelShape, unknown>[];
@@ -19,7 +19,7 @@ type ListPageProps<ModelShape extends { id: string }> = {
   initialSearchField: string[];
 };
 
-const ListPage = <ModelShape extends { id: string }>({
+const ListPage = <ModelShape extends { id?: string | null }>({
   modelName,
   children,
   extraColumns = [],

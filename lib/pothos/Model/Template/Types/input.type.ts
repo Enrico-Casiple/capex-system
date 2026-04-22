@@ -1,18 +1,20 @@
 import { Prisma } from '@/lib/generated/prisma/client';
-import { createInputRefs } from '@/lib/pothos/Inputs';
 import PrismaTypes from '@/lib/pothos/pothos-prisma-types';
-import { FindManyArgs, UpdateArgs } from './prismaArgs.type';
+import { FindManyArgs } from './prismaArgs.type';
 
 export type CreateInput<PrismaModel extends Prisma.ModelName> = {
-  data: (typeof createInputRefs)[PrismaModel];
+  // data: (typeof createInputRefs)[PrismaModel];
+  data: PrismaTypes[PrismaModel]['Create'];
   currentUserId?: string | null;
 };
 export type CreateManyInput<PrismaModel extends Prisma.ModelName> = {
-  data: (typeof createInputRefs)[PrismaModel][];
+  // data: (typeof createInputRefs)[PrismaModel][];
+  data: PrismaTypes[PrismaModel]['Create'][];
   currentUserId: string;
 };
 export type UpdateInput<PrismaModel extends Prisma.ModelName> = {
-  data: Partial<UpdateArgs<PrismaModel>['data']> & { id: UpdateArgs<PrismaModel>['where']['id'] };
+  // data: Partial<UpdateArgs<PrismaModel>['data']> & { id: UpdateArgs<PrismaModel>['where']['id'] };
+  data: PrismaTypes[PrismaModel]['Update'] & PrismaTypes[PrismaModel]['WhereUnique'];
   currentUserId: string;
 };
 export type RemoveInput = { id: string; currentUserId: string };
@@ -32,7 +34,7 @@ export type CursorPaginationInput<PrismaModel extends Prisma.ModelName> = {
   cursor?: string | null;
   direction?: 'forward' | 'backward'; // ← add this
   take?: number;
-  filter?: FindManyArgs<PrismaModel>['where'];
+  filter?: PrismaTypes[PrismaModel]['Where'];
   search?: string;
   searchFields?: (keyof PrismaTypes[PrismaModel]['Shape'])[]; // ← add this
 };

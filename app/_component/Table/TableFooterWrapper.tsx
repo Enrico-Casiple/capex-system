@@ -1,4 +1,5 @@
-import { Spinner, useListContext } from '@/app/_context/ListContext/ListProvider';
+import { useListContext } from '@/app/_context/ListContext/ListProvider';
+import { Spinner } from '@/app/_component/Spinner';
 import { Button } from '@/components/ui/button';
 import { TableCell, TableFooter, TableRow } from '@/components/ui/table'
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -6,12 +7,12 @@ import { useMemo, useEffect, useRef } from 'react';
 
 const TableFooterWrapper = () => {
   const { returnQuery, allRecordData, table, cursorKey, cursor, setCursor, active, filter, searchItems, cursorStack, setCursorStack, currentPage, setCurrentPage } = useListContext();
-  
-  const filterKey = useMemo(() => 
-    JSON.stringify({ active, filter, searchItems }), 
+
+  const filterKey = useMemo(() =>
+    JSON.stringify({ active, filter, searchItems }),
     [active, filter, searchItems]
   );
-  
+
   const prevFilterKeyRef = useRef(filterKey);
 
   useEffect(() => {
@@ -26,8 +27,8 @@ const TableFooterWrapper = () => {
 
   // Safely extract pagination data with type guards
   const queryResult = returnQuery.data?.[cursorKey];
-  const hasNextPage = queryResult && typeof queryResult === 'object' && 'hasNextPage' in queryResult 
-    ? Boolean(queryResult.hasNextPage) 
+  const hasNextPage = queryResult && typeof queryResult === 'object' && 'hasNextPage' in queryResult
+    ? Boolean(queryResult.hasNextPage)
     : false;
   const nextCursor = queryResult && typeof queryResult === 'object' && 'nextCursor' in queryResult
     ? (queryResult.nextCursor as string | null)
@@ -37,7 +38,7 @@ const TableFooterWrapper = () => {
 
   const handleNext = () => {
     if (!hasNextPage || !nextCursor || returnQuery.loading) return;
-    
+
     setCursorStack(prev => [...prev, cursor ?? '']);
     setCurrentPage(prev => prev + 1);
     setCursor(nextCursor);
@@ -45,7 +46,7 @@ const TableFooterWrapper = () => {
 
   const handlePrevious = () => {
     if (!hasPreviousPage || returnQuery.loading) return;
-    
+
     const prevCursor = cursorStack[cursorStack.length - 1] ?? null;
     setCursorStack(prev => {
       const newStack = [...prev];
@@ -66,21 +67,21 @@ const TableFooterWrapper = () => {
               <span>Loading...</span>
             </div>
           )}
-       
+
           {allRecordData.length > 0 && !returnQuery.loading && (
             <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
               <span className="text-xs text-muted-foreground">
                 Page {currentPage}
               </span>
               <span className="text-xs text-muted-foreground">
-                {hasNextPage 
-                  ? `Showing ${table.getRowCount()} records` 
+                {hasNextPage
+                  ? `Showing ${table.getRowCount()} records`
                   : `All ${table.getRowCount()} records loaded`
                 }
               </span>
               <span className="text-xs text-muted-foreground flex items-center gap-2">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="icon"
                   disabled={!hasPreviousPage || returnQuery.loading}
                   onClick={handlePrevious}
@@ -89,8 +90,8 @@ const TableFooterWrapper = () => {
                   <ChevronLeft className="size-4" />
                 </Button>
                 <span className="min-w-8 text-center">{currentPage}</span>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="icon"
                   disabled={!hasNextPage || returnQuery.loading}
                   onClick={handleNext}

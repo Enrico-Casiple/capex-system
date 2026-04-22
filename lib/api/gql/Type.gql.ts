@@ -3,6 +3,7 @@ export const TypeFragment = gql`
 fragment TypeFragment on Type {
   id
   name
+  description
   modelNameType
   isActive
   createdAt
@@ -117,7 +118,7 @@ export const TypeExportCsv = gql`
 
 
 export const TypeCreate = gql`
-  mutation TypeCreate($data: TypeCreateInput!, $currentUserId: String) {
+  mutation TypeCreate($data: Json!, $currentUserId: String) {
     TypeCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -129,7 +130,7 @@ export const TypeCreate = gql`
 `;
 
 export const TypeCreateMany = gql`
-  mutation TypeCreateMany($data: [TypeCreateInput!]!, $currentUserId: String) {
+  mutation TypeCreateMany($data: [Json!]!, $currentUserId: String) {
     TypeCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -141,7 +142,7 @@ export const TypeCreateMany = gql`
 `;
 
 export const TypeUpdate = gql`
-  mutation TypeUpdate($id: String!, $data: TypeUpdateInput!, $currentUserId: String) {
+  mutation TypeUpdate($id: String!, $data: Json!, $currentUserId: String) {
     TypeUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -153,7 +154,7 @@ export const TypeUpdate = gql`
 `;
 
 export const TypeUpdateMany = gql`
-  mutation TypeUpdateMany($data: [TypeUpdateInput!]!, $currentUserId: String) {
+  mutation TypeUpdateMany($data: [Json!]!, $currentUserId: String) {
     TypeUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

@@ -16,6 +16,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         model.fields.forEach((field) => {
           const fieldName = field.name as string;
           const isNullable = !field.isRequired;
+          // const isNullable = true; // For better compatibility with optional fields in the frontend, we treat all fields as nullable. This allows us to handle cases where data might be missing without causing errors. In practice, you can adjust this logic to reflect the actual nullability of fields based on your application's needs.
           const nullableNote = isNullable ? '(Optional)' : '(Required)';
 
           // Skip private fields starting with _ except id
@@ -52,6 +53,12 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
                 fields[fieldName] = t.exposeInt(fieldName as never, {
                   nullable: isNullable,
                   description: `${nullableNote} ${fieldName} field of ${modelName}. Type: Integer.`,
+                });
+                break;
+              case 'Float':
+                fields[fieldName] = t.exposeFloat(fieldName as never, {
+                  nullable: isNullable,
+                  description: `${nullableNote} ${fieldName} field of ${modelName}. Type: Float.`,
                 });
                 break;
               case 'Boolean':

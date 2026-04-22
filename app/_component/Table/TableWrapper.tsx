@@ -1,4 +1,5 @@
-import { Spinner, useListContext } from '@/app/_context/ListContext/ListProvider';
+import { useListContext } from '@/app/_context/ListContext/ListProvider';
+import { Spinner } from '@/app/_component/Spinner';
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { Query } from '@/lib/generated/api/customHookAPI/graphql';
@@ -16,7 +17,7 @@ const TableWrapper = <ModelShape, Response extends Record<string, Query[keyof Qu
   return (
     <div className="flex flex-col rounded-md border border-border overflow-hidden bg-background">
 
-        
+
       <div className="relative flex flex-col">
         {returnQuery.loading && !hasData && (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm gap-2">
@@ -31,7 +32,7 @@ const TableWrapper = <ModelShape, Response extends Record<string, Query[keyof Qu
             <TableHeaderWrapper table={table} />
               {isEmpty ? (
                 <TableBody>
-                  <TableRow style={{ display: 'table', width: '100%', tableLayout: 'fixed' }} 
+                  <TableRow style={{ display: 'table', width: '100%', tableLayout: 'fixed' }}
                   >
                     <TableCell className="flex flex-col items-center justify-center text-center border-0 space-y-4 p-10">
                       <FileSearchIcon size={36} strokeWidth={1.2} className="text-muted-foreground/50 text-center" />

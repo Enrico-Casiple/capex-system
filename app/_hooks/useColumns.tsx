@@ -8,7 +8,7 @@ type ColumnsProps<Model> = {
   actionCell?: (row: Model) => React.ReactNode;
 };
 
-function useColumns<Model extends { id: string }>({
+function useColumns<Model extends { id?: string | null }>({
   extraColumns,
   showActions,
   actionCell,
@@ -96,7 +96,7 @@ function useColumns<Model extends { id: string }>({
         header: 'Action',
         enableSorting: false, // by default, True so we need to disable sorting for this column
         enableColumnFilter: false, // by default, True so we need to disable filtering for this column
-        cell: ({ row }) => <div>{actionCell ? actionCell(row.original) : row.original.id}</div>,
+        cell: ({ row }) => <div className='text-start'>{actionCell ? actionCell(row.original) : row.original.id}</div>,
         size: 50,
       });
     }

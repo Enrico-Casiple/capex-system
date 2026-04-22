@@ -120,7 +120,7 @@ export const JobLevelExportCsv = gql`
 
 
 export const JobLevelCreate = gql`
-  mutation JobLevelCreate($data: JobLevelCreateInput!, $currentUserId: String) {
+  mutation JobLevelCreate($data: Json!, $currentUserId: String) {
     JobLevelCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -132,7 +132,7 @@ export const JobLevelCreate = gql`
 `;
 
 export const JobLevelCreateMany = gql`
-  mutation JobLevelCreateMany($data: [JobLevelCreateInput!]!, $currentUserId: String) {
+  mutation JobLevelCreateMany($data: [Json!]!, $currentUserId: String) {
     JobLevelCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -144,7 +144,7 @@ export const JobLevelCreateMany = gql`
 `;
 
 export const JobLevelUpdate = gql`
-  mutation JobLevelUpdate($id: String!, $data: JobLevelUpdateInput!, $currentUserId: String) {
+  mutation JobLevelUpdate($id: String!, $data: Json!, $currentUserId: String) {
     JobLevelUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -156,7 +156,7 @@ export const JobLevelUpdate = gql`
 `;
 
 export const JobLevelUpdateMany = gql`
-  mutation JobLevelUpdateMany($data: [JobLevelUpdateInput!]!, $currentUserId: String) {
+  mutation JobLevelUpdateMany($data: [Json!]!, $currentUserId: String) {
     JobLevelUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

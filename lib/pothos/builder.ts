@@ -1,5 +1,6 @@
 import SchemaBuilder from '@pothos/core';
 import PrismaPlugin from '@pothos/plugin-prisma';
+import PrismaUtils from '@pothos/plugin-prisma-utils';
 import { GraphQLDateTime, GraphQLJSON } from 'graphql-scalars';
 import { Session } from 'next-auth';
 import { prisma } from '../prisma/prisma';
@@ -25,7 +26,7 @@ export const builder = new SchemaBuilder<{
     rateLimiter: typeof rateLimiter;
   };
 }>({
-  plugins: [PrismaPlugin],
+  plugins: [PrismaPlugin, PrismaUtils],
   prisma: {
     client: prisma,
     dmmf: getDatamodel(),

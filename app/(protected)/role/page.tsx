@@ -1,16 +1,21 @@
 'use client';
+import Export from '@/app/_component/List/Export';
+import Import from '@/app/_component/List/Import';
+import Action, { ActionType, PopupType } from '@/app/_component/Row/Action';
 import ListPage from '@/app/_context/ListWrapper';
 import { Role, RoleCreateInput } from '@/lib/generated/api/customHookAPI/graphql';
-import ModelData from '../../_component/ModelData';
-import Action from '@/app/_component/Row/Action';
-import Method from './_form/Method';
 import { useCallback } from 'react';
-import { ActionType, PopupType } from '@/app/_component/Row/Action';
+import ModelData from '../../_component/ModelData';
 import { roleTableConfig } from '../_config';
-import Import from '@/app/_component/List/Import';
-import Export from '@/app/_component/List/Export';
-import ImportForm from './_form/ImportForm';
 import ExportForm from './_form/ExportForm';
+import ImportForm from './_form/ImportForm';
+import dynamic from 'next/dynamic';
+import { Spinner } from '@/app/_component/Spinner';
+
+const Method = dynamic(() => import('./_form/Method'), {
+  loading: () => <Spinner />,
+  ssr: false
+});
 
 const ModelPage = () => {
   const renderMethod = useCallback(
@@ -33,7 +38,7 @@ const ModelPage = () => {
   );
 
   const actionComponent = useCallback(
-    (row: Role) => <Action rowId={row.id} component={renderMethod} />,
+    (row: Role) => <Action rowId={row.id ?? null} component={renderMethod} />,
     [renderMethod],
   );
 
@@ -57,7 +62,7 @@ const ModelPage = () => {
   );
 
   const BULK_ACTIONS: React.ReactNode[] = [
-    
+
   ];
 
   const importForm = useCallback<(open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => React.ReactNode>(

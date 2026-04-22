@@ -5,6 +5,7 @@ fragment PositionFragment on Position {
   name
   acronym
   description
+  isActive
   createdAt
   updatedAt
   scopeTypeId
@@ -118,7 +119,7 @@ export const PositionExportCsv = gql`
 
 
 export const PositionCreate = gql`
-  mutation PositionCreate($data: PositionCreateInput!, $currentUserId: String) {
+  mutation PositionCreate($data: Json!, $currentUserId: String) {
     PositionCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -130,7 +131,7 @@ export const PositionCreate = gql`
 `;
 
 export const PositionCreateMany = gql`
-  mutation PositionCreateMany($data: [PositionCreateInput!]!, $currentUserId: String) {
+  mutation PositionCreateMany($data: [Json!]!, $currentUserId: String) {
     PositionCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -142,7 +143,7 @@ export const PositionCreateMany = gql`
 `;
 
 export const PositionUpdate = gql`
-  mutation PositionUpdate($id: String!, $data: PositionUpdateInput!, $currentUserId: String) {
+  mutation PositionUpdate($id: String!, $data: Json!, $currentUserId: String) {
     PositionUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -154,7 +155,7 @@ export const PositionUpdate = gql`
 `;
 
 export const PositionUpdateMany = gql`
-  mutation PositionUpdateMany($data: [PositionUpdateInput!]!, $currentUserId: String) {
+  mutation PositionUpdateMany($data: [Json!]!, $currentUserId: String) {
     PositionUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

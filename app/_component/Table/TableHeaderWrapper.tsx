@@ -25,7 +25,7 @@ const TableHeaderWrapper = <Model,>({ table }: TableHeaderWrapperProps<Model>) =
           return (
             <TableHead
               key={header.id}
-              className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground border-b select-none"
+              className="px-3 py-2 text-xs font-semibold uppercase text-muted-foreground border-b select-none"
               style={{ width: header.getSize() }}
             >
               {header.isPlaceholder ? null : (
@@ -40,7 +40,7 @@ const TableHeaderWrapper = <Model,>({ table }: TableHeaderWrapperProps<Model>) =
                 </div>
               )}
             </TableHead>
-          );
+          )
         })}
       </TableRow>
     ))}

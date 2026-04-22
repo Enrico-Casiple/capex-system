@@ -13,22 +13,22 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Archive, ArchiveRestore, Copy, Edit, EyeIcon, MoreHorizontal, Trash2 } from 'lucide-react';
 import React, { useState } from 'react';
-import ArchiveOne from './Archive';
-import RestoreOne from './RestoreOne';
-import RemoveOne from './RemoveOne';
 import RoleGate from '../RoleGate/RoleGate';
+import ArchiveOne from './Archive';
+import RemoveOne from './RemoveOne';
+import RestoreOne from './RestoreOne';
 
 export type ActionType = 'view' | 'edit' | 'duplicate' | 'archive' | 'restore' | 'delete' | 'none'; // none -> create
 export type PopupType = 'dialog' | 'drawer' | 'none';
 
 interface ActionState {
-  id: string;
+  id: string | null;
   actionType: ActionType;
   popupType: PopupType;
 }
 
 type ActionProps = {
-  rowId: string;
+  rowId: string | null;
   component: (
     rowid: string | null,
     actionType: ActionType,
@@ -47,7 +47,7 @@ const Action = ({ rowId, component }: ActionProps) => {
 
   const handleAction = (actionType: ActionType, popupType: PopupType = 'none') => {
     const actionState: ActionState = {
-      id: rowId,
+      id: rowId ?? null,
       actionType,
       popupType,
     };
@@ -159,7 +159,7 @@ const Action = ({ rowId, component }: ActionProps) => {
                 resource={[`${modelName.toLowerCase()}`, "*"]}
                 action={['duplicate', '*']}
               >
-                
+
                 <DropdownMenuItem
                   onSelect={() => handleAction('duplicate', 'drawer')}
                   className="cursor-pointer group"
@@ -228,7 +228,7 @@ const Action = ({ rowId, component }: ActionProps) => {
         >
           {drawerOpen &&
             component(
-              currentAction.id,
+              currentAction.id ?? null,
               currentAction.actionType,
               currentAction.popupType,
               drawerOpen,
@@ -245,13 +245,13 @@ const Action = ({ rowId, component }: ActionProps) => {
           description={getActionDetails(currentAction.actionType).description}
         >
           {currentAction.actionType === 'archive' && (
-            <ArchiveOne rowId={currentAction.id} setDialogOpen={setDialogOpen} />
+            <ArchiveOne rowId={currentAction.id ?? null} setDialogOpen={setDialogOpen} />
           )}
           {currentAction.actionType === 'restore' && (
-            <RestoreOne rowId={currentAction.id} setDialogOpen={setDialogOpen} />
+            <RestoreOne rowId={currentAction.id ?? null} setDialogOpen={setDialogOpen} />
           )}
           {currentAction.actionType === 'delete' && (
-            <RemoveOne rowId={currentAction.id} setDialogOpen={setDialogOpen} />
+            <RemoveOne rowId={currentAction.id ?? null} setDialogOpen={setDialogOpen} />
           )}
         </CustomDialog>
       )}

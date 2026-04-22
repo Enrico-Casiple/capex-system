@@ -124,7 +124,7 @@ export const ${modelName}ExportCsv = gql\`
 
 
 export const ${modelName}Create = gql\`
-  mutation ${modelName}Create($data: ${modelName}CreateInput!, $currentUserId: String) {
+  mutation ${modelName}Create($data: Json!, $currentUserId: String) {
     ${modelName}Create(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -136,7 +136,7 @@ export const ${modelName}Create = gql\`
 \`;
 
 export const ${modelName}CreateMany = gql\`
-  mutation ${modelName}CreateMany($data: [${modelName}CreateInput!]!, $currentUserId: String) {
+  mutation ${modelName}CreateMany($data: [Json!]!, $currentUserId: String) {
     ${modelName}CreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -148,7 +148,7 @@ export const ${modelName}CreateMany = gql\`
 \`;
 
 export const ${modelName}Update = gql\`
-  mutation ${modelName}Update($id: String!, $data: ${modelName}UpdateInput!, $currentUserId: String) {
+  mutation ${modelName}Update($id: String!, $data: Json!, $currentUserId: String) {
     ${modelName}Update(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -160,7 +160,7 @@ export const ${modelName}Update = gql\`
 \`;
 
 export const ${modelName}UpdateMany = gql\`
-  mutation ${modelName}UpdateMany($data: [${modelName}UpdateInput!]!, $currentUserId: String) {
+  mutation ${modelName}UpdateMany($data: [Json!]!, $currentUserId: String) {
     ${modelName}UpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

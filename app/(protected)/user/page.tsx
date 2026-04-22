@@ -3,7 +3,6 @@ import ListPage from '@/app/_context/ListWrapper';
 import { User, UserCreateInput } from '@/lib/generated/api/customHookAPI/graphql';
 import ModelData from '../../_component/ModelData';
 import Action from '@/app/_component/Row/Action';
-import Method from './_form/Method';
 import { useCallback } from 'react';
 import { ActionType, PopupType } from '@/app/_component/Row/Action';
 import { userTableConfig } from '../_config';
@@ -11,6 +10,13 @@ import Import from '@/app/_component/List/Import';
 import Export from '@/app/_component/List/Export';
 import ImportForm from './_form/ImportForm';
 import ExportForm from './_form/ExportForm';
+import dynamic from 'next/dynamic';
+import { Spinner } from '@/app/_component/Spinner';
+
+const Method = dynamic(() => import('./_form/Method'), {
+  loading: () => <Spinner />,
+  ssr: false
+});
 
 const ModelPage = () => {
   const renderMethod = useCallback(
@@ -57,7 +63,7 @@ const ModelPage = () => {
   );
 
   const BULK_ACTIONS: React.ReactNode[] = [
-    
+
   ];
 
   const importForm = useCallback(

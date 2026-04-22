@@ -218,13 +218,13 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
     });
   }
 
-  private escapeCsvValue(value: unknown): string {
-    if (value === null || value === undefined) return '';
-    if (value instanceof Date) return value.toISOString();
-    if (typeof value === 'object') return JSON.stringify(value);
-    const s = String(value);
-    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-  }
+  // private escapeCsvValue(value: unknown): string {
+  //   if (value === null || value === undefined) return '';
+  //   if (value instanceof Date) return value.toISOString();
+  //   if (typeof value === 'object') return JSON.stringify(value);
+  //   const s = String(value);
+  //   return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  // }
 
   private getValueByPath(record: Record<string, unknown>, path: string): unknown {
     if (!path) return null;
