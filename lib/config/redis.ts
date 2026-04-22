@@ -25,16 +25,17 @@ const isBuildContext = () => {
 const createMockRedisClient = () => {
   return new Proxy({}, {
     get: () => {
-      return (...args: any[]) => Promise.resolve(null);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      return (..._args: unknown[]) => Promise.resolve(null);
     },
-  }) as any;
+  }) as unknown as Redis;
 };
 
 export const redisClient = isBuildContext() ? createMockRedisClient() : new Redis(redisConfig);
 
 // Only attach listeners in runtime, not in build context
 if (!isBuildContext()) {
-  redisClient.on('error', (err) => {
+  redisClient.on('error', (err: Error) => {
     console.error('Redis Client Error', err);
   });
 
