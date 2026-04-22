@@ -40,7 +40,9 @@ if (!isBuildContext()) {
   });
 
   redisClient.on('connect', () => {
-    console.log('Redis Client Connected');
+    console.log(`=====================================================================`);
+    console.log(`Redis Client Connected to ${redisConfig.host}:${redisConfig.port}.`);
+    console.log(`=====================================================================`);
   });
 }
 

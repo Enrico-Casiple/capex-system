@@ -5,6 +5,10 @@ import { Context } from '../pothos/subscription';
 export const enforceRateLimit = async (ctx: Context, modelName: string) => {
   const consume = await checkRateLimit(ctx.session?.user?.email ?? 'anonymous');
   if (!consume.allowed) {
+    console.log(`==================================================================================`);
+    console.log(`🚦 Rate limit exceeded for user email: ${ctx.session?.user?.email}`);
+    console.log(`==================================================================================`);
+
     return {
       isSuccess: false,
       message: `Rate limit exceeded. Please try again in ${consume.retryAfter} seconds.`,
@@ -16,8 +20,11 @@ export const enforceRateLimit = async (ctx: Context, modelName: string) => {
       pageinfo: null,
     };
   }
+
+  console.log(`==================================================================================`);
   console.log(
-    `🚦 Rate limit check: ${consume.allowed ? 'Request allowed' : 'Rate limit exceeded'} for user email: ${ctx.session?.user?.email}`,
+    `🚦 Rate limit check passed for user email: ${ctx.session?.user?.email}. Remaining points: ${consume.remainingPoints}`,
   );
+  console.log(`==================================================================================`);
   return null;
 };

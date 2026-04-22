@@ -3306,10 +3306,8 @@ input BudgetUpdateOrConnectInput {
 
 """Represents a CapitalRecoveryFactor record in the database."""
 type CapitalRecoveryFactor {
-  """
-  (Optional) approvedAmmount field of CapitalRecoveryFactor. Type: Float.
-  """
-  approvedAmmount: Float
+  """(Optional) approvedAmount field of CapitalRecoveryFactor. Type: Float."""
+  approvedAmount: Float
 
   """
   (Optional) List of related Budget records linked to this CapitalRecoveryFactor.
@@ -3444,9 +3442,9 @@ type CapitalRecoveryFactorCountResponse {
 """Input fields required to create a new CapitalRecoveryFactor record."""
 input CapitalRecoveryFactorCreateInput {
   """
-  (Optional) The approvedAmmount of the new CapitalRecoveryFactor. Type: Float.
+  (Optional) The approvedAmount of the new CapitalRecoveryFactor. Type: Float.
   """
-  approvedAmmount: Float
+  approvedAmount: Float
 
   """(Optional) List of Budget relation."""
   budget: [BudgetCreateOrConnectInput!]
@@ -3709,9 +3707,9 @@ Complete input fields for CapitalRecoveryFactor form. Includes all scalars and r
 """
 input CapitalRecoveryFactorFormInput {
   """
-  (Optional) The approvedAmmount of the CapitalRecoveryFactor. Type: Float.
+  (Optional) The approvedAmount of the CapitalRecoveryFactor. Type: Float.
   """
-  approvedAmmount: Float
+  approvedAmount: Float
 
   """(Optional) List of Budget relation for direct nested operations."""
   budget: [BudgetFormInput!]
@@ -3906,9 +3904,9 @@ Input fields to update an existing CapitalRecoveryFactor record. All fields are 
 """
 input CapitalRecoveryFactorUpdateInput {
   """
-  (Optional) Update the approvedAmmount of the CapitalRecoveryFactor. Type: Float.
+  (Optional) Update the approvedAmount of the CapitalRecoveryFactor. Type: Float.
   """
-  approvedAmmount: Float
+  approvedAmount: Float
 
   """(Optional) List of Budget relation."""
   budget: [BudgetUpdateOrConnectInput!]
@@ -15382,8 +15380,8 @@ type Request {
   """(Optional) isActive field of Request. Type: Boolean."""
   isActive: Boolean
 
-  """(Optional) quotaionAmount field of Request. Type: Float."""
-  quotaionAmount: Float
+  """(Optional) quotationAmount field of Request. Type: Float."""
+  quotationAmount: Float
 
   """(Optional) quotationUrl field of Request. Type: String."""
   quotationUrl: String
@@ -15508,8 +15506,8 @@ input RequestCreateInput {
   """(Optional) The isActive of the new Request. Type: Boolean."""
   isActive: Boolean
 
-  """(Optional) The quotaionAmount of the new Request. Type: Float."""
-  quotaionAmount: Float
+  """(Optional) The quotationAmount of the new Request. Type: Float."""
+  quotationAmount: Float
 
   """(Optional) The quotationUrl of the new Request. Type: String."""
   quotationUrl: String
@@ -15746,8 +15744,8 @@ input RequestFormInput {
   """(Optional) The isActive of the Request. Type: Boolean."""
   isActive: Boolean
 
-  """(Optional) The quotaionAmount of the Request. Type: Float."""
-  quotaionAmount: Float
+  """(Optional) The quotationAmount of the Request. Type: Float."""
+  quotationAmount: Float
 
   """(Optional) The quotationUrl of the Request. Type: String."""
   quotationUrl: String
@@ -16433,8 +16431,8 @@ input RequestUpdateInput {
   """(Optional) Update the isActive of the Request. Type: Boolean."""
   isActive: Boolean
 
-  """(Optional) Update the quotaionAmount of the Request. Type: Float."""
-  quotaionAmount: Float
+  """(Optional) Update the quotationAmount of the Request. Type: Float."""
+  quotationAmount: Float
 
   """(Optional) Update the quotationUrl of the Request. Type: String."""
   quotationUrl: String
