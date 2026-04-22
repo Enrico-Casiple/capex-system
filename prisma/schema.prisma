@@ -6,12 +6,12 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../lib/generated/prisma"
+  output   = "../generated/prisma/client"
 }
 
 generator pothos {
   provider          = "prisma-pothos-types"
-  clientOutput      = "../generated/prisma"
+  clientOutput      = "../../generated/prisma/client"
   output            = "../lib/pothos/pothos-prisma-types.ts"
   documentation     = true
   prismaUtils       = true
@@ -20,7 +20,7 @@ generator pothos {
 
 generator zod {
   provider = "npx zod-prisma-types"
-  output   = "../lib/generated/zod/prisma-zod-types"
+  output   = "../generated/zod/prisma-zod-types"
 
   useMultipleFiles          = false
   writeBarrelFiles          = false
@@ -891,7 +891,9 @@ model CapitalRecoveryFactor {
   utilizedBudget  Float? // percentage of the budget that this request will consume, e.g. 0.25 means 25% of the budget
   approvedAmount Float? // the amount that was approved for this request, used for reporting and forecasting
   requestedAmount Float? // the actual amount that this request is asking for, used for approval and reporting
+  remainingAmount Float? // computed as approvedAmount - sum of committed and actual amounts from BudgetLedger, used for reporting and forecasting
   projectedBudget Float? // the projected budget amount that this request is asking for, used for forecasting and reporting
+  remark   Json? // Provided Specs During AOP and Provied purpose During AOP
 
   requestId String?  @db.ObjectId @unique
   request   Request? @relation(fields: [requestId], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -940,6 +942,7 @@ model Budget {
 
   requestedAmount Float?
   approvedAmount  Float?
+  remainingAmount Float? // computed as approvedAmount - sum of committed and actual amounts from BudgetLedger
   currency        String? @default("PHP")
 
   budgetLedgers  BudgetLedger[]

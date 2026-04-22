@@ -159,7 +159,7 @@ type CustomSingleSelectInputProps<TFormValues extends FieldValues> = {
   emptySelectedMessage?: string;
   emptyMessage?: string;
   cursorVariables: (search: string, cursor: string | null, take: number) => Record<string, unknown>;
-  uniqueVariables: (id: string) => Record<string, unknown>;
+  uniqueVariables: (value: string) => Record<string, unknown>; // Now returns the full variables object
   mapOption: (item: unknown) => ComboboxOption ;
   mapDefaultOption: (data: unknown) => ComboboxOption | null;
   disabled?: boolean;

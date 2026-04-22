@@ -1,0 +1,76 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.2/schema.json",
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "complexity": {
+        "noExcessiveCognitiveComplexity": "warn"
+      },
+      "correctness": {
+        "noConstAssign": "error",
+        "noConstantCondition": "warn",
+        "noEmptyCharacterClassInRegex": "error",
+        "noInvalidUseBeforeDeclaration": "error",
+        "noUnusedVariables": "warn"
+      },
+      "style": {
+        "noImplicitAny": "off",
+        "noNonNullAssertion": "off",
+        "useConst": "warn",
+        "useEnumInitializers": "warn"
+      },
+      "suspicious": {
+        "noAsyncPromiseExecutor": "error",
+        "noDuplicateJsxProps": "error"
+      }
+    }
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentSize": 2,
+    "indentStyle": "space",
+    "lineWidth": 100,
+    "lineEnding": "lf"
+  },
+  "javascript": {
+    "formatter": {
+      "arrowParentheses": "always",
+      "bracketSameLine": false,
+      "bracketSpacing": true,
+      "quoteProperties": "asNeeded",
+      "semicolons": "always",
+      "trailingComma": "all"
+    },
+    "globals": [
+      "React",
+      "JSX"
+    ]
+  },
+  "json": {
+    "parser": {
+      "allowTrailingComma": false
+    },
+    "formatter": {
+      "indentSize": 2
+    }
+  },
+  "overrides": [
+    {
+      "include": ["*.config.ts", "*.config.js"],
+      "formatter": {
+        "lineWidth": 120
+      }
+    },
+    {
+      "include": ["prisma/schema.prisma"],
+      "formatter": {
+        "lineWidth": 120
+      }
+    }
+  ]
+}

@@ -5,13 +5,13 @@ import { Prisma } from '../../../generated/prisma/client';
 import { builder } from '../../builder';
 import {
   countInputRefs,
-  createInputRefs,
+  // createInputRefs,
   csvExportInputRefs,
   cursorPaginationInputRefs,
   findByInputRefs,
   findFirstInputRefs,
   pageInputRefs,
-  updateInputRefs,
+  // updateInputRefs,
 } from '../../Inputs';
 import { getDatamodel } from '../../pothos-prisma-types';
 import {
@@ -46,8 +46,8 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   const model = modelName as Prisma.ModelName;
   const service = services[model];
   const subscriptionPublishName = `${modelName}Subscription`;
-  const createInputRef = createInputRefs[model];
-  const updateInputRef = updateInputRefs[model];
+  // const createInputRef = createInputRefs[model];
+  // const updateInputRef = updateInputRefs[model];
   const csvExportInputRef = csvExportInputRefs[model];
   const csvExportResponseType = csvExportResponseRef[model];
 
@@ -102,13 +102,13 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           description: `Cursor pagination and filter options for the ${modelName} list query.`,
         }),
       },
-      resolve: async (_parent, args, ctx) => {
+      resolve: async (_parent, args) => {
         console.log(
           `🔍 ${modelName}: FindAllWithCursor - Received cursor pagination request with input:`,
           args.cursorInput,
         );
-        const middlewareError = await middlewareCheck(ctx, modelName);
-        if (middlewareError) return middlewareError;
+        // const middlewareError = await middlewareCheck(ctx, modelName);
+        // if (middlewareError) return middlewareError;
         try {
           return await service.findAllWithCursor(args.cursorInput as never);
         } catch (error) {
@@ -139,10 +139,10 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           description: `The unique identifier of the ${modelName} record to retrieve.`,
         }),
       },
-      resolve: async (_parent, args, ctx) => {
+      resolve: async (_parent, args) => {
         console.log(`🔍 ${modelName}: FindUnique - Received request for id:`, args.id);
-        const middlewareError = await middlewareCheck(ctx, modelName);
-        if (middlewareError) return middlewareError;
+        // const middlewareError = await middlewareCheck(ctx, modelName);
+        // if (middlewareError) return middlewareError;
         return await service.findUnique(args.id);
       },
     }),
@@ -155,13 +155,13 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
       args: {
         input: t.arg({ type: findByInputRefs[model], required: true }),
       },
-      resolve: async (_root, { input }, ctx) => {
+      resolve: async (_root, { input }) => {
         console.log(
           `🔍 ${modelName}: FindBy - Received with dynamic key and value request with input:`,
           input,
         );
-        const middlewareError = await middlewareCheck(ctx, modelName);
-        if (middlewareError) return middlewareError;
+        // const middlewareError = await middlewareCheck(ctx, modelName);
+        // if (middlewareError) return middlewareError;
         return services[model].findBy(
           input.key as keyof FindUniqueArgs<typeof model>['where'],
           input.value,
@@ -177,13 +177,13 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
       args: {
         input: t.arg({ type: findFirstInputRefs[model], required: true }),
       },
-      resolve: async (_root, { input }, ctx) => {
+      resolve: async (_root, { input }) => {
         console.log(
           `🔍 ${modelName}: FindFirst - Received where clause request with input:`,
           input,
         );
-        const middlewareError = await middlewareCheck(ctx, modelName, true);
-        if (middlewareError) return middlewareError;
+        // const middlewareError = await middlewareCheck(ctx, modelName, true);
+        // if (middlewareError) return middlewareError;
         return services[model].findFirst(input.where as FindManyArgs<typeof model>['where']);
       },
     }),
@@ -196,10 +196,10 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
       args: {
         input: t.arg({ type: countInputRefs[model], required: true }),
       },
-      resolve: async (_root, { input }, ctx) => {
+      resolve: async (_root, { input }) => {
         console.log(`🔍 ${modelName}: Count - Received count request with input:`, input);
-        const middlewareError = await middlewareCheck(ctx, modelName, true);
-        if (middlewareError) return middlewareError;
+        // const middlewareError = await middlewareCheck(ctx, modelName, true);
+        // if (middlewareError) return middlewareError;
         return services[model].count(input.where as FindManyArgs<typeof model>['where']);
       },
     }),
@@ -238,7 +238,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   }
 
   // ─── MUTATION: create ─────────────────────────────────────────
-  if (!updateInputRef) return;
+  // if (!updateInputRef) return;
 
   builder.mutationField(`${modelName}Create`, (t) =>
     t.field({
@@ -333,15 +333,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         const middlewareError = await middlewareCheck(ctx, modelName);
         if (middlewareError) return middlewareError;
 
-        // removing the deleteMany and delete
-        if(args.data.deleteMany || args.data.delete) {
-          return {
-            isSuccess: false,
-            message: `Direct delete operations are not allowed in update. Please use the dedicated archive or remove mutations.`,
-            code: `${modelName.toUpperCase()}_UPDATE_FAILED`,
-            data: null,
-          };
-        }
+        // Control the Delete Option for the update operation
 
         const result = await service.update({
           data: { ...args.data, id: args.id },
@@ -377,14 +369,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         const middlewareError = await middlewareCheck(ctx, modelName);
         if (middlewareError) return middlewareError;
 
-        if(args.data.some((item: any) => item.deleteMany || item.delete)) {
-          return {
-            isSuccess: false,
-            message: `Direct delete operations are not allowed in update. Please use the dedicated archive or remove mutations.`,
-            code: `${modelName.toUpperCase()}_BULK_UPDATE_FAILED`,
-            data: null,
-          };
-        }
+        //  Control the Delete Option for the updateMany operation
 
         const result = await service.updateMany({
           data: args.data,

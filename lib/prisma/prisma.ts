@@ -1,5 +1,7 @@
-import { PrismaClient } from '../generated/prisma/client';
-import { LogEvent, QueryEvent } from '../generated/prisma/internal/prismaNamespace';
+import { PrismaClient } from '../../generated/prisma/client/client';
+import { LogEvent, QueryEvent } from '../../generated/prisma/client/internal/prismaNamespace';
+
+
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 

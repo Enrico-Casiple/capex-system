@@ -16,30 +16,30 @@ const config: CodegenConfig = {
       preset: 'client',
       plugins: [],
     },
-    // ─── Zod for the Client (optional) ─────────────────────────────
-    'lib/generated/zod/client.ts': {
-      plugins: ['typescript', 'typescript-validation-schema'],
-      config: {
-        schema: 'zodv4',
-        strictScalars: false,
-        scalars: {
-          DateTime: 'string | Date',
-          Json: 'Record<string, unknown>',
-          ID: 'string',
-        },
-      }
-    },
-    // ─── TypeScript types ─────────────────────────────────────
-    'lib/generated/types/generated/types.ts': {
-      plugins: ['typescript', 'typescript-operations'],
-      config: {
-        scalars: {
-          DateTime: 'string | Date',
-          Json: 'Record<string, unknown>',
-          ID: 'string',
-        },
-      },
-    },
+    // // ─── Zod for the Client (optional) ─────────────────────────────
+    // 'lib/generated/zod/client.ts': {
+    //   plugins: ['typescript', 'typescript-validation-schema'],
+    //   config: {
+    //     schema: 'zodv4',
+    //     strictScalars: false,
+    //     scalars: {
+    //       DateTime: 'string | Date',
+    //       Json: 'Record<string, unknown>',
+    //       ID: 'string',
+    //     },
+    //   }
+    // },
+    // // ─── TypeScript types ─────────────────────────────────────
+    // 'lib/generated/types/generated/types.ts': {
+    //   plugins: ['typescript', 'typescript-operations'],
+    //   config: {
+    //     scalars: {
+    //       DateTime: 'string | Date',
+    //       Json: 'Record<string, unknown>',
+    //       ID: 'string',
+    //     },
+    //   },
+    // },
      // ─── FORM TYPES (Pure TypeScript - Simple Scalars) ─────
     // 'lib/generated/types/form-input.ts': {
     //   plugins: ['typescript'],

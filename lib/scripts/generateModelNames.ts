@@ -14,6 +14,6 @@ export const MODEL_NAME_ENUM: Record<ModelName, ModelName> = Object.freeze(
 `;
 
 mkdirSync('lib/generated', { recursive: true });
-writeFileSync('lib/generated/model-names.ts', content);
+writeFileSync('generated/model-names.ts', content);
 
-console.log('Generated lib/generated/model-names.ts');
+console.log('Generated generated/model-names.ts');

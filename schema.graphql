@@ -1620,6 +1620,9 @@ type Budget {
   """(Optional) rejectedAt field of Budget. Type: DateTime (ISO 8601)."""
   rejectedAt: DateTime
 
+  """(Optional) remainingAmount field of Budget. Type: Float."""
+  remainingAmount: Float
+
   """(Optional) remark field of Budget. Type: JSON object."""
   remark: Json
 
@@ -1768,6 +1771,9 @@ input BudgetCreateInput {
 
   """(Optional) The rejectedAt of the new Budget. Type: DateTime."""
   rejectedAt: DateTime
+
+  """(Optional) The remainingAmount of the new Budget. Type: Float."""
+  remainingAmount: Float
 
   """(Optional) The remark of the new Budget. Type: Json."""
   remark: Json
@@ -2035,6 +2041,9 @@ input BudgetFormInput {
 
   """(Optional) The rejectedAt of the Budget. Type: DateTime."""
   rejectedAt: DateTime
+
+  """(Optional) The remainingAmount of the Budget. Type: Float."""
+  remainingAmount: Float
 
   """(Optional) The remark of the Budget. Type: Json."""
   remark: Json
@@ -3252,6 +3261,9 @@ input BudgetUpdateInput {
   """(Optional) Update the rejectedAt of the Budget. Type: DateTime."""
   rejectedAt: DateTime
 
+  """(Optional) Update the remainingAmount of the Budget. Type: Float."""
+  remainingAmount: Float
+
   """(Optional) Update the remark of the Budget. Type: Json."""
   remark: Json
 
@@ -3364,6 +3376,14 @@ type CapitalRecoveryFactor {
   (Optional) projectedBudget field of CapitalRecoveryFactor. Type: Float.
   """
   projectedBudget: Float
+
+  """
+  (Optional) remainingAmount field of CapitalRecoveryFactor. Type: Float.
+  """
+  remainingAmount: Float
+
+  """(Optional) remark field of CapitalRecoveryFactor. Type: JSON object."""
+  remark: Json
 
   """
   (Optional) Related Request record linked to this CapitalRecoveryFactor.
@@ -3500,6 +3520,14 @@ input CapitalRecoveryFactorCreateInput {
   (Optional) The projectedBudget of the new CapitalRecoveryFactor. Type: Float.
   """
   projectedBudget: Float
+
+  """
+  (Optional) The remainingAmount of the new CapitalRecoveryFactor. Type: Float.
+  """
+  remainingAmount: Float
+
+  """(Optional) The remark of the new CapitalRecoveryFactor. Type: Json."""
+  remark: Json
 
   """(Optional) Single Request relation."""
   request: RequestCreateOrConnectInput
@@ -3757,6 +3785,14 @@ input CapitalRecoveryFactorFormInput {
   """
   projectedBudget: Float
 
+  """
+  (Optional) The remainingAmount of the CapitalRecoveryFactor. Type: Float.
+  """
+  remainingAmount: Float
+
+  """(Optional) The remark of the CapitalRecoveryFactor. Type: Json."""
+  remark: Json
+
   """(Optional) Single Request relation for direct nested operations."""
   request: RequestFormInput
 
@@ -3965,6 +4001,14 @@ input CapitalRecoveryFactorUpdateInput {
   (Optional) Update the projectedBudget of the CapitalRecoveryFactor. Type: Float.
   """
   projectedBudget: Float
+
+  """
+  (Optional) Update the remainingAmount of the CapitalRecoveryFactor. Type: Float.
+  """
+  remainingAmount: Float
+
+  """(Optional) Update the remark of the CapitalRecoveryFactor. Type: Json."""
+  remark: Json
 
   """(Optional) Single Request relation."""
   request: RequestUpdateOrConnectInput

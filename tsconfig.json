@@ -10,14 +10,15 @@
       "dom.iterable",
       "esnext"
     ],
-    "allowJs": true,
-    "skipLibCheck": true,
     "noEmit": true,
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
     "jsx": "react-jsx",
+    "isolatedModules": true,
     "incremental": true,
-    //  "ignoreDeprecations": "6.0",
+    "tsBuildInfoFile": ".next/.tsbuildinfo",
     "plugins": [
       {
         "name": "next"
@@ -27,24 +28,34 @@
       "@/*": [
         "./*"
       ]
-    }
+    },
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "allowSyntheticDefaultImports": true,
+    "importsNotUsedAsValues": "remove",
+    "allowJs": true,
+    "skipLibCheck": true
   },
   "include": [
     "next-env.d.ts",
-    "app/**/*.ts",
-    "app/**/*.tsx",
-    "components/**/*.ts",
-    "components/**/*.tsx",
-    "lib/**/*.ts",
-    "lib/**/*.tsx",
+    "app",
+    "components",
     "auth.ts",
     "auth.config.ts",
-    "auth.middleware.config.ts",
-    "next.config.ts",
-    "proxy.ts",
-    "routes.ts",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-   "exclude": ["node_modules", ".next", "lib/generated", "lib/pothos"]
+  "exclude": [
+    "node_modules",
+    ".next",
+    "generated",
+    "lib/generated",
+    "lib/pothos",
+    "dist",
+    "build"
+  ]
 }
