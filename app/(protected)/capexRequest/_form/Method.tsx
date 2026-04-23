@@ -13,6 +13,7 @@ import { useSession } from 'next-auth/react';
 import { useFieldArray, useForm, UseFormReturn } from 'react-hook-form';
 import BudgetReferenceDetails from './Section/BudgetReferenceDetails';
 import React from "react";
+import RequestedItem, { RequestedItemFormValues } from './Section/RequestedItem';
 
 type MethodProps = {
   rowId?: string | null;
@@ -342,14 +343,7 @@ const Method = (props: MethodProps) => {
             <BudgetReferenceDetails form={form as unknown as UseFormReturn<Record<string, unknown>>} />
 
             {/* III. Workflow Approval Step */}
-            <section className='space-y-4'>
-              <div className='text-lg font-semibold border-b pb-3'>
-                IV. Requested Items
-              </div>
-              <div className='text-sm text-muted-foreground'>
-                {/* Form fields here */}
-              </div>
-            </section>
+            <RequestedItem form={form as unknown as UseFormReturn<RequestedItemFormValues>} />
 
             {/* IV. Workflow Approval Step */}
             <section className='space-y-4'>

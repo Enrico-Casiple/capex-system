@@ -1,18 +1,18 @@
 
 
-import {prisma} from '../lib/prisma/prisma';
+import {prisma} from '../../lib/prisma/prisma';
 
 const groupOfCompanies = [
   {
     name: "Educar Group of Companies",
     acronym: "EGOC",
-    description: "", 
+    description: "",
     isActive: true,
   },
   {
     name: "Rustan Group of Companies",
     acronym: "RGOC",
-    description: "", 
+    description: "",
     isActive: true,
   },
 ]

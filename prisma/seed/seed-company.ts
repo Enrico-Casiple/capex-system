@@ -1,12 +1,12 @@
 
 
-import {prisma} from '../lib/prisma/prisma';
+import {prisma} from '../../lib/prisma/prisma';
 
 const company = [
   {
     name: "Unilogix Inc.",
     acronym: "UI",
-    description: "", 
+    description: "",
     groupOfCompanyName: "Educar Group of Companies",
     isActive: true,
     email: "info@unilogix.com",
@@ -15,7 +15,7 @@ const company = [
    {
     name: "Omnivores Inc.",
     acronym: "OI",
-    description: "", 
+    description: "",
      groupOfCompanyName: "Educar Group of Companies",
     isActive: true,
     email: "info@omnivores.com",
@@ -24,7 +24,7 @@ const company = [
   {
     name: "Omnivires Manial Inc.",
     acronym: "OMI",
-    description: "", 
+    description: "",
      groupOfCompanyName: "Educar Group of Companies",
     isActive: true,
     email: "info@omnivores.com",
@@ -33,7 +33,7 @@ const company = [
   {
     name: "Gourment Garadge",
     acronym: "GG",
-    description: "", 
+    description: "",
     groupOfCompanyName: "Educar Group of Companies",
     isActive: true,
     email: "info@gourmentgaradge.com",
@@ -42,7 +42,7 @@ const company = [
   {
     name: "Rustan Design and Specialist Inc.",
     acronym: "RDSI",
-    description: "", 
+    description: "",
     groupOfCompanyName: "Rustan Group of Companies",
     isActive: true,
     email: "info@rustan.com",
@@ -51,7 +51,7 @@ const company = [
   {
     name: "Lavender Holding Inc.",
     acronym: "LHI",
-    description: "", 
+    description: "",
      groupOfCompanyName: "Educar Group of Companies",
     isActive: true,
     email: "info@lavender.com",
@@ -60,7 +60,7 @@ const company = [
   {
     name: "Bluegrass Properties Development Inc.",
     acronym: "BPDI",
-    description: "", 
+    description: "",
      groupOfCompanyName: "Educar Group of Companies",
     isActive: true,
     email: "info@bluegrassproperties.com",
@@ -69,7 +69,7 @@ const company = [
   {
     name: "Educar Shared Services Inc.",
     acronym: "ESSI",
-    description: "", 
+    description: "",
      groupOfCompanyName: "Educar Group of Companies",
     isActive: true,
     email: "info@educar.com",
@@ -78,7 +78,7 @@ const company = [
    {
     name: "Educar Distribution Inc.",
     acronym: "EDI",
-    description: "", 
+    description: "",
      groupOfCompanyName: "Educar Group of Companies",
     isActive: true,
     email: "info@educardistribution.com",
@@ -87,7 +87,7 @@ const company = [
    {
     name: "Swirly Goodness Philippines Inc.",
     acronym: "SGPI",
-    description: "", 
+    description: "",
      groupOfCompanyName: "Educar Group of Companies",
     isActive: true,
     email: "info@swirlygoodness.com",

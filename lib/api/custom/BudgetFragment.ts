@@ -29,6 +29,7 @@ fragment BudgetFragment on Budget {
   updatedAt
   budgetLedgers {
     budgetId
+    amount
     typeId
     type {
       name

@@ -7,8 +7,8 @@ import {
   GLOBAL_ACCESS_PERMISSION,
   roleManagementPermissions,
   userManagementPermissions,
-} from '../app/_role/role';
-import { prisma } from '../lib/prisma/prisma';
+} from '../../app/_role/role';
+import { prisma } from '../../lib/prisma/prisma';
 
 const seedComplete = async () => {
   console.log('🌱 Starting complete seed...');

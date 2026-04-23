@@ -70,7 +70,7 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
     skip: !findBudgetRefNo, // Skip query if no rowId or if action is 'create'
   });
 
-  const findTypeOfRelease = budgetQuery.data?.BudgetFindBy?.data?.budgetLedgers?.find(ledger => ledger.type?.name === "Release of Budget");
+  const findTypeOfActual = budgetQuery.data?.BudgetFindBy?.data?.budgetLedgers?.find(ledger => ledger.type?.name === "Actual");
 
   const budgetLegderQueryGroupBy = useQuery<{ BudgetLedgerGroupBy: BudgetLedgerGroupByResponse }, { input: BudgetLedgerGroupByInput }>(BudgetLedgerGroupBy, {
     variables: {
@@ -80,7 +80,7 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
         ],
         where: {
           budgetId: findBudgetRefNo ?? null,
-          typeId: findTypeOfRelease?.typeId ?? null,
+          typeId: findTypeOfActual?.typeId ?? null,
         },
         _sum: {
           amount: true
@@ -133,9 +133,22 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
     setField,
   ]);
 
+  const resetBudgetReferenceDetails = React.useCallback(() => {
+    setField("requestedCRF.budgetId", "");
+    setField("requestedCRF.categoryId", "");
+    setField("requestedCRF.approvedAmount", 0);
+    setField("requestedCRF.remainingAmount", 0);
+    setField("requestedCRF.utilizedBudget", 0);
+    setField("requestedCRF.newBalanceAmmount", 0);
+    setField("requestedCRF.projectedBudget", 0);
+    setField("requestedCRF.requestedAmount", 0);
+    setField("requestedCRF.remarks.notes", "");
+    form.clearErrors("requestedCRF");
+  }, [form, setField]);
+
   return (
     <section className="space-y-4">
-      {/* <pre>{JSON.stringify(budgetQuery?.data?.BudgetFindBy?.data?.approvedAmount, null, 2)}</pre> */}
+      {/* <pre>{JSON.stringify(budgetLegderQueryGroupBy.data?.BudgetLedgerGroupBy, null, 2)}</pre> */}
       <div className="flex items-center gap-3 pb-3 border-b">
         <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary font-semibold">
           II.
@@ -148,17 +161,7 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
             </p>
           </div>
           <div>
-            <Button variant="outline" size="icon" type="button" onClick={() => {
-              (form.setValue as (field: string, value: unknown, options?: unknown) => void)(
-                "requestedCRF.budgetId",
-                "",
-                {
-                  shouldDirty: false,
-                  shouldTouch: false,
-                },
-              );
-              form.clearErrors("requestedCRF");
-            }}>
+            <Button variant="outline" size="icon" type="button" onClick={resetBudgetReferenceDetails}>
               <RefreshCw className="h-4 w-4" />
             </Button>
           </div>
@@ -166,6 +169,9 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
       </div >
       <div className="space-y-4">
         {/* Budget Table */}
+        <div className="grid grid-cols-2">
+
+        </div>
         <div className="border rounded-lg overflow-hidden">
           <Table>
             <TableHeader className="bg-gradient-to-r from-slate-100 to-slate-50">
@@ -372,12 +378,14 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
             </TableBody>
           </Table>
         </div>
-        <div><CustomTextAreaInput
-          name="requestedCRF.remarks.notes"
-          control={form.control}
-          label="Remarks / Purpose"
-          placeholder="Enter remarks or purpose for the budget request or if this are Construction In Progress related, you may indicate the project name and location here."
-        /></div>
+        <div>
+          <CustomTextAreaInput
+            name="requestedCRF.remarks.notes"
+            control={form.control}
+            label="Remarks / Purpose"
+            placeholder="Enter remarks or purpose for the budget request or if this are Construction In Progress related, you may indicate the project name and location here."
+          />
+        </div>
       </div>
     </section >
   );
