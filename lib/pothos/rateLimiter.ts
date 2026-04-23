@@ -155,7 +155,7 @@ export const rateLimiter = {
 // ## 4. Install Redis
 // - In the same terminal, run:
 //   ```
-//   sudo apt install -y redis-server
+//   sudo dnf or apt install -y redis-server
 //   sudo systemctl enable redis-server
 //   sudo systemctl start redis-server
 //   ```

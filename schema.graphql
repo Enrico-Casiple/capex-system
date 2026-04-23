@@ -15765,7 +15765,7 @@ type Query {
     """
     Input for grouping AuditLog records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: AuditLogGroupByInput!
+    input: AuditLogGroupByInput!
   ): AuditLogGroupByResponse
   BasicInformationCount(input: BasicInformationCountInput!): BasicInformationCountResponse
   BasicInformationExportCsv(input: BasicInformationCsvExportInput!): BasicInformationCsvExportResponse
@@ -15804,7 +15804,7 @@ type Query {
     """
     Input for grouping BasicInformation records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: BasicInformationGroupByInput!
+    input: BasicInformationGroupByInput!
   ): BasicInformationGroupByResponse
   BudgetCount(input: BudgetCountInput!): BudgetCountResponse
   BudgetExportCsv(input: BudgetCsvExportInput!): BudgetCsvExportResponse
@@ -15841,7 +15841,7 @@ type Query {
     """
     Input for grouping Budget records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: BudgetGroupByInput!
+    input: BudgetGroupByInput!
   ): BudgetGroupByResponse
   BudgetLedgerCount(input: BudgetLedgerCountInput!): BudgetLedgerCountResponse
   BudgetLedgerExportCsv(input: BudgetLedgerCsvExportInput!): BudgetLedgerCsvExportResponse
@@ -15878,7 +15878,7 @@ type Query {
     """
     Input for grouping BudgetLedger records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: BudgetLedgerGroupByInput!
+    input: BudgetLedgerGroupByInput!
   ): BudgetLedgerGroupByResponse
   BudgetSnapshotCount(input: BudgetSnapshotCountInput!): BudgetSnapshotCountResponse
   BudgetSnapshotExportCsv(input: BudgetSnapshotCsvExportInput!): BudgetSnapshotCsvExportResponse
@@ -15917,7 +15917,7 @@ type Query {
     """
     Input for grouping BudgetSnapshot records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: BudgetSnapshotGroupByInput!
+    input: BudgetSnapshotGroupByInput!
   ): BudgetSnapshotGroupByResponse
   CapitalRecoveryFactorCount(input: CapitalRecoveryFactorCountInput!): CapitalRecoveryFactorCountResponse
   CapitalRecoveryFactorExportCsv(input: CapitalRecoveryFactorCsvExportInput!): CapitalRecoveryFactorCsvExportResponse
@@ -15958,7 +15958,7 @@ type Query {
     """
     Input for grouping CapitalRecoveryFactor records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: CapitalRecoveryFactorGroupByInput!
+    input: CapitalRecoveryFactorGroupByInput!
   ): CapitalRecoveryFactorGroupByResponse
   CategoryCount(input: CategoryCountInput!): CategoryCountResponse
   CategoryExportCsv(input: CategoryCsvExportInput!): CategoryCsvExportResponse
@@ -15995,7 +15995,7 @@ type Query {
     """
     Input for grouping Category records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: CategoryGroupByInput!
+    input: CategoryGroupByInput!
   ): CategoryGroupByResponse
   CompanyCount(input: CompanyCountInput!): CompanyCountResponse
   CompanyExportCsv(input: CompanyCsvExportInput!): CompanyCsvExportResponse
@@ -16032,7 +16032,7 @@ type Query {
     """
     Input for grouping Company records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: CompanyGroupByInput!
+    input: CompanyGroupByInput!
   ): CompanyGroupByResponse
   ConfigConditionCount(input: ConfigConditionCountInput!): ConfigConditionCountResponse
   ConfigConditionExportCsv(input: ConfigConditionCsvExportInput!): ConfigConditionCsvExportResponse
@@ -16071,7 +16071,7 @@ type Query {
     """
     Input for grouping ConfigCondition records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: ConfigConditionGroupByInput!
+    input: ConfigConditionGroupByInput!
   ): ConfigConditionGroupByResponse
   ConfigCount(input: ConfigCountInput!): ConfigCountResponse
   ConfigExportCsv(input: ConfigCsvExportInput!): ConfigCsvExportResponse
@@ -16108,7 +16108,7 @@ type Query {
     """
     Input for grouping Config records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: ConfigGroupByInput!
+    input: ConfigGroupByInput!
   ): ConfigGroupByResponse
   DepartmentCount(input: DepartmentCountInput!): DepartmentCountResponse
   DepartmentExportCsv(input: DepartmentCsvExportInput!): DepartmentCsvExportResponse
@@ -16145,7 +16145,7 @@ type Query {
     """
     Input for grouping Department records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: DepartmentGroupByInput!
+    input: DepartmentGroupByInput!
   ): DepartmentGroupByResponse
   GroupOfCompanyCount(input: GroupOfCompanyCountInput!): GroupOfCompanyCountResponse
   GroupOfCompanyExportCsv(input: GroupOfCompanyCsvExportInput!): GroupOfCompanyCsvExportResponse
@@ -16184,7 +16184,7 @@ type Query {
     """
     Input for grouping GroupOfCompany records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: GroupOfCompanyGroupByInput!
+    input: GroupOfCompanyGroupByInput!
   ): GroupOfCompanyGroupByResponse
   HolidayCount(input: HolidayCountInput!): HolidayCountResponse
   HolidayExportCsv(input: HolidayCsvExportInput!): HolidayCsvExportResponse
@@ -16221,7 +16221,7 @@ type Query {
     """
     Input for grouping Holiday records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: HolidayGroupByInput!
+    input: HolidayGroupByInput!
   ): HolidayGroupByResponse
   JobLevelCount(input: JobLevelCountInput!): JobLevelCountResponse
   JobLevelExportCsv(input: JobLevelCsvExportInput!): JobLevelCsvExportResponse
@@ -16258,7 +16258,7 @@ type Query {
     """
     Input for grouping JobLevel records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: JobLevelGroupByInput!
+    input: JobLevelGroupByInput!
   ): JobLevelGroupByResponse
   LocationCount(input: LocationCountInput!): LocationCountResponse
   LocationExportCsv(input: LocationCsvExportInput!): LocationCsvExportResponse
@@ -16295,7 +16295,7 @@ type Query {
     """
     Input for grouping Location records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: LocationGroupByInput!
+    input: LocationGroupByInput!
   ): LocationGroupByResponse
   PermissionCount(input: PermissionCountInput!): PermissionCountResponse
   PermissionExportCsv(input: PermissionCsvExportInput!): PermissionCsvExportResponse
@@ -16332,7 +16332,7 @@ type Query {
     """
     Input for grouping Permission records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: PermissionGroupByInput!
+    input: PermissionGroupByInput!
   ): PermissionGroupByResponse
   PositionCount(input: PositionCountInput!): PositionCountResponse
   PositionExportCsv(input: PositionCsvExportInput!): PositionCsvExportResponse
@@ -16369,7 +16369,7 @@ type Query {
     """
     Input for grouping Position records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: PositionGroupByInput!
+    input: PositionGroupByInput!
   ): PositionGroupByResponse
   RequestCount(input: RequestCountInput!): RequestCountResponse
   RequestExportCsv(input: RequestCsvExportInput!): RequestCsvExportResponse
@@ -16406,7 +16406,7 @@ type Query {
     """
     Input for grouping Request records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: RequestGroupByInput!
+    input: RequestGroupByInput!
   ): RequestGroupByResponse
   RequestItemCount(input: RequestItemCountInput!): RequestItemCountResponse
   RequestItemExportCsv(input: RequestItemCsvExportInput!): RequestItemCsvExportResponse
@@ -16443,7 +16443,7 @@ type Query {
     """
     Input for grouping RequestItem records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: RequestItemGroupByInput!
+    input: RequestItemGroupByInput!
   ): RequestItemGroupByResponse
   RoleCount(input: RoleCountInput!): RoleCountResponse
   RoleExportCsv(input: RoleCsvExportInput!): RoleCsvExportResponse
@@ -16480,7 +16480,7 @@ type Query {
     """
     Input for grouping Role records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: RoleGroupByInput!
+    input: RoleGroupByInput!
   ): RoleGroupByResponse
   RolePermissionCount(input: RolePermissionCountInput!): RolePermissionCountResponse
   RolePermissionExportCsv(input: RolePermissionCsvExportInput!): RolePermissionCsvExportResponse
@@ -16519,7 +16519,7 @@ type Query {
     """
     Input for grouping RolePermission records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: RolePermissionGroupByInput!
+    input: RolePermissionGroupByInput!
   ): RolePermissionGroupByResponse
   ShiftingScheduleCount(input: ShiftingScheduleCountInput!): ShiftingScheduleCountResponse
   ShiftingScheduleExportCsv(input: ShiftingScheduleCsvExportInput!): ShiftingScheduleCsvExportResponse
@@ -16558,7 +16558,7 @@ type Query {
     """
     Input for grouping ShiftingSchedule records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: ShiftingScheduleGroupByInput!
+    input: ShiftingScheduleGroupByInput!
   ): ShiftingScheduleGroupByResponse
   SignatureCount(input: SignatureCountInput!): SignatureCountResponse
   SignatureExportCsv(input: SignatureCsvExportInput!): SignatureCsvExportResponse
@@ -16595,7 +16595,7 @@ type Query {
     """
     Input for grouping Signature records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: SignatureGroupByInput!
+    input: SignatureGroupByInput!
   ): SignatureGroupByResponse
   StatusCount(input: StatusCountInput!): StatusCountResponse
   StatusExportCsv(input: StatusCsvExportInput!): StatusCsvExportResponse
@@ -16632,7 +16632,7 @@ type Query {
     """
     Input for grouping Status records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: StatusGroupByInput!
+    input: StatusGroupByInput!
   ): StatusGroupByResponse
   TypeCount(input: TypeCountInput!): TypeCountResponse
   TypeExportCsv(input: TypeCsvExportInput!): TypeCsvExportResponse
@@ -16669,7 +16669,7 @@ type Query {
     """
     Input for grouping Type records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: TypeGroupByInput!
+    input: TypeGroupByInput!
   ): TypeGroupByResponse
   UserCount(input: UserCountInput!): UserCountResponse
   UserExportCsv(input: UserCsvExportInput!): UserCsvExportResponse
@@ -16706,7 +16706,7 @@ type Query {
     """
     Input for grouping User records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: UserGroupByInput!
+    input: UserGroupByInput!
   ): UserGroupByResponse
   UserRoleCount(input: UserRoleCountInput!): UserRoleCountResponse
   UserRoleExportCsv(input: UserRoleCsvExportInput!): UserRoleCsvExportResponse
@@ -16743,7 +16743,7 @@ type Query {
     """
     Input for grouping UserRole records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: UserRoleGroupByInput!
+    input: UserRoleGroupByInput!
   ): UserRoleGroupByResponse
   WorkFlowInstanceCount(input: WorkFlowInstanceCountInput!): WorkFlowInstanceCountResponse
   WorkFlowInstanceExportCsv(input: WorkFlowInstanceCsvExportInput!): WorkFlowInstanceCsvExportResponse
@@ -16782,7 +16782,7 @@ type Query {
     """
     Input for grouping WorkFlowInstance records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: WorkFlowInstanceGroupByInput!
+    input: WorkFlowInstanceGroupByInput!
   ): WorkFlowInstanceGroupByResponse
   WorkFlowInstanceStepCount(input: WorkFlowInstanceStepCountInput!): WorkFlowInstanceStepCountResponse
   WorkFlowInstanceStepExportCsv(input: WorkFlowInstanceStepCsvExportInput!): WorkFlowInstanceStepCsvExportResponse
@@ -16821,7 +16821,7 @@ type Query {
     """
     Input for grouping WorkFlowInstanceStep records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: WorkFlowInstanceStepGroupByInput!
+    input: WorkFlowInstanceStepGroupByInput!
   ): WorkFlowInstanceStepGroupByResponse
   WorkFlowStepTemplateCount(input: WorkFlowStepTemplateCountInput!): WorkFlowStepTemplateCountResponse
   WorkFlowStepTemplateExportCsv(input: WorkFlowStepTemplateCsvExportInput!): WorkFlowStepTemplateCsvExportResponse
@@ -16860,7 +16860,7 @@ type Query {
     """
     Input for grouping WorkFlowStepTemplate records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: WorkFlowStepTemplateGroupByInput!
+    input: WorkFlowStepTemplateGroupByInput!
   ): WorkFlowStepTemplateGroupByResponse
   WorkFlowTemplateCount(input: WorkFlowTemplateCountInput!): WorkFlowTemplateCountResponse
   WorkFlowTemplateExportCsv(input: WorkFlowTemplateCsvExportInput!): WorkFlowTemplateCsvExportResponse
@@ -16899,7 +16899,7 @@ type Query {
     """
     Input for grouping WorkFlowTemplate records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: WorkFlowTemplateGroupByInput!
+    input: WorkFlowTemplateGroupByInput!
   ): WorkFlowTemplateGroupByResponse
   WorkFlowTemplateScopeCount(input: WorkFlowTemplateScopeCountInput!): WorkFlowTemplateScopeCountResponse
   WorkFlowTemplateScopeExportCsv(input: WorkFlowTemplateScopeCsvExportInput!): WorkFlowTemplateScopeCsvExportResponse
@@ -16940,7 +16940,7 @@ type Query {
     """
     Input for grouping WorkFlowTemplateScope records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: WorkFlowTemplateScopeGroupByInput!
+    input: WorkFlowTemplateScopeGroupByInput!
   ): WorkFlowTemplateScopeGroupByResponse
   WorkInformationCount(input: WorkInformationCountInput!): WorkInformationCountResponse
   WorkInformationExportCsv(input: WorkInformationCsvExportInput!): WorkInformationCsvExportResponse
@@ -16979,7 +16979,7 @@ type Query {
     """
     Input for grouping WorkInformation records. Specify fields to group by and aggregation operations.
     """
-    groupByInput: WorkInformationGroupByInput!
+    input: WorkInformationGroupByInput!
   ): WorkInformationGroupByResponse
   _dummy: String
 }

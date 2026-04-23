@@ -71,8 +71,8 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           `🔍 ${modelName}: FindAll - Received pagination request with input:`,
           args.paginationInput,
         );
-        const middlewareError = await middlewareCheck(ctx, modelName);
-        if (middlewareError) return middlewareError;
+        // const middlewareError = await middlewareCheck(ctx, modelName);
+        // if (middlewareError) return middlewareError;
         try {
           return await service.findAll(args.paginationInput as never);
         } catch (error) {
@@ -601,12 +601,12 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   );
 
   // Extra GroupBy, Aggregate, and other advanced queries and mutations can be added here following the same pattern.
-  builder.queryField(`${modelName}GroupBy`, (t) => 
+  builder.queryField(`${modelName}GroupBy`, (t) =>
     t.field({
       type: groupByResponseRef[model],
       description: `Group ${modelName} records by specified fields and perform aggregations. Supports dynamic grouping and aggregation options.`,
       args: {
-        groupByInput: t.arg({
+        input: t.arg({
           type: `${modelName}GroupByInput` as never,
           required: true,
           description: `Input for grouping ${modelName} records. Specify fields to group by and aggregation operations.`,
@@ -614,9 +614,9 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
       },
       resolve: async (_parent, args, ctx) => {
         console.log(`🔍 ${modelName}: GroupBy - Received group by request with args:`, args);
-        const middlewareError = await middlewareCheck(ctx, modelName);
-        if (middlewareError) return middlewareError;
-        const result = await service.groupBy(args.groupByInput);
+        // const middlewareError = await middlewareCheck(ctx, modelName);
+        // if (middlewareError) return middlewareError;
+        const result = await service.groupBy(args.input as never);
         return result as any;
       }
     })

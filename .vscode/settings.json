@@ -1,8 +1,25 @@
 {
   "js/ts.tsdk.path": "node_modules/typescript/lib",
   "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+  "js/ts.tsserver.maxMemory": 4096,
   "js/ts.tsserver.automaticTypeAcquisition.enabled": false,
   "js/ts.tsserver.checkNpmIsInstalled": false,
+  "files.watcherExclude": {
+    "**/.git/**": true,
+    "**/node_modules/**": true,
+    "**/.next/**": true,
+    "**/generated/**": true,
+    "**/lib/generated/**": true,
+    "**/dist/**": true,
+    "**/build/**": true
+  },
+  "search.exclude": {
+    "**/.next": true,
+    "**/generated": true,
+    "**/lib/generated": true,
+    "**/dist": true,
+    "**/build": true
+  },
   "[typescript]": {
     "editor.defaultFormatter": "vscode.typescript-language-features",
     "editor.formatOnSave": false
@@ -14,7 +31,7 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "never"
   },
-  "WillLuke.nextjs.addTypesOnSave": true,
+  "WillLuke.nextjs.addTypesOnSave": false,
   "WillLuke.nextjs.hasPrompted": true,
-  "prisma.pinToPrisma6": true,
+  "prisma.pinToPrisma6": true
 }

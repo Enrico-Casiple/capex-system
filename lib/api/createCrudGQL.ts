@@ -145,14 +145,15 @@ export class CrudGQLBuilder {
   }
 
   get groupBy() {
-     return gql`query ${this.entityName}GroupBy($input: ${this.entityName}GroupByInput!) {
-      ${this.entityName}GroupBy(input: $input) {
-        code
-        data
-        isSuccess
-        message
-      }
-    }`;
+     return gql`
+      query ${this.entityName}GroupBy($input: ${this.entityName}GroupByInput!) {
+        ${this.entityName}GroupBy(input: $input) {
+          code
+          data
+          isSuccess
+          message
+        }
+      }`;
   }
 
   // ─── Mutations ─────────────────────────────────────────────

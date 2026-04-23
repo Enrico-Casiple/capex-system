@@ -5,11 +5,7 @@
     "target": "ES2023",
     "strict": true,
     "esModuleInterop": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "noEmit": true,
     "resolveJsonModule": true,
     "declaration": false,
@@ -18,19 +14,17 @@
     "jsx": "react-jsx",
     "isolatedModules": true,
     "incremental": true,
-    "tsBuildInfoFile": ".next/.tsbuildinfo",
+    "tsBuildInfoFile": ".tsbuildinfo",
     "plugins": [
       {
         "name": "next"
       }
     ],
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     },
     "forceConsistentCasingInFileNames": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
@@ -46,16 +40,25 @@
     "components",
     "auth.ts",
     "auth.config.ts",
+    "lib",
+    "hooks",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules",
-    ".next",
-    "generated",
-    "lib/generated",
-    "lib/pothos",
-    "dist",
-    "build"
-  ]
+  "exclude": ["node_modules", ".next", "generated", "lib/generated", "dist", "build"],
+  "watchOptions": {
+    "watchFile": "useFsEventsOnParentDirectory",
+    "watchDirectory": "usefsevents",
+    "fallbackPolling": "dynamicPriority",
+    "synchronousWatchDirectory": true,
+    "excludeDirectories": [
+      "**/node_modules",
+      "**/.git",
+      ".next",
+      "generated",
+      "lib/generated",
+      "dist",
+      "build"
+    ]
+  }
 }

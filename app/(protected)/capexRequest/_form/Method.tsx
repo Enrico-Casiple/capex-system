@@ -58,7 +58,7 @@ const Method = (props: MethodProps) => {
       newBalanceAmmount: 0, // Remaining amount for the budget, which can be calculated as (approvedAmount - sum of committed and actual amounts from BudgetLedger) to give approvers an idea of how much budget is left after considering the approved amount and any amounts that have already been utilized or committed
       requestedAmount: 0, // Amount requested for the CRF, which can be more than the approved amount based on requester's input
       projectedBudget: 0, // Projected budget based on the requested amount and utilized budget, which can be calculated as (utilizedBudget + requestedAmount) to give approvers an idea of the total budget impact if the requested amount is approved
-      requestId: session.data?.user?.id || '', // Connect back to request for easier retrieval of CRF based on request 
+      requestId: session.data?.user?.id || '', // Connect back to request for easier retrieval of CRF based on request
       remarks: {
         isForConstructionInProgress: false, // Checkbox or toggle to indicate if the CRF is for construction in progress, which may have different approval requirements or budget considerations
         notes: '', // General notes or remarks about the CRF that may not fit into other fields, can be used for approvers to provide feedback or for requesters to add additional context about the CRF request
@@ -87,7 +87,7 @@ const Method = (props: MethodProps) => {
       form.setValue('responsibilityCenterId', '');
       form.setValue('departmentId', '');
     }
-  }, [form.watch('companyId')]);
+  }, [form]);
 
 
   const requestedItemFieldArray = useFieldArray({
@@ -339,7 +339,7 @@ const Method = (props: MethodProps) => {
             </section>
 
             {/* II. Budget Reference Details */}
-            <BudgetReferenceDetails form={form as unknown as UseFormReturn<Request>} />
+            <BudgetReferenceDetails form={form as unknown as UseFormReturn<Record<string, unknown>>} />
 
             {/* III. Workflow Approval Step */}
             <section className='space-y-4'>

@@ -1,9 +1,8 @@
-import { Request } from "@/lib/generated/api/customHookAPI/graphql"
 import { UseFormReturn } from "react-hook-form";
 
 
 interface RequestedItemProps {
-  form: UseFormReturn<Request>
+  form: UseFormReturn<Record<string, unknown>>
 }
 const RequestedItem = ({ form }: RequestedItemProps) => {
 

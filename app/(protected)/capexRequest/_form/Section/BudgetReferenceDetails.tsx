@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { modelGQL } from "@/lib/api/crud.gql";
-import { BudgetResponse, Request, BudgetFindByInput } from "@/lib/generated/api/customHookAPI/graphql";
+import { BudgetResponse, BudgetFindByInput, BudgetLedgerGroupByInput, BudgetLedgerGroupByResponse } from "@/lib/generated/api/customHookAPI/graphql";
 import { useQuery } from "@apollo/client/react";
 import { UseFormReturn } from "react-hook-form";
 import * as React from 'react';
@@ -18,15 +18,47 @@ import CustomNumberInput from '../../../../../components/Forms/Inputs/CustomNumb
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from "lucide-react";
 import CustomTextAreaInput from '../../../../../components/Forms/Inputs/CustomTextAreaInput';
+import { BudgetLedgerGroupBy } from "@/lib/api/gql/BudgetLedger.gql";
+
+type BudgetFieldMap = {
+  "requestedCRF.budgetId": string;
+  "requestedCRF.categoryId": string;
+  "requestedCRF.approvedAmount": number;
+  "requestedCRF.remainingAmount": number;
+  "requestedCRF.utilizedBudget": number;
+  "requestedCRF.newBalanceAmmount": number;
+  "requestedCRF.projectedBudget": number;
+  "requestedCRF.requestedAmount": number;
+  "requestedCRF.remarks.notes": string;
+};
+
+type BudgetFieldName = keyof BudgetFieldMap;
 
 type BudgetReferenceDetailsProps = {
-  form: UseFormReturn<Request>;
+  form: UseFormReturn<Record<string, unknown>>;
 };
 
 const modelAPI = modelGQL;
 
 const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
-  const findBudgetRefNo = form.watch("requestedCRF.budgetId");
+  const getField = React.useCallback(<K extends BudgetFieldName>(name: K): BudgetFieldMap[K] => {
+    return form.watch(name) as BudgetFieldMap[K];
+  }, [form]);
+
+  const getValue = React.useCallback(<K extends BudgetFieldName>(name: K): BudgetFieldMap[K] => {
+    return form.getValues(name) as BudgetFieldMap[K];
+  }, [form]);
+
+  const setField = React.useCallback(<K extends BudgetFieldName>(name: K, value: BudgetFieldMap[K]) => {
+    (form.setValue as (field: string, fieldValue: unknown) => void)(name, value);
+  }, [form]);
+
+  const watchedBudgetId = getField("requestedCRF.budgetId");
+  const watchedRemainingAmount = getField("requestedCRF.remainingAmount");
+  const watchedUtilizedBudget = getField("requestedCRF.utilizedBudget");
+  const watchedRequestedAmount = getField("requestedCRF.requestedAmount");
+
+  const findBudgetRefNo = watchedBudgetId;
 
   const budgetQuery = useQuery<{ BudgetFindBy: BudgetResponse }, { input: BudgetFindByInput }>(BudgetFindBy, {
     variables: {
@@ -38,63 +70,67 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
     skip: !findBudgetRefNo, // Skip query if no rowId or if action is 'create'
   });
 
-  const findTypeOfRealese = budgetQuery.data?.BudgetFindBy?.data?.budgetLedgers?.find(ledger => ledger.type?.name === "Release of Budget");
+  const findTypeOfRelease = budgetQuery.data?.BudgetFindBy?.data?.budgetLedgers?.find(ledger => ledger.type?.name === "Release of Budget");
 
   const budgetLegderQueryGroupBy = useQuery<{ BudgetLedgerGroupBy: BudgetLedgerGroupByResponse }, { input: BudgetLedgerGroupByInput }>(BudgetLedgerGroupBy, {
     variables: {
       input: {
         by: [
-          budgetId
+          "budgetId",
         ],
         where: {
-          budgetId: findBudgetRefNo ?? "" as string,
-          typeId: findTypeOfRealese ? { equals: findTypeOfRealese.typeId } : undefined
+          budgetId: findBudgetRefNo ?? null,
+          typeId: findTypeOfRelease?.typeId ?? null,
         },
         _sum: {
           amount: true
         }
       }
     },
-    // skip: !findBudgetRefNo, // Skip query if no rowId or if action is 'create'
+    skip: !findBudgetRefNo, // Skip query if no rowId or if action is 'create'
   });
 
   // Effect 1: Populate budget data when budget is selected
   React.useEffect(() => {
     const budgetData = budgetQuery?.data?.BudgetFindBy?.data;
+    const budgetLedgerData = budgetLegderQueryGroupBy?.data?.BudgetLedgerGroupBy?.data;
+    const budgetLedgerRealeseSum = Array.isArray(budgetLedgerData)
+      ? Number((budgetLedgerData[0] as { _sum?: { amount?: number | null } } | undefined)?._sum?.amount ?? 0)
+      : 0;
 
     if (budgetData) {
-      form.setValue("requestedCRF.categoryId", budgetData.categoryId ?? "" as string);
-      form.setValue("requestedCRF.approvedAmount", budgetData.approvedAmount ?? 0);
-      form.setValue("requestedCRF.remainingAmount", budgetData.remainingAmount ?? 0);
-      form.setValue("requestedCRF.utilizedBudget", 0);
-      form.setValue("requestedCRF.newBalanceAmmount", 0);
-      form.setValue("requestedCRF.projectedBudget", 0);
-      form.setValue("requestedCRF.requestedAmount", 0); // Clear requested amount too
+      setField("requestedCRF.categoryId", budgetData.categoryId ?? "");
+      setField("requestedCRF.approvedAmount", budgetData.approvedAmount ?? 0);
+      setField("requestedCRF.remainingAmount", budgetData.remainingAmount ?? 0);
+      setField("requestedCRF.utilizedBudget", budgetLedgerRealeseSum ?? 0);
+      setField("requestedCRF.newBalanceAmmount", 0);
+      setField("requestedCRF.projectedBudget", 0);
+      setField("requestedCRF.requestedAmount", 0);
     }
-  }, [budgetQuery.data?.BudgetFindBy?.data?.id]);
+  }, [budgetQuery?.data?.BudgetFindBy?.data, budgetLegderQueryGroupBy?.data?.BudgetLedgerGroupBy?.data, setField]);
 
   // Effect 2: Auto-compute newBalanceAmount and projectedBudget
   React.useEffect(() => {
-    const budgetId = form.watch("requestedCRF.budgetId");
-    const remainingAmount = form.watch("requestedCRF.remainingAmount");
-    const utilizedBudget = form.watch("requestedCRF.utilizedBudget");
-    const requestedAmount = form.watch("requestedCRF.requestedAmount");
+    const budgetId = watchedBudgetId;
+    const remainingAmount = watchedRemainingAmount;
+    const utilizedBudget = watchedUtilizedBudget;
+    const requestedAmount = watchedRequestedAmount;
 
     const newBalance = Number(remainingAmount) - Number(utilizedBudget);
     const projectedBalance = newBalance - Number(requestedAmount);
 
     if (!budgetId) {
-      // Set the utilizedBudget, as the Requested Amount
-      form.setValue("requestedCRF.utilizedBudget", requestedAmount);
+      setField("requestedCRF.utilizedBudget", requestedAmount);
     }
 
-    form.setValue("requestedCRF.newBalanceAmmount", newBalance ?? 0);
-    form.setValue("requestedCRF.projectedBudget", projectedBalance ?? 0);
+    setField("requestedCRF.newBalanceAmmount", newBalance);
+    setField("requestedCRF.projectedBudget", projectedBalance);
   }, [
-    form.watch("requestedCRF.budgetId"),
-    form.watch("requestedCRF.remainingAmount"),
-    form.watch("requestedCRF.utilizedBudget"),
-    form.watch("requestedCRF.requestedAmount"),
+    watchedBudgetId,
+    watchedRemainingAmount,
+    watchedUtilizedBudget,
+    watchedRequestedAmount,
+    setField,
   ]);
 
   return (
@@ -113,10 +149,14 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
           </div>
           <div>
             <Button variant="outline" size="icon" type="button" onClick={() => {
-              form.setValue("requestedCRF.budgetId", "" as string, {
-                shouldDirty: false,
-                shouldTouch: false,
-              });
+              (form.setValue as (field: string, value: unknown, options?: unknown) => void)(
+                "requestedCRF.budgetId",
+                "",
+                {
+                  shouldDirty: false,
+                  shouldTouch: false,
+                },
+              );
               form.clearErrors("requestedCRF");
             }}>
               <RefreshCw className="h-4 w-4" />
@@ -163,11 +203,11 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
                     name={`requestedCRF.budgetId`}
                     control={form.control}
                     label={""}
-                    disabled={form.watch("requestedCRF.categoryId") ?? false ?? undefined} // Disable if no budget selected
+                    disabled={Boolean(form.watch("requestedCRF.categoryId"))}
                     findAllWithCursorGQL={modelAPI.BudgetGQL.findAllWithCursor}
                     findUniqueGQL={modelAPI.BudgetGQL.findUnique}
                     defaultValueId={
-                      form.getValues(`requestedCRF.budgetId`) ?? ""
+                      getValue("requestedCRF.budgetId") ?? ""
                     }
                     placeholder={`Search budget...`}
                     searchPlaceholder={`Search budget...`}
@@ -208,15 +248,13 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
                     name={`requestedCRF.categoryId`}
                     control={form.control}
                     label={``}
-                    disabled={form.watch("requestedCRF.budgetId") ?? false ?? undefined} // Disable if no budget selected
+                    disabled={Boolean(form.watch("requestedCRF.budgetId"))}
                     findAllWithCursorGQL={
                       modelAPI.CategoryGQL.findAllWithCursor
                     }
                     findUniqueGQL={modelAPI.CategoryGQL.findUnique}
                     defaultValueId={
-                      form.getValues(
-                        `requestedCRF.categoryId`,
-                      ) ?? ""
+                      getValue("requestedCRF.categoryId") ?? ""
                     }
                     placeholder={`Search category...`}
                     searchPlaceholder={`Search category...`}
