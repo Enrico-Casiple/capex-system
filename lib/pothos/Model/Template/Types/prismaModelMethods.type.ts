@@ -1,5 +1,5 @@
-import { Prisma } from '@/lib/generated/prisma/client';
-import PrismaTypes from '@/lib/pothos/pothos-prisma-types';
+import { Prisma } from '../../../../../generated/prisma/client/client';
+import PrismaTypes from '../../../../../lib/pothos/pothos-prisma-types';
 import {
   CreateArgs,
   CreateManyArgs,
@@ -50,4 +50,15 @@ export type PrismaModelMethods<PrismaModel extends Prisma.ModelName> = {
   deleteMany: (args: {
     where?: UpdateManyArgs<PrismaModel>['where'];
   }) => Promise<PrismaTypes[PrismaModel]['Shape'] | null>;
+
+  groupBy: (args: {
+    by: (keyof PrismaTypes[PrismaModel]['Shape'])[];
+    where?: Prisma.Args<PrismaModel, 'groupBy'>['where'];
+    orderBy?: Prisma.Args<PrismaModel, 'groupBy'>['orderBy'];
+    _count?: Prisma.Args<PrismaModel, 'groupBy'>['_count'];
+    _avg?: Prisma.Args<PrismaModel, 'groupBy'>['_avg'];
+    _sum?: Prisma.Args<PrismaModel, 'groupBy'>['_sum'];
+    _min?: Prisma.Args<PrismaModel, 'groupBy'>['_min'];
+    _max?: Prisma.Args<PrismaModel, 'groupBy'>['_max'];
+  }) => Promise<Record<string, unknown>[] | null>;
 };

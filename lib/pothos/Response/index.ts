@@ -411,3 +411,49 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
     };
   }
 });
+
+export interface GROUPBY_RESPONSE {
+  code: string;
+  isSuccess: boolean;
+  message: string;
+  data: Record<string, unknown>[] | null;
+}
+
+export const responseGroupBySuffix = 'GroupByResponse';
+export const groupByResponseRef: Record<string, ReturnType<typeof builder.objectRef>> = {};
+
+// ─── GROUP BY RESPONSE STRUCTURE ──────────────────────────────────────────────
+Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
+  try {
+    const ref = builder.objectRef<GROUPBY_RESPONSE>(`${modelName}${responseGroupBySuffix}`);
+    groupByResponseRef[modelName] = ref;
+    ref.implement({
+      description: `GroupBy aggregation response for ${modelName}. Returns grouped records with optional aggregation results (_count, _sum, _avg, _min, _max).`,
+      fields: (t) => ({
+        code: t.exposeString('code', {
+          description: `Operation result code for the ${modelName} groupBy operation. e.g. '${modelName.toUpperCase()}_GROUP_BY_SUCCESS'.`,
+        }),
+        isSuccess: t.exposeBoolean('isSuccess', {
+          description: `Indicates whether the ${modelName} groupBy operation was successful.`,
+        }),
+        message: t.exposeString('message', {
+          description: `Human-readable message describing the result of the ${modelName} groupBy operation.`,
+        }),
+        data: t.field({
+          type: 'Json',
+          nullable: true,
+          description: `Array of grouped ${modelName} records with aggregation results. Each item contains the grouped-by fields plus aggregations (_count, _sum, _avg, _min, _max). Null if the operation failed.`,
+          resolve: (parent) => parent.data as never,
+        }),
+      }),
+    });
+  } catch (error) {
+    return {
+      code: 'ERROR',
+      isSuccess: false,
+      message: `Failed to implement ${modelName}${responseGroupBySuffix}: ${error}`,
+    };
+  }
+});
+
+console.log('✅ All responses implemented successfully');

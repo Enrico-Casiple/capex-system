@@ -20,7 +20,7 @@
 import { formatInTimeZone } from 'date-fns-tz';
 import Papa from 'papaparse';
 import { fail, ok } from '../../../../lib/util/reponseUtil';
-import { Prisma, PrismaClient } from '../../../generated/prisma/client';
+import { Prisma, PrismaClient } from '../../../../generated/prisma/client/client';
 import { getPrismaErrorMessage } from '../../../util/getPrismaErrorMessage';
 import PrismaTypes from '../../pothos-prisma-types';
 import { pubsub } from '../../subscription';
@@ -33,6 +33,7 @@ import {
   CreateManyInput,
   CursorPaginationInput,
   ExportCsvInput,
+  GroupByInput,
   PaginationInput,
   RemoveInput,
   RemoveManyInput,
@@ -1149,6 +1150,35 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
     } catch (error) {
       const { message } = getPrismaErrorMessage(error);
       return fail(this.code('EXPORT_CSV_FAILED'), `Failed to export CSV: ${message}`);
+    }
+  }
+
+  async groupBy(groupByInput: GroupByInput<PrismaModel>) {
+    try {
+      
+      const result = await this.delegate.groupBy({
+        by: groupByInput.by,
+        ...(groupByInput.where && { where: groupByInput.where }),
+        ...(groupByInput.orderBy && { orderBy: groupByInput.orderBy }),
+        ...(groupByInput._count && { _count: groupByInput._count }),
+        ...(groupByInput._sum && { _sum: groupByInput._sum }),
+        ...(groupByInput._avg && { _avg: groupByInput._avg }),
+        ...(groupByInput._min && { _min: groupByInput._min }),
+        ...(groupByInput._max && { _max: groupByInput._max }),
+      });
+
+      return ok(
+        this.code('GROUP_BY_SUCCESS'),
+        `Grouped ${this.modelName} records`,
+        result,
+      );
+    } catch (error) {
+      const { message } = getPrismaErrorMessage(error);
+      console.error(`❌ GroupBy ${this.modelName}:`, error);
+      return fail(
+        this.code('GROUP_BY_FAILED'),
+        `Failed to perform groupBy: ${message}`,
+      );
     }
   }
 }

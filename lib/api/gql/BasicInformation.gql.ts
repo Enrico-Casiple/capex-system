@@ -126,9 +126,20 @@ export const BasicInformationExportCsv = gql`
   }
 `;
 
+export const BasicInformationGroupBy = gql`
+  query BasicInformationGroupBy($input: BasicInformationGroupByInput!) {
+    BasicInformationGroupBy(input: $input) {
+      code
+      data
+      isSuccess
+      message
+    }
+  }
+`;
+
 
 export const BasicInformationCreate = gql`
-  mutation BasicInformationCreate($data: Json!, $currentUserId: String) {
+  mutation BasicInformationCreate($data: BasicInformationCreateInput!, $currentUserId: String) {
     BasicInformationCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -140,7 +151,7 @@ export const BasicInformationCreate = gql`
 `;
 
 export const BasicInformationCreateMany = gql`
-  mutation BasicInformationCreateMany($data: [Json!]!, $currentUserId: String) {
+  mutation BasicInformationCreateMany($data: [BasicInformationCreateInput!]!, $currentUserId: String) {
     BasicInformationCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -152,7 +163,7 @@ export const BasicInformationCreateMany = gql`
 `;
 
 export const BasicInformationUpdate = gql`
-  mutation BasicInformationUpdate($id: String!, $data: Json!, $currentUserId: String) {
+  mutation BasicInformationUpdate($id: String!, $data: BasicInformationUpdateInput!, $currentUserId: String) {
     BasicInformationUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -164,7 +175,7 @@ export const BasicInformationUpdate = gql`
 `;
 
 export const BasicInformationUpdateMany = gql`
-  mutation BasicInformationUpdateMany($data: [Json!]!, $currentUserId: String) {
+  mutation BasicInformationUpdateMany($data: [BasicInformationUpdateInput!]!, $currentUserId: String) {
     BasicInformationUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

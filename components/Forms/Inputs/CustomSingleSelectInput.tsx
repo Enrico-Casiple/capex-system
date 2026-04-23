@@ -160,7 +160,7 @@ type CustomSingleSelectInputProps<TFormValues extends FieldValues> = {
   emptyMessage?: string;
   cursorVariables: (search: string, cursor: string | null, take: number) => Record<string, unknown>;
   uniqueVariables: (value: string) => Record<string, unknown>; // Now returns the full variables object
-  mapOption: (item: unknown) => ComboboxOption ;
+  mapOption: (item: unknown) => ComboboxOption;
   mapDefaultOption: (data: unknown) => ComboboxOption | null;
   disabled?: boolean;
 };
@@ -207,7 +207,7 @@ const CustomSingleSelectInput = <TFormValues extends FieldValues>({
 
   const allOptions =
     defaultOption &&
-    !comboData.allOptions.some((opt: ComboboxOption) => opt.value === defaultOption.value)
+      !comboData.allOptions.some((opt: ComboboxOption) => opt.value === defaultOption.value)
       ? [defaultOption, ...comboData.allOptions]
       : comboData.allOptions;
 
@@ -244,7 +244,7 @@ const CustomSingleSelectInput = <TFormValues extends FieldValues>({
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="w-full p-0 overflow-hidden" align="start" style={{ width: triggerWidth ? `${triggerWidth}px` : '100%' }}>
+              <PopoverContent className="w-full p-0" align="start" style={{ width: triggerWidth ? `${triggerWidth}px` : '100%' }}>
                 <Command shouldFilter={false} className="w-full">
                   {/* ─── Search Input ────────────────────────── */}
                   <div className="border-b w-full">
@@ -262,7 +262,10 @@ const CustomSingleSelectInput = <TFormValues extends FieldValues>({
                     )}
                   </div>
 
-                  <CommandList className="w-full max-h-[300px]">
+                  <CommandList
+                    onWheel={(e) => e.stopPropagation()}
+                    className="w-full max-h-[300px] overflow-y-auto"
+                  >
                     <CommandEmpty className="py-2 text-center text-sm text-muted-foreground">
                       {comboData.isLoading ? 'Loading...' : emptyMessage}
                     </CommandEmpty>

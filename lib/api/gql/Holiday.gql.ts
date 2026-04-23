@@ -116,9 +116,20 @@ export const HolidayExportCsv = gql`
   }
 `;
 
+export const HolidayGroupBy = gql`
+  query HolidayGroupBy($input: HolidayGroupByInput!) {
+    HolidayGroupBy(input: $input) {
+      code
+      data
+      isSuccess
+      message
+    }
+  }
+`;
+
 
 export const HolidayCreate = gql`
-  mutation HolidayCreate($data: Json!, $currentUserId: String) {
+  mutation HolidayCreate($data: HolidayCreateInput!, $currentUserId: String) {
     HolidayCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -130,7 +141,7 @@ export const HolidayCreate = gql`
 `;
 
 export const HolidayCreateMany = gql`
-  mutation HolidayCreateMany($data: [Json!]!, $currentUserId: String) {
+  mutation HolidayCreateMany($data: [HolidayCreateInput!]!, $currentUserId: String) {
     HolidayCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -142,7 +153,7 @@ export const HolidayCreateMany = gql`
 `;
 
 export const HolidayUpdate = gql`
-  mutation HolidayUpdate($id: String!, $data: Json!, $currentUserId: String) {
+  mutation HolidayUpdate($id: String!, $data: HolidayUpdateInput!, $currentUserId: String) {
     HolidayUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -154,7 +165,7 @@ export const HolidayUpdate = gql`
 `;
 
 export const HolidayUpdateMany = gql`
-  mutation HolidayUpdateMany($data: [Json!]!, $currentUserId: String) {
+  mutation HolidayUpdateMany($data: [HolidayUpdateInput!]!, $currentUserId: String) {
     HolidayUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

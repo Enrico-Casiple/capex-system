@@ -118,9 +118,20 @@ export const JobLevelExportCsv = gql`
   }
 `;
 
+export const JobLevelGroupBy = gql`
+  query JobLevelGroupBy($input: JobLevelGroupByInput!) {
+    JobLevelGroupBy(input: $input) {
+      code
+      data
+      isSuccess
+      message
+    }
+  }
+`;
+
 
 export const JobLevelCreate = gql`
-  mutation JobLevelCreate($data: Json!, $currentUserId: String) {
+  mutation JobLevelCreate($data: JobLevelCreateInput!, $currentUserId: String) {
     JobLevelCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -132,7 +143,7 @@ export const JobLevelCreate = gql`
 `;
 
 export const JobLevelCreateMany = gql`
-  mutation JobLevelCreateMany($data: [Json!]!, $currentUserId: String) {
+  mutation JobLevelCreateMany($data: [JobLevelCreateInput!]!, $currentUserId: String) {
     JobLevelCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -144,7 +155,7 @@ export const JobLevelCreateMany = gql`
 `;
 
 export const JobLevelUpdate = gql`
-  mutation JobLevelUpdate($id: String!, $data: Json!, $currentUserId: String) {
+  mutation JobLevelUpdate($id: String!, $data: JobLevelUpdateInput!, $currentUserId: String) {
     JobLevelUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -156,7 +167,7 @@ export const JobLevelUpdate = gql`
 `;
 
 export const JobLevelUpdateMany = gql`
-  mutation JobLevelUpdateMany($data: [Json!]!, $currentUserId: String) {
+  mutation JobLevelUpdateMany($data: [JobLevelUpdateInput!]!, $currentUserId: String) {
     JobLevelUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

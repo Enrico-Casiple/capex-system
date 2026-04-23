@@ -13,6 +13,15 @@ type CustomNumberInputProps<TFormValues extends FieldValues> = {
 const CustomNumberInput = <TFormValues extends FieldValues>(
   props: CustomNumberInputProps<TFormValues>,
 ) => {
+  const formatNumber = (value: string | number) => {
+    if (!value && value !== 0) return "";
+    return Number(value).toLocaleString();
+  };
+
+  const parseNumber = (value: string) => {
+    return value.replace(/,/g, "");
+  };
+
   return (
     <Controller
       name={props.name}
@@ -27,8 +36,20 @@ const CustomNumberInput = <TFormValues extends FieldValues>(
             placeholder={props.placeholder}
             aria-invalid={fieldState.invalid}
             autoComplete="off"
-            type="number"
+            type="text"
+            inputMode="numeric"
             min={0}
+            value={formatNumber(field.value)}
+            onChange={(e) => {
+              const raw = parseNumber(e.target.value);
+              if (/^\d*$/.test(raw)) {
+                // Store raw number without commas
+                field.onChange(raw === "" ? "" : Number(raw));
+              }
+            }}
+            onBlur={() => {
+              field.onBlur();
+            }}
           />
           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
         </Field>

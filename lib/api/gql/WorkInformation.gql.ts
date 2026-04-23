@@ -132,9 +132,20 @@ export const WorkInformationExportCsv = gql`
   }
 `;
 
+export const WorkInformationGroupBy = gql`
+  query WorkInformationGroupBy($input: WorkInformationGroupByInput!) {
+    WorkInformationGroupBy(input: $input) {
+      code
+      data
+      isSuccess
+      message
+    }
+  }
+`;
+
 
 export const WorkInformationCreate = gql`
-  mutation WorkInformationCreate($data: Json!, $currentUserId: String) {
+  mutation WorkInformationCreate($data: WorkInformationCreateInput!, $currentUserId: String) {
     WorkInformationCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -146,7 +157,7 @@ export const WorkInformationCreate = gql`
 `;
 
 export const WorkInformationCreateMany = gql`
-  mutation WorkInformationCreateMany($data: [Json!]!, $currentUserId: String) {
+  mutation WorkInformationCreateMany($data: [WorkInformationCreateInput!]!, $currentUserId: String) {
     WorkInformationCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -158,7 +169,7 @@ export const WorkInformationCreateMany = gql`
 `;
 
 export const WorkInformationUpdate = gql`
-  mutation WorkInformationUpdate($id: String!, $data: Json!, $currentUserId: String) {
+  mutation WorkInformationUpdate($id: String!, $data: WorkInformationUpdateInput!, $currentUserId: String) {
     WorkInformationUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -170,7 +181,7 @@ export const WorkInformationUpdate = gql`
 `;
 
 export const WorkInformationUpdateMany = gql`
-  mutation WorkInformationUpdateMany($data: [Json!]!, $currentUserId: String) {
+  mutation WorkInformationUpdateMany($data: [WorkInformationUpdateInput!]!, $currentUserId: String) {
     WorkInformationUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

@@ -122,9 +122,20 @@ export const CompanyExportCsv = gql`
   }
 `;
 
+export const CompanyGroupBy = gql`
+  query CompanyGroupBy($input: CompanyGroupByInput!) {
+    CompanyGroupBy(input: $input) {
+      code
+      data
+      isSuccess
+      message
+    }
+  }
+`;
+
 
 export const CompanyCreate = gql`
-  mutation CompanyCreate($data: Json!, $currentUserId: String) {
+  mutation CompanyCreate($data: CompanyCreateInput!, $currentUserId: String) {
     CompanyCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -136,7 +147,7 @@ export const CompanyCreate = gql`
 `;
 
 export const CompanyCreateMany = gql`
-  mutation CompanyCreateMany($data: [Json!]!, $currentUserId: String) {
+  mutation CompanyCreateMany($data: [CompanyCreateInput!]!, $currentUserId: String) {
     CompanyCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -148,7 +159,7 @@ export const CompanyCreateMany = gql`
 `;
 
 export const CompanyUpdate = gql`
-  mutation CompanyUpdate($id: String!, $data: Json!, $currentUserId: String) {
+  mutation CompanyUpdate($id: String!, $data: CompanyUpdateInput!, $currentUserId: String) {
     CompanyUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -160,7 +171,7 @@ export const CompanyUpdate = gql`
 `;
 
 export const CompanyUpdateMany = gql`
-  mutation CompanyUpdateMany($data: [Json!]!, $currentUserId: String) {
+  mutation CompanyUpdateMany($data: [CompanyUpdateInput!]!, $currentUserId: String) {
     CompanyUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

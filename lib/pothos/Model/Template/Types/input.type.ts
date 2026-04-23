@@ -1,5 +1,5 @@
-import { Prisma } from '@/lib/generated/prisma/client';
-import PrismaTypes from '@/lib/pothos/pothos-prisma-types';
+import { Prisma } from '../../../../../generated/prisma/client/client';
+import PrismaTypes from '../../../../../lib/pothos/pothos-prisma-types';
 import { FindManyArgs } from './prismaArgs.type';
 
 export type CreateInput<PrismaModel extends Prisma.ModelName> = {
@@ -58,3 +58,14 @@ export type ExportCsvInput<PrismaModel extends Prisma.ModelName> = {
   columns?: string[];
   fileName?: string;
 };
+
+export interface GroupByInput<PrismaModel extends Prisma.ModelName> {
+  by: (keyof PrismaTypes[PrismaModel]['Shape'])[];
+  where?: Prisma.Args<PrismaModel, 'groupBy'>['where'];
+  orderBy?: Prisma.Args<PrismaModel, 'groupBy'>['orderBy'];
+  _count?: Prisma.Args<PrismaModel, 'groupBy'>['_count'];
+  _avg?: Prisma.Args<PrismaModel, 'groupBy'>['_avg'];
+  _sum?: Prisma.Args<PrismaModel, 'groupBy'>['_sum'];
+  _min?: Prisma.Args<PrismaModel, 'groupBy'>['_min'];
+  _max?: Prisma.Args<PrismaModel, 'groupBy'>['_max'];
+}

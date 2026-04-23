@@ -23,3 +23,5 @@ export type UpdateManyArgs<PrismaModel extends Prisma.ModelName> =
   Prisma.TypeMap['model'][PrismaModel]['operations']['updateMany']['args'];
 export type PrismaModelShape<PrismaModel extends Prisma.ModelName> =
   PrismaTypes[PrismaModel]['Shape'];
+export type GroupByArgs<PrismaModel extends Prisma.ModelName> =
+  Prisma.TypeMap['model'][PrismaModel]['operations']['groupBy']['args'];

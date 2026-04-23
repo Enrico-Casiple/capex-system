@@ -121,9 +121,20 @@ export const ConfigExportCsv = gql`
   }
 `;
 
+export const ConfigGroupBy = gql`
+  query ConfigGroupBy($input: ConfigGroupByInput!) {
+    ConfigGroupBy(input: $input) {
+      code
+      data
+      isSuccess
+      message
+    }
+  }
+`;
+
 
 export const ConfigCreate = gql`
-  mutation ConfigCreate($data: Json!, $currentUserId: String) {
+  mutation ConfigCreate($data: ConfigCreateInput!, $currentUserId: String) {
     ConfigCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -135,7 +146,7 @@ export const ConfigCreate = gql`
 `;
 
 export const ConfigCreateMany = gql`
-  mutation ConfigCreateMany($data: [Json!]!, $currentUserId: String) {
+  mutation ConfigCreateMany($data: [ConfigCreateInput!]!, $currentUserId: String) {
     ConfigCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -147,7 +158,7 @@ export const ConfigCreateMany = gql`
 `;
 
 export const ConfigUpdate = gql`
-  mutation ConfigUpdate($id: String!, $data: Json!, $currentUserId: String) {
+  mutation ConfigUpdate($id: String!, $data: ConfigUpdateInput!, $currentUserId: String) {
     ConfigUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -159,7 +170,7 @@ export const ConfigUpdate = gql`
 `;
 
 export const ConfigUpdateMany = gql`
-  mutation ConfigUpdateMany($data: [Json!]!, $currentUserId: String) {
+  mutation ConfigUpdateMany($data: [ConfigUpdateInput!]!, $currentUserId: String) {
     ConfigUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

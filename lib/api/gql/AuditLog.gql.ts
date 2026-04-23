@@ -122,9 +122,20 @@ export const AuditLogExportCsv = gql`
   }
 `;
 
+export const AuditLogGroupBy = gql`
+  query AuditLogGroupBy($input: AuditLogGroupByInput!) {
+    AuditLogGroupBy(input: $input) {
+      code
+      data
+      isSuccess
+      message
+    }
+  }
+`;
+
 
 export const AuditLogCreate = gql`
-  mutation AuditLogCreate($data: Json!, $currentUserId: String) {
+  mutation AuditLogCreate($data: AuditLogCreateInput!, $currentUserId: String) {
     AuditLogCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -136,7 +147,7 @@ export const AuditLogCreate = gql`
 `;
 
 export const AuditLogCreateMany = gql`
-  mutation AuditLogCreateMany($data: [Json!]!, $currentUserId: String) {
+  mutation AuditLogCreateMany($data: [AuditLogCreateInput!]!, $currentUserId: String) {
     AuditLogCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -148,7 +159,7 @@ export const AuditLogCreateMany = gql`
 `;
 
 export const AuditLogUpdate = gql`
-  mutation AuditLogUpdate($id: String!, $data: Json!, $currentUserId: String) {
+  mutation AuditLogUpdate($id: String!, $data: AuditLogUpdateInput!, $currentUserId: String) {
     AuditLogUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -160,7 +171,7 @@ export const AuditLogUpdate = gql`
 `;
 
 export const AuditLogUpdateMany = gql`
-  mutation AuditLogUpdateMany($data: [Json!]!, $currentUserId: String) {
+  mutation AuditLogUpdateMany($data: [AuditLogUpdateInput!]!, $currentUserId: String) {
     AuditLogUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

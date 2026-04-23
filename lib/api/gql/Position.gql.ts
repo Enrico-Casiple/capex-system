@@ -117,9 +117,20 @@ export const PositionExportCsv = gql`
   }
 `;
 
+export const PositionGroupBy = gql`
+  query PositionGroupBy($input: PositionGroupByInput!) {
+    PositionGroupBy(input: $input) {
+      code
+      data
+      isSuccess
+      message
+    }
+  }
+`;
+
 
 export const PositionCreate = gql`
-  mutation PositionCreate($data: Json!, $currentUserId: String) {
+  mutation PositionCreate($data: PositionCreateInput!, $currentUserId: String) {
     PositionCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -131,7 +142,7 @@ export const PositionCreate = gql`
 `;
 
 export const PositionCreateMany = gql`
-  mutation PositionCreateMany($data: [Json!]!, $currentUserId: String) {
+  mutation PositionCreateMany($data: [PositionCreateInput!]!, $currentUserId: String) {
     PositionCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -143,7 +154,7 @@ export const PositionCreateMany = gql`
 `;
 
 export const PositionUpdate = gql`
-  mutation PositionUpdate($id: String!, $data: Json!, $currentUserId: String) {
+  mutation PositionUpdate($id: String!, $data: PositionUpdateInput!, $currentUserId: String) {
     PositionUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -155,7 +166,7 @@ export const PositionUpdate = gql`
 `;
 
 export const PositionUpdateMany = gql`
-  mutation PositionUpdateMany($data: [Json!]!, $currentUserId: String) {
+  mutation PositionUpdateMany($data: [PositionUpdateInput!]!, $currentUserId: String) {
     PositionUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

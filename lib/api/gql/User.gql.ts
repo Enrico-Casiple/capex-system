@@ -106,9 +106,20 @@ export const UserExportCsv = gql`
   }
 `;
 
+export const UserGroupBy = gql`
+  query UserGroupBy($input: UserGroupByInput!) {
+    UserGroupBy(input: $input) {
+      code
+      data
+      isSuccess
+      message
+    }
+  }
+`;
+
 
 export const UserCreate = gql`
-  mutation UserCreate($data: Json!, $currentUserId: String) {
+  mutation UserCreate($data: UserCreateInput!, $currentUserId: String) {
     UserCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -120,7 +131,7 @@ export const UserCreate = gql`
 `;
 
 export const UserCreateMany = gql`
-  mutation UserCreateMany($data: [Json!]!, $currentUserId: String) {
+  mutation UserCreateMany($data: [UserCreateInput!]!, $currentUserId: String) {
     UserCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -132,7 +143,7 @@ export const UserCreateMany = gql`
 `;
 
 export const UserUpdate = gql`
-  mutation UserUpdate($id: String!, $data: Json!, $currentUserId: String) {
+  mutation UserUpdate($id: String!, $data: UserUpdateInput!, $currentUserId: String) {
     UserUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -144,7 +155,7 @@ export const UserUpdate = gql`
 `;
 
 export const UserUpdateMany = gql`
-  mutation UserUpdateMany($data: [Json!]!, $currentUserId: String) {
+  mutation UserUpdateMany($data: [UserUpdateInput!]!, $currentUserId: String) {
     UserUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

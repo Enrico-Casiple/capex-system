@@ -122,9 +122,20 @@ export const PermissionExportCsv = gql`
   }
 `;
 
+export const PermissionGroupBy = gql`
+  query PermissionGroupBy($input: PermissionGroupByInput!) {
+    PermissionGroupBy(input: $input) {
+      code
+      data
+      isSuccess
+      message
+    }
+  }
+`;
+
 
 export const PermissionCreate = gql`
-  mutation PermissionCreate($data: Json!, $currentUserId: String) {
+  mutation PermissionCreate($data: PermissionCreateInput!, $currentUserId: String) {
     PermissionCreate(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -136,7 +147,7 @@ export const PermissionCreate = gql`
 `;
 
 export const PermissionCreateMany = gql`
-  mutation PermissionCreateMany($data: [Json!]!, $currentUserId: String) {
+  mutation PermissionCreateMany($data: [PermissionCreateInput!]!, $currentUserId: String) {
     PermissionCreateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -148,7 +159,7 @@ export const PermissionCreateMany = gql`
 `;
 
 export const PermissionUpdate = gql`
-  mutation PermissionUpdate($id: String!, $data: Json!, $currentUserId: String) {
+  mutation PermissionUpdate($id: String!, $data: PermissionUpdateInput!, $currentUserId: String) {
     PermissionUpdate(id: $id, data: $data, currentUserId: $currentUserId) {
       isSuccess
       message
@@ -160,7 +171,7 @@ export const PermissionUpdate = gql`
 `;
 
 export const PermissionUpdateMany = gql`
-  mutation PermissionUpdateMany($data: [Json!]!, $currentUserId: String) {
+  mutation PermissionUpdateMany($data: [PermissionUpdateInput!]!, $currentUserId: String) {
     PermissionUpdateMany(data: $data, currentUserId: $currentUserId) {
       isSuccess
       message

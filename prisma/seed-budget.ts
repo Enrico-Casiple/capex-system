@@ -120,73 +120,72 @@ const data = [
 const seed = async () => {
   for (const datas of data) {
    await prisma.budget.create({
-  data: {
-    fiscalYear: datas.fiscalYear,
-    statusBudget: {
-      connect: {
-        name_modelNameType: {
-          name: datas.statusBudget.name,
-          modelNameType: datas.statusBudget.modelNameType,
-        }
-      }
-    },
-    budgetRefNo: datas.budgetRefNo,
-    company: {
-      connect: {
-        name_acronym: {
-          name: datas.company.name,
-          acronym: datas.company.acronym,
-        }
-      }
-    },
-
-    department: datas.department?.name && datas.department?.acronym
-      ? {
+      data: {
+        fiscalYear: datas.fiscalYear,
+        statusBudget: {
           connect: {
-            name_acronym: {
-              name: datas.department.name,
-              acronym: datas.department.acronym,
+            name_modelNameType: {
+              name: datas.statusBudget.name,
+              modelNameType: datas.statusBudget.modelNameType,
             }
           }
-        }
-      : undefined,
+        },
+        budgetRefNo: datas.budgetRefNo,
+        company: {
+          connect: {
+            name_acronym: {
+              name: datas.company.name,
+              acronym: datas.company.acronym,
+            }
+          }
+        },
 
-    category: {
-      connect: {
-        name_acronym_modelNameType: {
-          name: datas.categoryName.name,
-          acronym: datas.categoryName.acronym,
-          modelNameType: datas.categoryName.modelNameType,
+        department: datas.department?.name && datas.department?.acronym
+          ? {
+              connect: {
+                name_acronym: {
+                  name: datas.department.name,
+                  acronym: datas.department.acronym,
+                }
+              }
+            }
+          : undefined,
+
+        category: {
+          connect: {
+            name_acronym_modelNameType: {
+              name: datas.categoryName.name,
+              acronym: datas.categoryName.acronym,
+              modelNameType: datas.categoryName.modelNameType,
+            }
+          }
+        },
+
+        requester: {
+          connect: { id: datas.requesterId }
+        },
+
+        purpose: datas.purpose,
+        specs: datas.specs,
+        quantity: datas.quantity,
+
+        remark: datas.remark,
+
+        submittedAt: datas.submittedAt,
+        requestedAmount: datas.requestedAmount,
+        approvedAmount: datas.approvedAmount,
+        currency: datas.currency,
+
+        auditLogs: {
+          create: {
+            modelName: "Budget",
+            action: "CREATE",
+            timestamp: new Date(),
+            newDetails: JSON.stringify(datas),
+          }
         }
       }
-    },
-
-    requester: {
-      connect: { id: datas.requesterId }
-    },
-
-    purpose: datas.purpose,
-    specs: datas.specs,
-    quantity: datas.quantity,
-
-    remark: datas.remark,
-
-    submittedAt: datas.submittedAt,
-    requestedAmount: datas.requestedAmount,
-    approvedAmount: datas.approvedAmount,
-    currency: datas.currency,
-
-    auditLogs: {
-      create: {
-        modelName: "Budget",
-        action: "CREATE",
-        timestamp: new Date(),
-        newDetails: JSON.stringify(datas),
-      }
-    }
-  }
-});
-    
+    });
   }
 }
 

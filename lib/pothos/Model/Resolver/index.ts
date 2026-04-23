@@ -1,7 +1,7 @@
 import authenticate from '../../../../lib/util/authenticate';
 import { checkAuthentication } from '../../../../lib/util/checkAuthentication';
 import { enforceRateLimit } from '../../../../lib/util/enforceRateLimit';
-import { Prisma } from '../../../generated/prisma/client';
+import { Prisma } from '../../../../generated/prisma/client/client';
 import { builder } from '../../builder';
 import {
   countInputRefs,
@@ -19,6 +19,7 @@ import {
   csvExportResponseRef,
   cursorPaginationResponseRef,
   deletedListResponseRef,
+  groupByResponseRef,
   paginationResponseRefs,
   responseListRefs,
   responseRefs,
@@ -241,42 +242,44 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   // if (!updateInputRef) return;
 
   builder.mutationField(`${modelName}Create`, (t) =>
-    t.field({
-      type: responseRefs[model],
+    t.prismaField({
+      type: responseRefs[model] as never,
       description: `Create a new ${modelName} record using Prisma ${modelName}CreateInput format. Triggers a real-time subscription event on success.`,
       args: {
         data: t.arg({
-          type: 'Json',
+          // This references the Prisma-generated input type for this model
+          type: `${modelName}CreateInput` as never,
           required: true,
-          description: `JSON object matching Prisma.${modelName}CreateInput structure. Accepts: scalars, nested create/connect/connectOrCreate, and list operations.`,
+          description: ` Prisma.${modelName}CreateInput structure. Accepts: scalars, nested create/connect/connectOrCreate, and list operations.`,
         }),
         currentUserId: t.arg.string({
           required: false,
           description: `(Optional) The ID of the user performing the create operation. Defaults to current session user.`,
         }),
       },
-      resolve: async (_parent, args, ctx) => {
+      resolve: async (query, _parent, args, ctx) => {
         console.log(`✏️ ${modelName}: Create - Received create request with data:`, args.data);
         const middlewareError = await middlewareCheck(ctx, modelName, true);
         if (middlewareError) return middlewareError;
         const result = await service.create({
+          ...query,
           data: args.data,
           currentUserId: (ctx.session?.user?.id as string) ?? 'system',
         } as never);
         ctx.pubsub.publish(subscriptionPublishName, result.data);
-        return result;
+        return result as any;
       },
     }),
   );
 
   // ─── MUTATION: createMany ─────────────────────────────────────
   builder.mutationField(`${modelName}CreateMany`, (t) =>
-    t.field({
-      type: responseListRefs[model],
+    t.prismaField({
+      type: responseListRefs[model] as never,
       description: `Create multiple ${modelName} records in a single operation. Each record must match Prisma ${modelName}CreateInput. Each created record triggers an individual real-time subscription event.`,
       args: {
         data: t.arg({
-          type: ['Json'],
+          type: [`${modelName}CreateInput` as never],
           required: true,
           description: `Array of JSON objects, each matching Prisma.${modelName}CreateInput structure.`,
         }),
@@ -285,7 +288,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           description: `(Optional) The ID of the user performing the bulk create. Defaults to current session user.`,
         }),
       },
-      resolve: async (_parent, args, ctx) => {
+      resolve: async (query, _parent, args, ctx) => {
         console.log(
           `✏️ ${modelName}: CreateMany - Received bulk create request with data:`,
           args.data,
@@ -293,6 +296,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         const middlewareError = await middlewareCheck(ctx, modelName, true);
         if (middlewareError) return middlewareError;
         const result = await service.createMany({
+          ...query,
           data: args.data,
           currentUserId: (ctx.session?.user?.id as string) ?? 'system',
         } as never);
@@ -303,15 +307,15 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           });
         }
 
-        return result;
+        return result as any;
       },
     }),
   );
 
   // ─── MUTATION: update ─────────────────────────────────────────
   builder.mutationField(`${modelName}Update`, (t) =>
-    t.field({
-      type: responseRefs[model],
+    t.prismaField({
+      type: responseRefs[model] as never,
       description: `Update an existing ${modelName} record by ID. Data must match Prisma ${modelName}UpdateInput structure. Triggers a real-time subscription event on success.`,
       args: {
         id: t.arg.string({
@@ -319,7 +323,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           description: `The unique identifier of the ${modelName} record to update.`,
         }),
         data: t.arg({
-          type: 'Json',
+          type: `${modelName}UpdateInput` as never,
           required: true,
           description: `JSON object matching Prisma.${modelName}UpdateInput structure. All fields are optional. Supports nested update/connect/connectOrCreate/upsert.`,
         }),
@@ -328,31 +332,30 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           description: `(Optional) The ID of the user performing the update. Defaults to current session user.`,
         }),
       },
-      resolve: async (_parent, args, ctx) => {
+      resolve: async (query, _parent, args, ctx) => {
         console.log(`✏️ ${modelName}: Update - Received update request for id:`, args.id);
         const middlewareError = await middlewareCheck(ctx, modelName);
         if (middlewareError) return middlewareError;
 
-        // Control the Delete Option for the update operation
-
         const result = await service.update({
-          data: { ...args.data, id: args.id },
+          ...query,
+          data: args.data,
           currentUserId: (ctx.session?.user?.id as string) ?? 'system',
         } as never);
         ctx.pubsub.publish(subscriptionPublishName, result.data);
-        return result;
+        return result as any;
       },
     }),
   );
 
   // ─── MUTATION: updateMany ─────────────────────────────────────
   builder.mutationField(`${modelName}UpdateMany`, (t) =>
-    t.field({
-      type: responseListRefs[model],
+    t.prismaField({
+      type: responseListRefs[model] as never,
       description: `Update multiple ${modelName} records in a single operation. Each record must include the ID and fields to update. Each updated record triggers an individual real-time subscription event.`,
       args: {
         data: t.arg({
-          type: ['Json'],
+          type: [`${modelName}UpdateInput` as never],
           required: true,
           description: `Array of JSON objects matching Prisma.${modelName}UpdateInput. Each must include 'id' field.`,
         }),
@@ -361,7 +364,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           description: `(Optional) The ID of the user performing the bulk update. Defaults to current session user.`,
         }),
       },
-      resolve: async (_parent, args, ctx) => {
+      resolve: async (query, _parent, args, ctx) => {
         console.log(
           `✏️ ${modelName}: UpdateMany - Received bulk update request with data:`,
           args.data,
@@ -372,6 +375,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         //  Control the Delete Option for the updateMany operation
 
         const result = await service.updateMany({
+          ...query,
           data: args.data,
           currentUserId: (ctx.session?.user?.id as string) ?? 'system',
         } as never);
@@ -380,7 +384,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
             ctx.pubsub.publish(subscriptionPublishName, record);
           });
         }
-        return result;
+        return result as any;
       },
     }),
   );
@@ -595,6 +599,28 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
       },
     }),
   );
+
+  // Extra GroupBy, Aggregate, and other advanced queries and mutations can be added here following the same pattern.
+  builder.queryField(`${modelName}GroupBy`, (t) => 
+    t.field({
+      type: groupByResponseRef[model],
+      description: `Group ${modelName} records by specified fields and perform aggregations. Supports dynamic grouping and aggregation options.`,
+      args: {
+        groupByInput: t.arg({
+          type: `${modelName}GroupByInput` as never,
+          required: true,
+          description: `Input for grouping ${modelName} records. Specify fields to group by and aggregation operations.`,
+        }),
+      },
+      resolve: async (_parent, args, ctx) => {
+        console.log(`🔍 ${modelName}: GroupBy - Received group by request with args:`, args);
+        const middlewareError = await middlewareCheck(ctx, modelName);
+        if (middlewareError) return middlewareError;
+        const result = await service.groupBy(args.groupByInput);
+        return result as any;
+      }
+    })
+  )
 
   // ─── SUBSCRIPTION: onChange ─────────────────────────────────
   builder.subscriptionField(subscriptionPublishName, (t) =>
