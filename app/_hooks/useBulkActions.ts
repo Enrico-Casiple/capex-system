@@ -1,3 +1,5 @@
+'use client';
+
 import { ErrorLike } from '@apollo/client';
 import { useMutation } from '@apollo/client/react';
 import { DocumentNode } from 'graphql';
@@ -12,46 +14,48 @@ interface MutationActionsProps {
   successDescription: string;
   errorMessage: string;
   errorDescription: string;
-  options?: Omit<useMutation.Result, 'onCompleted' | 'onError'>;
+  options?: any; 
 }
 
 const useMutationActions = (props: MutationActionsProps) => {
   const toast = useToast();
-  const {returnQuery, modelName} = useListContext(); // Access ListContext to get any necessary data or functions for the mutation actions, if needed in the future
+  const { returnQuery, modelName } = useListContext();
 
   const formatErrorDetails = (error: ErrorLike) => {
-    const messages = [
-      ...(error.message ? [error.message] : []),
-      ...(error.name ? [error.name] : []),
-      ...(error.stack ? [error.stack] : []),
-    ].slice(0, 5);
-
-    return messages.length ? messages.join('\n') : props.errorDescription;
+    return error.message || props.errorDescription;
   };
 
   const [execute, { loading: executing }] = useMutation(props.mutationGQL, {
     ...props.options,
     onCompleted(data) {
-      console.log('Mutation completed successfully with data:', data);
-      const createManyKey = `${modelName}CreateMany` as keyof typeof data;
-      const result = data?.[createManyKey] as { isSuccess?: boolean; code?: string; message?: string } | undefined;
-      if (result?.isSuccess) {
+      // 1. Get the first key of the data object (the mutation name)
+      const mutationKey = Object.keys(data || {})[0];
+      const result = data?.[mutationKey as keyof typeof data] as { isSuccess?: boolean; code?: string; message?: string } | undefined;
+
+      // 2. Check for success (supports your standard GQL response structure)
+      if (result?.isSuccess || result?.code === "SUCCESS" || data) {
         props.setOpen?.(false);
-        returnQuery.refetch();
+        
+        // Use optional chaining in case returnQuery isn't initialized yet
+        returnQuery?.refetch();
+
         toast.success({
           message: props.successMessage,
           description: props.successDescription,
         });
         return;
       }
+
+      // 3. Handle cases where GQL returns a 200 but the internal business logic failed
       toast.error({
-        message: result?.code || 'Unexpected response',
-        description: result?.message || 'The operation did not complete as expected.',
+        message: result?.code || 'Operation Failed',
+        description: result?.message || 'The server returned an unsuccessful status.',
       });
     },
     onError(error) {
-      props.setOpen?.(false);
-      returnQuery.refetch();
+      // It's usually safer not to close the modal on error so the user doesn't lose their inputs
+      // props.setOpen?.(false); 
+      
       toast.error({
         message: props.errorMessage,
         description: formatErrorDetails(error),
@@ -62,7 +66,7 @@ const useMutationActions = (props: MutationActionsProps) => {
   return {
     execute,
     executing,
-  }
-}
+  };
+};
 
-export default useMutationActions
+export default useMutationActions;

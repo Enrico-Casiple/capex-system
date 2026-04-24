@@ -37,18 +37,6 @@ const requestExtraColumns: SearchableColumnDef<Request>[] = [
     accessorKey: "responsibilityCenter",
     meta: { searchable: true },
   },
-  // {
-  //   id: 'requestedBudget.approvedAmount',
-  //   header: 'Requested Budget',
-  //   accessorKey: 'requestedBudget',
-  //   meta: { searchable: true },
-  // },
-  //  {
-  //   id: 'quotaionAmount',
-  //   header: 'Quotation Amount',
-  //   accessorKey: 'quotaionAmount',
-  //   meta: { searchable: true },
-  // },
 ];
 
 export const capexRequest = {

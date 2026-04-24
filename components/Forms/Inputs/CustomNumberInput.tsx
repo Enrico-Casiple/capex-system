@@ -43,8 +43,8 @@ const CustomNumberInput = <TFormValues extends FieldValues>(
             onChange={(e) => {
               const raw = parseNumber(e.target.value);
               if (/^\d*$/.test(raw)) {
-                // Store raw number without commas
                 field.onChange(raw === "" ? "" : Number(raw));
+                props.inputProps?.onChange?.(e);
               }
             }}
             onBlur={() => {

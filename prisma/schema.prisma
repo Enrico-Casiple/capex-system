@@ -210,6 +210,8 @@ model Company {
   request          Request[]
   budget           Budget[]
   crfCompany       CapitalRecoveryFactor[] @relation("CRFCompany")
+  positionCompany Position[] @relation("PositionCompany")
+  workFlowTemplateScopeCompany WorkFlowTemplateScope[] @relation("WorkFlowTemplateScopeCompany")
   isActive         Boolean?                @default(true)
   createdAt        DateTime                @default(now())
   updatedAt        DateTime                @updatedAt
@@ -234,7 +236,7 @@ model Department {
   budget                      Budget[]
   requestResponsibilityCenter Request[]               @relation("RequestResponsibilityCenter")
   crfDepartment               CapitalRecoveryFactor[] @relation("CRFDepartment")
-
+  workFlowTemplateScopeDepartment WorkFlowTemplateScope[] @relation("WorkFlowTemplateScopeDepartment")
   isActive  Boolean?  @default(true)
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
@@ -249,6 +251,8 @@ model Position {
   name             String?
   acronym          String?
   description      String?
+  companyId        String?           @db.ObjectId
+  company          Company?          @relation("PositionCompany", fields: [companyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   auditLogs        AuditLog[]
   workInformations WorkInformation[]
   isActive         Boolean?          @default(true)
@@ -256,6 +260,7 @@ model Position {
   updatedAt        DateTime          @updatedAt
   scopeTypeId      String?           @db.ObjectId
   scopeType        Type?             @relation("PositionType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  workFlowTemplateScopePosition WorkFlowTemplateScope[] @relation("WorkFlowTemplateScopePosition")
 
   // ✅ Add indexes
   @@unique([name, acronym]) // Ensure unique position names
@@ -270,6 +275,7 @@ model JobLevel {
   jobcodeType      Type?             @relation("JobCodeType", fields: [jobcodeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   companyId        String?           @db.ObjectId
   company          Company?          @relation("CompanyJobLevels", fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  WorkFlowTemplateScopeJobLevel WorkFlowTemplateScope[] @relation("WorkFlowTemplateScopeJobLevel")
   workInformations WorkInformation[]
   auditLogs        AuditLog[]
 
@@ -542,13 +548,17 @@ model WorkFlowTemplateScope {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
   templateId String?           @db.ObjectId
-  template   WorkFlowTemplate? @relation(fields: [templateId], references: [id])
+  template   WorkFlowTemplate? @relation(fields: [templateId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  scopeTypeId      String? @db.ObjectId
-  scopeType        Type?   @relation("ScopeType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  scopeReferenceId String? @db.ObjectId
-
-  priority Int? @default(0)
+  // Who's this workflow template applicable to? (for auto-assigning templates based on user attributes)
+  companyId    String? @db.ObjectId
+  company      Company? @relation("WorkFlowTemplateScopeCompany",fields: [companyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  departmentId String? @db.ObjectId
+  department   Department? @relation("WorkFlowTemplateScopeDepartment",fields: [departmentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  positionId   String? @db.ObjectId
+  position     Position? @relation("WorkFlowTemplateScopePosition",fields: [positionId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  jobLevelId   String? @db.ObjectId
+  jobLevel     JobLevel? @relation("WorkFlowTemplateScopeJobLevel",fields: [jobLevelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   auditLogs AuditLog[]
   isActive  Boolean?   @default(true)
@@ -556,7 +566,6 @@ model WorkFlowTemplateScope {
   updatedAt DateTime?  @updatedAt
 
   @@index([templateId])
-  @@index([scopeTypeId, scopeReferenceId])
 }
 
 model WorkFlowStepTemplate {
@@ -719,7 +728,6 @@ model Type {
   actionType     AuditLog[]        @relation("ActionType")
   auditLogs      AuditLog[]
 
-  workFlowTemplateScope WorkFlowTemplateScope[] @relation("ScopeType")
   stepAssignmentType    WorkFlowStepTemplate[]  @relation("StepAssignmentType")
   workFlowInstance      WorkFlowInstance[]      @relation("ReferenceType")
   budgetMovementType    BudgetLedger[]          @relation("BudgetMovementType")
@@ -1040,7 +1048,11 @@ model RequestItem {
 
   description   String?
   quantity      Int?
+  unitOfMeasure String?
+  vatPercentage Float?
+  isInclusiveVat Boolean? @default(false)
   unitPrice     Float?
+  amountGrossOfVat Float? // computed as quantity * unitPrice
   totalPrice    Float?
   attachmentUrl String?
   auditLogs     AuditLog[]

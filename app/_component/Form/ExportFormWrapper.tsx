@@ -8,6 +8,7 @@ import { useQuery } from '@apollo/client/react'
 import { ExportResponse, ExportFormat, ColumnConfig } from '@/lib/types/export'
 import { downloadFile } from '@/lib/util/download'
 import useToast from '@/app/_hooks/useToast'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 type ExportFormWrapperProps = {
   open: boolean
@@ -104,10 +105,10 @@ const ExportFormWrapper = ({
         message = exportResult?.message || 'Export failed'
         console.error(message)
         onExportComplete?.(false, message)
-          toast.error({
-            message: 'Export Failed',
-            description: message,
-          })
+        toast.error({
+          message: 'Export Failed',
+          description: message,
+        })
         return
       }
 
@@ -132,7 +133,7 @@ const ExportFormWrapper = ({
       // Handle XLSX format
       else if (format === 'xlsx') {
         const excelData = exportResult?.data?.excelBase64
-        const mimeType =  exportResult?.data?.excelMimeType || 'application/vnd.ms-excel'
+        const mimeType = exportResult?.data?.excelMimeType || 'application/vnd.ms-excel'
         const fileName = (exportResult?.data?.excelFileName || `export_${modelName.toLowerCase()}`).replace(/\.xls$/i, '.xls')
 
         if (!excelData) {
@@ -180,24 +181,22 @@ const ExportFormWrapper = ({
           <Label className="text-sm font-semibold text-foreground">Export Format</Label>
           <span className="text-xs text-muted-foreground ml-auto">Choose your file type</span>
         </div>
-        
+
         <div className="grid grid-cols-2 gap-3">
           {(['csv', 'xlsx'] as const).map((fmt) => (
             <button
               key={fmt}
               onClick={() => setFormat(fmt)}
-              className={`relative p-4 rounded-lg border-2 transition-all cursor-pointer group ${
-                format === fmt
-                  ? 'border-primary bg-primary/5'
-                  : 'border-input bg-card hover:border-primary/50'
-              }`}
+              className={`relative p-4 rounded-lg border-2 transition-all cursor-pointer group ${format === fmt
+                ? 'border-primary bg-primary/5'
+                : 'border-input bg-card hover:border-primary/50'
+                }`}
             >
               <div className="flex items-center gap-2">
-                <div className={`p-2 rounded-md transition-all ${
-                  format === fmt
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted text-muted-foreground group-hover:bg-primary/10'
-                }`}>
+                <div className={`p-2 rounded-md transition-all ${format === fmt
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground group-hover:bg-primary/10'
+                  }`}>
                   <Table2 className="w-4 h-4" />
                 </div>
                 <div className="text-left">
@@ -245,53 +244,95 @@ const ExportFormWrapper = ({
           </Button>
         </div>
 
-        {/* Column List */}
-        <div className="border border-input rounded-lg bg-card overflow-hidden shadow-sm">
-          <div className="flex flex-wrap gap-2 p-3">
-            {availableColumns.map((column) => (
-              <div
-                key={column.id}
-                className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors group border ${
-                  column.isRelation
+        {/* Column List - Desktop Grid */}
+        <div className="hidden md:block border border-input rounded-lg bg-card overflow-hidden shadow-sm">
+          <ScrollArea className="h-64 w-full">
+            <div className="flex flex-wrap gap-2 p-3">
+              {availableColumns.map((column) => (
+                <div
+                  key={column.id}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md transition-all group border ${column.isRelation
                     ? 'bg-blue-500/10 border-blue-200 hover:bg-blue-500/15 dark:border-blue-800'
                     : 'bg-muted/40 border-input/50 hover:bg-muted/60'
-                }`}
-              >
-                <Checkbox
-                  id={column.id}
-                  checked={selectedColumns.includes(column.id)}
-                  onCheckedChange={() => toggleColumn(column.id)}
-                  disabled={selectedColumns.length === 1 && selectedColumns.includes(column.id)}
-                  className="h-3.5 w-3.5"
-                />
-                <Label
-                  htmlFor={column.id}
-                  className="text-xs font-medium cursor-pointer whitespace-nowrap flex items-center gap-1"
+                    }`}
                 >
-                  {column.label}
-                  {column.isRelation && (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-semibold">
-                      relation
-                    </span>
+                  <Checkbox
+                    id={column.id}
+                    checked={selectedColumns.includes(column.id)}
+                    onCheckedChange={() => toggleColumn(column.id)}
+                    disabled={selectedColumns.length === 1 && selectedColumns.includes(column.id)}
+                    className="h-3.5 w-3.5"
+                  />
+                  <Label
+                    htmlFor={column.id}
+                    className="text-xs font-medium cursor-pointer whitespace-nowrap flex items-center gap-1"
+                  >
+                    {column.label}
+                    {column.isRelation && (
+                      <span className="text-xs px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-semibold">
+                        relation
+                      </span>
+                    )}
+                  </Label>
+                  {selectedColumns.includes(column.id) && (
+                    <CheckCheck className="w-3 h-3 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                   )}
-                </Label>
-                {selectedColumns.includes(column.id) && (
-                  <CheckCheck className="w-3 h-3 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-                )}
-              </div>
-            ))}
-          </div>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
+
+        {/* Column List - Mobile Stack */}
+        <div className="md:hidden border border-input rounded-lg bg-card overflow-hidden shadow-sm">
+          <ScrollArea className="h-80 w-full">
+            <div className="space-y-2 p-3">
+              {availableColumns.map((column) => (
+                <div
+                  key={column.id}
+                  className={`flex items-center justify-between gap-2 px-3 py-3 rounded-md transition-all group border ${column.isRelation
+                    ? 'bg-blue-500/10 border-blue-200 hover:bg-blue-500/15 dark:border-blue-800'
+                    : 'bg-muted/40 border-input/50 hover:bg-muted/60'
+                    }`}
+                >
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <Checkbox
+                      id={column.id}
+                      checked={selectedColumns.includes(column.id)}
+                      onCheckedChange={() => toggleColumn(column.id)}
+                      disabled={selectedColumns.length === 1 && selectedColumns.includes(column.id)}
+                      className="h-4 w-4 shrink-0"
+                    />
+                    <Label
+                      htmlFor={column.id}
+                      className="text-sm font-medium cursor-pointer flex-1 min-w-0 flex items-center gap-2"
+                    >
+                      <span className="truncate">{column.label}</span>
+                      {column.isRelation && (
+                        <span className="text-xs px-2 py-1 rounded bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 font-semibold shrink-0">
+                          rel
+                        </span>
+                      )}
+                    </Label>
+                  </div>
+                  {selectedColumns.includes(column.id) && (
+                    <CheckCheck className="w-4 h-4 text-primary shrink-0" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
         </div>
 
         {/* Info Text */}
         <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/40 p-3 rounded-lg">
-          <FileText className="w-3.5 h-3.5 text-primary" />
-          <span>
+          <FileText className="w-3.5 h-3.5 text-primary shrink-0" />
+          <span className="line-clamp-2">
             {selectedColumns.length === availableColumns.length
               ? 'All columns will be exported'
               : `${selectedColumns.length} column${selectedColumns.length !== 1 ? 's' : ''} ready to export`}
             {selectedColumns.some(col => col.includes('.')) && (
-              <span className="ml-2 text-blue-600 dark:text-blue-400 font-medium">
+              <span className="ml-2 text-blue-600 dark:text-blue-400 font-medium block">
                 • Including nested relations
               </span>
             )}

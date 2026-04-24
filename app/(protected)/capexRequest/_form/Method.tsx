@@ -8,12 +8,13 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { modelGQL } from '@/lib/api/crud.gql';
 import { Request } from '@/lib/generated/api/customHookAPI/graphql';
 import { generate_code } from '@/lib/util/bcryptjs';
-import { ok } from '@/lib/util/reponseUtil';
+import { fail, ok } from '@/lib/util/reponseUtil';
 import { useSession } from 'next-auth/react';
 import { useFieldArray, useForm, UseFormReturn } from 'react-hook-form';
 import BudgetReferenceDetails from './Section/BudgetReferenceDetails';
 import React from "react";
 import RequestedItem, { RequestedItemFormValues } from './Section/RequestedItem';
+import useToast from '@/app/_hooks/useToast';
 
 type MethodProps = {
   rowId?: string | null;
@@ -27,6 +28,7 @@ const modelAPI = modelGQL;
 
 const Method = (props: MethodProps) => {
   const session = useSession();
+  const toast = useToast();
 
   // Get Month and Year for request number generation
   const currentDate = new Date();
@@ -38,8 +40,8 @@ const Method = (props: MethodProps) => {
     // requestNumber => "REQ-(MMYYYY)-(Generated Random 5-digit number)"
     requestNumber: '',
     dateNeeded: new Date(), // Default to current date, can be changed by user input
-    quotationUrl: '', // URL for the quotation document, can be used for reference or record-keeping
-    quotationAmount: 0, // Amount specified in the quotation, can be used for budget comparison or approval reference
+    quotationUrl: 'https://purchase-system-files.sgp1.digitaloceanspaces.com/1', // URL for the quotation document, can be used for reference or record-keeping
+    quotationAmount: 10000, // Amount specified in the quotation, can be used for budget comparison or approval reference
     currency: 'PHP', // Default currency set to PHP, can be changed by user input based on the currency of the request or company standards
     companyId: '', // Connect to company for easier filtering and retrieval of CRF based on company
     departmentId: '', // Connect to department for easier filtering and retrieval of CRF based on department
@@ -68,11 +70,15 @@ const Method = (props: MethodProps) => {
     },
     requestItems: [{
       description: '',
-      quantity: 0,
+      quantity: 1,
+      unitOfMeasure: '',
+      vatPercentage: 12,
+      isInclusiveVat: false,
       unitPrice: 0,
       totalPrice: 0,
+      amountGrossOfVat: 0,
       attachmentUrl: '',
-      statusId: "", // Connect to status for easier retrieval of request items based on status
+      statusId: "",
     }],
   };
 
@@ -106,6 +112,26 @@ const Method = (props: MethodProps) => {
     // const budgetNumberPrefix = `${yearComplete}AX-${"UNI"}-${generate_code(5)}`;
 
     alert(JSON.stringify({ ...requestCreateInput, requestNumber: requestNumberPrefix }, null, 2));
+
+    //  If no Quotation Amount is provided, return error
+    if (!requestCreateInput.quotationAmount || requestCreateInput.quotationAmount <= 0) {
+      toast.error({
+        message: "Invalid Quotation Amount",
+        description: "Please provide a valid quotation amount greater than 0."
+      })
+      return fail("INVALID_QUOTATION_AMOUNT", "Please provide a valid quotation amount greater than 0.");
+    }
+
+    //  Check the the Totoal of the requested items and compate it the requested amount in the CRF, if not match return error
+    const totalRequestedItemsAmount = requestCreateInput.requestItems.reduce((total, item) => total + (item.totalPrice ?? 0), 0);
+    if (totalRequestedItemsAmount !== (requestCreateInput.requestedCRF?.requestedAmount ?? 0)) {
+      toast.error({
+        message: "Requested amount mismatch",
+        description: `The total amount of the requested items (${totalRequestedItemsAmount}) does not match the requested amount in the CRF (${requestCreateInput.requestedCRF?.requestedAmount}). Please review your request and try again.`
+      })
+      return fail("REQUESTED_AMOUNT_MISMATCH", `The total amount of the requested items (${totalRequestedItemsAmount}) does not match the requested amount in the CRF (${requestCreateInput.requestedCRF?.requestedAmount}). Please review your request and try again.`);
+    }
+
     switch (props.actionType) {
       case 'duplicate':
         // Mutation to create a new request
@@ -133,7 +159,7 @@ const Method = (props: MethodProps) => {
     }
   }
 
-  return <div>
+  return props.actionType === 'edit' ? <> View </> : <div>
     <FormTemplate
       title=''
       description=''
@@ -303,7 +329,6 @@ const Method = (props: MethodProps) => {
                     emptyMessage={`No responsibility center found.`}
                     disabled={!form.watch('companyId')}
                     cursorVariables={(search, cursor, take) => {
-                      const selectedCompanyId = form.watch('companyId');
                       return {
                         cursorInput: {
                           cursor,
@@ -311,7 +336,6 @@ const Method = (props: MethodProps) => {
                           take,
                           filter: {
                             ...(search ? { name: { contains: search, mode: 'insensitive' } } : {}),
-                            ...(selectedCompanyId && { companyId: selectedCompanyId }),
                           },
                         },
                       };

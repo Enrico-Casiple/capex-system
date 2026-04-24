@@ -1,16 +1,16 @@
 'use client';
 import Export from '@/app/_component/List/Export';
-// import Import from '@/app/_component/List/Import';
+import Import from '@/app/_component/List/Import';
 import Action, { ActionType, PopupType } from '@/app/_component/Row/Action';
 import { Spinner } from '@/app/_component/Spinner';
 import ListPage from '@/app/_context/ListWrapper';
-import { Request, RequestCreateInput } from '@/lib/generated/api/customHookAPI/graphql';
+import { Request, RequestCreateInput, WorkFlowTemplate, WorkFlowTemplateCreateInput } from '@/lib/generated/api/customHookAPI/graphql';
 import dynamic from 'next/dynamic';
 import { useCallback } from 'react';
 import ModelData from '../../_component/ModelData';
-import { capexRequestTableConfig } from '../_config';
+import { capexRequestTableConfig, workFlowTemplateTableConfig } from '../_config';
 import ExportForm from './_form/ExportForm';
-// import ImportForm from './_form/ImportForm';
+import ImportForm from './_form/ImportForm';
 
 const Method = dynamic(() => import('./_form/Method'), {
   loading: () => <Spinner />,
@@ -19,8 +19,8 @@ const Method = dynamic(() => import('./_form/Method'), {
 
 const ModelPage = () => {
 
-  type ModelRequest = Request
-  type ModelCreateInput = RequestCreateInput
+  type ModelRequest = WorkFlowTemplate
+  type ModelCreateInput = WorkFlowTemplateCreateInput
   const {
     modelName,
     extraColumns,
@@ -31,7 +31,7 @@ const ModelPage = () => {
     listName,
     description,
     initialSearchField
-  } = capexRequestTableConfig
+  } = workFlowTemplateTableConfig
 
   const renderMethod = useCallback(
     (
@@ -80,12 +80,12 @@ const ModelPage = () => {
 
   ];
 
-  // const importForm = useCallback(
-  //   (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (
-  //     <ImportForm<ModelRequest, ModelCreateInput> open={open} setOpen={setOpen} />
-  //   ),
-  //   [],
-  // );
+  const importForm = useCallback(
+    (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (
+      <ImportForm<ModelRequest, ModelCreateInput> open={open} setOpen={setOpen} />
+    ),
+    [],
+  );
 
   const exportForm = useCallback(
     (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (
@@ -110,8 +110,7 @@ const ModelPage = () => {
         description={description}
         newBulkAction={BULK_ACTIONS}
         createAction={createAction}
-        // importComponent={<Import importFormComponent={importForm} />}
-        importComponent={<div></div>}
+        importComponent={<Import importFormComponent={importForm} />}
         exportComponent={<Export exportFormComponent={exportForm} />}
       />
     </ListPage>

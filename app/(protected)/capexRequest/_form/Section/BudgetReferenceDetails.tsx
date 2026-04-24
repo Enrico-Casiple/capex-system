@@ -1,5 +1,9 @@
 "use client";
+
 import CustomSingleSelectInput from "@/components/Forms/Inputs/CustomSingleSelectInput";
+import CustomNumberInput from "@/components/Forms/Inputs/CustomNumberInput";
+import CustomTextAreaInput from "@/components/Forms/Inputs/CustomTextAreaInput";
+import CustomImportInput from "@/components/Forms/Inputs/CustomImportInput";
 import {
   Table,
   TableBody,
@@ -8,19 +12,25 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { modelGQL } from "@/lib/api/crud.gql";
-import { BudgetResponse, BudgetFindByInput, BudgetLedgerGroupByInput, BudgetLedgerGroupByResponse } from "@/lib/generated/api/customHookAPI/graphql";
+import {
+  BudgetResponse,
+  BudgetFindByInput,
+  BudgetLedgerGroupByInput,
+  BudgetLedgerGroupByResponse,
+} from "@/lib/generated/api/customHookAPI/graphql";
 import { useQuery } from "@apollo/client/react";
 import { UseFormReturn } from "react-hook-form";
-import * as React from 'react';
-import { BudgetFindBy } from '../../../../../lib/api/gql/Budget.gql';
-import CustomNumberInput from '../../../../../components/Forms/Inputs/CustomNumberInput';
-import { Button } from '@/components/ui/button';
-import { RefreshCw } from "lucide-react";
-import CustomTextAreaInput from '../../../../../components/Forms/Inputs/CustomTextAreaInput';
+import * as React from "react";
+import { BudgetFindBy } from "../../../../../lib/api/gql/Budget.gql";
 import { BudgetLedgerGroupBy } from "@/lib/api/gql/BudgetLedger.gql";
+import { RefreshCw, ChevronDown } from "lucide-react";
 
 type BudgetFieldMap = {
+  quotationAmount: number;
   "requestedCRF.budgetId": string;
   "requestedCRF.categoryId": string;
   "requestedCRF.approvedAmount": number;
@@ -41,17 +51,31 @@ type BudgetReferenceDetailsProps = {
 const modelAPI = modelGQL;
 
 const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
-  const getField = React.useCallback(<K extends BudgetFieldName>(name: K): BudgetFieldMap[K] => {
-    return form.watch(name) as BudgetFieldMap[K];
-  }, [form]);
+  const [mobileExpanded, setMobileExpanded] = React.useState(false);
 
-  const getValue = React.useCallback(<K extends BudgetFieldName>(name: K): BudgetFieldMap[K] => {
-    return form.getValues(name) as BudgetFieldMap[K];
-  }, [form]);
+  const getField = React.useCallback(
+    <K extends BudgetFieldName>(name: K): BudgetFieldMap[K] => {
+      return form.watch(name) as BudgetFieldMap[K];
+    },
+    [form]
+  );
 
-  const setField = React.useCallback(<K extends BudgetFieldName>(name: K, value: BudgetFieldMap[K]) => {
-    (form.setValue as (field: string, fieldValue: unknown) => void)(name, value);
-  }, [form]);
+  const getValue = React.useCallback(
+    <K extends BudgetFieldName>(name: K): BudgetFieldMap[K] => {
+      return form.getValues(name) as BudgetFieldMap[K];
+    },
+    [form]
+  );
+
+  const setField = React.useCallback(
+    <K extends BudgetFieldName>(name: K, value: BudgetFieldMap[K]) => {
+      (form.setValue as (field: string, fieldValue: unknown) => void)(
+        name,
+        value
+      );
+    },
+    [form]
+  );
 
   const watchedBudgetId = getField("requestedCRF.budgetId");
   const watchedRemainingAmount = getField("requestedCRF.remainingAmount");
@@ -60,56 +84,72 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
 
   const findBudgetRefNo = watchedBudgetId;
 
-  const budgetQuery = useQuery<{ BudgetFindBy: BudgetResponse }, { input: BudgetFindByInput }>(BudgetFindBy, {
+  const budgetQuery = useQuery<
+    { BudgetFindBy: BudgetResponse },
+    { input: BudgetFindByInput }
+  >(BudgetFindBy, {
     variables: {
       input: {
         key: "id",
-        value: findBudgetRefNo ?? "" as string,
-      }
+        value: findBudgetRefNo ?? ("" as string),
+      },
     },
-    skip: !findBudgetRefNo, // Skip query if no rowId or if action is 'create'
+    skip: !findBudgetRefNo,
   });
 
-  const findTypeOfActual = budgetQuery.data?.BudgetFindBy?.data?.budgetLedgers?.find(ledger => ledger.type?.name === "Actual");
+  const findTypeOfActual = budgetQuery.data?.BudgetFindBy?.data?.budgetLedgers?.find(
+    (ledger) => ledger.type?.name === "Actual"
+  );
 
-  const budgetLegderQueryGroupBy = useQuery<{ BudgetLedgerGroupBy: BudgetLedgerGroupByResponse }, { input: BudgetLedgerGroupByInput }>(BudgetLedgerGroupBy, {
+  const budgetLedgerQueryGroupBy = useQuery<
+    { BudgetLedgerGroupBy: BudgetLedgerGroupByResponse },
+    { input: BudgetLedgerGroupByInput }
+  >(BudgetLedgerGroupBy, {
     variables: {
       input: {
-        by: [
-          "budgetId",
-        ],
+        by: ["budgetId"],
         where: {
           budgetId: findBudgetRefNo ?? null,
           typeId: findTypeOfActual?.typeId ?? null,
         },
         _sum: {
-          amount: true
-        }
-      }
+          amount: true,
+        },
+      },
     },
-    skip: !findBudgetRefNo, // Skip query if no rowId or if action is 'create'
+    skip: !findBudgetRefNo,
   });
 
-  // Effect 1: Populate budget data when budget is selected
   React.useEffect(() => {
     const budgetData = budgetQuery?.data?.BudgetFindBy?.data;
-    const budgetLedgerData = budgetLegderQueryGroupBy?.data?.BudgetLedgerGroupBy?.data;
-    const budgetLedgerRealeseSum = Array.isArray(budgetLedgerData)
-      ? Number((budgetLedgerData[0] as { _sum?: { amount?: number | null } } | undefined)?._sum?.amount ?? 0)
+    const budgetLedgerData =
+      budgetLedgerQueryGroupBy?.data?.BudgetLedgerGroupBy?.data;
+    const budgetLedgerReleaseSum = Array.isArray(budgetLedgerData)
+      ? Number(
+        (
+          budgetLedgerData[0] as
+          | { _sum?: { amount?: number | null } }
+          | undefined
+        )?._sum?.amount ?? 0
+      )
       : 0;
 
     if (budgetData) {
+      setField("quotationAmount", 0);
       setField("requestedCRF.categoryId", budgetData.categoryId ?? "");
       setField("requestedCRF.approvedAmount", budgetData.approvedAmount ?? 0);
       setField("requestedCRF.remainingAmount", budgetData.remainingAmount ?? 0);
-      setField("requestedCRF.utilizedBudget", budgetLedgerRealeseSum ?? 0);
+      setField("requestedCRF.utilizedBudget", budgetLedgerReleaseSum ?? 0);
       setField("requestedCRF.newBalanceAmmount", 0);
       setField("requestedCRF.projectedBudget", 0);
       setField("requestedCRF.requestedAmount", 0);
     }
-  }, [budgetQuery?.data?.BudgetFindBy?.data, budgetLegderQueryGroupBy?.data?.BudgetLedgerGroupBy?.data, setField]);
+  }, [
+    budgetQuery?.data?.BudgetFindBy?.data,
+    budgetLedgerQueryGroupBy?.data?.BudgetLedgerGroupBy?.data,
+    setField,
+  ]);
 
-  // Effect 2: Auto-compute newBalanceAmount and projectedBudget
   React.useEffect(() => {
     const budgetId = watchedBudgetId;
     const remainingAmount = watchedRemainingAmount;
@@ -134,6 +174,7 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
   ]);
 
   const resetBudgetReferenceDetails = React.useCallback(() => {
+    setField("quotationAmount", 0);
     setField("requestedCRF.budgetId", "");
     setField("requestedCRF.categoryId", "");
     setField("requestedCRF.approvedAmount", 0);
@@ -146,86 +187,161 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
     form.clearErrors("requestedCRF");
   }, [form, setField]);
 
+  const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat("en-PH", {
+      style: "currency",
+      currency: "PHP",
+    }).format(amount);
+
+  const budgetStats = [
+    {
+      label: "Approved Budget",
+      value: getValue("requestedCRF.approvedAmount"),
+      color: "text-slate-900",
+    },
+    {
+      label: "Remaining",
+      value: getValue("requestedCRF.remainingAmount"),
+      color: "text-blue-600",
+    },
+    {
+      label: "Utilized",
+      value: getValue("requestedCRF.utilizedBudget"),
+      color: "text-amber-600",
+    },
+    {
+      label: "Balance",
+      value: getValue("requestedCRF.newBalanceAmmount"),
+      color: "text-green-600",
+    },
+    {
+      label: "Requested",
+      value: getValue("requestedCRF.requestedAmount"),
+      color: "text-purple-600",
+    },
+    {
+      label: "Projected",
+      value: getValue("requestedCRF.projectedBudget"),
+      color: "text-primary font-bold",
+    },
+  ];
+
   return (
     <section className="space-y-4">
-      {/* <pre>{JSON.stringify(budgetLegderQueryGroupBy.data?.BudgetLedgerGroupBy, null, 2)}</pre> */}
-      <div className="flex items-center gap-3 pb-3 border-b">
-        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary font-semibold">
-          II.
-        </div>
-        <div className="flex justify-between w-full">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pb-3 border-b">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary font-semibold text-sm">
+            II.
+          </div>
           <div>
-            <h3 className="text-lg font-semibold">Budget Reference Details</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Provide budget reference information
+            <h3 className="text-base md:text-lg font-semibold">
+              Budget Reference Details
+            </h3>
+            <p className="text-xs text-muted-foreground mt-0.5 hidden sm:block">
+              Provide budget reference information and upload quotations
             </p>
           </div>
-          <div>
-            <Button variant="outline" size="icon" type="button" onClick={resetBudgetReferenceDetails}>
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-          </div>
         </div>
-      </div >
-      <div className="space-y-4">
-        {/* Budget Table */}
-        <div className="grid grid-cols-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          type="button"
+          onClick={resetBudgetReferenceDetails}
+          className="self-start md:self-auto"
+        >
+          <RefreshCw className="h-4 w-4" />
+        </Button>
+      </div>
 
+      <div className="space-y-4">
+        {/* Upload Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CustomImportInput<Record<string, unknown>>
+            name="attachmentUrl"
+            label="Upload Quotation"
+            control={form.control}
+            setError={form.setError}
+            clearErrors={form.clearErrors}
+            maxSizeMB={10}
+            allowedExtensions={["pdf"]}
+            dropzoneProps={{ maxFiles: 1 }}
+          />
+          <CustomNumberInput
+            name="quotationAmount"
+            control={form.control}
+            label="Quotation Amount"
+            placeholder="Enter amount from quotation"
+            inputProps={{
+              onChange: (e) => {
+                const raw = Number(e.currentTarget.value.replace(/,/g, ""));
+                setField("requestedCRF.requestedAmount", raw);
+              },
+              required: true,
+            }}
+          />
         </div>
-        <div className="border rounded-lg overflow-hidden">
+
+        {/* Desktop Table View */}
+        <div className="hidden lg:block border rounded-lg overflow-hidden shadow-sm">
           <Table>
             <TableHeader className="bg-gradient-to-r from-slate-100 to-slate-50">
               <TableRow className="hover:bg-slate-100">
-                <TableHead className="font-bold text-slate-900">
+                <TableHead className="font-bold text-slate-900 text-xs">
                   Budget Reference
                 </TableHead>
-                <TableHead className="font-bold text-slate-900">
+                <TableHead className="font-bold text-slate-900 text-xs">
                   Category
                 </TableHead>
-                <TableHead className="font-bold text-slate-900">
+                <TableHead className="font-bold text-slate-900 text-xs text-center">
                   Approved Budget
                 </TableHead>
-                <TableHead className="font-bold text-slate-900">
-                  Remaining Budget
+                <TableHead className="font-bold text-slate-900 text-xs text-center">
+                  Remaining
                 </TableHead>
-                <TableHead className="font-bold text-slate-900">
-                  Utilized Amount
+                <TableHead className="font-bold text-slate-900 text-xs text-center">
+                  Utilized
                 </TableHead>
-                <TableHead className="font-bold text-slate-900">
-                  Balance Amount
+                <TableHead className="font-bold text-slate-900 text-xs text-center">
+                  Balance
                 </TableHead>
-                <TableHead className="font-bold text-slate-900">
-                  Requested Amount
+                <TableHead className="font-bold text-slate-900 text-xs text-center">
+                  Requested
                 </TableHead>
-                <TableHead className="font-bold text-slate-900">
-                  Projected Balance
+                <TableHead className="font-bold text-slate-900 text-xs text-center">
+                  Projected
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow className="hover:bg-slate-50 transition-colors">
-                <TableCell className="text-slate-900">
+              <TableRow className="hover:bg-slate-50/50 transition-colors">
+                <TableCell className="text-slate-900 p-2">
                   <CustomSingleSelectInput
-                    name={`requestedCRF.budgetId`}
+                    name="requestedCRF.budgetId"
                     control={form.control}
-                    label={""}
+                    label=""
                     disabled={Boolean(form.watch("requestedCRF.categoryId"))}
-                    findAllWithCursorGQL={modelAPI.BudgetGQL.findAllWithCursor}
-                    findUniqueGQL={modelAPI.BudgetGQL.findUnique}
-                    defaultValueId={
-                      getValue("requestedCRF.budgetId") ?? ""
+                    findAllWithCursorGQL={
+                      modelAPI.BudgetGQL.findAllWithCursor
                     }
-                    placeholder={`Search budget...`}
-                    searchPlaceholder={`Search budget...`}
-                    emptySelectedMessage={`Budget already selected.`}
-                    emptyMessage={`No budget found.`}
+                    findUniqueGQL={modelAPI.BudgetGQL.findUnique}
+                    defaultValueId={getValue("requestedCRF.budgetId") ?? ""}
+                    placeholder="Search budget..."
+                    searchPlaceholder="Search budget..."
+                    emptySelectedMessage="Budget already selected."
+                    emptyMessage="No budget found."
                     cursorVariables={(search, cursor, take) => ({
                       cursorInput: {
                         cursor,
                         isActive: true,
                         take,
                         filter: search
-                          ? { name: { contains: search, mode: "insensitive" } }
+                          ? {
+                            name: {
+                              contains: search,
+                              mode: "insensitive",
+                            },
+                          }
                           : undefined,
                       },
                     })}
@@ -234,7 +350,7 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
                       const d = data as { budgetRefNo?: string; id?: string };
                       return {
                         label: d.budgetRefNo ?? "",
-                        value: d.id ?? "", // Store budgetRefNo as value
+                        value: d.id ?? "",
                       };
                     }}
                     mapDefaultOption={(data: unknown) => {
@@ -244,28 +360,26 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
                       if (!d?.data) return null;
                       return {
                         label: d.data.budgetRefNo ?? "",
-                        value: d.data.id ?? "", // Store budgetRefNo as value
+                        value: d.data.id ?? "",
                       };
                     }}
                   />
                 </TableCell>
-                <TableCell className="text-slate-900">
+                <TableCell className="text-slate-900 p-2">
                   <CustomSingleSelectInput
-                    name={`requestedCRF.categoryId`}
+                    name="requestedCRF.categoryId"
                     control={form.control}
-                    label={``}
+                    label=""
                     disabled={Boolean(form.watch("requestedCRF.budgetId"))}
                     findAllWithCursorGQL={
                       modelAPI.CategoryGQL.findAllWithCursor
                     }
                     findUniqueGQL={modelAPI.CategoryGQL.findUnique}
-                    defaultValueId={
-                      getValue("requestedCRF.categoryId") ?? ""
-                    }
-                    placeholder={`Search category...`}
-                    searchPlaceholder={`Search category...`}
-                    emptySelectedMessage={`Category already selected.`}
-                    emptyMessage={`No category found.`}
+                    defaultValueId={getValue("requestedCRF.categoryId") ?? ""}
+                    placeholder="Search category..."
+                    searchPlaceholder="Search category..."
+                    emptySelectedMessage="Category already selected."
+                    emptyMessage="No category found."
                     cursorVariables={(search, cursor, take) => ({
                       cursorInput: {
                         cursor,
@@ -273,7 +387,10 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
                         take,
                         filter: search
                           ? {
-                            name: { contains: search, mode: "insensitive" },
+                            name: {
+                              contains: search,
+                              mode: "insensitive",
+                            },
                           }
                           : undefined,
                       },
@@ -310,84 +427,241 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
                     }}
                   />
                 </TableCell>
-                <TableCell className="text-slate-900">
+                <TableCell className="text-slate-900 p-2">
                   <CustomNumberInput
-                    name={`requestedCRF.approvedAmount`}
+                    name="requestedCRF.approvedAmount"
                     control={form.control}
-                    label={``}
-                    placeholder={`Approved Amount`}
-                    inputProps={{
-                      disabled: true
-                    }}
+                    label=""
+                    inputProps={{ disabled: true }}
+                    placeholder="Auto-calculated the amount from the form"
                   />
                 </TableCell>
-                <TableCell className="text-slate-900">
+                <TableCell className="text-slate-900 p-2">
                   <CustomNumberInput
-                    name={`requestedCRF.remainingAmount`}
+                    name="requestedCRF.remainingAmount"
                     control={form.control}
-                    label={``}
-                    placeholder={`Remaining Amount`}
-                    inputProps={{
-                      disabled: true
-                    }}
+                    label=""
+                    inputProps={{ disabled: true }}
+                    placeholder="Auto-calculated the total from the form"
                   />
                 </TableCell>
-                <TableCell className="text-slate-900">
+                <TableCell className="text-slate-900 p-2">
                   <CustomNumberInput
-                    name={`requestedCRF.utilizedBudget`}
+                    name="requestedCRF.utilizedBudget"
                     control={form.control}
-                    label={``}
-                    placeholder={`Utilized Amount`}
-                    inputProps={{
-                      disabled: true
-                    }}
+                    label=""
+                    inputProps={{ disabled: true }}
+                    placeholder="Auto-calculated the total from the form"
                   />
                 </TableCell>
-                <TableCell className="text-slate-900">
+                <TableCell className="text-slate-900 p-2">
                   <CustomNumberInput
-                    name={`requestedCRF.newBalanceAmmount`}
+                    name="requestedCRF.newBalanceAmmount"
                     control={form.control}
-                    label={``}
-                    placeholder={`Balance Amount`}
-                    inputProps={{
-                      disabled: true
-                    }}
+                    label=""
+                    inputProps={{ disabled: true }}
+                    placeholder="Auto-calculated the total from the form"
                   />
                 </TableCell>
-                <TableCell className="text-slate-900">
+                <TableCell className="text-slate-900 p-2">
                   <CustomNumberInput
-                    name={`requestedCRF.requestedAmount`}
+                    name="requestedCRF.requestedAmount"
                     control={form.control}
-                    label={``}
-                    placeholder={`Requested Amount`}
+                    label=""
+                    inputProps={{ disabled: true }}
+                    placeholder="Auto-calculated the total from the form"
                   />
                 </TableCell>
-                <TableCell className="text-slate-900">
+                <TableCell className="text-slate-900 p-2">
                   <CustomNumberInput
-                    name={`requestedCRF.projectedBudget`}
+                    name="requestedCRF.projectedBudget"
                     control={form.control}
-                    label={``}
-                    placeholder={`Projected Budget`}
-                    inputProps={{
-                      disabled: true
-                    }}
+                    label=""
+                    inputProps={{ disabled: true }}
+                    placeholder="Auto-calculated the total from the form"
                   />
                 </TableCell>
-
               </TableRow>
             </TableBody>
           </Table>
         </div>
+
+        {/* Mobile Card View */}
+        <div className="lg:hidden space-y-3">
+          <Card className="border-l-4 border-l-primary">
+            <CardHeader
+              className="pb-3 cursor-pointer"
+              onClick={() => setMobileExpanded(!mobileExpanded)}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-sm">Budget Selection</CardTitle>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {form.watch("requestedCRF.budgetId")
+                      ? "Budget selected"
+                      : "Select a budget"}
+                  </p>
+                </div>
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform ${mobileExpanded ? "rotate-180" : ""
+                    }`}
+                />
+              </div>
+            </CardHeader>
+
+            {mobileExpanded && (
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-slate-600">
+                    Budget Reference
+                  </label>
+                  <CustomSingleSelectInput
+                    name="requestedCRF.budgetId"
+                    control={form.control}
+                    label=""
+                    disabled={Boolean(
+                      form.watch("requestedCRF.categoryId")
+                    )}
+                    findAllWithCursorGQL={
+                      modelAPI.BudgetGQL.findAllWithCursor
+                    }
+                    findUniqueGQL={modelAPI.BudgetGQL.findUnique}
+                    defaultValueId={getValue("requestedCRF.budgetId") ?? ""}
+                    placeholder="Search budget..."
+                    searchPlaceholder="Search budget..."
+                    emptySelectedMessage="Budget already selected."
+                    emptyMessage="No budget found."
+                    cursorVariables={(search, cursor, take) => ({
+                      cursorInput: {
+                        cursor,
+                        isActive: true,
+                        take,
+                        filter: search
+                          ? {
+                            name: {
+                              contains: search,
+                              mode: "insensitive",
+                            },
+                          }
+                          : undefined,
+                      },
+                    })}
+                    uniqueVariables={(id) => ({ id })}
+                    mapOption={(data: unknown) => {
+                      const d = data as { budgetRefNo?: string; id?: string };
+                      return {
+                        label: d.budgetRefNo ?? "",
+                        value: d.id ?? "",
+                      };
+                    }}
+                    mapDefaultOption={(data: unknown) => {
+                      const d = data as {
+                        data?: { budgetRefNo?: string; id?: string };
+                      };
+                      if (!d?.data) return null;
+                      return {
+                        label: d.data.budgetRefNo ?? "",
+                        value: d.data.id ?? "",
+                      };
+                    }}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-slate-600">
+                    Category
+                  </label>
+                  <CustomSingleSelectInput
+                    name="requestedCRF.categoryId"
+                    control={form.control}
+                    label=""
+                    disabled={Boolean(form.watch("requestedCRF.budgetId"))}
+                    findAllWithCursorGQL={
+                      modelAPI.CategoryGQL.findAllWithCursor
+                    }
+                    findUniqueGQL={modelAPI.CategoryGQL.findUnique}
+                    defaultValueId={getValue("requestedCRF.categoryId") ?? ""}
+                    placeholder="Search category..."
+                    searchPlaceholder="Search category..."
+                    emptySelectedMessage="Category already selected."
+                    emptyMessage="No category found."
+                    cursorVariables={(search, cursor, take) => ({
+                      cursorInput: {
+                        cursor,
+                        isActive: true,
+                        take,
+                        filter: search
+                          ? {
+                            name: {
+                              contains: search,
+                              mode: "insensitive",
+                            },
+                          }
+                          : undefined,
+                      },
+                    })}
+                    uniqueVariables={(id) => ({ id })}
+                    mapOption={(data: unknown) => {
+                      const d = data as {
+                        id?: string;
+                        name?: string;
+                      };
+                      return {
+                        label: d.name ?? "",
+                        value: d.id ?? "",
+                      };
+                    }}
+                    mapDefaultOption={(data: unknown) => {
+                      const d = data as {
+                        data?: {
+                          id?: string;
+                          name?: string;
+                          userName?: string;
+                          email?: string;
+                        };
+                      };
+                      if (!d?.data) return null;
+                      return {
+                        label:
+                          d.data.name ??
+                          d.data.userName ??
+                          d.data.email ??
+                          "",
+                        value: d.data.id ?? "",
+                      };
+                    }}
+                  />
+                </div>
+              </CardContent>
+            )}
+          </Card>
+
+          {/* Budget Stats Cards */}
+          <div className="grid grid-cols-2 gap-2">
+            {budgetStats.map((stat, idx) => (
+              <Card key={idx} className="p-3">
+                <p className="text-[10px] text-muted-foreground font-semibold mb-1">
+                  {stat.label}
+                </p>
+                <p className={`text-sm font-bold ${stat.color}`}>
+                  {formatCurrency(stat.value as number)}
+                </p>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Remarks Section */}
         <div>
           <CustomTextAreaInput
             name="requestedCRF.remarks.notes"
             control={form.control}
             label="Remarks / Purpose"
-            placeholder="Enter remarks or purpose for the budget request or if this are Construction In Progress related, you may indicate the project name and location here."
+            placeholder="Enter remarks or purpose for the budget request or if this is Construction In Progress related, indicate the project name and location here."
           />
         </div>
       </div>
-    </section >
+    </section>
   );
 };
 

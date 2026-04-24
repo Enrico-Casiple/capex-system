@@ -5018,6 +5018,9 @@ type Company {
   """(Optional) name field of Company. Type: String."""
   name: String
 
+  """(Optional) List of related Position records linked to this Company."""
+  positionCompany: [Position!]!
+
   """(Optional) List of related Request records linked to this Company."""
   request: [Request!]!
 
@@ -5029,6 +5032,11 @@ type Company {
 
   """(Required) updatedAt field of Company. Type: DateTime (ISO 8601)."""
   updatedAt: DateTime!
+
+  """
+  (Optional) List of related WorkFlowTemplateScope records linked to this Company.
+  """
+  workFlowTemplateScopeCompany: [WorkFlowTemplateScope!]!
 
   """
   (Optional) List of related WorkInformation records linked to this Company.
@@ -5095,10 +5103,12 @@ input CompanyCreateInput {
   locationsid: String
   logo: String
   name: String
+  positionCompany: PositionCreateManyNestedInput
   request: RequestCreateManyNestedInput
   scopeType: TypeCreateOneNestedInput
   scopeTypeId: String
   updatedAt: DateTime!
+  workFlowTemplateScopeCompany: WorkFlowTemplateScopeCreateManyNestedInput
   workInformations: WorkInformationCreateManyNestedInput
 }
 
@@ -5324,6 +5334,9 @@ input CompanyFormInput {
   """(Optional) The name of the Company. Type: String."""
   name: String
 
+  """(Optional) List of Position relation for direct nested operations."""
+  positionCompany: [PositionFormInput!]
+
   """(Optional) List of Request relation for direct nested operations."""
   request: [RequestFormInput!]
 
@@ -5335,6 +5348,11 @@ input CompanyFormInput {
 
   """(Optional) The updatedAt of the Company. Type: DateTime."""
   updatedAt: DateTime
+
+  """
+  (Optional) List of WorkFlowTemplateScope relation for direct nested operations.
+  """
+  workFlowTemplateScopeCompany: [WorkFlowTemplateScopeFormInput!]
 
   """
   (Optional) List of WorkInformation relation for direct nested operations.
@@ -5515,10 +5533,12 @@ input CompanyUpdateInput {
   locationsid: String
   logo: String
   name: String
+  positionCompany: PositionUpdateManyNestedInput
   request: RequestUpdateManyNestedInput
   scopeType: TypeUpdateOneNestedInput
   scopeTypeId: String
   updatedAt: DateTime
+  workFlowTemplateScopeCompany: WorkFlowTemplateScopeUpdateManyNestedInput
   workInformations: WorkInformationUpdateManyNestedInput
 }
 
@@ -5620,6 +5640,9 @@ input CompanyWhereInput {
   """Filter by name (String)."""
   name: Json
 
+  """Filter by related Position records."""
+  positionCompany: PositionWhereInput
+
   """Filter by related Request records."""
   request: RequestWhereInput
 
@@ -5631,6 +5654,9 @@ input CompanyWhereInput {
 
   """Filter by updatedAt (DateTime)."""
   updatedAt: Json
+
+  """Filter by related WorkFlowTemplateScope records."""
+  workFlowTemplateScopeCompany: WorkFlowTemplateScopeWhereInput
 
   """Filter by related WorkInformation records."""
   workInformations: WorkInformationWhereInput
@@ -6923,6 +6949,11 @@ type Department {
   updatedAt: DateTime
 
   """
+  (Optional) List of related WorkFlowTemplateScope records linked to this Department.
+  """
+  workFlowTemplateScopeDepartment: [WorkFlowTemplateScope!]!
+
+  """
   (Optional) List of related WorkInformation records linked to this Department.
   """
   workInformations: [WorkInformation!]!
@@ -6985,6 +7016,7 @@ input DepartmentCreateInput {
   scopeType: TypeCreateOneNestedInput
   scopeTypeId: String
   updatedAt: DateTime
+  workFlowTemplateScopeDepartment: WorkFlowTemplateScopeCreateManyNestedInput
   workInformations: WorkInformationCreateManyNestedInput
 }
 
@@ -7203,6 +7235,11 @@ input DepartmentFormInput {
   updatedAt: DateTime
 
   """
+  (Optional) List of WorkFlowTemplateScope relation for direct nested operations.
+  """
+  workFlowTemplateScopeDepartment: [WorkFlowTemplateScopeFormInput!]
+
+  """
   (Optional) List of WorkInformation relation for direct nested operations.
   """
   workInformations: [WorkInformationFormInput!]
@@ -7383,6 +7420,7 @@ input DepartmentUpdateInput {
   scopeType: TypeUpdateOneNestedInput
   scopeTypeId: String
   updatedAt: DateTime
+  workFlowTemplateScopeDepartment: WorkFlowTemplateScopeUpdateManyNestedInput
   workInformations: WorkInformationUpdateManyNestedInput
 }
 
@@ -7477,6 +7515,9 @@ input DepartmentWhereInput {
 
   """Filter by updatedAt (DateTime)."""
   updatedAt: Json
+
+  """Filter by related WorkFlowTemplateScope records."""
+  workFlowTemplateScopeDepartment: WorkFlowTemplateScopeWhereInput
 
   """Filter by related WorkInformation records."""
   workInformations: WorkInformationWhereInput
@@ -8572,6 +8613,11 @@ input HolidayWhereInput {
 
 """Represents a JobLevel record in the database."""
 type JobLevel {
+  """
+  (Optional) List of related WorkFlowTemplateScope records linked to this JobLevel.
+  """
+  WorkFlowTemplateScopeJobLevel: [WorkFlowTemplateScope!]!
+
   """(Optional) acronym field of JobLevel. Type: String."""
   acronym: String
 
@@ -8656,6 +8702,7 @@ type JobLevelCountResponse {
 }
 
 input JobLevelCreateInput {
+  WorkFlowTemplateScopeJobLevel: WorkFlowTemplateScopeCreateManyNestedInput
   acronym: String
   auditLogs: AuditLogCreateManyNestedInput
   company: CompanyCreateOneNestedInput
@@ -8834,6 +8881,11 @@ input JobLevelFindFirstInput {
 Complete input fields for JobLevel form. Includes all scalars and relations optimized for forms.
 """
 input JobLevelFormInput {
+  """
+  (Optional) List of WorkFlowTemplateScope relation for direct nested operations.
+  """
+  WorkFlowTemplateScopeJobLevel: [WorkFlowTemplateScopeFormInput!]
+
   """(Optional) The acronym of the JobLevel. Type: String."""
   acronym: String
 
@@ -9035,6 +9087,7 @@ type JobLevelResponse {
 }
 
 input JobLevelUpdateInput {
+  WorkFlowTemplateScopeJobLevel: WorkFlowTemplateScopeUpdateManyNestedInput
   acronym: String
   auditLogs: AuditLogUpdateManyNestedInput
   company: CompanyUpdateOneNestedInput
@@ -9093,6 +9146,9 @@ input JobLevelWhereInput {
 
   """At least one condition must match (OR)."""
   OR: [JobLevelWhereInput!]
+
+  """Filter by related WorkFlowTemplateScope records."""
+  WorkFlowTemplateScopeJobLevel: WorkFlowTemplateScopeWhereInput
 
   """Filter by acronym (String)."""
   acronym: Json
@@ -15195,6 +15251,12 @@ type Position {
   """(Optional) List of related AuditLog records linked to this Position."""
   auditLogs: [AuditLog!]!
 
+  """(Optional) Related Company record linked to this Position."""
+  company: Company
+
+  """(Optional) companyId field of Position. Type: String."""
+  companyId: String
+
   """(Required) createdAt field of Position. Type: DateTime (ISO 8601)."""
   createdAt: DateTime!
 
@@ -15218,6 +15280,11 @@ type Position {
 
   """(Required) updatedAt field of Position. Type: DateTime (ISO 8601)."""
   updatedAt: DateTime!
+
+  """
+  (Optional) List of related WorkFlowTemplateScope records linked to this Position.
+  """
+  workFlowTemplateScopePosition: [WorkFlowTemplateScope!]!
 
   """
   (Optional) List of related WorkInformation records linked to this Position.
@@ -15269,6 +15336,8 @@ type PositionCountResponse {
 input PositionCreateInput {
   acronym: String
   auditLogs: AuditLogCreateManyNestedInput
+  company: CompanyCreateOneNestedInput
+  companyId: String
   createdAt: DateTime
   description: String
   isActive: Boolean
@@ -15276,6 +15345,7 @@ input PositionCreateInput {
   scopeType: TypeCreateOneNestedInput
   scopeTypeId: String
   updatedAt: DateTime!
+  workFlowTemplateScopePosition: WorkFlowTemplateScopeCreateManyNestedInput
   workInformations: WorkInformationCreateManyNestedInput
 }
 
@@ -15449,6 +15519,12 @@ input PositionFormInput {
   """(Optional) List of AuditLog relation for direct nested operations."""
   auditLogs: [AuditLogFormInput!]
 
+  """(Optional) Single Company relation for direct nested operations."""
+  company: CompanyFormInput
+
+  """(Optional) Foreign key to connect a Company record."""
+  companyId: String
+
   """(Optional) The createdAt of the Position. Type: DateTime."""
   createdAt: DateTime
 
@@ -15472,6 +15548,11 @@ input PositionFormInput {
 
   """(Optional) The updatedAt of the Position. Type: DateTime."""
   updatedAt: DateTime
+
+  """
+  (Optional) List of WorkFlowTemplateScope relation for direct nested operations.
+  """
+  workFlowTemplateScopePosition: [WorkFlowTemplateScopeFormInput!]
 
   """
   (Optional) List of WorkInformation relation for direct nested operations.
@@ -15640,6 +15721,8 @@ type PositionResponse {
 input PositionUpdateInput {
   acronym: String
   auditLogs: AuditLogUpdateManyNestedInput
+  company: CompanyUpdateOneNestedInput
+  companyId: String
   createdAt: DateTime
   description: String
   id: String
@@ -15648,6 +15731,7 @@ input PositionUpdateInput {
   scopeType: TypeUpdateOneNestedInput
   scopeTypeId: String
   updatedAt: DateTime
+  workFlowTemplateScopePosition: WorkFlowTemplateScopeUpdateManyNestedInput
   workInformations: WorkInformationUpdateManyNestedInput
 }
 
@@ -15701,6 +15785,12 @@ input PositionWhereInput {
   """Filter by related AuditLog records."""
   auditLogs: AuditLogWhereInput
 
+  """Filter by related Company records."""
+  company: CompanyWhereInput
+
+  """Filter by companyId (String)."""
+  companyId: Json
+
   """Filter by createdAt (DateTime)."""
   createdAt: Json
 
@@ -15724,6 +15814,9 @@ input PositionWhereInput {
 
   """Filter by updatedAt (DateTime)."""
   updatedAt: Json
+
+  """Filter by related WorkFlowTemplateScope records."""
+  workFlowTemplateScopePosition: WorkFlowTemplateScopeWhereInput
 
   """Filter by related WorkInformation records."""
   workInformations: WorkInformationWhereInput
@@ -17456,6 +17549,9 @@ type RequestGroupByResponse {
 
 """Represents a RequestItem record in the database."""
 type RequestItem {
+  """(Optional) amountGrossOfVat field of RequestItem. Type: Float."""
+  amountGrossOfVat: Float
+
   """(Optional) attachmentUrl field of RequestItem. Type: String."""
   attachmentUrl: String
 
@@ -17476,6 +17572,9 @@ type RequestItem {
   """(Optional) isActive field of RequestItem. Type: Boolean."""
   isActive: Boolean
 
+  """(Optional) isInclusiveVat field of RequestItem. Type: Boolean."""
+  isInclusiveVat: Boolean
+
   """(Optional) quantity field of RequestItem. Type: Integer."""
   quantity: Int
 
@@ -17494,11 +17593,17 @@ type RequestItem {
   """(Optional) totalPrice field of RequestItem. Type: Float."""
   totalPrice: Float
 
+  """(Optional) unitOfMeasure field of RequestItem. Type: String."""
+  unitOfMeasure: String
+
   """(Optional) unitPrice field of RequestItem. Type: Float."""
   unitPrice: Float
 
   """(Optional) updatedAt field of RequestItem. Type: DateTime (ISO 8601)."""
   updatedAt: DateTime
+
+  """(Optional) vatPercentage field of RequestItem. Type: Float."""
+  vatPercentage: Float
 }
 
 """Input to connect an existing RequestItem record by a unique field."""
@@ -17543,19 +17648,23 @@ type RequestItemCountResponse {
 }
 
 input RequestItemCreateInput {
+  amountGrossOfVat: Float
   attachmentUrl: String
   auditLogs: AuditLogCreateManyNestedInput
   createdAt: DateTime
   description: String
   isActive: Boolean
+  isInclusiveVat: Boolean
   quantity: Int
   request: RequestCreateOneNestedInput
   requestId: String
   status: StatusCreateOneNestedInput
   statusId: String
   totalPrice: Float
+  unitOfMeasure: String
   unitPrice: Float
   updatedAt: DateTime
+  vatPercentage: Float
 }
 
 """Nested create many for RequestItem."""
@@ -17724,6 +17833,9 @@ input RequestItemFindFirstInput {
 Complete input fields for RequestItem form. Includes all scalars and relations optimized for forms.
 """
 input RequestItemFormInput {
+  """(Optional) The amountGrossOfVat of the RequestItem. Type: Float."""
+  amountGrossOfVat: Float
+
   """(Optional) The attachmentUrl of the RequestItem. Type: String."""
   attachmentUrl: String
 
@@ -17741,6 +17853,9 @@ input RequestItemFormInput {
 
   """(Optional) The isActive of the RequestItem. Type: Boolean."""
   isActive: Boolean
+
+  """(Optional) The isInclusiveVat of the RequestItem. Type: Boolean."""
+  isInclusiveVat: Boolean
 
   """(Optional) The quantity of the RequestItem. Type: Int."""
   quantity: Int
@@ -17760,11 +17875,17 @@ input RequestItemFormInput {
   """(Optional) The totalPrice of the RequestItem. Type: Float."""
   totalPrice: Float
 
+  """(Optional) The unitOfMeasure of the RequestItem. Type: String."""
+  unitOfMeasure: String
+
   """(Optional) The unitPrice of the RequestItem. Type: Float."""
   unitPrice: Float
 
   """(Optional) The updatedAt of the RequestItem. Type: DateTime."""
   updatedAt: DateTime
+
+  """(Optional) The vatPercentage of the RequestItem. Type: Float."""
+  vatPercentage: Float
 }
 
 """
@@ -17926,20 +18047,24 @@ type RequestItemResponse {
 }
 
 input RequestItemUpdateInput {
+  amountGrossOfVat: Float
   attachmentUrl: String
   auditLogs: AuditLogUpdateManyNestedInput
   createdAt: DateTime
   description: String
   id: String
   isActive: Boolean
+  isInclusiveVat: Boolean
   quantity: Int
   request: RequestUpdateOneNestedInput
   requestId: String
   status: StatusUpdateOneNestedInput
   statusId: String
   totalPrice: Float
+  unitOfMeasure: String
   unitPrice: Float
   updatedAt: DateTime
+  vatPercentage: Float
 }
 
 """Nested update many for RequestItem."""
@@ -17986,6 +18111,9 @@ input RequestItemWhereInput {
   """At least one condition must match (OR)."""
   OR: [RequestItemWhereInput!]
 
+  """Filter by amountGrossOfVat (Float)."""
+  amountGrossOfVat: Json
+
   """Filter by attachmentUrl (String)."""
   attachmentUrl: Json
 
@@ -18003,6 +18131,9 @@ input RequestItemWhereInput {
 
   """Filter by isActive (Boolean)."""
   isActive: Json
+
+  """Filter by isInclusiveVat (Boolean)."""
+  isInclusiveVat: Json
 
   """Filter by quantity (Int)."""
   quantity: Json
@@ -18022,11 +18153,17 @@ input RequestItemWhereInput {
   """Filter by totalPrice (Float)."""
   totalPrice: Json
 
+  """Filter by unitOfMeasure (String)."""
+  unitOfMeasure: Json
+
   """Filter by unitPrice (Float)."""
   unitPrice: Json
 
   """Filter by updatedAt (DateTime)."""
   updatedAt: Json
+
+  """Filter by vatPercentage (Float)."""
+  vatPercentage: Json
 }
 
 """
@@ -21453,11 +21590,6 @@ type Type {
   workFlowInstance: [WorkFlowInstance!]!
 
   """
-  (Optional) List of related WorkFlowTemplateScope records linked to this Type.
-  """
-  workFlowTemplateScope: [WorkFlowTemplateScope!]!
-
-  """
   (Optional) List of related WorkInformation records linked to this Type.
   """
   workSetupType: [WorkInformation!]!
@@ -21523,7 +21655,6 @@ input TypeCreateInput {
   stepAssignmentType: WorkFlowStepTemplateCreateManyNestedInput
   updatedAt: DateTime
   workFlowInstance: WorkFlowInstanceCreateManyNestedInput
-  workFlowTemplateScope: WorkFlowTemplateScopeCreateManyNestedInput
   workSetupType: WorkInformationCreateManyNestedInput
 }
 
@@ -21757,11 +21888,6 @@ input TypeFormInput {
   workFlowInstance: [WorkFlowInstanceFormInput!]
 
   """
-  (Optional) List of WorkFlowTemplateScope relation for direct nested operations.
-  """
-  workFlowTemplateScope: [WorkFlowTemplateScopeFormInput!]
-
-  """
   (Optional) List of WorkInformation relation for direct nested operations.
   """
   workSetupType: [WorkInformationFormInput!]
@@ -21939,7 +22065,6 @@ input TypeUpdateInput {
   stepAssignmentType: WorkFlowStepTemplateUpdateManyNestedInput
   updatedAt: DateTime
   workFlowInstance: WorkFlowInstanceUpdateManyNestedInput
-  workFlowTemplateScope: WorkFlowTemplateScopeUpdateManyNestedInput
   workSetupType: WorkInformationUpdateManyNestedInput
 }
 
@@ -22043,9 +22168,6 @@ input TypeWhereInput {
 
   """Filter by related WorkFlowInstance records."""
   workFlowInstance: WorkFlowInstanceWhereInput
-
-  """Filter by related WorkFlowTemplateScope records."""
-  workFlowTemplateScope: WorkFlowTemplateScopeWhereInput
 
   """Filter by related WorkInformation records."""
   workSetupType: WorkInformationWhereInput
@@ -25987,9 +26109,25 @@ type WorkFlowTemplateScope {
   auditLogs: [AuditLog!]!
 
   """
+  (Optional) Related Company record linked to this WorkFlowTemplateScope.
+  """
+  company: Company
+
+  """(Optional) companyId field of WorkFlowTemplateScope. Type: String."""
+  companyId: String
+
+  """
   (Optional) createdAt field of WorkFlowTemplateScope. Type: DateTime (ISO 8601).
   """
   createdAt: DateTime
+
+  """
+  (Optional) Related Department record linked to this WorkFlowTemplateScope.
+  """
+  department: Department
+
+  """(Optional) departmentId field of WorkFlowTemplateScope. Type: String."""
+  departmentId: String
 
   """Unique identifier of the WorkFlowTemplateScope record."""
   id: ID!
@@ -25997,19 +26135,21 @@ type WorkFlowTemplateScope {
   """(Optional) isActive field of WorkFlowTemplateScope. Type: Boolean."""
   isActive: Boolean
 
-  """(Optional) priority field of WorkFlowTemplateScope. Type: Integer."""
-  priority: Int
+  """
+  (Optional) Related JobLevel record linked to this WorkFlowTemplateScope.
+  """
+  jobLevel: JobLevel
+
+  """(Optional) jobLevelId field of WorkFlowTemplateScope. Type: String."""
+  jobLevelId: String
 
   """
-  (Optional) scopeReferenceId field of WorkFlowTemplateScope. Type: String.
+  (Optional) Related Position record linked to this WorkFlowTemplateScope.
   """
-  scopeReferenceId: String
+  position: Position
 
-  """(Optional) Related Type record linked to this WorkFlowTemplateScope."""
-  scopeType: Type
-
-  """(Optional) scopeTypeId field of WorkFlowTemplateScope. Type: String."""
-  scopeTypeId: String
+  """(Optional) positionId field of WorkFlowTemplateScope. Type: String."""
+  positionId: String
 
   """
   (Optional) Related WorkFlowTemplate record linked to this WorkFlowTemplateScope.
@@ -26072,12 +26212,16 @@ type WorkFlowTemplateScopeCountResponse {
 
 input WorkFlowTemplateScopeCreateInput {
   auditLogs: AuditLogCreateManyNestedInput
+  company: CompanyCreateOneNestedInput
+  companyId: String
   createdAt: DateTime
+  department: DepartmentCreateOneNestedInput
+  departmentId: String
   isActive: Boolean
-  priority: Int
-  scopeReferenceId: String
-  scopeType: TypeCreateOneNestedInput
-  scopeTypeId: String
+  jobLevel: JobLevelCreateOneNestedInput
+  jobLevelId: String
+  position: PositionCreateOneNestedInput
+  positionId: String
   template: WorkFlowTemplateCreateOneNestedInput
   templateId: String
   updatedAt: DateTime
@@ -26270,8 +26414,20 @@ input WorkFlowTemplateScopeFormInput {
   """(Optional) List of AuditLog relation for direct nested operations."""
   auditLogs: [AuditLogFormInput!]
 
+  """(Optional) Single Company relation for direct nested operations."""
+  company: CompanyFormInput
+
+  """(Optional) Foreign key to connect a Company record."""
+  companyId: String
+
   """(Optional) The createdAt of the WorkFlowTemplateScope. Type: DateTime."""
   createdAt: DateTime
+
+  """(Optional) Single Department relation for direct nested operations."""
+  department: DepartmentFormInput
+
+  """(Optional) Foreign key to connect a Department record."""
+  departmentId: String
 
   """(Optional) The id of the WorkFlowTemplateScope. Type: String."""
   id: String
@@ -26279,19 +26435,17 @@ input WorkFlowTemplateScopeFormInput {
   """(Optional) The isActive of the WorkFlowTemplateScope. Type: Boolean."""
   isActive: Boolean
 
-  """(Optional) The priority of the WorkFlowTemplateScope. Type: Int."""
-  priority: Int
+  """(Optional) Single JobLevel relation for direct nested operations."""
+  jobLevel: JobLevelFormInput
 
-  """
-  (Optional) The scopeReferenceId of the WorkFlowTemplateScope. Type: String.
-  """
-  scopeReferenceId: String
+  """(Optional) Foreign key to connect a JobLevel record."""
+  jobLevelId: String
 
-  """(Optional) Single Type relation for direct nested operations."""
-  scopeType: TypeFormInput
+  """(Optional) Single Position relation for direct nested operations."""
+  position: PositionFormInput
 
-  """(Optional) Foreign key to connect a Type record."""
-  scopeTypeId: String
+  """(Optional) Foreign key to connect a Position record."""
+  positionId: String
 
   """
   (Optional) Single WorkFlowTemplate relation for direct nested operations.
@@ -26477,13 +26631,17 @@ type WorkFlowTemplateScopeResponse {
 
 input WorkFlowTemplateScopeUpdateInput {
   auditLogs: AuditLogUpdateManyNestedInput
+  company: CompanyUpdateOneNestedInput
+  companyId: String
   createdAt: DateTime
+  department: DepartmentUpdateOneNestedInput
+  departmentId: String
   id: String
   isActive: Boolean
-  priority: Int
-  scopeReferenceId: String
-  scopeType: TypeUpdateOneNestedInput
-  scopeTypeId: String
+  jobLevel: JobLevelUpdateOneNestedInput
+  jobLevelId: String
+  position: PositionUpdateOneNestedInput
+  positionId: String
   template: WorkFlowTemplateUpdateOneNestedInput
   templateId: String
   updatedAt: DateTime
@@ -26536,8 +26694,20 @@ input WorkFlowTemplateScopeWhereInput {
   """Filter by related AuditLog records."""
   auditLogs: AuditLogWhereInput
 
+  """Filter by related Company records."""
+  company: CompanyWhereInput
+
+  """Filter by companyId (String)."""
+  companyId: Json
+
   """Filter by createdAt (DateTime)."""
   createdAt: Json
+
+  """Filter by related Department records."""
+  department: DepartmentWhereInput
+
+  """Filter by departmentId (String)."""
+  departmentId: Json
 
   """Filter by id (String)."""
   id: Json
@@ -26545,17 +26715,17 @@ input WorkFlowTemplateScopeWhereInput {
   """Filter by isActive (Boolean)."""
   isActive: Json
 
-  """Filter by priority (Int)."""
-  priority: Json
+  """Filter by related JobLevel records."""
+  jobLevel: JobLevelWhereInput
 
-  """Filter by scopeReferenceId (String)."""
-  scopeReferenceId: Json
+  """Filter by jobLevelId (String)."""
+  jobLevelId: Json
 
-  """Filter by related Type records."""
-  scopeType: TypeWhereInput
+  """Filter by related Position records."""
+  position: PositionWhereInput
 
-  """Filter by scopeTypeId (String)."""
-  scopeTypeId: Json
+  """Filter by positionId (String)."""
+  positionId: Json
 
   """Filter by related WorkFlowTemplate records."""
   template: WorkFlowTemplateWhereInput

@@ -5,6 +5,7 @@ fragment PositionFragment on Position {
   name
   acronym
   description
+  companyId
   isActive
   createdAt
   updatedAt
