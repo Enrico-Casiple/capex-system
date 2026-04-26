@@ -26,6 +26,7 @@ interface ModelDataProps {
   ) => React.ReactNode;
   importComponent?: React.ReactNode;
   exportComponent?: React.ReactNode;
+  updateComponent?: React.ReactNode;
 }
 
 const ModelData = <ModelShape, Response extends Record<string, Query[keyof Query]>>({
@@ -34,6 +35,7 @@ const ModelData = <ModelShape, Response extends Record<string, Query[keyof Query
   newBulkAction,
   importComponent,
   exportComponent,
+  updateComponent,
   createAction,
 }: ModelDataProps) => {
   const { active, table, modelName } = useListContext();
@@ -74,7 +76,7 @@ const ModelData = <ModelShape, Response extends Record<string, Query[keyof Query
           <Card className="p-4">
             <div className="flex items-center justify-between gap-4">
               {/* Action Buttons */}
-              <ListAction importComponent={importComponent} exportComponent={exportComponent} />
+              <ListAction importComponent={importComponent} exportComponent={exportComponent} updateComponent={updateComponent} />
               {/* Search Bar */}
               <ListSearch />
             </div>

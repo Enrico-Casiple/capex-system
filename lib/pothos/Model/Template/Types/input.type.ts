@@ -13,8 +13,8 @@ export type CreateManyInput<PrismaModel extends Prisma.ModelName> = {
   currentUserId: string;
 };
 export type UpdateInput<PrismaModel extends Prisma.ModelName> = {
-  // data: Partial<UpdateArgs<PrismaModel>['data']> & { id: UpdateArgs<PrismaModel>['where']['id'] };
-  data: PrismaTypes[PrismaModel]['Update'] & PrismaTypes[PrismaModel]['WhereUnique'];
+  id: string;
+  data: PrismaTypes[PrismaModel]['Update'];
   currentUserId: string;
 };
 export type RemoveInput = { id: string; currentUserId: string };

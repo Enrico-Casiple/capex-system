@@ -3,8 +3,7 @@ import { ActionType, PopupType } from '@/app/_component/Row/Action';
 import { modelGQL } from '@/lib/api/crud.gql';
 import { useSession } from 'next-auth/react';
 import React, { useEffect } from "react";
-import useToast from '@/app/_hooks/useToast';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm, UseFormReturn } from 'react-hook-form';
 import { ok } from '@/lib/util/reponseUtil';
 import { WorkFlowTemplate, WorkFlowTemplateResponse } from '@/lib/generated/api/customHookAPI/graphql';
 import FormTemplate from '@/components/Forms/FormTemplate';
@@ -12,15 +11,16 @@ import CustomTextInput from '@/components/Forms/Inputs/CustomTextInput';
 import CustomTextAreaInput from '@/components/Forms/Inputs/CustomTextAreaInput';
 import CustomNumberInput from '@/components/Forms/Inputs/CustomNumberInput';
 import CustomCheckbox from '@/components/Forms/Inputs/CustomCheckbox';
-import { Layers, Info, Globe, Trash2, PackagePlus } from 'lucide-react';
+import { Layers, Info, Trash2, PackagePlus } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import useMutationActions from '@/app/_hooks/useBulkActions';
 import { useListContext } from '@/app/_context/ListContext/ListProvider';
 import CustomSingleSelectInput from '@/components/Forms/Inputs/CustomSingleSelectInput';
-import { workFlowTemplate } from '../../_config/workTemplate.config';
 import { useQuery } from '@apollo/client/react';
 import { WorkFlowTemplateFindUnique } from '@/lib/api/gql/WorkFlowTemplate.gql';
+import { DrawerClose } from '@/components/ui/drawer';
+import WorkFlowTemplateStepForm from './components/WorkFlowTemplateStepForm';
 
 type MethodProps = {
   rowId?: string | null;
@@ -35,7 +35,6 @@ const modelAPI = modelGQL;
 const Method = (props: MethodProps) => {
   const { model } = useListContext();
   const session = useSession();
-  const toast = useToast();
 
   const workFlowTemplateFindUnique = useQuery<
     { WorkFlowTemplateFindUnique: WorkFlowTemplateResponse },
@@ -57,6 +56,25 @@ const Method = (props: MethodProps) => {
       departmentId: "",
       positionId: "",
       jobLevelId: "",
+    }],
+    steps: [{
+      stepNumber: 1,
+      assignmentTypeId: "",
+      assignedToUserId: "",
+      conditions: [{
+        modelName: "WorkFlowTemplateConfig",
+        group: "WorkFlowTemplateConfig",
+        codeKey: "workflow_template_config_conditions",
+        code: "workflow_template_config_conditions",
+        codeLabel: "Conditions",
+        value: {
+          nodeType: "RULE",
+          logicalOperator: "",
+          field: "",
+          operator: "",
+          value: ""
+        }
+      }]
     }]
   };
 
@@ -87,10 +105,29 @@ const Method = (props: MethodProps) => {
     }
   }, [workFlowTemplateFindUnique.data, props.actionType, form]);
 
+
+
   const scopeFieldArray = useFieldArray({
     control: form.control,
     name: "scope"
   })
+
+  const isGlobal = form.watch("isGlobal");
+  const previousScope = React.useRef(form.getValues("scope"));
+
+  useEffect(() => {
+    if (isGlobal) {
+      previousScope.current = form.getValues("scope");
+      form.setValue("scope", [{
+        companyId: "",
+        departmentId: "",
+        positionId: "",
+        jobLevelId: "",
+      }]);
+    }
+  }, [isGlobal, form])
+
+
   const handleToAddScope = () => {
     scopeFieldArray.append({
       companyId: "",
@@ -123,18 +160,28 @@ const Method = (props: MethodProps) => {
     errorDescription: `There was an error creating the workflow template. Please try again.`,
   });
 
+
+  const { execute: executeUpdate, executing: executingUpdate } = useMutationActions({
+    mutationGQL: modelAPI[model].update,
+    setOpen: props.setOpen,
+    successMessage: 'Update Workflow Template Successfully',
+    successDescription: `The workflow template has been updated successfully.`,
+    errorMessage: 'Update Workflow Template Failed',
+    errorDescription: `There was an error updating the workflow template. Please try again.`,
+  });
+
   const handleToSubmit = async (data: unknown) => {
     const modelData = data as unknown as WorkFlowTemplate;
 
     // Remove all scope fields that have empty values
     const filteredScope = modelData.scope?.filter(scope =>
       scope.companyId || scope.departmentId || scope.positionId || scope.jobLevelId
-    ) ?? [];
+    ) ?? null;
 
     // Map filtered scope to create format - remove empty strings
-    const scopeData = filteredScope.length > 0
+    const scopeData = filteredScope?.length > 0
       ? {
-        create: filteredScope.map(scope => ({
+        create: filteredScope?.map(scope => ({
           companyId: scope.companyId ? scope.companyId : null,
           departmentId: scope.departmentId ? scope.departmentId : null,
           positionId: scope.positionId ? scope.positionId : null,
@@ -145,9 +192,42 @@ const Method = (props: MethodProps) => {
 
     switch (props.actionType) {
       case 'edit':
+        await executeUpdate({
+          variables: {
+            id: props.rowId ?? "",
+            data: {
+              name: modelData.name ?? workFlowTemplateFindUnique.data?.WorkFlowTemplateFindUnique.data?.name,
+              description: modelData.description ?? workFlowTemplateFindUnique.data?.WorkFlowTemplateFindUnique.data?.description,
+              isGlobal: modelData.isGlobal ?? workFlowTemplateFindUnique.data?.WorkFlowTemplateFindUnique.data?.isGlobal,
+              version: (workFlowTemplateFindUnique?.data?.WorkFlowTemplateFindUnique.data?.version ?? 0) + 1,
+              // Logic: Wipe existing associations, then inject new ones
+              scope: scopeData ? {
+                deleteMany: {},
+                create: scopeData.create,
+              } : undefined
+            },
+            currentUserId: session?.data?.user?.id,
+          }
+        })
         return ok("SUCCESS_UPDATE_WORKFLOW_TEMPLATE",
           `Successfully updated workflow template: ${modelData.name}`,
-          filteredScope
+          {
+            variables: {
+              id: props.rowId ?? "",
+              data: {
+                name: modelData.name ?? workFlowTemplateFindUnique.data?.WorkFlowTemplateFindUnique.data?.name,
+                description: modelData.description ?? workFlowTemplateFindUnique.data?.WorkFlowTemplateFindUnique.data?.description,
+                isGlobal: modelData.isGlobal ?? workFlowTemplateFindUnique.data?.WorkFlowTemplateFindUnique.data?.isGlobal,
+                version: (workFlowTemplateFindUnique?.data?.WorkFlowTemplateFindUnique.data?.version ?? 0) + 1,
+                // Logic: Wipe existing associations, then inject new ones
+                scope: {
+                  deleteMany: {},
+                  create: scopeData?.create ?? [],
+                }
+              },
+              currentUserId: session?.data?.user?.id,
+            }
+          }
         );
       case "duplicate":
         await executeCreate({
@@ -197,7 +277,7 @@ const Method = (props: MethodProps) => {
     >
       <div className='flex flex-col gap-6 -mt-5 overflow-hidden'>
         {/* {JSON.stringify(workFlowTemplateFindUnique.data?.WorkFlowTemplateFindUnique.data, null, 2)} */}
-        <ScrollArea className='h-[calc(100vh-200px)]'>
+        <ScrollArea className='h-[calc(100vh-210px)]'>
           <div className="space-y-6">
             {/* Header section with Icon */}
             <div className="flex items-center gap-3 pb-2 border-b">
@@ -256,7 +336,7 @@ const Method = (props: MethodProps) => {
                           <Layers className="w-5 h-5" />
                         </div>
                         <div>
-                          <h3 className="text-sm font-bold uppercase tracking-tight text-slate-700">Scope (Who's the view)</h3>
+                          <h3 className="text-sm font-bold uppercase tracking-tight text-slate-700">Scope ({`Who's the view`})</h3>
                           <p className="text-xs text-muted-foreground">
                             Define the scope of this workflow template. This helps the system auto-assign templates based on user attributes.
                           </p>
@@ -475,6 +555,8 @@ const Method = (props: MethodProps) => {
                 )
               }
 
+              {/* WorkFlow Template StepForm */}
+              <WorkFlowTemplateStepForm form={form as unknown as UseFormReturn<Record<string, unknown>>} />
 
               {/* Versioning Footer */}
               < div className="pt-4 mt-2 border-t bg-slate-50/50 -mx-6 px-6 py-4 rounded-b-xl" >
@@ -503,16 +585,32 @@ const Method = (props: MethodProps) => {
           </div>
         </ScrollArea>
         {/* Action Buttons - Fixed at Bottom */}
-        <div className='flex gap-3 justify-end bg-background border-t pt-4'>
-          <Button variant='outline' disabled={executingCreate}
-            className={`px-8 ${executingCreate ? 'cursor-not-allowed' : ''}`}
-          >Cancel</Button>
-          <Button type='submit' className='px-8'>
-            {
-              executingCreate ? 'Submit...' : 'Submit'
-            }
-          </Button>
-        </div>
+        {
+          props.actionType === "view" ? null : (
+
+            <div className='flex gap-3 justify-end bg-background border-t pt-4'>
+              <DrawerClose asChild>
+                <Button
+                  variant='outline'
+                  disabled={executingCreate || executingUpdate}
+                  className={`px-8 ${(executingCreate || executingUpdate) ? 'cursor-not-allowed' : ''}`}
+                  type='button'
+                >
+                  Cancel
+                </Button>
+              </DrawerClose>
+              <Button type='submit'
+                className={`px-8 ${(executingCreate || executingUpdate) ? 'cursor-not-allowed' : ''}`}
+                disabled={executingCreate || executingUpdate}
+
+              >
+                {
+                  (executingCreate || executingUpdate) ? 'Submit...' : 'Submit'
+                }
+              </Button>
+            </div>
+          )
+        }
       </div>
     </FormTemplate>
   );

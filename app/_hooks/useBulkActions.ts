@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { ErrorLike } from '@apollo/client';
@@ -14,12 +15,12 @@ interface MutationActionsProps {
   successDescription: string;
   errorMessage: string;
   errorDescription: string;
-  options?: any; 
+  options?: any;
 }
 
 const useMutationActions = (props: MutationActionsProps) => {
   const toast = useToast();
-  const { returnQuery, modelName } = useListContext();
+  const { returnQuery } = useListContext();
 
   const formatErrorDetails = (error: ErrorLike) => {
     return error.message || props.errorDescription;
@@ -35,7 +36,7 @@ const useMutationActions = (props: MutationActionsProps) => {
       // 2. Check for success (supports your standard GQL response structure)
       if (result?.isSuccess || result?.code === "SUCCESS" || data) {
         props.setOpen?.(false);
-        
+
         // Use optional chaining in case returnQuery isn't initialized yet
         returnQuery?.refetch();
 
@@ -54,8 +55,8 @@ const useMutationActions = (props: MutationActionsProps) => {
     },
     onError(error) {
       // It's usually safer not to close the modal on error so the user doesn't lose their inputs
-      // props.setOpen?.(false); 
-      
+      // props.setOpen?.(false);
+
       toast.error({
         message: props.errorMessage,
         description: formatErrorDetails(error),

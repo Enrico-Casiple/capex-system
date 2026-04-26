@@ -9,7 +9,7 @@
     "windows": "npm run codegen:gen && npm run generate:gql:force && concurrently --names \"DEV,STUDIO\" --prefix \"[{name}]\" --prefix-colors \"blue,yellow\" \"cross-env NODE_ENV=development NODE_OPTIONS=--max_old_space_size=4096 tsx watch lib/server/server.ts\" \"npm run prisma:studio\"",
     "server": "npm run generate:gql && concurrently --names \"DEV,CODEGEN\" --prefix \"[{name}]\" --prefix-colors \"blue,green\" \"npm run dev\" \"npm run codegen:watch\"",
     "full": "npm run generate:gql && concurrently --names \"DEV,CODEGEN,STUDIO\" --prefix \"[{name}]\" --prefix-colors \"blue,green,yellow\" \"npm run dev\" \"npm run codegen:watch\" \"npm run prisma:studio\"",
-    "seed": "dotenv -e .env -- npx tsx prisma/seed/seed-status.ts",
+    "seed": "dotenv -e .env -- npx tsx prisma/seed/seed-type.ts",
     "generate:gql": "tsx lib/scripts/generateGQLFiles.ts",
     "generate:gql:force": "tsx lib/scripts/generateGQLFiles.ts --force",
     "codegen:gen": "prisma generate && prisma db push && graphql-codegen --config lib/pothos/codegen.ts && npm run generate:model-names",

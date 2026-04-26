@@ -39,7 +39,7 @@ type ActionProps = {
 };
 
 const Action = ({ rowId, component }: ActionProps) => {
-  const { active,modelName } = useListContext();
+  const { active, modelName } = useListContext();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentAction, setCurrentAction] = useState<ActionState | null>(null);
@@ -72,24 +72,24 @@ const Action = ({ rowId, component }: ActionProps) => {
 
   const getActionDetails = (actionType: ActionType) => {
     const titles: Record<ActionType, string> = {
-      view: 'View User Details',
-      edit: 'Edit User Information',
-      duplicate: 'Duplicate User',
-      archive: 'Archive User',
-      restore: 'Restore User',
-      delete: 'Delete User',
+      view: `View ${modelName} Details`,
+      edit: `Edit ${modelName} Information`,
+      duplicate: `Duplicate ${modelName}`,
+      archive: `Archive ${modelName}`,
+      restore: `Restore ${modelName}`,
+      delete: `Delete ${modelName}`,
       none: 'Action',
     };
 
     const descriptions: Record<ActionType, string> = {
-      view: 'Review the complete information for this user account.',
-      edit: 'Update user information, settings, and permissions.',
-      duplicate: 'Create a copy of this user with new details.',
+      view: `Review the complete information for this ${modelName.toLowerCase()}.`,
+      edit: `Update ${modelName.toLowerCase()} information, settings, and permissions.`,
+      duplicate: `Create a copy of this ${modelName.toLowerCase()} with new details.`,
       archive:
-        'Are you sure? This user will be moved to archived records. You can restore it later.',
-      restore: 'Are you sure? This user will return to active records.',
-      delete: 'This action is permanent and cannot be undone. All associated data will be deleted.',
-      none: 'Perform an action on this record.',
+        `Are you sure? This ${modelName.toLowerCase()} will be moved to archived records and won't be active.`,
+      restore: `Are you sure? This ${modelName.toLowerCase()} will return to active records.`,
+      delete: `This action is permanent and cannot be undone. All associated data will be deleted.`,
+      none: `Perform an action on this ${modelName.toLowerCase()}.`,
     };
 
     return {
@@ -141,7 +141,7 @@ const Action = ({ rowId, component }: ActionProps) => {
                 </DropdownMenuItem>
 
               </RoleGate>
-               <RoleGate
+              <RoleGate
                 module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
                 resource={[`${modelName.toLowerCase()}`, "*"]}
                 action={['update', '*']}
@@ -172,11 +172,11 @@ const Action = ({ rowId, component }: ActionProps) => {
           )}
 
           {active ? (
-             <RoleGate
-                module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
-                resource={[`${modelName.toLowerCase()}`, "*"]}
-                action={['archive', '*']}
-              >
+            <RoleGate
+              module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
+              resource={[`${modelName.toLowerCase()}`, "*"]}
+              action={['archive', '*']}
+            >
               <DropdownMenuItem
                 onSelect={() => handleAction('archive', 'dialog')}
                 className="cursor-pointer group group-hover:text-foreground transition-colors"
@@ -184,35 +184,35 @@ const Action = ({ rowId, component }: ActionProps) => {
                 <Archive className="h-4 w-4 mr-3" />
                 <span>Archive</span>
               </DropdownMenuItem>
-              </RoleGate>
+            </RoleGate>
           ) : (
             <>
-            <RoleGate
+              <RoleGate
                 module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
                 resource={[`${modelName.toLowerCase()}`, "*"]}
                 action={['restore', '*']}
               >
 
-              <DropdownMenuItem
-                onSelect={() => handleAction('restore', 'dialog')}
-                className="cursor-pointer group group-hover:text-foreground transition-colors"
-              >
-                <ArchiveRestore className="h-4 w-4 mr-3" />
-                <span>Restore</span>
-              </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => handleAction('restore', 'dialog')}
+                  className="cursor-pointer group group-hover:text-foreground transition-colors"
+                >
+                  <ArchiveRestore className="h-4 w-4 mr-3" />
+                  <span>Restore</span>
+                </DropdownMenuItem>
               </RoleGate>
-             <RoleGate
+              <RoleGate
                 module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
                 resource={[`${modelName.toLowerCase()}`, "*"]}
                 action={['delete', '*']}
               >
-              <DropdownMenuItem
-                onSelect={() => handleAction('delete', 'dialog')}
-                className="cursor-pointer group group-hover:text-foreground transition-colors"
-              >
-                <Trash2 className="h-4 w-4 mr-3" />
-                <span>Delete</span>
-              </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => handleAction('delete', 'dialog')}
+                  className="cursor-pointer group group-hover:text-foreground transition-colors"
+                >
+                  <Trash2 className="h-4 w-4 mr-3" />
+                  <span>Delete</span>
+                </DropdownMenuItem>
               </RoleGate>
             </>
           )}

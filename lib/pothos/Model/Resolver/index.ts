@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import authenticate from '../../../../lib/util/authenticate';
 import { checkAuthentication } from '../../../../lib/util/checkAuthentication';
 import { enforceRateLimit } from '../../../../lib/util/enforceRateLimit';
@@ -35,11 +36,12 @@ const middlewareCheck = async (
   skipForUserModel: boolean = false,
   isNeeded: boolean = true,
 ) => {
-  if (!isNeeded) return;
+  if (!isNeeded) return null;
   const rateLimitError = await enforceRateLimit(ctx, modelName);
   if (rateLimitError) return rateLimitError;
   const authError = await checkAuthentication(ctx, modelName, skipForUserModel);
   if (authError) return authError;
+  return null;
 };
 
 // Auto-generate all queries and mutations for all models
@@ -66,7 +68,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           description: `Pagination and filter options for the ${modelName} list query.`,
         }),
       },
-      resolve: async (_parent, args, ctx) => {
+      resolve: async (_parent, args) => {
         console.log(
           `🔍 ${modelName}: FindAll - Received pagination request with input:`,
           args.paginationInput,
@@ -339,6 +341,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
 
         const result = await service.update({
           ...query,
+          id: args.id,
           data: args.data,
           currentUserId: (ctx.session?.user?.id as string) ?? 'system',
         } as never);
@@ -612,7 +615,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           description: `Input for grouping ${modelName} records. Specify fields to group by and aggregation operations.`,
         }),
       },
-      resolve: async (_parent, args, ctx) => {
+      resolve: async (_parent, args) => {
         console.log(`🔍 ${modelName}: GroupBy - Received group by request with args:`, args);
         // const middlewareError = await middlewareCheck(ctx, modelName);
         // if (middlewareError) return middlewareError;

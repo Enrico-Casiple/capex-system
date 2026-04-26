@@ -111,7 +111,42 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
   }
 
   private mapUpdate(data: UpdateInput<PrismaModel>['data']): UpdateArgs<PrismaModel>['data'] {
-    return (this.strategy.mapUpdate ?? ((d) => d))(data);
+    const mapped = (this.strategy.mapUpdate ?? ((d) => d))(data);
+    return this.normalizeNestedOperations(mapped as Record<string, unknown>) as UpdateArgs<PrismaModel>['data'];
+  }
+
+  private normalizeNestedOperations(data: Record<string, unknown>): Record<string, unknown> {
+    if (!data || typeof data !== 'object') return data;
+
+    const result: Record<string, unknown> = {};
+    const keys = Object.keys(data);
+
+    for (const key of keys) {
+      const value = data[key];
+
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        const nestedValue = value as Record<string, unknown>;
+        const nestedKeys = Object.keys(nestedValue);
+        const hasDeleteMany = nestedKeys.includes('deleteMany');
+        const hasCreate = nestedKeys.includes('create');
+
+        if (hasDeleteMany && hasCreate) {
+          result[key] = {
+            deleteMany: nestedValue.deleteMany,
+            create: nestedValue.create,
+            ...Object.fromEntries(
+              nestedKeys.filter(k => k !== 'deleteMany' && k !== 'create').map(k => [k, nestedValue[k]])
+            )
+          };
+        } else {
+          result[key] = value;
+        }
+      } else {
+        result[key] = value;
+      }
+    }
+
+    return result;
   }
 
   private code(suffix: string) {
@@ -691,31 +726,30 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
   async update(input: UpdateInput<PrismaModel>) {
     console.log(`📝 Update ${this.modelName}`, input);
     try {
-      const { data, currentUserId } = input;
-      if (!data.id) return fail(this.code('UPDATE_ONE_FAILED'), `id is required`);
+      const { id, data, currentUserId } = input;
+      if (!id) return fail(this.code('UPDATE_ONE_FAILED'), `id is required`);
 
-      const existing = await this.findUnique(data.id);
+      const existing = await this.findUnique(id);
       if (!existing.isSuccess) return fail(this.code('UPDATE_ONE_FAILED'), existing.message);
 
       const mappedData = this.mapUpdate(data);
-      const { id: _id, ...safeData } = mappedData as typeof mappedData & { id?: string };
 
       const record = await this.delegate.update({
-        where: { id: data.id } as FindManyArgs<PrismaModel>['where'],
+        where: { id } as FindManyArgs<PrismaModel>['where'],
         data: {
-          ...safeData,
-          auditLogs: this.audit('UPDATE', currentUserId, safeData, existing.data),
+          ...mappedData,
+          auditLogs: this.audit('UPDATE', currentUserId, mappedData, existing.data),
         },
         include: this.include,
       });
       this.publish(record);
-      return ok(this.code('UPDATE_ONE_SUCCESS'), `Updated ${this.modelName} id:${data.id}`, record);
+      return ok(this.code('UPDATE_ONE_SUCCESS'), `Updated ${this.modelName} id:${id}`, record);
     } catch (error) {
       const { message } = getPrismaErrorMessage(error);
       console.error(`❌ Update ${this.modelName}:`, error);
       return fail(
         this.code('UPDATE_ONE_FAILED'),
-        `Failed to update ${this.modelName} id:${input.data.id}: ${message}`,
+        `Failed to update ${this.modelName} id:${input.id}: ${message}`,
       );
     }
   }
@@ -725,16 +759,14 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
     try {
       const inputArray = Array.isArray(inputs) ? inputs : [inputs];
       const allData: Array<{
-        data: Partial<UpdateArgs<PrismaModel>['data']> & { id: string };
+        id: string;
+        data: PrismaTypes[PrismaModel]['Update'];
         currentUserId: string;
       }> = [];
 
       inputArray.forEach((input) => {
-        const items = Array.isArray(input.data) ? input.data : [input.data];
-        items.forEach((item) => {
-          if (item.id) allData.push({ data: item, currentUserId: input.currentUserId });
-          else console.warn(`Skipping record without id:`, item);
-        });
+        if (input.id) allData.push({ id: input.id, data: input.data, currentUserId: input.currentUserId });
+        else console.warn(`Skipping record without id:`, input);
       });
 
       if (!allData.length)
@@ -743,38 +775,37 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
       const results = await this.prisma.$transaction(
         async (tx) =>
           Promise.all(
-            allData.map(async ({ data, currentUserId }) => {
+            allData.map(async ({ id, data, currentUserId }) => {
               try {
                 const existing = await (
                   tx[this.prismaModel] as unknown as PrismaModelMethods<PrismaModel>
                 ).findUnique({
-                  where: { id: data.id } as FindUniqueArgs<PrismaModel>['where'],
+                  where: { id } as FindUniqueArgs<PrismaModel>['where'],
                   include: this.include,
                 });
                 if (!existing)
-                  return fail(this.code('UPDATE_MANY_FAILED'), `Record not found id:${data.id}`);
+                  return fail(this.code('UPDATE_MANY_FAILED'), `Record not found id:${id}`);
 
                 const mappedData = this.mapUpdate(data);
-                const { id: _id, ...safeData } = mappedData as typeof mappedData & { id?: string };
 
                 const record = await (
                   tx[this.prismaModel] as unknown as PrismaModelMethods<PrismaModel>
                 ).update({
-                  where: { id: data.id } as FindManyArgs<PrismaModel>['where'],
+                  where: { id } as FindManyArgs<PrismaModel>['where'],
                   data: {
-                    ...safeData,
-                    auditLogs: this.audit('UPDATE', currentUserId, safeData, existing),
+                    ...mappedData,
+                    auditLogs: this.audit('UPDATE', currentUserId, mappedData, existing),
                   },
                   include: this.include,
                 });
                 return ok(
                   this.code('UPDATE_MANY_SUCCESS'),
-                  `Updated ${this.modelName} id:${data.id}`,
+                  `Updated ${this.modelName} id:${id}`,
                   record,
                 );
               } catch (error) {
                 console.error(`❌ UpdateMany item ${this.modelName}:`, error);
-                return fail(this.code('UPDATE_MANY_FAILED'), `Failed id:${data.id}: ${error}`);
+                return fail(this.code('UPDATE_MANY_FAILED'), `Failed id:${id}: ${error}`);
               }
             }),
           ),
@@ -1155,7 +1186,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
 
   async groupBy(groupByInput: GroupByInput<PrismaModel>) {
     try {
-      
+
       const result = await this.delegate.groupBy({
         by: groupByInput.by,
         ...(groupByInput.where && { where: groupByInput.where }),

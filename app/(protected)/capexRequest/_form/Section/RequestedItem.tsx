@@ -77,13 +77,11 @@ const calculateItemAmounts = (qty: number, price: number, vatRate: number, isInc
 
 const MobileItemCard = ({
   index,
-  field,
   form,
   remove,
   fieldsLength
 }: {
   index: number;
-  field: any;
   form: UseFormReturn<RequestedItemFormValues>;
   remove: (index: number) => void;
   fieldsLength: number;
@@ -576,7 +574,6 @@ const RequestedItem = ({ form }: RequestedItemProps) => {
             <MobileItemCard
               key={field.id}
               index={index}
-              field={field}
               form={form}
               remove={remove}
               fieldsLength={fields.length}

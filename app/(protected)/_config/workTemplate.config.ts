@@ -23,7 +23,7 @@ const workFlowTemplateExtraColumns: SearchableColumnDef<WorkFlowTemplate>[] = [
     id: "isGlobal",
     header: "Global Template",
     accessorKey: "isGlobal",
-    meta: { searchable: true },
+    meta: { searchable: false },
   },
   {
     id: "version",

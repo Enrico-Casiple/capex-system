@@ -4,13 +4,15 @@ import Import from '@/app/_component/List/Import';
 import Action, { ActionType, PopupType } from '@/app/_component/Row/Action';
 import { Spinner } from '@/app/_component/Spinner';
 import ListPage from '@/app/_context/ListWrapper';
-import { Request, RequestCreateInput, WorkFlowTemplate, WorkFlowTemplateCreateInput } from '@/lib/generated/api/customHookAPI/graphql';
+import { WorkFlowTemplate, WorkFlowTemplateCreateInput } from '@/lib/generated/api/customHookAPI/graphql';
 import dynamic from 'next/dynamic';
 import { useCallback } from 'react';
 import ModelData from '../../_component/ModelData';
-import { capexRequestTableConfig, workFlowTemplateTableConfig } from '../_config';
+import { workFlowTemplateTableConfig } from '../_config';
 import ExportForm from './_form/ExportForm';
 import ImportForm from './_form/ImportForm';
+import ImportUpdate from '@/app/_component/List/ImportUpdate';
+import ImportUpdateForm from './_form/ImportUpdateForm';
 
 const Method = dynamic(() => import('./_form/Method'), {
   loading: () => <Spinner />,
@@ -87,6 +89,13 @@ const ModelPage = () => {
     [],
   );
 
+  const updateForm = useCallback(
+    (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (
+      <ImportUpdateForm<ModelRequest, ModelCreateInput> open={open} setOpen={setOpen} />
+    ),
+    [],
+  );
+
   const exportForm = useCallback(
     (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (
       <ExportForm open={open} setOpen={setOpen} />
@@ -112,6 +121,7 @@ const ModelPage = () => {
         createAction={createAction}
         importComponent={<Import importFormComponent={importForm} />}
         exportComponent={<Export exportFormComponent={exportForm} />}
+        updateComponent={<ImportUpdate importUpdateFormComponent={updateForm} />}
       />
     </ListPage>
   );

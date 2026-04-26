@@ -788,15 +788,15 @@ input AuditLogUpdateInput {
 input AuditLogUpdateManyNestedInput {
   connect: [AuditLogConnectInput!]
   connectOrCreate: [AuditLogConnectOrCreateInput!]
-  create: AuditLogCreateInput
+  create: [AuditLogCreateInput!]
   createMany: [AuditLogCreateInput!]
-  delete: [AuditLogDeleteOneInput!]
-  deleteMany: AuditLogDeleteManyInput
-  disconnect: Boolean
+  delete: [AuditLogConnectInput!]
+  deleteMany: [AuditLogWhereInput!]
+  disconnect: [AuditLogConnectInput!]
   set: [AuditLogConnectInput!]
-  update: AuditLogUpdateInput
-  updateMany: [AuditLogUpdateInput!]
-  upsert: AuditLogUpsertNestedInput
+  update: [AuditLogUpsertNestedInput!]
+  updateMany: [AuditLogUpsertNestedInput!]
+  upsert: [AuditLogUpsertNestedInput!]
 }
 
 """Nested update one for AuditLog."""
@@ -806,7 +806,7 @@ input AuditLogUpdateOneNestedInput {
   create: AuditLogCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: AuditLogUpdateInput
+  update: AuditLogUpsertNestedInput
   upsert: AuditLogUpsertNestedInput
 }
 
@@ -1558,15 +1558,15 @@ input BasicInformationUpdateInput {
 input BasicInformationUpdateManyNestedInput {
   connect: [BasicInformationConnectInput!]
   connectOrCreate: [BasicInformationConnectOrCreateInput!]
-  create: BasicInformationCreateInput
+  create: [BasicInformationCreateInput!]
   createMany: [BasicInformationCreateInput!]
-  delete: [BasicInformationDeleteOneInput!]
-  deleteMany: BasicInformationDeleteManyInput
-  disconnect: Boolean
+  delete: [BasicInformationConnectInput!]
+  deleteMany: [BasicInformationWhereInput!]
+  disconnect: [BasicInformationConnectInput!]
   set: [BasicInformationConnectInput!]
-  update: BasicInformationUpdateInput
-  updateMany: [BasicInformationUpdateInput!]
-  upsert: BasicInformationUpsertNestedInput
+  update: [BasicInformationUpsertNestedInput!]
+  updateMany: [BasicInformationUpsertNestedInput!]
+  upsert: [BasicInformationUpsertNestedInput!]
 }
 
 """Nested update one for BasicInformation."""
@@ -1576,7 +1576,7 @@ input BasicInformationUpdateOneNestedInput {
   create: BasicInformationCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: BasicInformationUpdateInput
+  update: BasicInformationUpsertNestedInput
   upsert: BasicInformationUpsertNestedInput
 }
 
@@ -2709,15 +2709,15 @@ input BudgetLedgerUpdateInput {
 input BudgetLedgerUpdateManyNestedInput {
   connect: [BudgetLedgerConnectInput!]
   connectOrCreate: [BudgetLedgerConnectOrCreateInput!]
-  create: BudgetLedgerCreateInput
+  create: [BudgetLedgerCreateInput!]
   createMany: [BudgetLedgerCreateInput!]
-  delete: [BudgetLedgerDeleteOneInput!]
-  deleteMany: BudgetLedgerDeleteManyInput
-  disconnect: Boolean
+  delete: [BudgetLedgerConnectInput!]
+  deleteMany: [BudgetLedgerWhereInput!]
+  disconnect: [BudgetLedgerConnectInput!]
   set: [BudgetLedgerConnectInput!]
-  update: BudgetLedgerUpdateInput
-  updateMany: [BudgetLedgerUpdateInput!]
-  upsert: BudgetLedgerUpsertNestedInput
+  update: [BudgetLedgerUpsertNestedInput!]
+  updateMany: [BudgetLedgerUpsertNestedInput!]
+  upsert: [BudgetLedgerUpsertNestedInput!]
 }
 
 """Nested update one for BudgetLedger."""
@@ -2727,7 +2727,7 @@ input BudgetLedgerUpdateOneNestedInput {
   create: BudgetLedgerCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: BudgetLedgerUpdateInput
+  update: BudgetLedgerUpsertNestedInput
   upsert: BudgetLedgerUpsertNestedInput
 }
 
@@ -3382,15 +3382,15 @@ input BudgetSnapshotUpdateInput {
 input BudgetSnapshotUpdateManyNestedInput {
   connect: [BudgetSnapshotConnectInput!]
   connectOrCreate: [BudgetSnapshotConnectOrCreateInput!]
-  create: BudgetSnapshotCreateInput
+  create: [BudgetSnapshotCreateInput!]
   createMany: [BudgetSnapshotCreateInput!]
-  delete: [BudgetSnapshotDeleteOneInput!]
-  deleteMany: BudgetSnapshotDeleteManyInput
-  disconnect: Boolean
+  delete: [BudgetSnapshotConnectInput!]
+  deleteMany: [BudgetSnapshotWhereInput!]
+  disconnect: [BudgetSnapshotConnectInput!]
   set: [BudgetSnapshotConnectInput!]
-  update: BudgetSnapshotUpdateInput
-  updateMany: [BudgetSnapshotUpdateInput!]
-  upsert: BudgetSnapshotUpsertNestedInput
+  update: [BudgetSnapshotUpsertNestedInput!]
+  updateMany: [BudgetSnapshotUpsertNestedInput!]
+  upsert: [BudgetSnapshotUpsertNestedInput!]
 }
 
 """Nested update one for BudgetSnapshot."""
@@ -3400,7 +3400,7 @@ input BudgetSnapshotUpdateOneNestedInput {
   create: BudgetSnapshotCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: BudgetSnapshotUpdateInput
+  update: BudgetSnapshotUpsertNestedInput
   upsert: BudgetSnapshotUpsertNestedInput
 }
 
@@ -3503,15 +3503,15 @@ input BudgetUpdateInput {
 input BudgetUpdateManyNestedInput {
   connect: [BudgetConnectInput!]
   connectOrCreate: [BudgetConnectOrCreateInput!]
-  create: BudgetCreateInput
+  create: [BudgetCreateInput!]
   createMany: [BudgetCreateInput!]
-  delete: [BudgetDeleteOneInput!]
-  deleteMany: BudgetDeleteManyInput
-  disconnect: Boolean
+  delete: [BudgetConnectInput!]
+  deleteMany: [BudgetWhereInput!]
+  disconnect: [BudgetConnectInput!]
   set: [BudgetConnectInput!]
-  update: BudgetUpdateInput
-  updateMany: [BudgetUpdateInput!]
-  upsert: BudgetUpsertNestedInput
+  update: [BudgetUpsertNestedInput!]
+  updateMany: [BudgetUpsertNestedInput!]
+  upsert: [BudgetUpsertNestedInput!]
 }
 
 """Nested update one for Budget."""
@@ -3521,7 +3521,7 @@ input BudgetUpdateOneNestedInput {
   create: BudgetCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: BudgetUpdateInput
+  update: BudgetUpsertNestedInput
   upsert: BudgetUpsertNestedInput
 }
 
@@ -4302,15 +4302,15 @@ input CapitalRecoveryFactorUpdateInput {
 input CapitalRecoveryFactorUpdateManyNestedInput {
   connect: [CapitalRecoveryFactorConnectInput!]
   connectOrCreate: [CapitalRecoveryFactorConnectOrCreateInput!]
-  create: CapitalRecoveryFactorCreateInput
+  create: [CapitalRecoveryFactorCreateInput!]
   createMany: [CapitalRecoveryFactorCreateInput!]
-  delete: [CapitalRecoveryFactorDeleteOneInput!]
-  deleteMany: CapitalRecoveryFactorDeleteManyInput
-  disconnect: Boolean
+  delete: [CapitalRecoveryFactorConnectInput!]
+  deleteMany: [CapitalRecoveryFactorWhereInput!]
+  disconnect: [CapitalRecoveryFactorConnectInput!]
   set: [CapitalRecoveryFactorConnectInput!]
-  update: CapitalRecoveryFactorUpdateInput
-  updateMany: [CapitalRecoveryFactorUpdateInput!]
-  upsert: CapitalRecoveryFactorUpsertNestedInput
+  update: [CapitalRecoveryFactorUpsertNestedInput!]
+  updateMany: [CapitalRecoveryFactorUpsertNestedInput!]
+  upsert: [CapitalRecoveryFactorUpsertNestedInput!]
 }
 
 """Nested update one for CapitalRecoveryFactor."""
@@ -4320,7 +4320,7 @@ input CapitalRecoveryFactorUpdateOneNestedInput {
   create: CapitalRecoveryFactorCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: CapitalRecoveryFactorUpdateInput
+  update: CapitalRecoveryFactorUpsertNestedInput
   upsert: CapitalRecoveryFactorUpsertNestedInput
 }
 
@@ -4886,15 +4886,15 @@ input CategoryUpdateInput {
 input CategoryUpdateManyNestedInput {
   connect: [CategoryConnectInput!]
   connectOrCreate: [CategoryConnectOrCreateInput!]
-  create: CategoryCreateInput
+  create: [CategoryCreateInput!]
   createMany: [CategoryCreateInput!]
-  delete: [CategoryDeleteOneInput!]
-  deleteMany: CategoryDeleteManyInput
-  disconnect: Boolean
+  delete: [CategoryConnectInput!]
+  deleteMany: [CategoryWhereInput!]
+  disconnect: [CategoryConnectInput!]
   set: [CategoryConnectInput!]
-  update: CategoryUpdateInput
-  updateMany: [CategoryUpdateInput!]
-  upsert: CategoryUpsertNestedInput
+  update: [CategoryUpsertNestedInput!]
+  updateMany: [CategoryUpsertNestedInput!]
+  upsert: [CategoryUpsertNestedInput!]
 }
 
 """Nested update one for Category."""
@@ -4904,7 +4904,7 @@ input CategoryUpdateOneNestedInput {
   create: CategoryCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: CategoryUpdateInput
+  update: CategoryUpsertNestedInput
   upsert: CategoryUpsertNestedInput
 }
 
@@ -5546,15 +5546,15 @@ input CompanyUpdateInput {
 input CompanyUpdateManyNestedInput {
   connect: [CompanyConnectInput!]
   connectOrCreate: [CompanyConnectOrCreateInput!]
-  create: CompanyCreateInput
+  create: [CompanyCreateInput!]
   createMany: [CompanyCreateInput!]
-  delete: [CompanyDeleteOneInput!]
-  deleteMany: CompanyDeleteManyInput
-  disconnect: Boolean
+  delete: [CompanyConnectInput!]
+  deleteMany: [CompanyWhereInput!]
+  disconnect: [CompanyConnectInput!]
   set: [CompanyConnectInput!]
-  update: CompanyUpdateInput
-  updateMany: [CompanyUpdateInput!]
-  upsert: CompanyUpsertNestedInput
+  update: [CompanyUpsertNestedInput!]
+  updateMany: [CompanyUpsertNestedInput!]
+  upsert: [CompanyUpsertNestedInput!]
 }
 
 """Nested update one for Company."""
@@ -5564,7 +5564,7 @@ input CompanyUpdateOneNestedInput {
   create: CompanyCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: CompanyUpdateInput
+  update: CompanyUpsertNestedInput
   upsert: CompanyUpsertNestedInput
 }
 
@@ -6233,15 +6233,15 @@ input ConfigConditionUpdateInput {
 input ConfigConditionUpdateManyNestedInput {
   connect: [ConfigConditionConnectInput!]
   connectOrCreate: [ConfigConditionConnectOrCreateInput!]
-  create: ConfigConditionCreateInput
+  create: [ConfigConditionCreateInput!]
   createMany: [ConfigConditionCreateInput!]
-  delete: [ConfigConditionDeleteOneInput!]
-  deleteMany: ConfigConditionDeleteManyInput
-  disconnect: Boolean
+  delete: [ConfigConditionConnectInput!]
+  deleteMany: [ConfigConditionWhereInput!]
+  disconnect: [ConfigConditionConnectInput!]
   set: [ConfigConditionConnectInput!]
-  update: ConfigConditionUpdateInput
-  updateMany: [ConfigConditionUpdateInput!]
-  upsert: ConfigConditionUpsertNestedInput
+  update: [ConfigConditionUpsertNestedInput!]
+  updateMany: [ConfigConditionUpsertNestedInput!]
+  upsert: [ConfigConditionUpsertNestedInput!]
 }
 
 """Nested update one for ConfigCondition."""
@@ -6251,7 +6251,7 @@ input ConfigConditionUpdateOneNestedInput {
   create: ConfigConditionCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: ConfigConditionUpdateInput
+  update: ConfigConditionUpsertNestedInput
   upsert: ConfigConditionUpsertNestedInput
 }
 
@@ -6774,15 +6774,15 @@ input ConfigUpdateInput {
 input ConfigUpdateManyNestedInput {
   connect: [ConfigConnectInput!]
   connectOrCreate: [ConfigConnectOrCreateInput!]
-  create: ConfigCreateInput
+  create: [ConfigCreateInput!]
   createMany: [ConfigCreateInput!]
-  delete: [ConfigDeleteOneInput!]
-  deleteMany: ConfigDeleteManyInput
-  disconnect: Boolean
+  delete: [ConfigConnectInput!]
+  deleteMany: [ConfigWhereInput!]
+  disconnect: [ConfigConnectInput!]
   set: [ConfigConnectInput!]
-  update: ConfigUpdateInput
-  updateMany: [ConfigUpdateInput!]
-  upsert: ConfigUpsertNestedInput
+  update: [ConfigUpsertNestedInput!]
+  updateMany: [ConfigUpsertNestedInput!]
+  upsert: [ConfigUpsertNestedInput!]
 }
 
 """Nested update one for Config."""
@@ -6792,7 +6792,7 @@ input ConfigUpdateOneNestedInput {
   create: ConfigCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: ConfigUpdateInput
+  update: ConfigUpsertNestedInput
   upsert: ConfigUpsertNestedInput
 }
 
@@ -7428,15 +7428,15 @@ input DepartmentUpdateInput {
 input DepartmentUpdateManyNestedInput {
   connect: [DepartmentConnectInput!]
   connectOrCreate: [DepartmentConnectOrCreateInput!]
-  create: DepartmentCreateInput
+  create: [DepartmentCreateInput!]
   createMany: [DepartmentCreateInput!]
-  delete: [DepartmentDeleteOneInput!]
-  deleteMany: DepartmentDeleteManyInput
-  disconnect: Boolean
+  delete: [DepartmentConnectInput!]
+  deleteMany: [DepartmentWhereInput!]
+  disconnect: [DepartmentConnectInput!]
   set: [DepartmentConnectInput!]
-  update: DepartmentUpdateInput
-  updateMany: [DepartmentUpdateInput!]
-  upsert: DepartmentUpsertNestedInput
+  update: [DepartmentUpsertNestedInput!]
+  updateMany: [DepartmentUpsertNestedInput!]
+  upsert: [DepartmentUpsertNestedInput!]
 }
 
 """Nested update one for Department."""
@@ -7446,7 +7446,7 @@ input DepartmentUpdateOneNestedInput {
   create: DepartmentCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: DepartmentUpdateInput
+  update: DepartmentUpsertNestedInput
   upsert: DepartmentUpsertNestedInput
 }
 
@@ -8027,15 +8027,15 @@ input GroupOfCompanyUpdateInput {
 input GroupOfCompanyUpdateManyNestedInput {
   connect: [GroupOfCompanyConnectInput!]
   connectOrCreate: [GroupOfCompanyConnectOrCreateInput!]
-  create: GroupOfCompanyCreateInput
+  create: [GroupOfCompanyCreateInput!]
   createMany: [GroupOfCompanyCreateInput!]
-  delete: [GroupOfCompanyDeleteOneInput!]
-  deleteMany: GroupOfCompanyDeleteManyInput
-  disconnect: Boolean
+  delete: [GroupOfCompanyConnectInput!]
+  deleteMany: [GroupOfCompanyWhereInput!]
+  disconnect: [GroupOfCompanyConnectInput!]
   set: [GroupOfCompanyConnectInput!]
-  update: GroupOfCompanyUpdateInput
-  updateMany: [GroupOfCompanyUpdateInput!]
-  upsert: GroupOfCompanyUpsertNestedInput
+  update: [GroupOfCompanyUpsertNestedInput!]
+  updateMany: [GroupOfCompanyUpsertNestedInput!]
+  upsert: [GroupOfCompanyUpsertNestedInput!]
 }
 
 """Nested update one for GroupOfCompany."""
@@ -8045,7 +8045,7 @@ input GroupOfCompanyUpdateOneNestedInput {
   create: GroupOfCompanyCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: GroupOfCompanyUpdateInput
+  update: GroupOfCompanyUpsertNestedInput
   upsert: GroupOfCompanyUpsertNestedInput
 }
 
@@ -8546,15 +8546,15 @@ input HolidayUpdateInput {
 input HolidayUpdateManyNestedInput {
   connect: [HolidayConnectInput!]
   connectOrCreate: [HolidayConnectOrCreateInput!]
-  create: HolidayCreateInput
+  create: [HolidayCreateInput!]
   createMany: [HolidayCreateInput!]
-  delete: [HolidayDeleteOneInput!]
-  deleteMany: HolidayDeleteManyInput
-  disconnect: Boolean
+  delete: [HolidayConnectInput!]
+  deleteMany: [HolidayWhereInput!]
+  disconnect: [HolidayConnectInput!]
   set: [HolidayConnectInput!]
-  update: HolidayUpdateInput
-  updateMany: [HolidayUpdateInput!]
-  upsert: HolidayUpsertNestedInput
+  update: [HolidayUpsertNestedInput!]
+  updateMany: [HolidayUpsertNestedInput!]
+  upsert: [HolidayUpsertNestedInput!]
 }
 
 """Nested update one for Holiday."""
@@ -8564,7 +8564,7 @@ input HolidayUpdateOneNestedInput {
   create: HolidayCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: HolidayUpdateInput
+  update: HolidayUpsertNestedInput
   upsert: HolidayUpsertNestedInput
 }
 
@@ -9107,15 +9107,15 @@ input JobLevelUpdateInput {
 input JobLevelUpdateManyNestedInput {
   connect: [JobLevelConnectInput!]
   connectOrCreate: [JobLevelConnectOrCreateInput!]
-  create: JobLevelCreateInput
+  create: [JobLevelCreateInput!]
   createMany: [JobLevelCreateInput!]
-  delete: [JobLevelDeleteOneInput!]
-  deleteMany: JobLevelDeleteManyInput
-  disconnect: Boolean
+  delete: [JobLevelConnectInput!]
+  deleteMany: [JobLevelWhereInput!]
+  disconnect: [JobLevelConnectInput!]
   set: [JobLevelConnectInput!]
-  update: JobLevelUpdateInput
-  updateMany: [JobLevelUpdateInput!]
-  upsert: JobLevelUpsertNestedInput
+  update: [JobLevelUpsertNestedInput!]
+  updateMany: [JobLevelUpsertNestedInput!]
+  upsert: [JobLevelUpsertNestedInput!]
 }
 
 """Nested update one for JobLevel."""
@@ -9125,7 +9125,7 @@ input JobLevelUpdateOneNestedInput {
   create: JobLevelCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: JobLevelUpdateInput
+  update: JobLevelUpsertNestedInput
   upsert: JobLevelUpsertNestedInput
 }
 
@@ -9659,15 +9659,15 @@ input LocationUpdateInput {
 input LocationUpdateManyNestedInput {
   connect: [LocationConnectInput!]
   connectOrCreate: [LocationConnectOrCreateInput!]
-  create: LocationCreateInput
+  create: [LocationCreateInput!]
   createMany: [LocationCreateInput!]
-  delete: [LocationDeleteOneInput!]
-  deleteMany: LocationDeleteManyInput
-  disconnect: Boolean
+  delete: [LocationConnectInput!]
+  deleteMany: [LocationWhereInput!]
+  disconnect: [LocationConnectInput!]
   set: [LocationConnectInput!]
-  update: LocationUpdateInput
-  updateMany: [LocationUpdateInput!]
-  upsert: LocationUpsertNestedInput
+  update: [LocationUpsertNestedInput!]
+  updateMany: [LocationUpsertNestedInput!]
+  upsert: [LocationUpsertNestedInput!]
 }
 
 """Nested update one for Location."""
@@ -9677,7 +9677,7 @@ input LocationUpdateOneNestedInput {
   create: LocationCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: LocationUpdateInput
+  update: LocationUpsertNestedInput
   upsert: LocationUpsertNestedInput
 }
 
@@ -15157,15 +15157,15 @@ input PermissionUpdateInput {
 input PermissionUpdateManyNestedInput {
   connect: [PermissionConnectInput!]
   connectOrCreate: [PermissionConnectOrCreateInput!]
-  create: PermissionCreateInput
+  create: [PermissionCreateInput!]
   createMany: [PermissionCreateInput!]
-  delete: [PermissionDeleteOneInput!]
-  deleteMany: PermissionDeleteManyInput
-  disconnect: Boolean
+  delete: [PermissionConnectInput!]
+  deleteMany: [PermissionWhereInput!]
+  disconnect: [PermissionConnectInput!]
   set: [PermissionConnectInput!]
-  update: PermissionUpdateInput
-  updateMany: [PermissionUpdateInput!]
-  upsert: PermissionUpsertNestedInput
+  update: [PermissionUpsertNestedInput!]
+  updateMany: [PermissionUpsertNestedInput!]
+  upsert: [PermissionUpsertNestedInput!]
 }
 
 """Nested update one for Permission."""
@@ -15175,7 +15175,7 @@ input PermissionUpdateOneNestedInput {
   create: PermissionCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: PermissionUpdateInput
+  update: PermissionUpsertNestedInput
   upsert: PermissionUpsertNestedInput
 }
 
@@ -15739,15 +15739,15 @@ input PositionUpdateInput {
 input PositionUpdateManyNestedInput {
   connect: [PositionConnectInput!]
   connectOrCreate: [PositionConnectOrCreateInput!]
-  create: PositionCreateInput
+  create: [PositionCreateInput!]
   createMany: [PositionCreateInput!]
-  delete: [PositionDeleteOneInput!]
-  deleteMany: PositionDeleteManyInput
-  disconnect: Boolean
+  delete: [PositionConnectInput!]
+  deleteMany: [PositionWhereInput!]
+  disconnect: [PositionConnectInput!]
   set: [PositionConnectInput!]
-  update: PositionUpdateInput
-  updateMany: [PositionUpdateInput!]
-  upsert: PositionUpsertNestedInput
+  update: [PositionUpsertNestedInput!]
+  updateMany: [PositionUpsertNestedInput!]
+  upsert: [PositionUpsertNestedInput!]
 }
 
 """Nested update one for Position."""
@@ -15757,7 +15757,7 @@ input PositionUpdateOneNestedInput {
   create: PositionCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: PositionUpdateInput
+  update: PositionUpsertNestedInput
   upsert: PositionUpsertNestedInput
 }
 
@@ -18071,15 +18071,15 @@ input RequestItemUpdateInput {
 input RequestItemUpdateManyNestedInput {
   connect: [RequestItemConnectInput!]
   connectOrCreate: [RequestItemConnectOrCreateInput!]
-  create: RequestItemCreateInput
+  create: [RequestItemCreateInput!]
   createMany: [RequestItemCreateInput!]
-  delete: [RequestItemDeleteOneInput!]
-  deleteMany: RequestItemDeleteManyInput
-  disconnect: Boolean
+  delete: [RequestItemConnectInput!]
+  deleteMany: [RequestItemWhereInput!]
+  disconnect: [RequestItemConnectInput!]
   set: [RequestItemConnectInput!]
-  update: RequestItemUpdateInput
-  updateMany: [RequestItemUpdateInput!]
-  upsert: RequestItemUpsertNestedInput
+  update: [RequestItemUpsertNestedInput!]
+  updateMany: [RequestItemUpsertNestedInput!]
+  upsert: [RequestItemUpsertNestedInput!]
 }
 
 """Nested update one for RequestItem."""
@@ -18089,7 +18089,7 @@ input RequestItemUpdateOneNestedInput {
   create: RequestItemCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: RequestItemUpdateInput
+  update: RequestItemUpsertNestedInput
   upsert: RequestItemUpsertNestedInput
 }
 
@@ -18303,15 +18303,15 @@ input RequestUpdateInput {
 input RequestUpdateManyNestedInput {
   connect: [RequestConnectInput!]
   connectOrCreate: [RequestConnectOrCreateInput!]
-  create: RequestCreateInput
+  create: [RequestCreateInput!]
   createMany: [RequestCreateInput!]
-  delete: [RequestDeleteOneInput!]
-  deleteMany: RequestDeleteManyInput
-  disconnect: Boolean
+  delete: [RequestConnectInput!]
+  deleteMany: [RequestWhereInput!]
+  disconnect: [RequestConnectInput!]
   set: [RequestConnectInput!]
-  update: RequestUpdateInput
-  updateMany: [RequestUpdateInput!]
-  upsert: RequestUpsertNestedInput
+  update: [RequestUpsertNestedInput!]
+  updateMany: [RequestUpsertNestedInput!]
+  upsert: [RequestUpsertNestedInput!]
 }
 
 """Nested update one for Request."""
@@ -18321,7 +18321,7 @@ input RequestUpdateOneNestedInput {
   create: RequestCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: RequestUpdateInput
+  update: RequestUpsertNestedInput
   upsert: RequestUpsertNestedInput
 }
 
@@ -19346,15 +19346,15 @@ input RolePermissionUpdateInput {
 input RolePermissionUpdateManyNestedInput {
   connect: [RolePermissionConnectInput!]
   connectOrCreate: [RolePermissionConnectOrCreateInput!]
-  create: RolePermissionCreateInput
+  create: [RolePermissionCreateInput!]
   createMany: [RolePermissionCreateInput!]
-  delete: [RolePermissionDeleteOneInput!]
-  deleteMany: RolePermissionDeleteManyInput
-  disconnect: Boolean
+  delete: [RolePermissionConnectInput!]
+  deleteMany: [RolePermissionWhereInput!]
+  disconnect: [RolePermissionConnectInput!]
   set: [RolePermissionConnectInput!]
-  update: RolePermissionUpdateInput
-  updateMany: [RolePermissionUpdateInput!]
-  upsert: RolePermissionUpsertNestedInput
+  update: [RolePermissionUpsertNestedInput!]
+  updateMany: [RolePermissionUpsertNestedInput!]
+  upsert: [RolePermissionUpsertNestedInput!]
 }
 
 """Nested update one for RolePermission."""
@@ -19364,7 +19364,7 @@ input RolePermissionUpdateOneNestedInput {
   create: RolePermissionCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: RolePermissionUpdateInput
+  update: RolePermissionUpsertNestedInput
   upsert: RolePermissionUpsertNestedInput
 }
 
@@ -19462,15 +19462,15 @@ input RoleUpdateInput {
 input RoleUpdateManyNestedInput {
   connect: [RoleConnectInput!]
   connectOrCreate: [RoleConnectOrCreateInput!]
-  create: RoleCreateInput
+  create: [RoleCreateInput!]
   createMany: [RoleCreateInput!]
-  delete: [RoleDeleteOneInput!]
-  deleteMany: RoleDeleteManyInput
-  disconnect: Boolean
+  delete: [RoleConnectInput!]
+  deleteMany: [RoleWhereInput!]
+  disconnect: [RoleConnectInput!]
   set: [RoleConnectInput!]
-  update: RoleUpdateInput
-  updateMany: [RoleUpdateInput!]
-  upsert: RoleUpsertNestedInput
+  update: [RoleUpsertNestedInput!]
+  updateMany: [RoleUpsertNestedInput!]
+  upsert: [RoleUpsertNestedInput!]
 }
 
 """Nested update one for Role."""
@@ -19480,7 +19480,7 @@ input RoleUpdateOneNestedInput {
   create: RoleCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: RoleUpdateInput
+  update: RoleUpsertNestedInput
   upsert: RoleUpsertNestedInput
 }
 
@@ -20096,15 +20096,15 @@ input ShiftingScheduleUpdateInput {
 input ShiftingScheduleUpdateManyNestedInput {
   connect: [ShiftingScheduleConnectInput!]
   connectOrCreate: [ShiftingScheduleConnectOrCreateInput!]
-  create: ShiftingScheduleCreateInput
+  create: [ShiftingScheduleCreateInput!]
   createMany: [ShiftingScheduleCreateInput!]
-  delete: [ShiftingScheduleDeleteOneInput!]
-  deleteMany: ShiftingScheduleDeleteManyInput
-  disconnect: Boolean
+  delete: [ShiftingScheduleConnectInput!]
+  deleteMany: [ShiftingScheduleWhereInput!]
+  disconnect: [ShiftingScheduleConnectInput!]
   set: [ShiftingScheduleConnectInput!]
-  update: ShiftingScheduleUpdateInput
-  updateMany: [ShiftingScheduleUpdateInput!]
-  upsert: ShiftingScheduleUpsertNestedInput
+  update: [ShiftingScheduleUpsertNestedInput!]
+  updateMany: [ShiftingScheduleUpsertNestedInput!]
+  upsert: [ShiftingScheduleUpsertNestedInput!]
 }
 
 """Nested update one for ShiftingSchedule."""
@@ -20114,7 +20114,7 @@ input ShiftingScheduleUpdateOneNestedInput {
   create: ShiftingScheduleCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: ShiftingScheduleUpdateInput
+  update: ShiftingScheduleUpsertNestedInput
   upsert: ShiftingScheduleUpsertNestedInput
 }
 
@@ -20687,15 +20687,15 @@ input SignatureUpdateInput {
 input SignatureUpdateManyNestedInput {
   connect: [SignatureConnectInput!]
   connectOrCreate: [SignatureConnectOrCreateInput!]
-  create: SignatureCreateInput
+  create: [SignatureCreateInput!]
   createMany: [SignatureCreateInput!]
-  delete: [SignatureDeleteOneInput!]
-  deleteMany: SignatureDeleteManyInput
-  disconnect: Boolean
+  delete: [SignatureConnectInput!]
+  deleteMany: [SignatureWhereInput!]
+  disconnect: [SignatureConnectInput!]
   set: [SignatureConnectInput!]
-  update: SignatureUpdateInput
-  updateMany: [SignatureUpdateInput!]
-  upsert: SignatureUpsertNestedInput
+  update: [SignatureUpsertNestedInput!]
+  updateMany: [SignatureUpsertNestedInput!]
+  upsert: [SignatureUpsertNestedInput!]
 }
 
 """Nested update one for Signature."""
@@ -20705,7 +20705,7 @@ input SignatureUpdateOneNestedInput {
   create: SignatureCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: SignatureUpdateInput
+  update: SignatureUpsertNestedInput
   upsert: SignatureUpsertNestedInput
 }
 
@@ -21273,15 +21273,15 @@ input StatusUpdateInput {
 input StatusUpdateManyNestedInput {
   connect: [StatusConnectInput!]
   connectOrCreate: [StatusConnectOrCreateInput!]
-  create: StatusCreateInput
+  create: [StatusCreateInput!]
   createMany: [StatusCreateInput!]
-  delete: [StatusDeleteOneInput!]
-  deleteMany: StatusDeleteManyInput
-  disconnect: Boolean
+  delete: [StatusConnectInput!]
+  deleteMany: [StatusWhereInput!]
+  disconnect: [StatusConnectInput!]
   set: [StatusConnectInput!]
-  update: StatusUpdateInput
-  updateMany: [StatusUpdateInput!]
-  upsert: StatusUpsertNestedInput
+  update: [StatusUpsertNestedInput!]
+  updateMany: [StatusUpsertNestedInput!]
+  upsert: [StatusUpsertNestedInput!]
 }
 
 """Nested update one for Status."""
@@ -21291,7 +21291,7 @@ input StatusUpdateOneNestedInput {
   create: StatusCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: StatusUpdateInput
+  update: StatusUpsertNestedInput
   upsert: StatusUpsertNestedInput
 }
 
@@ -22072,15 +22072,15 @@ input TypeUpdateInput {
 input TypeUpdateManyNestedInput {
   connect: [TypeConnectInput!]
   connectOrCreate: [TypeConnectOrCreateInput!]
-  create: TypeCreateInput
+  create: [TypeCreateInput!]
   createMany: [TypeCreateInput!]
-  delete: [TypeDeleteOneInput!]
-  deleteMany: TypeDeleteManyInput
-  disconnect: Boolean
+  delete: [TypeConnectInput!]
+  deleteMany: [TypeWhereInput!]
+  disconnect: [TypeConnectInput!]
   set: [TypeConnectInput!]
-  update: TypeUpdateInput
-  updateMany: [TypeUpdateInput!]
-  upsert: TypeUpsertNestedInput
+  update: [TypeUpsertNestedInput!]
+  updateMany: [TypeUpsertNestedInput!]
+  upsert: [TypeUpsertNestedInput!]
 }
 
 """Nested update one for Type."""
@@ -22090,7 +22090,7 @@ input TypeUpdateOneNestedInput {
   create: TypeCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: TypeUpdateInput
+  update: TypeUpsertNestedInput
   upsert: TypeUpsertNestedInput
 }
 
@@ -23225,15 +23225,15 @@ input UserRoleUpdateInput {
 input UserRoleUpdateManyNestedInput {
   connect: [UserRoleConnectInput!]
   connectOrCreate: [UserRoleConnectOrCreateInput!]
-  create: UserRoleCreateInput
+  create: [UserRoleCreateInput!]
   createMany: [UserRoleCreateInput!]
-  delete: [UserRoleDeleteOneInput!]
-  deleteMany: UserRoleDeleteManyInput
-  disconnect: Boolean
+  delete: [UserRoleConnectInput!]
+  deleteMany: [UserRoleWhereInput!]
+  disconnect: [UserRoleConnectInput!]
   set: [UserRoleConnectInput!]
-  update: UserRoleUpdateInput
-  updateMany: [UserRoleUpdateInput!]
-  upsert: UserRoleUpsertNestedInput
+  update: [UserRoleUpsertNestedInput!]
+  updateMany: [UserRoleUpsertNestedInput!]
+  upsert: [UserRoleUpsertNestedInput!]
 }
 
 """Nested update one for UserRole."""
@@ -23243,7 +23243,7 @@ input UserRoleUpdateOneNestedInput {
   create: UserRoleCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: UserRoleUpdateInput
+  update: UserRoleUpsertNestedInput
   upsert: UserRoleUpsertNestedInput
 }
 
@@ -23341,15 +23341,15 @@ input UserUpdateInput {
 input UserUpdateManyNestedInput {
   connect: [UserConnectInput!]
   connectOrCreate: [UserConnectOrCreateInput!]
-  create: UserCreateInput
+  create: [UserCreateInput!]
   createMany: [UserCreateInput!]
-  delete: [UserDeleteOneInput!]
-  deleteMany: UserDeleteManyInput
-  disconnect: Boolean
+  delete: [UserConnectInput!]
+  deleteMany: [UserWhereInput!]
+  disconnect: [UserConnectInput!]
   set: [UserConnectInput!]
-  update: UserUpdateInput
-  updateMany: [UserUpdateInput!]
-  upsert: UserUpsertNestedInput
+  update: [UserUpsertNestedInput!]
+  updateMany: [UserUpsertNestedInput!]
+  upsert: [UserUpsertNestedInput!]
 }
 
 """Nested update one for User."""
@@ -23359,7 +23359,7 @@ input UserUpdateOneNestedInput {
   create: UserCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: UserUpdateInput
+  update: UserUpsertNestedInput
   upsert: UserUpsertNestedInput
 }
 
@@ -24624,15 +24624,15 @@ input WorkFlowInstanceStepUpdateInput {
 input WorkFlowInstanceStepUpdateManyNestedInput {
   connect: [WorkFlowInstanceStepConnectInput!]
   connectOrCreate: [WorkFlowInstanceStepConnectOrCreateInput!]
-  create: WorkFlowInstanceStepCreateInput
+  create: [WorkFlowInstanceStepCreateInput!]
   createMany: [WorkFlowInstanceStepCreateInput!]
-  delete: [WorkFlowInstanceStepDeleteOneInput!]
-  deleteMany: WorkFlowInstanceStepDeleteManyInput
-  disconnect: Boolean
+  delete: [WorkFlowInstanceStepConnectInput!]
+  deleteMany: [WorkFlowInstanceStepWhereInput!]
+  disconnect: [WorkFlowInstanceStepConnectInput!]
   set: [WorkFlowInstanceStepConnectInput!]
-  update: WorkFlowInstanceStepUpdateInput
-  updateMany: [WorkFlowInstanceStepUpdateInput!]
-  upsert: WorkFlowInstanceStepUpsertNestedInput
+  update: [WorkFlowInstanceStepUpsertNestedInput!]
+  updateMany: [WorkFlowInstanceStepUpsertNestedInput!]
+  upsert: [WorkFlowInstanceStepUpsertNestedInput!]
 }
 
 """Nested update one for WorkFlowInstanceStep."""
@@ -24642,7 +24642,7 @@ input WorkFlowInstanceStepUpdateOneNestedInput {
   create: WorkFlowInstanceStepCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: WorkFlowInstanceStepUpdateInput
+  update: WorkFlowInstanceStepUpsertNestedInput
   upsert: WorkFlowInstanceStepUpsertNestedInput
 }
 
@@ -24757,15 +24757,15 @@ input WorkFlowInstanceUpdateInput {
 input WorkFlowInstanceUpdateManyNestedInput {
   connect: [WorkFlowInstanceConnectInput!]
   connectOrCreate: [WorkFlowInstanceConnectOrCreateInput!]
-  create: WorkFlowInstanceCreateInput
+  create: [WorkFlowInstanceCreateInput!]
   createMany: [WorkFlowInstanceCreateInput!]
-  delete: [WorkFlowInstanceDeleteOneInput!]
-  deleteMany: WorkFlowInstanceDeleteManyInput
-  disconnect: Boolean
+  delete: [WorkFlowInstanceConnectInput!]
+  deleteMany: [WorkFlowInstanceWhereInput!]
+  disconnect: [WorkFlowInstanceConnectInput!]
   set: [WorkFlowInstanceConnectInput!]
-  update: WorkFlowInstanceUpdateInput
-  updateMany: [WorkFlowInstanceUpdateInput!]
-  upsert: WorkFlowInstanceUpsertNestedInput
+  update: [WorkFlowInstanceUpsertNestedInput!]
+  updateMany: [WorkFlowInstanceUpsertNestedInput!]
+  upsert: [WorkFlowInstanceUpsertNestedInput!]
 }
 
 """Nested update one for WorkFlowInstance."""
@@ -24775,7 +24775,7 @@ input WorkFlowInstanceUpdateOneNestedInput {
   create: WorkFlowInstanceCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: WorkFlowInstanceUpdateInput
+  update: WorkFlowInstanceUpsertNestedInput
   upsert: WorkFlowInstanceUpsertNestedInput
 }
 
@@ -25486,15 +25486,15 @@ input WorkFlowStepTemplateUpdateInput {
 input WorkFlowStepTemplateUpdateManyNestedInput {
   connect: [WorkFlowStepTemplateConnectInput!]
   connectOrCreate: [WorkFlowStepTemplateConnectOrCreateInput!]
-  create: WorkFlowStepTemplateCreateInput
+  create: [WorkFlowStepTemplateCreateInput!]
   createMany: [WorkFlowStepTemplateCreateInput!]
-  delete: [WorkFlowStepTemplateDeleteOneInput!]
-  deleteMany: WorkFlowStepTemplateDeleteManyInput
-  disconnect: Boolean
+  delete: [WorkFlowStepTemplateConnectInput!]
+  deleteMany: [WorkFlowStepTemplateWhereInput!]
+  disconnect: [WorkFlowStepTemplateConnectInput!]
   set: [WorkFlowStepTemplateConnectInput!]
-  update: WorkFlowStepTemplateUpdateInput
-  updateMany: [WorkFlowStepTemplateUpdateInput!]
-  upsert: WorkFlowStepTemplateUpsertNestedInput
+  update: [WorkFlowStepTemplateUpsertNestedInput!]
+  updateMany: [WorkFlowStepTemplateUpsertNestedInput!]
+  upsert: [WorkFlowStepTemplateUpsertNestedInput!]
 }
 
 """Nested update one for WorkFlowStepTemplate."""
@@ -25504,7 +25504,7 @@ input WorkFlowStepTemplateUpdateOneNestedInput {
   create: WorkFlowStepTemplateCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: WorkFlowStepTemplateUpdateInput
+  update: WorkFlowStepTemplateUpsertNestedInput
   upsert: WorkFlowStepTemplateUpsertNestedInput
 }
 
@@ -26651,15 +26651,15 @@ input WorkFlowTemplateScopeUpdateInput {
 input WorkFlowTemplateScopeUpdateManyNestedInput {
   connect: [WorkFlowTemplateScopeConnectInput!]
   connectOrCreate: [WorkFlowTemplateScopeConnectOrCreateInput!]
-  create: WorkFlowTemplateScopeCreateInput
+  create: [WorkFlowTemplateScopeCreateInput!]
   createMany: [WorkFlowTemplateScopeCreateInput!]
-  delete: [WorkFlowTemplateScopeDeleteOneInput!]
-  deleteMany: WorkFlowTemplateScopeDeleteManyInput
-  disconnect: Boolean
+  delete: [WorkFlowTemplateScopeConnectInput!]
+  deleteMany: [WorkFlowTemplateScopeWhereInput!]
+  disconnect: [WorkFlowTemplateScopeConnectInput!]
   set: [WorkFlowTemplateScopeConnectInput!]
-  update: WorkFlowTemplateScopeUpdateInput
-  updateMany: [WorkFlowTemplateScopeUpdateInput!]
-  upsert: WorkFlowTemplateScopeUpsertNestedInput
+  update: [WorkFlowTemplateScopeUpsertNestedInput!]
+  updateMany: [WorkFlowTemplateScopeUpsertNestedInput!]
+  upsert: [WorkFlowTemplateScopeUpsertNestedInput!]
 }
 
 """Nested update one for WorkFlowTemplateScope."""
@@ -26669,7 +26669,7 @@ input WorkFlowTemplateScopeUpdateOneNestedInput {
   create: WorkFlowTemplateScopeCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: WorkFlowTemplateScopeUpdateInput
+  update: WorkFlowTemplateScopeUpsertNestedInput
   upsert: WorkFlowTemplateScopeUpsertNestedInput
 }
 
@@ -26758,15 +26758,15 @@ input WorkFlowTemplateUpdateInput {
 input WorkFlowTemplateUpdateManyNestedInput {
   connect: [WorkFlowTemplateConnectInput!]
   connectOrCreate: [WorkFlowTemplateConnectOrCreateInput!]
-  create: WorkFlowTemplateCreateInput
+  create: [WorkFlowTemplateCreateInput!]
   createMany: [WorkFlowTemplateCreateInput!]
-  delete: [WorkFlowTemplateDeleteOneInput!]
-  deleteMany: WorkFlowTemplateDeleteManyInput
-  disconnect: Boolean
+  delete: [WorkFlowTemplateConnectInput!]
+  deleteMany: [WorkFlowTemplateWhereInput!]
+  disconnect: [WorkFlowTemplateConnectInput!]
   set: [WorkFlowTemplateConnectInput!]
-  update: WorkFlowTemplateUpdateInput
-  updateMany: [WorkFlowTemplateUpdateInput!]
-  upsert: WorkFlowTemplateUpsertNestedInput
+  update: [WorkFlowTemplateUpsertNestedInput!]
+  updateMany: [WorkFlowTemplateUpsertNestedInput!]
+  upsert: [WorkFlowTemplateUpsertNestedInput!]
 }
 
 """Nested update one for WorkFlowTemplate."""
@@ -26776,7 +26776,7 @@ input WorkFlowTemplateUpdateOneNestedInput {
   create: WorkFlowTemplateCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: WorkFlowTemplateUpdateInput
+  update: WorkFlowTemplateUpsertNestedInput
   upsert: WorkFlowTemplateUpsertNestedInput
 }
 
@@ -27558,15 +27558,15 @@ input WorkInformationUpdateInput {
 input WorkInformationUpdateManyNestedInput {
   connect: [WorkInformationConnectInput!]
   connectOrCreate: [WorkInformationConnectOrCreateInput!]
-  create: WorkInformationCreateInput
+  create: [WorkInformationCreateInput!]
   createMany: [WorkInformationCreateInput!]
-  delete: [WorkInformationDeleteOneInput!]
-  deleteMany: WorkInformationDeleteManyInput
-  disconnect: Boolean
+  delete: [WorkInformationConnectInput!]
+  deleteMany: [WorkInformationWhereInput!]
+  disconnect: [WorkInformationConnectInput!]
   set: [WorkInformationConnectInput!]
-  update: WorkInformationUpdateInput
-  updateMany: [WorkInformationUpdateInput!]
-  upsert: WorkInformationUpsertNestedInput
+  update: [WorkInformationUpsertNestedInput!]
+  updateMany: [WorkInformationUpsertNestedInput!]
+  upsert: [WorkInformationUpsertNestedInput!]
 }
 
 """Nested update one for WorkInformation."""
@@ -27576,7 +27576,7 @@ input WorkInformationUpdateOneNestedInput {
   create: WorkInformationCreateInput
   delete: Boolean
   disconnect: Boolean
-  update: WorkInformationUpdateInput
+  update: WorkInformationUpsertNestedInput
   upsert: WorkInformationUpsertNestedInput
 }
 

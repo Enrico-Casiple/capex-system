@@ -1,4 +1,4 @@
-import { Prisma } from '@/lib/generated/prisma/client';
+import { Prisma } from '@/generated/prisma/client/client';
 import PrismaTypes from '@/lib/pothos/pothos-prisma-types';
 import { CreateInput, CreateManyInput, UpdateInput } from '../Types/input.type';
 import { CreateArgs, CreateManyArgs, FindManyArgs, UpdateArgs } from '../Types/prismaArgs.type';

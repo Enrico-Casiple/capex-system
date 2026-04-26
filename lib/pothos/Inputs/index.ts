@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Prisma } from '../../../generated/prisma/client/client';
-import { GenericInputFieldRef, InputObjectRef, InputRef } from '@pothos/core';
+import { GenericInputFieldRef, InputRef } from '@pothos/core';
 import { builder } from '../builder';
 import PrismaTypes, { getDatamodel } from '../pothos-prisma-types';
 
@@ -63,8 +64,6 @@ const buildScalarField = (
       return t.string({ required, description });
     case 'Int':
       return t.int({ required, description });
-    case 'Float':
-      return t.float({ required, description });
     case 'Boolean':
       return t.boolean({ required, description });
     case 'DateTime':
@@ -88,186 +87,6 @@ const getUniqueScalarFields = (modelName: string) => {
       field.kind === 'scalar' && !field.name.startsWith('_') && (field.isId || field.isUnique),
   ) as Array<{ name: string; type: string; isList: boolean }>;
 };
-
-// // ─── Step 1: ConnectInput ─────────────────────────────────────────────────────
-// Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
-//   try {
-//     const ref = builder.inputRef(`${modelName}${connectInputSuffix}`);
-//     connectInputRefs[modelName] = ref;
-//     ref.implement({
-//       description: `Input to connect an existing ${modelName} record by a unique field.`,
-//       fields: (t) => {
-//         const uniqueFields = getUniqueScalarFields(modelName);
-//         const fields: Record<string, GenericInputFieldRef> = {};
-
-//         uniqueFields.forEach((field) => {
-//           fields[field.name] = buildScalarField(
-//             t,
-//             field,
-//             false,
-//             `Unique field '${field.name}' used to connect an existing ${modelName} record.`,
-//           );
-//         });
-
-//         // Fallback to id for safety if metadata doesn't report unique fields.
-//         if (Object.keys(fields).length === 0) {
-//           fields.id = t.string({
-//             required: false,
-//             description: `Unique identifier of the existing ${modelName} record to connect.`,
-//           });
-//         }
-
-//         return fields as never;
-//       },
-//     });
-//   } catch (error) {
-//     console.error(`ConnectInput error for ${modelName}: ${error}`);
-//   }
-// });
-
-// // ─── Step 2: CreateOrConnectInput ────────────────────────────────────────────
-// Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
-//   try {
-//     const ref = builder.inputRef(`${modelName}${createOrConnectInputSuffix}`);
-//     createOrConnectInputRefs[modelName] = ref;
-//     ref.implement({
-//       description: `Prisma-style nested relation ops for ${modelName}: where/create/connect.`,
-//       fields: (t) => ({
-//         where: t.field({
-//           type: `${modelName}${connectInputSuffix}` as never,
-//           required: false,
-//           description: `Unique selector to locate an existing ${modelName}.`,
-//         }),
-//         create: t.field({
-//           type: `${modelName}${createInputSuffix}` as never,
-//           required: false,
-//           description: `Create a new ${modelName} and link it to the parent.`,
-//         }),
-//         connect: t.field({
-//           type: `${modelName}${connectInputSuffix}` as never,
-//           required: false,
-//           description: `Connect an existing ${modelName} by unique field(s).`,
-//         }),
-//       }),
-//     });
-//   } catch (error) {
-//     console.error(`CreateOrConnectInput error for ${modelName}: ${error}`);
-//   }
-// });
-
-// ─── Step 3: UpdateOrConnectInput ────────────────────────────────────────────
-// Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
-//   try {
-//     const ref = builder.inputRef(`${modelName}${updateOrConnectInputSuffix}`);
-//     updateOrConnectInputRefs[modelName] = ref;
-//     ref.implement({
-//       description: `Prisma-style nested update ops for ${modelName}.`,
-//       fields: (t) => ({
-//         update: t.field({
-//           type: `${modelName}${updateInputSuffix}` as never,
-//           required: false,
-//           description: `Update fields of the related ${modelName} record inline.`,
-//         }),
-//         create: t.field({
-//           type: `${modelName}${createInputSuffix}` as never,
-//           required: false,
-//           description: `Create a new related ${modelName} record inline.`,
-//         }),
-//         connect: t.field({
-//           type: `${modelName}${connectInputSuffix}` as never,
-//           required: false,
-//           description: `Reconnect to an existing ${modelName} by unique field(s).`,
-//         }),
-//         disconnect: t.boolean({
-//           required: false,
-//           description: `Disconnect the current related ${modelName} record.`,
-//         }),
-//       }),
-//     });
-//   } catch (error) {
-//     console.error(`UpdateOrConnectInput error for ${modelName}: ${error}`);
-//   }
-// });
-
-// ─── Step 4: CreateInput ──────────────────────────────────────────────────────
-// Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
-//   try {
-//     const typedModel = modelName as Prisma.ModelName;
-//     const ref = builder.inputRef<Record<string, unknown>>(`${modelName}${createInputSuffix}`);
-//     createInputRefs[typedModel] = ref;
-//     ref.implement({
-//       description: `Input fields required to create a new ${modelName} record.`,
-//       fields: (t) => {
-//         const model = prismaDataModel.datamodel.models[modelName];
-//         const fields: Record<string, GenericInputFieldRef> = {};
-
-//         model.fields.forEach((field) => {
-//           if (field.name === 'id' || field.name.startsWith('_')) return;
-
-//           if (field.kind === 'scalar') {
-//             const required = false;
-//             const note = '(Optional)';
-//             const description = `${note} The ${field.name} of the new ${modelName}. Type: ${field.type}${field.isList ? '[]' : ''}.`;
-//             fields[field.name] = buildScalarField(t, field, required, description);
-//           }
-
-//           if (field.kind === 'object') {
-//             const description = `(Optional) ${field.isList ? 'List of' : 'Single'} ${field.type} relation.`;
-//             fields[field.name] = t.field({
-//               type: field.isList
-//                 ? ([`${field.type}${createOrConnectInputSuffix}`] as never)
-//                 : (`${field.type}${createOrConnectInputSuffix}` as never),
-//               required: false,
-//               description,
-//             });
-//           }
-//         });
-
-//         return fields as never;
-//       },
-//     });
-//   } catch (error) {
-//     console.error(`CreateInput error for ${modelName}: ${error}`);
-//   }
-// });
-
-// ─── Step 5: UpdateInput ──────────────────────────────────────────────────────
-// Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
-//   try {
-//     const typedModel = modelName as Prisma.ModelName;
-//     const ref = builder.inputRef<Record<string, unknown>>(`${modelName}${updateInputSuffix}`);
-//     updateInputRefs[typedModel] = ref;
-//     ref.implement({
-//       description: `Input fields to update an existing ${modelName} record. All fields are optional.`,
-//       fields: (t) => {
-//         const model = prismaDataModel.datamodel.models[modelName];
-//         const fields: Record<string, GenericInputFieldRef> = {};
-
-//         model.fields.forEach((field) => {
-//           if (field.kind === 'scalar') {
-//             const description = `(Optional) Update the ${field.name} of the ${modelName}. Type: ${field.type}${field.isList ? '[]' : ''}.`;
-//             fields[field.name] = buildScalarField(t, field, false, description);
-//           }
-
-//           if (field.kind === 'object') {
-//             const description = `(Optional) ${field.isList ? 'List of' : 'Single'} ${field.type} relation.`;
-//             fields[field.name] = t.field({
-//               type: field.isList
-//                 ? ([`${field.type}${updateOrConnectInputSuffix}`] as never)
-//                 : (`${field.type}${updateOrConnectInputSuffix}` as never),
-//               required: false,
-//               description,
-//             });
-//           }
-//         });
-
-//         return fields as never;
-//       },
-//     });
-//   } catch (error) {
-//     console.error(`UpdateInput error for ${modelName}: ${error}`);
-//   }
-// });
 
 // ─── Step 6: PageInput ────────────────────────────────────────────────────────
 Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
@@ -376,7 +195,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   }
 });
 
-// ─── Step 11: PageInput ────────────────────────────────────────────────────────
+// ─── Step 11: CsvExportInput ────────────────────────────────────────────────────────
 Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   try {
     const ref = builder.inputRef(`${modelName}${csvExportInputSuffix}`);
@@ -407,7 +226,6 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
 // ─── FormInput: Complete form-friendly inputs with all fields and relations ───────────────────
 Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   try {
-    // const typedModel = modelName as Prisma.ModelName;
     const ref = builder.inputRef<Record<string, unknown>>(`${modelName}FormInput`);
     ref.implement({
       description: `Complete input fields for ${modelName} form. Includes all scalars and relations optimized for forms.`,
@@ -416,18 +234,14 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         const fields: Record<string, GenericInputFieldRef> = {};
 
         model.fields.forEach((field) => {
-          // Skip only internal system fields
           if (field.name.startsWith('_')) return;
 
-          // ✅ Include ALL scalar fields (id, timestamps, strings, numbers, booleans, dates, json)
           if (field.kind === 'scalar') {
             const description = `(Optional) The ${field.name} of the ${modelName}. Type: ${field.type}${field.isList ? '[]' : ''}.`;
             fields[field.name] = buildScalarField(t, field, false, description);
           }
 
-          // ✅ Include BOTH foreign key ID field AND nested relation object
           if (field.kind === 'object') {
-            // 1️⃣ Add the foreign key ID field (e.g., userId)
             const idField = model.fields.find(
               (f) => f.name === `${field.name}Id` && f.kind === 'scalar'
             );
@@ -437,7 +251,6 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
               fields[idField.name] = buildScalarField(t, idField, false, description);
             }
 
-            // 2️⃣ Add the direct relation input (no recursive CreateOrConnect)
             const relationDescription = `(Optional) ${field.isList ? 'List of' : 'Single'} ${field.type} relation for direct nested operations.`;
             fields[field.name] = t.field({
               type: field.isList
@@ -478,10 +291,10 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   const model = prismaDataModel.datamodel.models[modelName];
 
   try {
-    // 1. ConnectInput - IMPLEMENT ONLY ONCE
+    // 1. ConnectInput
     inputRefs[`${modelName}ConnectInput`].implement({
       description: `Input to connect an existing ${modelName} record by a unique field.`,
-      fields: (t: any) => {
+      fields: (t) => {
         const uniqueFields = getUniqueScalarFields(modelName);
         const fields: Record<string, any> = {};
 
@@ -494,7 +307,6 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           );
         });
 
-        // Fallback if no unique fields
         if (Object.keys(fields).length === 0) {
           fields.id = t.string({ required: false, description: `Fallback ID` });
         }
@@ -506,7 +318,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
     // 2. ConnectOrCreateInput
     inputRefs[`${modelName}ConnectOrCreateInput`].implement({
       description: `Connect or create ${modelName} record.`,
-      fields: (t: any) => ({
+      fields: (t) => ({
         where: t.field({
           type: inputRefs[`${modelName}ConnectInput`],
           required: true,
@@ -555,7 +367,6 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
       },
     });
 
-
     // 4. UpdateInput via Prisma
     builder.prismaUpdate(modelName as any, {
       name: `${modelName}${updateInputSuffix}`,
@@ -596,7 +407,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
     // 5. CreateOneNestedInput
     inputRefs[`${modelName}CreateOneNestedInput`].implement({
       description: `Nested create one for ${modelName}.`,
-      fields: (t: any) => ({
+      fields: (t) => ({
         create: t.field({
           type: `${modelName}${createInputSuffix}` as never,
           required: false,
@@ -615,7 +426,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
     // 6. UpdateOneNestedInput
     inputRefs[`${modelName}UpdateOneNestedInput`].implement({
       description: `Nested update one for ${modelName}.`,
-      fields: (t: any) => ({
+      fields: (t) => ({
         create: t.field({
           type: `${modelName}${createInputSuffix}` as never,
           required: false,
@@ -629,7 +440,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           required: false,
         }),
         update: t.field({
-          type: `${modelName}${updateInputSuffix}` as never,
+          type: inputRefs[`${modelName}UpsertNestedInput`],
           required: false,
         }),
         upsert: t.field({
@@ -644,7 +455,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
     // 7. CreateManyNestedInput
     inputRefs[`${modelName}CreateManyNestedInput`].implement({
       description: `Nested create many for ${modelName}.`,
-      fields: (t: any) => ({
+      fields: (t) => ({
         create: t.field({
           type: [`${modelName}CreateInput` as never],
           required: false,
@@ -667,7 +478,11 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
     // 8. UpdateManyNestedInput
     inputRefs[`${modelName}UpdateManyNestedInput`].implement({
       description: `Nested update many for ${modelName}.`,
-      fields: (t: any) => ({
+      fields: (t) => ({
+        deleteMany: t.field({
+          type: inputRefs[`${modelName}WhereInput`] as never,
+          required: false,
+        }),
         connect: t.field({
           type: [inputRefs[`${modelName}ConnectInput`]] as never,
           required: false,
@@ -677,11 +492,11 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           required: false,
         }),
         create: t.field({
-          type: `${modelName}CreateInput` as never,
+          type: [`${modelName}CreateInput` as never],
           required: false,
         }),
         upsert: t.field({
-          type: inputRefs[`${modelName}UpsertNestedInput`],
+          type: [inputRefs[`${modelName}UpsertNestedInput`]] as never,
           required: false,
         }),
         createMany: t.field({
@@ -692,31 +507,30 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           type: [inputRefs[`${modelName}ConnectInput`]] as never,
           required: false,
         }),
-        disconnect: t.boolean({ required: false }),
+        disconnect: t.field({
+          type: [inputRefs[`${modelName}ConnectInput`]] as never,
+          required: false,
+        }),
         delete: t.field({
-          type: [inputRefs[`${modelName}DeleteOneInput`]] as never,
+          type: [inputRefs[`${modelName}ConnectInput`]] as never,
           required: false,
         }),
         update: t.field({
-          type: `${modelName}UpdateInput` as never,
+          type: [inputRefs[`${modelName}UpsertNestedInput`]] as never,
           required: false,
         }),
         updateMany: t.field({
-          type: [`${modelName}UpdateInput` as never],
+          type: [inputRefs[`${modelName}UpsertNestedInput`]] as never,
           required: false,
         }),
-        deleteMany: t.field({
-          type: `${modelName}DeleteManyInput` as never,
-          required: false,
-        }),
+
       }),
     });
-
 
     // 8.5 DeleteOneInput
     inputRefs[`${modelName}DeleteOneInput`].implement({
       description: `Nested delete one for ${modelName}.`,
-      fields: (t: any) => ({
+      fields: (t) => ({
         where: t.field({
           type: inputRefs[`${modelName}ConnectInput`],
           required: true,
@@ -727,7 +541,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
     // 8.6 DeleteManyInput
     inputRefs[`${modelName}DeleteManyInput`].implement({
       description: `Nested delete many for ${modelName}.`,
-      fields: (t: any) => ({
+      fields: (t) => ({
         where: t.field({
           type: inputRefs[`${modelName}WhereInput`],
           required: true,
@@ -735,12 +549,10 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
       }),
     });
 
-
-
     // 9. UpsertNestedInput
     inputRefs[`${modelName}UpsertNestedInput`].implement({
       description: `Nested upsert for ${modelName}.`,
-      fields: (t: any) => ({
+      fields: (t) => ({
         where: t.field({
           type: inputRefs[`${modelName}ConnectInput`],
           required: true,
@@ -759,9 +571,8 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
     // 10. WhereInput with AND, OR, NOT logical operators
     inputRefs[`${modelName}WhereInput`].implement({
       description: `Filter ${modelName} records with AND, OR, NOT operators.`,
-      fields: (t: any) => {
+      fields: (t) => {
         const fields: Record<string, any> = {
-          // Logical operators
           AND: t.field({
             type: [inputRefs[`${modelName}WhereInput`]] as never,
             required: false,
@@ -779,7 +590,6 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           }),
         };
 
-        // Scalar field filters
         model.fields.forEach((field) => {
           if (field.name.startsWith('_')) return;
 
@@ -791,7 +601,6 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
             });
           }
 
-          // Relation filters
           if (field.kind === 'object') {
             fields[field.name] = t.field({
               type: inputRefs[`${field.type}WhereInput`],
@@ -820,70 +629,48 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
     groupByInputRefs[modelName] = ref;
     ref.implement({
       description: `GroupBy input for aggregating ${modelName} records with aggregation functions.`,
-      fields: (t) => {
-        const model = prismaDataModel.datamodel.models[modelName];
-        const scalarFields = model.fields.filter(
-          (f) => f.kind === 'scalar' && !f.name.startsWith('_')
-        );
-
-        return {
-          // Required: scalar fields to group by
-          by: t.field({
-            type: ['String'] as never,
-            required: true,
-            description: `Scalar fields to group by (e.g., ['status', 'category']).`,
-          }),
-
-          // Optional: WHERE clause to filter records before grouping
-          where: t.field({
-            type: 'Json',
-            required: false,
-            description: `Optional Prisma where clause to filter records before grouping.`,
-          }),
-
-          // Optional: ORDER BY clause
-          orderBy: t.field({
-            type: 'Json',
-            required: false,
-            description: `Optional order by clause (e.g., { _count: { id: 'desc' } }).`,
-          }),
-
-          // Optional: COUNT aggregations
-          _count: t.field({
-            type: 'Json',
-            required: false,
-            description: `Count aggregations. Can use _all or specific fields.`,
-          }),
-
-          // Optional: SUM aggregations (numeric fields only)
-          _sum: t.field({
-            type: 'Json',
-            required: false,
-            description: `Sum aggregations for numeric fields.`,
-          }),
-
-          // Optional: AVERAGE aggregations (numeric fields only)
-          _avg: t.field({
-            type: 'Json',
-            required: false,
-            description: `Average aggregations for numeric fields.`,
-          }),
-
-          // Optional: MIN aggregations
-          _min: t.field({
-            type: 'Json',
-            required: false,
-            description: `Minimum value aggregations.`,
-          }),
-
-          // Optional: MAX aggregations
-          _max: t.field({
-            type: 'Json',
-            required: false,
-            description: `Maximum value aggregations.`,
-          }),
-        };
-      },
+      fields: (t) => ({
+        by: t.field({
+          type: ['String'] as never,
+          required: true,
+          description: `Scalar fields to group by (e.g., ['status', 'category']).`,
+        }),
+        where: t.field({
+          type: 'Json',
+          required: false,
+          description: `Optional Prisma where clause to filter records before grouping.`,
+        }),
+        orderBy: t.field({
+          type: 'Json',
+          required: false,
+          description: `Optional order by clause (e.g., { _count: { id: 'desc' } }).`,
+        }),
+        _count: t.field({
+          type: 'Json',
+          required: false,
+          description: `Count aggregations. Can use _all or specific fields.`,
+        }),
+        _sum: t.field({
+          type: 'Json',
+          required: false,
+          description: `Sum aggregations for numeric fields.`,
+        }),
+        _avg: t.field({
+          type: 'Json',
+          required: false,
+          description: `Average aggregations for numeric fields.`,
+        }),
+        _min: t.field({
+          type: 'Json',
+          required: false,
+          description: `Minimum value aggregations.`,
+        }),
+        _max: t.field({
+          type: 'Json',
+          required: false,
+          description: `Maximum value aggregations.`,
+        }),
+      }),
     });
   } catch (error) {
     console.error(`GroupByInput error for ${modelName}: ${error}`);

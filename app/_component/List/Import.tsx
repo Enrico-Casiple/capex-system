@@ -13,12 +13,12 @@ const Import = ({ importFormComponent }: ImportProps) => {
     <React.Fragment>
       <Button variant="outline" size="sm" className="gap-2" onClick={() => setIsOpen(true)}>
         <Upload className="h-4 w-4" />
-        Import
-      </Button> 
-      <CustomDialog 
-        open={isOpen} 
+        Import & Create
+      </Button>
+      <CustomDialog
+        open={isOpen}
         setOpen={setIsOpen}
-        title={`Import Data`} 
+        title={`Import Data`}
         description={`This is a dialog for importing data. You can upload a file or paste data to import.`}
       >
         {importFormComponent(isOpen, setIsOpen)}

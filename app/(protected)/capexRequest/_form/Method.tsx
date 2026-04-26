@@ -40,7 +40,7 @@ const Method = (props: MethodProps) => {
     // requestNumber => "REQ-(MMYYYY)-(Generated Random 5-digit number)"
     requestNumber: '',
     dateNeeded: new Date(), // Default to current date, can be changed by user input
-    quotationUrl: 'https://purchase-system-files.sgp1.digitaloceanspaces.com/1', // URL for the quotation document, can be used for reference or record-keeping
+    quotationUrl: '', // URL for the quotation document, can be used for reference or record-keeping
     quotationAmount: 10000, // Amount specified in the quotation, can be used for budget comparison or approval reference
     currency: 'PHP', // Default currency set to PHP, can be changed by user input based on the currency of the request or company standards
     companyId: '', // Connect to company for easier filtering and retrieval of CRF based on company

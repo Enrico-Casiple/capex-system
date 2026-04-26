@@ -4,7 +4,7 @@ import Export from '@/app/_component/List/Export';
 import Action, { ActionType, PopupType } from '@/app/_component/Row/Action';
 import { Spinner } from '@/app/_component/Spinner';
 import ListPage from '@/app/_context/ListWrapper';
-import { Request, RequestCreateInput } from '@/lib/generated/api/customHookAPI/graphql';
+import { Request } from '@/lib/generated/api/customHookAPI/graphql';
 import dynamic from 'next/dynamic';
 import { useCallback } from 'react';
 import ModelData from '../../_component/ModelData';
@@ -20,7 +20,7 @@ const Method = dynamic(() => import('./_form/Method'), {
 const ModelPage = () => {
 
   type ModelRequest = Request
-  type ModelCreateInput = RequestCreateInput
+  // type ModelCreateInput = RequestCreateInput
   const {
     modelName,
     extraColumns,

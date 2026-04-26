@@ -74,11 +74,22 @@ const data = [
     isActive: true,
     modelNameType: "SourceLedgerType",
   },
+  {
+    name: "Static Entry",
+    description: "Creation of a static entry, is user assignment based on role for approval template",
+    isActive: true,
+    modelNameType: "WorkFlowApprovalType",
+  },
+  {
+    name: "Dynamic Entry",
+    description: "Creation of a dynamic entry, is user assignment based on condition for approval template",
+    isActive: true,
+    modelNameType: "WorkFlowApprovalType",
+  },
 ];
 
 const seed = async () => {
   for (const datas of data) {
-
     await prisma.type.create({
       data: {
         ...datas,
@@ -92,7 +103,6 @@ const seed = async () => {
         }
       },
     });
-
   }
 }
 
@@ -108,4 +118,3 @@ seed()
   .finally(async () => {
     await prisma.$disconnect();
   });
-

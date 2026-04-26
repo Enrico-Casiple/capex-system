@@ -9,8 +9,8 @@ fragment WorkFlowTemplateFragment on WorkFlowTemplate {
   isActive
   createdAt
   updatedAt
-
   scope {
+    id
     companyId
     company {
       name
