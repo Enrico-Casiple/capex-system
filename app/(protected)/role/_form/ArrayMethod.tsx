@@ -1,25 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { modelGQL, ModelGQLMap } from '@/lib/api/crud.gql';
-import {  FieldArrayWithId, UseFieldArrayReturn, UseFormReturn } from 'react-hook-form';
-import { RoleFormValues } from './Method';
+import { FieldArrayWithId, UseFieldArrayReturn, UseFormReturn } from 'react-hook-form';
 import useToast from '@/app/_hooks/useToast';
 import CustomStaticSelectInput from '@/components/Forms/Inputs/CustomStaticSelectInput';
 import { Button } from '@/components/ui/button';
 import { Trash2Icon } from 'lucide-react';
 import React, { useEffect } from 'react';
 import CustomSingleSelectInput from '@/components/Forms/Inputs/CustomSingleSelectInput';
+import { RoleFormValues } from '@/lib/components/RoleMethodForm';
 
 type ArrayMethodProps = {
   form: UseFormReturn<RoleFormValues, any, RoleFormValues>
- fieldArray: UseFieldArrayReturn<RoleFormValues, "conditions", "id">
- addField: () => string | number | undefined
- removeField: (index: number) => void
- 
+  fieldArray: UseFieldArrayReturn<RoleFormValues, "conditions", "id">
+  addField: () => void
+  removeField: (index: number) => void
+
 }
 export const MODEL_NAME_OPTIONS = [
   { label: 'User', value: 'User' },
   { label: 'Group of Company', value: 'GroupOfCompany' },
-   { label: 'Company', value: 'Company' },
+  { label: 'Company', value: 'Company' },
   { label: 'Department', value: 'Department' },
   { label: 'Job Position', value: 'Position' },
   { label: 'Job Code', value: 'JobLevel' },
@@ -66,7 +66,7 @@ const ConditionRow = ({ field, index, form, removeField, watchedModelNames }: Co
   const { code, codeKey } = conditionalReturn(codeLabel);
   const modelName = form.watch(`conditions.${index}.modelName`);
 
-  if(!code || !codeKey) {
+  if (!code || !codeKey) {
     toast.error({
       message: 'Unrecognized condition',
       description: `The selected condition "${codeLabel}" is not recognized.`,
@@ -103,7 +103,7 @@ const ConditionRow = ({ field, index, form, removeField, watchedModelNames }: Co
             label="Model Name"
             options={availableModelOptions}
             placeholder="Select model name"
-            
+
           />
         </div>
         <div className='col-span-3'>
@@ -128,43 +128,43 @@ const ConditionRow = ({ field, index, form, removeField, watchedModelNames }: Co
           ) : (
             <>
               <CustomSingleSelectInput
-                  name={`conditions.${index}.value.stringValue`}
-                  control={form.control}
-                  label={`Select ${form.watch(`conditions.${index}.modelName`)}`}
-                  findAllWithCursorGQL={modelAPI[model].findAllWithCursor}
-                  findUniqueGQL={modelAPI[model].findUnique}
-                  defaultValueId={""}
-                  placeholder={`Search ${form.watch(`conditions.${index}.modelName`)}...`}
-                  searchPlaceholder={`Search ${form.watch(`conditions.${index}.modelName`)}...`}
-                  emptySelectedMessage={` ${form.watch(`conditions.${index}.modelName`)} already selected.`}
-                  emptyMessage={`No ${form.watch(`conditions.${index}.modelName`)} found.`}
-                  cursorVariables={(search, cursor, take) => ({
-                    cursorInput: {
-                      cursor,
-                      isActive: true,
-                      take,
-                      filter: search ? { name: { contains: search, mode: 'insensitive' } } : undefined,
-                    },
-                  })}
-                  uniqueVariables={(id) => ({ id })}
-                  mapOption={(data: unknown) => {
-                    const d = data as { id?: string; name?: string; userName?: string; email?: string };
-                    return {
-                      label: d.name ?? d.userName ?? d.email ?? '',
-                      value: d.id ?? '',
-                    };
-                  }}
-                  mapDefaultOption={(data: unknown) => {
-                    const d = data as {
-                      data?: { id?: string; name?: string; userName?: string; email?: string };
-                    };
-                    if (!d?.data) return null;
-                    return {
-                      label: d.data.name ?? d.data.userName ?? d.data.email ?? '',
-                      value: d.data.id ?? '',
-                    };
-                  }}
-                />
+                name={`conditions.${index}.value.stringValue`}
+                control={form.control}
+                label={`Select ${form.watch(`conditions.${index}.modelName`)}`}
+                findAllWithCursorGQL={modelAPI[model].findAllWithCursor}
+                findUniqueGQL={modelAPI[model].findUnique}
+                defaultValueId={""}
+                placeholder={`Search ${form.watch(`conditions.${index}.modelName`)}...`}
+                searchPlaceholder={`Search ${form.watch(`conditions.${index}.modelName`)}...`}
+                emptySelectedMessage={` ${form.watch(`conditions.${index}.modelName`)} already selected.`}
+                emptyMessage={`No ${form.watch(`conditions.${index}.modelName`)} found.`}
+                cursorVariables={(search, cursor, take) => ({
+                  cursorInput: {
+                    cursor,
+                    isActive: true,
+                    take,
+                    filter: search ? { name: { contains: search, mode: 'insensitive' } } : undefined,
+                  },
+                })}
+                uniqueVariables={(id) => ({ id })}
+                mapOption={(data: unknown) => {
+                  const d = data as { id?: string; name?: string; userName?: string; email?: string };
+                  return {
+                    label: d.name ?? d.userName ?? d.email ?? '',
+                    value: d.id ?? '',
+                  };
+                }}
+                mapDefaultOption={(data: unknown) => {
+                  const d = data as {
+                    data?: { id?: string; name?: string; userName?: string; email?: string };
+                  };
+                  if (!d?.data) return null;
+                  return {
+                    label: d.data.name ?? d.data.userName ?? d.data.email ?? '',
+                    value: d.data.id ?? '',
+                  };
+                }}
+              />
             </>
           )}
         </div>
@@ -185,7 +185,7 @@ const ArrayMethod = ({
   form
 }: ArrayMethodProps) => {
   // Watch all condition modelNames once at component level
-  const watchedModelNames = fieldArray.fields.map((_, i) => 
+  const watchedModelNames = fieldArray.fields.map((_, i) =>
     form.watch(`conditions.${i}.modelName`)
   );
 

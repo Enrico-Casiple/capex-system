@@ -28,5 +28,20 @@ fragment WorkFlowTemplateFragment on WorkFlowTemplate {
       name
     }
   }
+  steps {
+    id
+    stepNumber
+    assignmentTypeId
+    assignedToUserId
+    isHaveCondition
+    conditions {
+      modelName
+      group
+      codeKey
+      code
+      codeLabel
+      value
+    }
+  }
 }
 `;

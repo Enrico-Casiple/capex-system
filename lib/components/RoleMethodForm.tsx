@@ -165,7 +165,7 @@ const RoleMethodForm = ({ rowId, actionType, popupType, setOpen }: RoleMethodPro
     if(fieldArray.fields.length < optionLength) {
       fieldArray.append(newField);
     } else {
-      return toast.error({
+      toast.error({
         message: 'You have reached the maximum number of fields',
         description: `You can only add up to ${optionLength} fields.`,
       });
@@ -316,7 +316,7 @@ const RoleMethodForm = ({ rowId, actionType, popupType, setOpen }: RoleMethodPro
 
             <div className='flex justify-between items-center'>
               <Label className='text-sm'>Scope for View</Label>
-              <Button variant={'default'} onClick={() => addField()}>
+              <Button variant={'default'} type="button" onClick={() => addField()}>
                 <PlusIcon className='size-4' />
                 Add new condition
               </Button>

@@ -190,31 +190,31 @@ model GroupOfCompany {
 }
 
 model Company {
-  id               String                  @id @default(auto()) @map("_id") @db.ObjectId
-  name             String?
-  acronym          String?
-  description      String? // Description of the company
-  groupOfCompanyId String?                 @db.ObjectId
-  groupOfCompany   GroupOfCompany?         @relation(fields: [groupOfCompanyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  locationsid      String?                 @db.ObjectId
-  locations        Location?               @relation("CompaniesLocation", fields: [locationsid], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  conctactNumber   String?
-  email            String?
-  departments      Department[]            @relation("CompanyDepartments")
-  logo             String?
-  jobLevels        JobLevel[]              @relation("CompanyJobLevels")
-  auditLogs        AuditLog[]
-  workInformations WorkInformation[]
-  scopeTypeId      String?                 @db.ObjectId
-  scopeType        Type?                   @relation("CompanyType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  request          Request[]
-  budget           Budget[]
-  crfCompany       CapitalRecoveryFactor[] @relation("CRFCompany")
-  positionCompany Position[] @relation("PositionCompany")
+  id                           String                  @id @default(auto()) @map("_id") @db.ObjectId
+  name                         String?
+  acronym                      String?
+  description                  String? // Description of the company
+  groupOfCompanyId             String?                 @db.ObjectId
+  groupOfCompany               GroupOfCompany?         @relation(fields: [groupOfCompanyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  locationsid                  String?                 @db.ObjectId
+  locations                    Location?               @relation("CompaniesLocation", fields: [locationsid], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  conctactNumber               String?
+  email                        String?
+  departments                  Department[]            @relation("CompanyDepartments")
+  logo                         String?
+  jobLevels                    JobLevel[]              @relation("CompanyJobLevels")
+  auditLogs                    AuditLog[]
+  workInformations             WorkInformation[]
+  scopeTypeId                  String?                 @db.ObjectId
+  scopeType                    Type?                   @relation("CompanyType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  request                      Request[]
+  budget                       Budget[]
+  crfCompany                   CapitalRecoveryFactor[] @relation("CRFCompany")
+  positionCompany              Position[]              @relation("PositionCompany")
   workFlowTemplateScopeCompany WorkFlowTemplateScope[] @relation("WorkFlowTemplateScopeCompany")
-  isActive         Boolean?                @default(true)
-  createdAt        DateTime                @default(now())
-  updatedAt        DateTime                @updatedAt
+  isActive                     Boolean?                @default(true)
+  createdAt                    DateTime                @default(now())
+  updatedAt                    DateTime                @updatedAt
 
   // ✅ Add indexes
   @@unique([name, acronym])
@@ -222,24 +222,24 @@ model Company {
 }
 
 model Department {
-  id                          String                  @id @default(auto()) @map("_id") @db.ObjectId
-  name                        String?
-  acronym                     String?
-  description                 String?
-  companyId                   String?                 @db.ObjectId
-  company                     Company?                @relation("CompanyDepartments", fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  auditLogs                   AuditLog[]
-  workInformations            WorkInformation[]
-  scopeTypeId                 String?                 @db.ObjectId
-  scopeType                   Type?                   @relation("DepartmentType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  request                     Request[]
-  budget                      Budget[]
-  requestResponsibilityCenter Request[]               @relation("RequestResponsibilityCenter")
-  crfDepartment               CapitalRecoveryFactor[] @relation("CRFDepartment")
+  id                              String                  @id @default(auto()) @map("_id") @db.ObjectId
+  name                            String?
+  acronym                         String?
+  description                     String?
+  companyId                       String?                 @db.ObjectId
+  company                         Company?                @relation("CompanyDepartments", fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  auditLogs                       AuditLog[]
+  workInformations                WorkInformation[]
+  scopeTypeId                     String?                 @db.ObjectId
+  scopeType                       Type?                   @relation("DepartmentType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  request                         Request[]
+  budget                          Budget[]
+  requestResponsibilityCenter     Request[]               @relation("RequestResponsibilityCenter")
+  crfDepartment                   CapitalRecoveryFactor[] @relation("CRFDepartment")
   workFlowTemplateScopeDepartment WorkFlowTemplateScope[] @relation("WorkFlowTemplateScopeDepartment")
-  isActive  Boolean?  @default(true)
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
+  isActive                        Boolean?                @default(true)
+  createdAt                       DateTime?               @default(now())
+  updatedAt                       DateTime?               @updatedAt
 
   @@unique([name, acronym]) // Department names should be unique within a company
   // ✅ Add indexes
@@ -247,19 +247,19 @@ model Department {
 }
 
 model Position {
-  id               String            @id @default(auto()) @map("_id") @db.ObjectId
-  name             String?
-  acronym          String?
-  description      String?
-  companyId        String?           @db.ObjectId
-  company          Company?          @relation("PositionCompany", fields: [companyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  auditLogs        AuditLog[]
-  workInformations WorkInformation[]
-  isActive         Boolean?          @default(true)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  scopeTypeId      String?           @db.ObjectId
-  scopeType        Type?             @relation("PositionType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  id                            String                  @id @default(auto()) @map("_id") @db.ObjectId
+  name                          String?
+  acronym                       String?
+  description                   String?
+  companyId                     String?                 @db.ObjectId
+  company                       Company?                @relation("PositionCompany", fields: [companyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  auditLogs                     AuditLog[]
+  workInformations              WorkInformation[]
+  isActive                      Boolean?                @default(true)
+  createdAt                     DateTime                @default(now())
+  updatedAt                     DateTime                @updatedAt
+  scopeTypeId                   String?                 @db.ObjectId
+  scopeType                     Type?                   @relation("PositionType", fields: [scopeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   workFlowTemplateScopePosition WorkFlowTemplateScope[] @relation("WorkFlowTemplateScopePosition")
 
   // ✅ Add indexes
@@ -267,17 +267,17 @@ model Position {
 }
 
 model JobLevel {
-  id               String            @id @default(auto()) @map("_id") @db.ObjectId
-  name             String?
-  description      String?
-  acronym          String?
-  jobcodeTypeId    String?           @db.ObjectId
-  jobcodeType      Type?             @relation("JobCodeType", fields: [jobcodeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  companyId        String?           @db.ObjectId
-  company          Company?          @relation("CompanyJobLevels", fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id                            String                  @id @default(auto()) @map("_id") @db.ObjectId
+  name                          String?
+  description                   String?
+  acronym                       String?
+  jobcodeTypeId                 String?                 @db.ObjectId
+  jobcodeType                   Type?                   @relation("JobCodeType", fields: [jobcodeTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  companyId                     String?                 @db.ObjectId
+  company                       Company?                @relation("CompanyJobLevels", fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   WorkFlowTemplateScopeJobLevel WorkFlowTemplateScope[] @relation("WorkFlowTemplateScopeJobLevel")
-  workInformations WorkInformation[]
-  auditLogs        AuditLog[]
+  workInformations              WorkInformation[]
+  auditLogs                     AuditLog[]
 
   isActive  Boolean?  @default(true)
   createdAt DateTime? @default(now())
@@ -508,9 +508,11 @@ model AuditLog {
   parent                AuditLog?              @relation("ParentLog", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   auditLogs             AuditLog[]             @relation("ParentLog")
 
-  isActive  Boolean?  @default(true)
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
+  isActive        Boolean?       @default(true)
+  createdAt       DateTime?      @default(now())
+  updatedAt       DateTime?      @updatedAt
+  inventoryItem   InventoryItem? @relation(fields: [inventoryItemId], references: [id])
+  inventoryItemId String?        @db.ObjectId
 
   // Indexes for fast queries
   @@index([modelName, action]) // Find changes to specific models
@@ -551,14 +553,14 @@ model WorkFlowTemplateScope {
   template   WorkFlowTemplate? @relation(fields: [templateId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   // Who's this workflow template applicable to? (for auto-assigning templates based on user attributes)
-  companyId    String? @db.ObjectId
-  company      Company? @relation("WorkFlowTemplateScopeCompany",fields: [companyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  departmentId String? @db.ObjectId
-  department   Department? @relation("WorkFlowTemplateScopeDepartment",fields: [departmentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  positionId   String? @db.ObjectId
-  position     Position? @relation("WorkFlowTemplateScopePosition",fields: [positionId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  jobLevelId   String? @db.ObjectId
-  jobLevel     JobLevel? @relation("WorkFlowTemplateScopeJobLevel",fields: [jobLevelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  companyId    String?     @db.ObjectId
+  company      Company?    @relation("WorkFlowTemplateScopeCompany", fields: [companyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  departmentId String?     @db.ObjectId
+  department   Department? @relation("WorkFlowTemplateScopeDepartment", fields: [departmentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  positionId   String?     @db.ObjectId
+  position     Position?   @relation("WorkFlowTemplateScopePosition", fields: [positionId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  jobLevelId   String?     @db.ObjectId
+  jobLevel     JobLevel?   @relation("WorkFlowTemplateScopeJobLevel", fields: [jobLevelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   auditLogs AuditLog[]
   isActive  Boolean?   @default(true)
@@ -572,7 +574,7 @@ model WorkFlowStepTemplate {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
   workflowTemplateId String?           @db.ObjectId
-  workflowTemplate   WorkFlowTemplate? @relation(fields: [workflowTemplateId], references: [id])
+  workflowTemplate   WorkFlowTemplate? @relation(fields: [workflowTemplateId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   stepNumber       Int?
   assignmentTypeId String? @db.ObjectId
@@ -584,9 +586,9 @@ model WorkFlowStepTemplate {
 
   // DYNAMIC
   assignmentRules Json?
-
+  isHaveCondition Boolean? @default(false) // whether this step has conditions that determine if it should be included or skipped
   // CONDITIONS (skip or include step)
-  conditions Config[] @relation("StepConditions")
+  conditions      Config[] @relation("StepConditions")
 
   // PARALLEL APPROVAL
   isParallel        Boolean? @default(false)
@@ -728,10 +730,10 @@ model Type {
   actionType     AuditLog[]        @relation("ActionType")
   auditLogs      AuditLog[]
 
-  stepAssignmentType    WorkFlowStepTemplate[]  @relation("StepAssignmentType")
-  workFlowInstance      WorkFlowInstance[]      @relation("ReferenceType")
-  budgetMovementType    BudgetLedger[]          @relation("BudgetMovementType")
-  sourceDocumentType    BudgetLedger[]          @relation("SourceDocumentType")
+  stepAssignmentType WorkFlowStepTemplate[] @relation("StepAssignmentType")
+  workFlowInstance   WorkFlowInstance[]     @relation("ReferenceType")
+  budgetMovementType BudgetLedger[]         @relation("BudgetMovementType")
+  sourceDocumentType BudgetLedger[]         @relation("SourceDocumentType")
 
   isActive  Boolean?  @default(true)
   createdAt DateTime? @default(now())
@@ -750,9 +752,10 @@ model Category {
   acronym       String?
   modelNameType String?
 
-  budget      Budget[]
-  crfCategory CapitalRecoveryFactor[] @relation("CRFCategory")
-  auditLogs   AuditLog[]
+  budget              Budget[]
+  crfCategory         CapitalRecoveryFactor[] @relation("CRFCategory")
+  requestItemCategory RequestItem[]           @relation("RequestItemCategory")
+  auditLogs           AuditLog[]
 
   isActive  Boolean?  @default(true)
   createdAt DateTime? @default(now())
@@ -812,7 +815,6 @@ model Config {
   createdAt DateTime?  @default(now())
   updatedAt DateTime?  @updatedAt
 
-  @@unique([modelName, modelId, group, codeKey])
   @@index([modelName, modelId])
   @@index([group, codeKey])
 }
@@ -861,11 +863,11 @@ model Request {
   responsibilityCenter   Department? @relation("RequestResponsibilityCenter", fields: [responsibilityCenterId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   // Request a budget If not have a Budget Id yet
-  requestedCRF   CapitalRecoveryFactor? // For requesting a budget when creating a request, if the request is directly linked to an existing budget then this will be null and the budgetId field in Request will be used instead
-  requestItems   RequestItem[]
-  quotationUrl   String?
+  requestedCRF    CapitalRecoveryFactor? // For requesting a budget when creating a request, if the request is directly linked to an existing budget then this will be null and the budgetId field in Request will be used instead
+  requestItems    RequestItem[]
+  quotationUrl    String?
   quotationAmount Float?
-  currency       String?                 @default("PHP")
+  currency        String?                @default("PHP")
 
   workflowTemplateId String?           @db.ObjectId
   workflowTemplate   WorkFlowTemplate? @relation(fields: [workflowTemplateId], references: [id], onDelete: SetNull, onUpdate: Cascade)
@@ -888,25 +890,25 @@ model CapitalRecoveryFactor {
   description    String?
   crfReferenceNo String? // "CRF-2025-00001"
 
-  statusId        String?     @db.ObjectId
-  status          Status?     @relation("CRFStatus", fields: [statusId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  companyId       String?     @db.ObjectId
-  company         Company?    @relation("CRFCompany", fields: [companyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  departmentId    String?     @db.ObjectId
-  department      Department? @relation("CRFDepartment", fields: [departmentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  categoryId      String?     @db.ObjectId
-  category        Category?   @relation("CRFCategory", fields: [categoryId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  utilizedBudget  Float? // percentage of the budget that this request will consume, e.g. 0.25 means 25% of the budget
-  approvedAmount Float? // the amount that was approved for this request, used for reporting and forecasting
-  requestedAmount Float? // the actual amount that this request is asking for, used for approval and reporting
+  statusId          String?     @db.ObjectId
+  status            Status?     @relation("CRFStatus", fields: [statusId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  companyId         String?     @db.ObjectId
+  company           Company?    @relation("CRFCompany", fields: [companyId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  departmentId      String?     @db.ObjectId
+  department        Department? @relation("CRFDepartment", fields: [departmentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  categoryId        String?     @db.ObjectId
+  category          Category?   @relation("CRFCategory", fields: [categoryId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  utilizedBudget    Float? // percentage of the budget that this request will consume, e.g. 0.25 means 25% of the budget
+  approvedAmount    Float? // the amount that was approved for this request, used for reporting and forecasting
+  requestedAmount   Float? // the actual amount that this request is asking for, used for approval and reporting
   newBalanceAmmount Float? // computed as approvedAmount - sum of committed and actual amounts from BudgetLedger, used for reporting and forecasting
-  projectedBudget Float? // the projected budget amount that this request is asking for, used for forecasting and reporting
-  remark   Json? // Provided Specs During AOP and Provied purpose During AOP
+  projectedBudget   Float? // the projected budget amount that this request is asking for, used for forecasting and reporting
+  remark            Json? // Provided Specs During AOP and Provied purpose During AOP
 
-  requestId String?  @db.ObjectId @unique
+  requestId String?  @unique @db.ObjectId
   request   Request? @relation(fields: [requestId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  budgetId String?  @db.ObjectId 
-  budget Budget? @relation(fields: [budgetId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  budgetId  String?  @db.ObjectId
+  budget    Budget?  @relation(fields: [budgetId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   isActive  Boolean?  @default(true)
   createdAt DateTime? @default(now())
@@ -917,7 +919,6 @@ model CapitalRecoveryFactor {
 
 model Budget {
   id String @id @default(auto()) @map("_id") @db.ObjectId
-
 
   crf CapitalRecoveryFactor[]
 
@@ -1041,24 +1042,52 @@ model BudgetSnapshot {
 model RequestItem {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  requestId String?  @db.ObjectId
-  request   Request? @relation(fields: [requestId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  statusId  String?  @db.ObjectId
-  status    Status?  @relation(fields: [statusId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  requestId   String?  @db.ObjectId
+  request     Request? @relation(fields: [requestId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  statusId    String?  @db.ObjectId
+  status      Status?  @relation(fields: [statusId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  isPriceNeed Boolean? @default(false)
 
-  description   String?
-  quantity      Int?
-  unitOfMeasure String?
-  vatPercentage Float?
-  isInclusiveVat Boolean? @default(false)
-  unitPrice     Float?
+  itemId           String?        @db.ObjectId // optional link to inventory item
+  inventoryItem    InventoryItem? @relation(fields: [itemId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  categoryId       String?        @db.ObjectId
+  category         Category?      @relation("RequestItemCategory", fields: [categoryId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  description      String?
+  quantity         Int?
+  unitOfMeasure    String?
+  vatPercentage    Float?
+  isInclusiveVat   Boolean?       @default(false)
+  unitPrice        Float?
   amountGrossOfVat Float? // computed as quantity * unitPrice
-  totalPrice    Float?
-  attachmentUrl String?
-  auditLogs     AuditLog[]
-  isActive      Boolean?   @default(true)
-  createdAt     DateTime?  @default(now())
-  updatedAt     DateTime?  @updatedAt
+  totalPrice       Float?
+  attachmentUrl    String?
+  auditLogs        AuditLog[]
+  isActive         Boolean?       @default(true)
+  createdAt        DateTime?      @default(now())
+  updatedAt        DateTime?      @updatedAt
 
   @@index([requestId])
+}
+
+// Inventory Item Model
+model InventoryItem {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name        String?
+  description String?
+
+  companyId       String? @db.ObjectId
+  departmentId    String? @db.ObjectId
+  categoryId      String? @db.ObjectId
+  quantityInStock Int?
+  unitOfMeasure   String?
+  remainingStock  Int? // computed as quantityInStock - sum of quantities from RequestItems that are linked to this inventory item
+
+  requestItems RequestItem[]
+  auditLogs    AuditLog[]
+  isActive     Boolean?      @default(true)
+  createdAt    DateTime?     @default(now())
+  updatedAt    DateTime?     @updatedAt
+
+  @@index([name])
 }

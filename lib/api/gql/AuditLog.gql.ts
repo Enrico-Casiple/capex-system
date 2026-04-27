@@ -14,6 +14,7 @@ fragment AuditLogFragment on AuditLog {
   isActive
   createdAt
   updatedAt
+  inventoryItemId
 }
 `;
 

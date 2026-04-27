@@ -10,11 +10,12 @@ import { Request } from '@/lib/generated/api/customHookAPI/graphql';
 import { generate_code } from '@/lib/util/bcryptjs';
 import { fail, ok } from '@/lib/util/reponseUtil';
 import { useSession } from 'next-auth/react';
-import { useFieldArray, useForm, UseFormReturn } from 'react-hook-form';
+import { useForm, UseFormReturn } from 'react-hook-form';
 import BudgetReferenceDetails from './Section/BudgetReferenceDetails';
 import React from "react";
 import RequestedItem, { RequestedItemFormValues } from './Section/RequestedItem';
 import useToast from '@/app/_hooks/useToast';
+import WorkApprovalInstance from './Section/WorkApprovalInstance';
 
 type MethodProps = {
   rowId?: string | null;
@@ -41,7 +42,7 @@ const Method = (props: MethodProps) => {
     requestNumber: '',
     dateNeeded: new Date(), // Default to current date, can be changed by user input
     quotationUrl: '', // URL for the quotation document, can be used for reference or record-keeping
-    quotationAmount: 10000, // Amount specified in the quotation, can be used for budget comparison or approval reference
+    quotationAmount: 0, // Amount specified in the quotation, can be used for budget comparison or approval reference
     currency: 'PHP', // Default currency set to PHP, can be changed by user input based on the currency of the request or company standards
     companyId: '', // Connect to company for easier filtering and retrieval of CRF based on company
     departmentId: '', // Connect to department for easier filtering and retrieval of CRF based on department
@@ -80,6 +81,25 @@ const Method = (props: MethodProps) => {
       attachmentUrl: '',
       statusId: "",
     }],
+    workflowTemplateId: "", // Connect to workflow template for easier retrieval of workflow template based on the request and to apply the correct approval workflow for the request
+    workFlowInstance: {
+      budgetId: null, // Connect to budget for easier retrieval of workflow instance based on budget and to track the budget impact of the request throughout the approval process
+      templateId: null, // Connect to workflow template for easier retrieval of workflow template based on the request and to apply the correct approval workflow for the request
+      title: "",
+      description: "",
+      statusId: "69ef2115f681bdf7f3214d99", // DRAFT | FOR_APPROVAL | APPROVED | REJECTED | CLOSED | VERIFIED
+      currentStep: 1,
+      startedAt: new Date(),
+      steps: [{
+        stepTemplateId: null, // Connect to step template for easier retrieval of step template based on the workflow template and to apply the correct approval steps for the request
+        stepNumber: 1,
+        statusId: "69ef2115f681bdf7f3214d99", // DRAFT | FOR_APPROVAL | APPROVED | REJECTED | CLOSED | VERIFIED
+        assignedToUserId: null, // Connect to user for easier retrieval of workflow steps assigned to a user and to notify the user of their pending approval tasks
+        startedAt: new Date(),
+        isEditable: false, // Flag to indicate if the current step is editable by the assigned approver, which can be used to control the UI and prevent changes to the step once it's completed or if the approver doesn't have permission to edit it
+        source: "REQUEST_ITEM_APPROVAL" // Enum or string to indicate the source of the workflow step, which can be used for tracking and reporting purposes to differentiate between different types of workflow steps (e.g., request item approval, budget approval, etc.)
+      }]
+    }
   };
 
 
@@ -95,14 +115,6 @@ const Method = (props: MethodProps) => {
       form.setValue('departmentId', '');
     }
   }, [form]);
-
-
-  const requestedItemFieldArray = useFieldArray({
-    control: form.control,
-    name: "requestItems", // Type assertion to ensure correct typing for nested field array
-  });
-
-  console.log('Method props:', requestedItemFieldArray, 'Method props:', props);
 
 
   const handleToSubmit = async (data: unknown) => {
@@ -370,14 +382,7 @@ const Method = (props: MethodProps) => {
             <RequestedItem form={form as unknown as UseFormReturn<RequestedItemFormValues>} />
 
             {/* IV. Workflow Approval Step */}
-            <section className='space-y-4'>
-              <div className='text-lg font-semibold border-b pb-3'>
-                IV. Workflow Approval Step
-              </div>
-              <div className='text-sm text-muted-foreground'>
-                {/* Form fields here */}
-              </div>
-            </section>
+            <WorkApprovalInstance form={form as unknown as UseFormReturn<Record<string, unknown>>} />
           </div>
         </ScrollArea>
         {/* Action Buttons - Fixed at Bottom */}

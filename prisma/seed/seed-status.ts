@@ -72,6 +72,36 @@ const data = [
     isActive: true,
     modelNameType: "BudgetStatus",
   },
+  {
+    name: "Draft",
+    isActive: true,
+    modelNameType: "WorkFlowInstanceStatus",
+  },
+  {
+    name: "On-going",
+    isActive: true,
+    modelNameType: "WorkFlowInstanceStatus",
+  },
+  {
+    name: "Approved",
+    isActive: true,
+    modelNameType: "WorkFlowInstanceStatus",
+  },
+  {
+    name: "Pending",
+    isActive: true,
+    modelNameType: "WorkFlowInstanceStepStatus",
+  },
+  {
+    name: "Approved",
+    isActive: true,
+    modelNameType: "WorkFlowInstanceStepStatus",
+  },
+  {
+    name: "Rejected",
+    isActive: true,
+    modelNameType: "WorkFlowInstanceStepStatus",
+  }
 ];
 
 const seed = async () => {

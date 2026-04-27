@@ -57,6 +57,12 @@ type AuditLog {
   """Unique identifier of the AuditLog record."""
   id: ID!
 
+  """(Optional) Related InventoryItem record linked to this AuditLog."""
+  inventoryItem: InventoryItem
+
+  """(Optional) inventoryItemId field of AuditLog. Type: String."""
+  inventoryItemId: String
+
   """(Optional) isActive field of AuditLog. Type: Boolean."""
   isActive: Boolean
 
@@ -211,6 +217,8 @@ input AuditLogCreateInput {
   department: DepartmentCreateOneNestedInput
   groupOfCompany: GroupOfCompanyCreateOneNestedInput
   holiday: HolidayCreateOneNestedInput
+  inventoryItem: InventoryItemCreateOneNestedInput
+  inventoryItemId: String
   isActive: Boolean
   jobLevel: JobLevelCreateOneNestedInput
   location: LocationCreateOneNestedInput
@@ -470,6 +478,12 @@ input AuditLogFormInput {
 
   """(Optional) The id of the AuditLog. Type: String."""
   id: String
+
+  """(Optional) Single InventoryItem relation for direct nested operations."""
+  inventoryItem: InventoryItemFormInput
+
+  """(Optional) The inventoryItemId of the AuditLog. Type: String."""
+  inventoryItemId: String
 
   """(Optional) The isActive of the AuditLog. Type: Boolean."""
   isActive: Boolean
@@ -753,6 +767,8 @@ input AuditLogUpdateInput {
   groupOfCompany: GroupOfCompanyUpdateOneNestedInput
   holiday: HolidayUpdateOneNestedInput
   id: String
+  inventoryItem: InventoryItemUpdateOneNestedInput
+  inventoryItemId: String
   isActive: Boolean
   jobLevel: JobLevelUpdateOneNestedInput
   location: LocationUpdateOneNestedInput
@@ -791,7 +807,7 @@ input AuditLogUpdateManyNestedInput {
   create: [AuditLogCreateInput!]
   createMany: [AuditLogCreateInput!]
   delete: [AuditLogConnectInput!]
-  deleteMany: [AuditLogWhereInput!]
+  deleteMany: AuditLogWhereInput
   disconnect: [AuditLogConnectInput!]
   set: [AuditLogConnectInput!]
   update: [AuditLogUpsertNestedInput!]
@@ -884,6 +900,12 @@ input AuditLogWhereInput {
 
   """Filter by id (String)."""
   id: Json
+
+  """Filter by related InventoryItem records."""
+  inventoryItem: InventoryItemWhereInput
+
+  """Filter by inventoryItemId (String)."""
+  inventoryItemId: Json
 
   """Filter by isActive (Boolean)."""
   isActive: Json
@@ -1561,7 +1583,7 @@ input BasicInformationUpdateManyNestedInput {
   create: [BasicInformationCreateInput!]
   createMany: [BasicInformationCreateInput!]
   delete: [BasicInformationConnectInput!]
-  deleteMany: [BasicInformationWhereInput!]
+  deleteMany: BasicInformationWhereInput
   disconnect: [BasicInformationConnectInput!]
   set: [BasicInformationConnectInput!]
   update: [BasicInformationUpsertNestedInput!]
@@ -2712,7 +2734,7 @@ input BudgetLedgerUpdateManyNestedInput {
   create: [BudgetLedgerCreateInput!]
   createMany: [BudgetLedgerCreateInput!]
   delete: [BudgetLedgerConnectInput!]
-  deleteMany: [BudgetLedgerWhereInput!]
+  deleteMany: BudgetLedgerWhereInput
   disconnect: [BudgetLedgerConnectInput!]
   set: [BudgetLedgerConnectInput!]
   update: [BudgetLedgerUpsertNestedInput!]
@@ -3385,7 +3407,7 @@ input BudgetSnapshotUpdateManyNestedInput {
   create: [BudgetSnapshotCreateInput!]
   createMany: [BudgetSnapshotCreateInput!]
   delete: [BudgetSnapshotConnectInput!]
-  deleteMany: [BudgetSnapshotWhereInput!]
+  deleteMany: BudgetSnapshotWhereInput
   disconnect: [BudgetSnapshotConnectInput!]
   set: [BudgetSnapshotConnectInput!]
   update: [BudgetSnapshotUpsertNestedInput!]
@@ -3506,7 +3528,7 @@ input BudgetUpdateManyNestedInput {
   create: [BudgetCreateInput!]
   createMany: [BudgetCreateInput!]
   delete: [BudgetConnectInput!]
-  deleteMany: [BudgetWhereInput!]
+  deleteMany: BudgetWhereInput
   disconnect: [BudgetConnectInput!]
   set: [BudgetConnectInput!]
   update: [BudgetUpsertNestedInput!]
@@ -4305,7 +4327,7 @@ input CapitalRecoveryFactorUpdateManyNestedInput {
   create: [CapitalRecoveryFactorCreateInput!]
   createMany: [CapitalRecoveryFactorCreateInput!]
   delete: [CapitalRecoveryFactorConnectInput!]
-  deleteMany: [CapitalRecoveryFactorWhereInput!]
+  deleteMany: CapitalRecoveryFactorWhereInput
   disconnect: [CapitalRecoveryFactorConnectInput!]
   set: [CapitalRecoveryFactorConnectInput!]
   update: [CapitalRecoveryFactorUpsertNestedInput!]
@@ -4452,6 +4474,11 @@ type Category {
   """(Optional) name field of Category. Type: String."""
   name: String
 
+  """
+  (Optional) List of related RequestItem records linked to this Category.
+  """
+  requestItemCategory: [RequestItem!]!
+
   """(Optional) updatedAt field of Category. Type: DateTime (ISO 8601)."""
   updatedAt: DateTime
 }
@@ -4507,6 +4534,7 @@ input CategoryCreateInput {
   isActive: Boolean
   modelNameType: String
   name: String
+  requestItemCategory: RequestItemCreateManyNestedInput
   updatedAt: DateTime
 }
 
@@ -4706,6 +4734,9 @@ input CategoryFormInput {
   """(Optional) The name of the Category. Type: String."""
   name: String
 
+  """(Optional) List of RequestItem relation for direct nested operations."""
+  requestItemCategory: [RequestItemFormInput!]
+
   """(Optional) The updatedAt of the Category. Type: DateTime."""
   updatedAt: DateTime
 }
@@ -4879,6 +4910,7 @@ input CategoryUpdateInput {
   isActive: Boolean
   modelNameType: String
   name: String
+  requestItemCategory: RequestItemUpdateManyNestedInput
   updatedAt: DateTime
 }
 
@@ -4889,7 +4921,7 @@ input CategoryUpdateManyNestedInput {
   create: [CategoryCreateInput!]
   createMany: [CategoryCreateInput!]
   delete: [CategoryConnectInput!]
-  deleteMany: [CategoryWhereInput!]
+  deleteMany: CategoryWhereInput
   disconnect: [CategoryConnectInput!]
   set: [CategoryConnectInput!]
   update: [CategoryUpsertNestedInput!]
@@ -4955,6 +4987,9 @@ input CategoryWhereInput {
 
   """Filter by name (String)."""
   name: Json
+
+  """Filter by related RequestItem records."""
+  requestItemCategory: RequestItemWhereInput
 
   """Filter by updatedAt (DateTime)."""
   updatedAt: Json
@@ -5549,7 +5584,7 @@ input CompanyUpdateManyNestedInput {
   create: [CompanyCreateInput!]
   createMany: [CompanyCreateInput!]
   delete: [CompanyConnectInput!]
-  deleteMany: [CompanyWhereInput!]
+  deleteMany: CompanyWhereInput
   disconnect: [CompanyConnectInput!]
   set: [CompanyConnectInput!]
   update: [CompanyUpsertNestedInput!]
@@ -6236,7 +6271,7 @@ input ConfigConditionUpdateManyNestedInput {
   create: [ConfigConditionCreateInput!]
   createMany: [ConfigConditionCreateInput!]
   delete: [ConfigConditionConnectInput!]
-  deleteMany: [ConfigConditionWhereInput!]
+  deleteMany: ConfigConditionWhereInput
   disconnect: [ConfigConditionConnectInput!]
   set: [ConfigConditionConnectInput!]
   update: [ConfigConditionUpsertNestedInput!]
@@ -6777,7 +6812,7 @@ input ConfigUpdateManyNestedInput {
   create: [ConfigCreateInput!]
   createMany: [ConfigCreateInput!]
   delete: [ConfigConnectInput!]
-  deleteMany: [ConfigWhereInput!]
+  deleteMany: ConfigWhereInput
   disconnect: [ConfigConnectInput!]
   set: [ConfigConnectInput!]
   update: [ConfigUpsertNestedInput!]
@@ -7431,7 +7466,7 @@ input DepartmentUpdateManyNestedInput {
   create: [DepartmentCreateInput!]
   createMany: [DepartmentCreateInput!]
   delete: [DepartmentConnectInput!]
-  deleteMany: [DepartmentWhereInput!]
+  deleteMany: DepartmentWhereInput
   disconnect: [DepartmentConnectInput!]
   set: [DepartmentConnectInput!]
   update: [DepartmentUpsertNestedInput!]
@@ -8030,7 +8065,7 @@ input GroupOfCompanyUpdateManyNestedInput {
   create: [GroupOfCompanyCreateInput!]
   createMany: [GroupOfCompanyCreateInput!]
   delete: [GroupOfCompanyConnectInput!]
-  deleteMany: [GroupOfCompanyWhereInput!]
+  deleteMany: GroupOfCompanyWhereInput
   disconnect: [GroupOfCompanyConnectInput!]
   set: [GroupOfCompanyConnectInput!]
   update: [GroupOfCompanyUpsertNestedInput!]
@@ -8549,7 +8584,7 @@ input HolidayUpdateManyNestedInput {
   create: [HolidayCreateInput!]
   createMany: [HolidayCreateInput!]
   delete: [HolidayConnectInput!]
-  deleteMany: [HolidayWhereInput!]
+  deleteMany: HolidayWhereInput
   disconnect: [HolidayConnectInput!]
   set: [HolidayConnectInput!]
   update: [HolidayUpsertNestedInput!]
@@ -8606,6 +8641,589 @@ input HolidayWhereInput {
 
   """Filter by name (String)."""
   name: Json
+
+  """Filter by updatedAt (DateTime)."""
+  updatedAt: Json
+}
+
+"""Represents a InventoryItem record in the database."""
+type InventoryItem {
+  """
+  (Optional) List of related AuditLog records linked to this InventoryItem.
+  """
+  auditLogs: [AuditLog!]!
+
+  """(Optional) categoryId field of InventoryItem. Type: String."""
+  categoryId: String
+
+  """(Optional) companyId field of InventoryItem. Type: String."""
+  companyId: String
+
+  """
+  (Optional) createdAt field of InventoryItem. Type: DateTime (ISO 8601).
+  """
+  createdAt: DateTime
+
+  """(Optional) departmentId field of InventoryItem. Type: String."""
+  departmentId: String
+
+  """(Optional) description field of InventoryItem. Type: String."""
+  description: String
+
+  """Unique identifier of the InventoryItem record."""
+  id: ID!
+
+  """(Optional) isActive field of InventoryItem. Type: Boolean."""
+  isActive: Boolean
+
+  """(Optional) name field of InventoryItem. Type: String."""
+  name: String
+
+  """(Optional) quantityInStock field of InventoryItem. Type: Integer."""
+  quantityInStock: Int
+
+  """(Optional) remainingStock field of InventoryItem. Type: Integer."""
+  remainingStock: Int
+
+  """
+  (Optional) List of related RequestItem records linked to this InventoryItem.
+  """
+  requestItems: [RequestItem!]!
+
+  """(Optional) unitOfMeasure field of InventoryItem. Type: String."""
+  unitOfMeasure: String
+
+  """
+  (Optional) updatedAt field of InventoryItem. Type: DateTime (ISO 8601).
+  """
+  updatedAt: DateTime
+}
+
+"""Input to connect an existing InventoryItem record by a unique field."""
+input InventoryItemConnectInput {
+  """Unique field 'id' for InventoryItem"""
+  id: String
+}
+
+"""Connect or create InventoryItem record."""
+input InventoryItemConnectOrCreateInput {
+  create: InventoryItemCreateInput!
+  where: InventoryItemConnectInput!
+}
+
+"""Where input for counting InventoryItem records."""
+input InventoryItemCountInput {
+  """Prisma where clause."""
+  where: Json!
+}
+
+"""
+Count response wrapper for InventoryItem. Returns the count of InventoryItem records matching the criteria.
+"""
+type InventoryItemCountResponse {
+  """
+  Operation result code for the InventoryItem count operation. e.g. 'INVENTORYITEM_COUNT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The count of InventoryItem records matching the criteria. Null if the operation failed.
+  """
+  data: Int
+
+  """Indicates whether the InventoryItem count operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the InventoryItem count operation.
+  """
+  message: String
+}
+
+input InventoryItemCreateInput {
+  auditLogs: AuditLogCreateManyNestedInput
+  categoryId: String
+  companyId: String
+  createdAt: DateTime
+  departmentId: String
+  description: String
+  isActive: Boolean
+  name: String
+  quantityInStock: Int
+  remainingStock: Int
+  requestItems: RequestItemCreateManyNestedInput
+  unitOfMeasure: String
+  updatedAt: DateTime
+}
+
+"""Nested create many for InventoryItem."""
+input InventoryItemCreateManyNestedInput {
+  connect: [InventoryItemConnectInput!]
+  connectOrCreate: [InventoryItemConnectOrCreateInput!]
+  create: [InventoryItemCreateInput!]
+  createMany: [InventoryItemCreateInput!]
+}
+
+"""Nested create one for InventoryItem."""
+input InventoryItemCreateOneNestedInput {
+  connect: InventoryItemConnectInput
+  connectOrCreate: InventoryItemConnectOrCreateInput
+  create: InventoryItemCreateInput
+}
+
+"""Pagination and filtering input for querying InventoryItem records."""
+input InventoryItemCsvExportInput {
+  """Fields to include in the CSV export."""
+  columns: [String!]
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+}
+
+type InventoryItemCsvExportResponse {
+  """
+  Operation result code for the InventoryItem CSV export operation. e.g. 'INVENTORYITEM_CSV_EXPORT_SUCCESS'.
+  """
+  code: String
+
+  """
+  The result of the CSV export operation, including the file name, MIME type, CSV content, and row count. Null if the operation failed.
+  """
+  data: CsvExportData
+
+  """
+  Indicates whether the InventoryItem CSV export operation was successful.
+  """
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the InventoryItem CSV export operation.
+  """
+  message: String
+}
+
+"""Cursor-based pagination input for querying InventoryItem records."""
+input InventoryItemCursorPaginationInput {
+  """Cursor from the last record."""
+  cursor: String
+
+  """Pagination direction."""
+  direction: InventoryItemPaginationDirection
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean!
+
+  """Search keyword."""
+  search: String
+
+  """Fields to search within."""
+  searchFields: [String!]
+
+  """Number of records to return."""
+  take: Int!
+}
+
+"""
+Paginated response wrapper for InventoryItem. Returns a paged list of InventoryItem records with pagination metadata and counts.
+"""
+type InventoryItemCursorPaginationResponse {
+  """
+  Operation result code for the InventoryItem pagination query. e.g. 'INVENTORYITEM_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of InventoryItem records. Null if the query failed."""
+  data: [InventoryItem!]
+
+  """Indicates if there is a next page of InventoryItem records available."""
+  hasNextPage: Boolean
+
+  """
+  Indicates if there is a previous page of InventoryItem records available.
+  """
+  hasPrevPage: Boolean
+
+  """Indicates whether the InventoryItem pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the InventoryItem pagination query.
+  """
+  message: String
+
+  """
+  Cursor for fetching the next page of InventoryItem records. Null if there are no more pages.
+  """
+  nextCursor: String
+
+  """
+  Cursor for fetching the previous page of InventoryItem records. Null if there are no previous pages.
+  """
+  prevCursor: String
+}
+
+"""Nested delete many for InventoryItem."""
+input InventoryItemDeleteManyInput {
+  where: InventoryItemWhereInput!
+}
+
+"""Nested delete one for InventoryItem."""
+input InventoryItemDeleteOneInput {
+  where: InventoryItemConnectInput!
+}
+
+"""
+Paginated response wrapper for InventoryItem. Returns a paged list of InventoryItem records with pagination metadata and counts.
+"""
+type InventoryItemDeletedListResponse {
+  """
+  Operation result code for the InventoryItem pagination query. e.g. 'INVENTORYITEM_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of InventoryItem records. Null if the query failed."""
+  data: [DeletedItem!]
+
+  """Indicates whether the InventoryItem pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the InventoryItem pagination query.
+  """
+  message: String
+}
+
+"""Dynamic field lookup input for InventoryItem."""
+input InventoryItemFindByInput {
+  """Field name to search by."""
+  key: String!
+
+  """Value to match."""
+  value: String!
+}
+
+"""Where input for finding the first matching InventoryItem record."""
+input InventoryItemFindFirstInput {
+  """Prisma where clause."""
+  where: Json!
+}
+
+"""
+Complete input fields for InventoryItem form. Includes all scalars and relations optimized for forms.
+"""
+input InventoryItemFormInput {
+  """(Optional) List of AuditLog relation for direct nested operations."""
+  auditLogs: [AuditLogFormInput!]
+
+  """(Optional) The categoryId of the InventoryItem. Type: String."""
+  categoryId: String
+
+  """(Optional) The companyId of the InventoryItem. Type: String."""
+  companyId: String
+
+  """(Optional) The createdAt of the InventoryItem. Type: DateTime."""
+  createdAt: DateTime
+
+  """(Optional) The departmentId of the InventoryItem. Type: String."""
+  departmentId: String
+
+  """(Optional) The description of the InventoryItem. Type: String."""
+  description: String
+
+  """(Optional) The id of the InventoryItem. Type: String."""
+  id: String
+
+  """(Optional) The isActive of the InventoryItem. Type: Boolean."""
+  isActive: Boolean
+
+  """(Optional) The name of the InventoryItem. Type: String."""
+  name: String
+
+  """(Optional) The quantityInStock of the InventoryItem. Type: Int."""
+  quantityInStock: Int
+
+  """(Optional) The remainingStock of the InventoryItem. Type: Int."""
+  remainingStock: Int
+
+  """(Optional) List of RequestItem relation for direct nested operations."""
+  requestItems: [RequestItemFormInput!]
+
+  """(Optional) The unitOfMeasure of the InventoryItem. Type: String."""
+  unitOfMeasure: String
+
+  """(Optional) The updatedAt of the InventoryItem. Type: DateTime."""
+  updatedAt: DateTime
+}
+
+"""
+GroupBy input for aggregating InventoryItem records with aggregation functions.
+"""
+input InventoryItemGroupByInput {
+  """Average aggregations for numeric fields."""
+  _avg: Json
+
+  """Count aggregations. Can use _all or specific fields."""
+  _count: Json
+
+  """Maximum value aggregations."""
+  _max: Json
+
+  """Minimum value aggregations."""
+  _min: Json
+
+  """Sum aggregations for numeric fields."""
+  _sum: Json
+
+  """Scalar fields to group by (e.g., ['status', 'category'])."""
+  by: [String!]!
+
+  """Optional order by clause (e.g., { _count: { id: 'desc' } })."""
+  orderBy: Json
+
+  """Optional Prisma where clause to filter records before grouping."""
+  where: Json
+}
+
+"""
+GroupBy aggregation response for InventoryItem. Returns grouped records with optional aggregation results (_count, _sum, _avg, _min, _max).
+"""
+type InventoryItemGroupByResponse {
+  """
+  Operation result code for the InventoryItem groupBy operation. e.g. 'INVENTORYITEM_GROUP_BY_SUCCESS'.
+  """
+  code: String
+
+  """
+  Array of grouped InventoryItem records with aggregation results. Each item contains the grouped-by fields plus aggregations (_count, _sum, _avg, _min, _max). Null if the operation failed.
+  """
+  data: Json
+
+  """Indicates whether the InventoryItem groupBy operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the InventoryItem groupBy operation.
+  """
+  message: String
+}
+
+"""
+List response wrapper for InventoryItem. Returns multiple InventoryItem records along with operation status.
+"""
+type InventoryItemListResponse {
+  """
+  Operation result code for the InventoryItem list operation. e.g. 'INVENTORYITEM_CREATE_MANY_SUCCESS'.
+  """
+  code: String
+
+  """
+  Array of InventoryItem records returned from the operation. Null if the operation failed.
+  """
+  data: [InventoryItem!]
+
+  """Indicates whether the InventoryItem list operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the InventoryItem list operation.
+  """
+  message: String
+}
+
+"""Pagination and filtering input for querying InventoryItem records."""
+input InventoryItemPageInput {
+  """Page number. Starts at 1."""
+  currentPage: Int!
+
+  """Advanced JSON filter."""
+  filter: Json
+
+  """Filter by active status."""
+  isActive: Boolean!
+
+  """Number of records per page."""
+  pageSize: Int!
+
+  """Search keyword."""
+  search: String
+}
+
+enum InventoryItemPaginationDirection {
+  backward
+  forward
+}
+
+"""
+Paginated response wrapper for InventoryItem. Returns a paged list of InventoryItem records with pagination metadata and counts.
+"""
+type InventoryItemPaginationResponse {
+  """Total number of active (isActive: true) InventoryItem records."""
+  active: Int
+
+  """
+  Total number of InventoryItem records in the database regardless of filters.
+  """
+  allCount: Int
+
+  """
+  Operation result code for the InventoryItem pagination query. e.g. 'INVENTORYITEM_FETCH_SUCCESS'.
+  """
+  code: String
+
+  """The current page of InventoryItem records. Null if the query failed."""
+  data: [InventoryItem!]
+
+  """Total number of inactive (isActive: false) InventoryItem records."""
+  inActive: Int
+
+  """Indicates whether the InventoryItem pagination query was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the InventoryItem pagination query.
+  """
+  message: String
+
+  """
+  Pagination metadata including current page, total pages, and navigation flags for InventoryItem.
+  """
+  pageinfo: PageInfo
+}
+
+"""
+Single record response wrapper for InventoryItem. Returns the created/updated/deleted InventoryItem record along with operation status.
+"""
+type InventoryItemResponse {
+  """
+  Operation result code for InventoryItem. e.g. 'INVENTORYITEM_CREATE_SUCCESS' or 'INVENTORYITEM_NOT_FOUND'.
+  """
+  code: String
+
+  """
+  The InventoryItem record returned from the operation. Null if the operation failed.
+  """
+  data: InventoryItem
+
+  """Indicates whether the InventoryItem operation was successful."""
+  isSuccess: Boolean
+
+  """
+  Human-readable message describing the result of the InventoryItem operation.
+  """
+  message: String
+}
+
+input InventoryItemUpdateInput {
+  auditLogs: AuditLogUpdateManyNestedInput
+  categoryId: String
+  companyId: String
+  createdAt: DateTime
+  departmentId: String
+  description: String
+  id: String
+  isActive: Boolean
+  name: String
+  quantityInStock: Int
+  remainingStock: Int
+  requestItems: RequestItemUpdateManyNestedInput
+  unitOfMeasure: String
+  updatedAt: DateTime
+}
+
+"""Nested update many for InventoryItem."""
+input InventoryItemUpdateManyNestedInput {
+  connect: [InventoryItemConnectInput!]
+  connectOrCreate: [InventoryItemConnectOrCreateInput!]
+  create: [InventoryItemCreateInput!]
+  createMany: [InventoryItemCreateInput!]
+  delete: [InventoryItemConnectInput!]
+  deleteMany: InventoryItemWhereInput
+  disconnect: [InventoryItemConnectInput!]
+  set: [InventoryItemConnectInput!]
+  update: [InventoryItemUpsertNestedInput!]
+  updateMany: [InventoryItemUpsertNestedInput!]
+  upsert: [InventoryItemUpsertNestedInput!]
+}
+
+"""Nested update one for InventoryItem."""
+input InventoryItemUpdateOneNestedInput {
+  connect: InventoryItemConnectInput
+  connectOrCreate: InventoryItemConnectOrCreateInput
+  create: InventoryItemCreateInput
+  delete: Boolean
+  disconnect: Boolean
+  update: InventoryItemUpsertNestedInput
+  upsert: InventoryItemUpsertNestedInput
+}
+
+"""Nested upsert for InventoryItem."""
+input InventoryItemUpsertNestedInput {
+  create: InventoryItemCreateInput!
+  update: InventoryItemUpdateInput!
+  where: InventoryItemConnectInput!
+}
+
+"""Filter InventoryItem records with AND, OR, NOT operators."""
+input InventoryItemWhereInput {
+  """All conditions must match (AND)."""
+  AND: [InventoryItemWhereInput!]
+
+  """None of the conditions must match (NOT)."""
+  NOT: [InventoryItemWhereInput!]
+
+  """At least one condition must match (OR)."""
+  OR: [InventoryItemWhereInput!]
+
+  """Filter by related AuditLog records."""
+  auditLogs: AuditLogWhereInput
+
+  """Filter by categoryId (String)."""
+  categoryId: Json
+
+  """Filter by companyId (String)."""
+  companyId: Json
+
+  """Filter by createdAt (DateTime)."""
+  createdAt: Json
+
+  """Filter by departmentId (String)."""
+  departmentId: Json
+
+  """Filter by description (String)."""
+  description: Json
+
+  """Filter by id (String)."""
+  id: Json
+
+  """Filter by isActive (Boolean)."""
+  isActive: Json
+
+  """Filter by name (String)."""
+  name: Json
+
+  """Filter by quantityInStock (Int)."""
+  quantityInStock: Json
+
+  """Filter by remainingStock (Int)."""
+  remainingStock: Json
+
+  """Filter by related RequestItem records."""
+  requestItems: RequestItemWhereInput
+
+  """Filter by unitOfMeasure (String)."""
+  unitOfMeasure: Json
 
   """Filter by updatedAt (DateTime)."""
   updatedAt: Json
@@ -9110,7 +9728,7 @@ input JobLevelUpdateManyNestedInput {
   create: [JobLevelCreateInput!]
   createMany: [JobLevelCreateInput!]
   delete: [JobLevelConnectInput!]
-  deleteMany: [JobLevelWhereInput!]
+  deleteMany: JobLevelWhereInput
   disconnect: [JobLevelConnectInput!]
   set: [JobLevelConnectInput!]
   update: [JobLevelUpsertNestedInput!]
@@ -9662,7 +10280,7 @@ input LocationUpdateManyNestedInput {
   create: [LocationCreateInput!]
   createMany: [LocationCreateInput!]
   delete: [LocationConnectInput!]
-  deleteMany: [LocationWhereInput!]
+  deleteMany: LocationWhereInput
   disconnect: [LocationConnectInput!]
   set: [LocationConnectInput!]
   update: [LocationUpsertNestedInput!]
@@ -11661,6 +12279,155 @@ type Mutation {
     """
     data: [HolidayUpdateInput!]!
   ): HolidayListResponse
+
+  """
+  Soft-delete a InventoryItem record by setting it as inactive. The record is not permanently removed. Triggers a real-time subscription event on success.
+  """
+  InventoryItemArchive(
+    """
+    (Optional) The ID of the user performing the archive. Defaults to 'system' if not provided.
+    """
+    currentUserId: String
+
+    """The unique identifier of the InventoryItem record to archive."""
+    id: String!
+  ): InventoryItemResponse
+
+  """
+  Soft-delete multiple InventoryItem records by setting them as inactive. Each archived record triggers an individual real-time subscription event.
+  """
+  InventoryItemArchiveMany(
+    """
+    (Optional) The ID of the user performing the bulk archive. Defaults to 'system' if not provided.
+    """
+    currentUserId: String
+
+    """Array of unique identifiers of the InventoryItem records to archive."""
+    ids: [String!]!
+  ): InventoryItemListResponse
+
+  """
+  Create a new InventoryItem record using Prisma InventoryItemCreateInput format. Triggers a real-time subscription event on success.
+  """
+  InventoryItemCreate(
+    """
+    (Optional) The ID of the user performing the create operation. Defaults to current session user.
+    """
+    currentUserId: String
+
+    """ Prisma.InventoryItemCreateInput structure. Accepts: scalars, nested create/connect/connectOrCreate, and list operations.
+    """
+    data: InventoryItemCreateInput!
+  ): InventoryItemResponse
+
+  """
+  Create multiple InventoryItem records in a single operation. Each record must match Prisma InventoryItemCreateInput. Each created record triggers an individual real-time subscription event.
+  """
+  InventoryItemCreateMany(
+    """
+    (Optional) The ID of the user performing the bulk create. Defaults to current session user.
+    """
+    currentUserId: String
+
+    """
+    Array of JSON objects, each matching Prisma.InventoryItemCreateInput structure.
+    """
+    data: [InventoryItemCreateInput!]!
+  ): InventoryItemListResponse
+
+  """
+  Permanently delete a InventoryItem record by ID. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  InventoryItemRemove(
+    """
+    (Optional) The ID of the user performing the delete. Defaults to 'system' if not provided.
+    """
+    currentUserId: String
+
+    """
+    The unique identifier of the InventoryItem record to permanently delete.
+    """
+    id: String!
+  ): InventoryItemResponse
+
+  """
+  Permanently delete all InventoryItem records. This action is irreversible. Triggers a real-time subscription event on success.
+  """
+  InventoryItemRemoveAll: InventoryItemResponse
+
+  """
+  Permanently delete multiple InventoryItem records by their IDs. This action is irreversible. Each removed record triggers an individual real-time subscription event.
+  """
+  InventoryItemRemoveMany(
+    """
+    (Optional) The ID of the user performing the bulk delete. Defaults to 'system' if not provided.
+    """
+    currentUserId: String
+
+    """
+    Comma-separated or array of unique identifiers of the InventoryItem records to permanently delete.
+    """
+    ids: [String!]!
+  ): InventoryItemDeletedListResponse
+
+  """
+  Restore a previously archived InventoryItem record by setting it back to active. Triggers a real-time subscription event on success.
+  """
+  InventoryItemRestore(
+    """
+    (Optional) The ID of the user performing the restore. Defaults to 'system' if not provided.
+    """
+    currentUserId: String
+
+    """The unique identifier of the InventoryItem record to restore."""
+    id: String!
+  ): InventoryItemResponse
+
+  """
+  Restore multiple previously archived InventoryItem records back to active. Each restored record triggers an individual real-time subscription event.
+  """
+  InventoryItemRestoreMany(
+    """
+    (Optional) The ID of the user performing the bulk restore. Defaults to 'system' if not provided.
+    """
+    currentUserId: String
+
+    """Array of unique identifiers of the InventoryItem records to restore."""
+    ids: [String!]!
+  ): InventoryItemListResponse
+
+  """
+  Update an existing InventoryItem record by ID. Data must match Prisma InventoryItemUpdateInput structure. Triggers a real-time subscription event on success.
+  """
+  InventoryItemUpdate(
+    """
+    (Optional) The ID of the user performing the update. Defaults to current session user.
+    """
+    currentUserId: String
+
+    """
+    JSON object matching Prisma.InventoryItemUpdateInput structure. All fields are optional. Supports nested update/connect/connectOrCreate/upsert.
+    """
+    data: InventoryItemUpdateInput!
+
+    """The unique identifier of the InventoryItem record to update."""
+    id: String!
+  ): InventoryItemResponse
+
+  """
+  Update multiple InventoryItem records in a single operation. Each record must include the ID and fields to update. Each updated record triggers an individual real-time subscription event.
+  """
+  InventoryItemUpdateMany(
+    """
+    (Optional) The ID of the user performing the bulk update. Defaults to current session user.
+    """
+    currentUserId: String
+
+    """
+    Array of JSON objects matching Prisma.InventoryItemUpdateInput. Each must include 'id' field.
+    """
+    data: [InventoryItemUpdateInput!]!
+  ): InventoryItemListResponse
 
   """
   Soft-delete a JobLevel record by setting it as inactive. The record is not permanently removed. Triggers a real-time subscription event on success.
@@ -15160,7 +15927,7 @@ input PermissionUpdateManyNestedInput {
   create: [PermissionCreateInput!]
   createMany: [PermissionCreateInput!]
   delete: [PermissionConnectInput!]
-  deleteMany: [PermissionWhereInput!]
+  deleteMany: PermissionWhereInput
   disconnect: [PermissionConnectInput!]
   set: [PermissionConnectInput!]
   update: [PermissionUpsertNestedInput!]
@@ -15742,7 +16509,7 @@ input PositionUpdateManyNestedInput {
   create: [PositionCreateInput!]
   createMany: [PositionCreateInput!]
   delete: [PositionConnectInput!]
-  deleteMany: [PositionWhereInput!]
+  deleteMany: PositionWhereInput
   disconnect: [PositionConnectInput!]
   set: [PositionConnectInput!]
   update: [PositionUpsertNestedInput!]
@@ -16316,6 +17083,43 @@ type Query {
     """
     input: HolidayGroupByInput!
   ): HolidayGroupByResponse
+  InventoryItemCount(input: InventoryItemCountInput!): InventoryItemCountResponse
+  InventoryItemExportCsv(input: InventoryItemCsvExportInput!): InventoryItemCsvExportResponse
+  InventoryItemExportExcel(input: InventoryItemCsvExportInput!): InventoryItemCsvExportResponse
+
+  """
+  Retrieve a paginated list of InventoryItem records. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  InventoryItemFindAll(
+    """Pagination and filter options for the InventoryItem list query."""
+    paginationInput: InventoryItemPageInput!
+  ): InventoryItemPaginationResponse
+
+  """
+  Retrieve a paginated list of InventoryItem records using cursor-based pagination. Supports filtering by active status, keyword search, and advanced JSON filters.
+  """
+  InventoryItemFindAllWithCursor(
+    """Cursor pagination and filter options for the InventoryItem list query."""
+    cursorInput: InventoryItemCursorPaginationInput!
+  ): InventoryItemCursorPaginationResponse
+  InventoryItemFindBy(input: InventoryItemFindByInput!): InventoryItemResponse
+  InventoryItemFindFirst(input: InventoryItemFindFirstInput!): InventoryItemResponse
+
+  """Retrieve a single InventoryItem record by its unique ID."""
+  InventoryItemFindUnique(
+    """The unique identifier of the InventoryItem record to retrieve."""
+    id: String!
+  ): InventoryItemResponse
+
+  """
+  Group InventoryItem records by specified fields and perform aggregations. Supports dynamic grouping and aggregation options.
+  """
+  InventoryItemGroupBy(
+    """
+    Input for grouping InventoryItem records. Specify fields to group by and aggregation operations.
+    """
+    input: InventoryItemGroupByInput!
+  ): InventoryItemGroupByResponse
   JobLevelCount(input: JobLevelCountInput!): JobLevelCountResponse
   JobLevelExportCsv(input: JobLevelCsvExportInput!): JobLevelCsvExportResponse
   JobLevelExportExcel(input: JobLevelCsvExportInput!): JobLevelCsvExportResponse
@@ -17560,6 +18364,12 @@ type RequestItem {
   """
   auditLogs: [AuditLog!]!
 
+  """(Optional) Related Category record linked to this RequestItem."""
+  category: Category
+
+  """(Optional) categoryId field of RequestItem. Type: String."""
+  categoryId: String
+
   """(Optional) createdAt field of RequestItem. Type: DateTime (ISO 8601)."""
   createdAt: DateTime
 
@@ -17569,11 +18379,20 @@ type RequestItem {
   """Unique identifier of the RequestItem record."""
   id: ID!
 
+  """(Optional) Related InventoryItem record linked to this RequestItem."""
+  inventoryItem: InventoryItem
+
   """(Optional) isActive field of RequestItem. Type: Boolean."""
   isActive: Boolean
 
   """(Optional) isInclusiveVat field of RequestItem. Type: Boolean."""
   isInclusiveVat: Boolean
+
+  """(Optional) isPriceNeed field of RequestItem. Type: Boolean."""
+  isPriceNeed: Boolean
+
+  """(Optional) itemId field of RequestItem. Type: String."""
+  itemId: String
 
   """(Optional) quantity field of RequestItem. Type: Integer."""
   quantity: Int
@@ -17651,10 +18470,15 @@ input RequestItemCreateInput {
   amountGrossOfVat: Float
   attachmentUrl: String
   auditLogs: AuditLogCreateManyNestedInput
+  category: CategoryCreateOneNestedInput
+  categoryId: String
   createdAt: DateTime
   description: String
+  inventoryItem: InventoryItemCreateOneNestedInput
   isActive: Boolean
   isInclusiveVat: Boolean
+  isPriceNeed: Boolean
+  itemId: String
   quantity: Int
   request: RequestCreateOneNestedInput
   requestId: String
@@ -17842,6 +18666,12 @@ input RequestItemFormInput {
   """(Optional) List of AuditLog relation for direct nested operations."""
   auditLogs: [AuditLogFormInput!]
 
+  """(Optional) Single Category relation for direct nested operations."""
+  category: CategoryFormInput
+
+  """(Optional) Foreign key to connect a Category record."""
+  categoryId: String
+
   """(Optional) The createdAt of the RequestItem. Type: DateTime."""
   createdAt: DateTime
 
@@ -17851,11 +18681,20 @@ input RequestItemFormInput {
   """(Optional) The id of the RequestItem. Type: String."""
   id: String
 
+  """(Optional) Single InventoryItem relation for direct nested operations."""
+  inventoryItem: InventoryItemFormInput
+
   """(Optional) The isActive of the RequestItem. Type: Boolean."""
   isActive: Boolean
 
   """(Optional) The isInclusiveVat of the RequestItem. Type: Boolean."""
   isInclusiveVat: Boolean
+
+  """(Optional) The isPriceNeed of the RequestItem. Type: Boolean."""
+  isPriceNeed: Boolean
+
+  """(Optional) The itemId of the RequestItem. Type: String."""
+  itemId: String
 
   """(Optional) The quantity of the RequestItem. Type: Int."""
   quantity: Int
@@ -18050,11 +18889,16 @@ input RequestItemUpdateInput {
   amountGrossOfVat: Float
   attachmentUrl: String
   auditLogs: AuditLogUpdateManyNestedInput
+  category: CategoryUpdateOneNestedInput
+  categoryId: String
   createdAt: DateTime
   description: String
   id: String
+  inventoryItem: InventoryItemUpdateOneNestedInput
   isActive: Boolean
   isInclusiveVat: Boolean
+  isPriceNeed: Boolean
+  itemId: String
   quantity: Int
   request: RequestUpdateOneNestedInput
   requestId: String
@@ -18074,7 +18918,7 @@ input RequestItemUpdateManyNestedInput {
   create: [RequestItemCreateInput!]
   createMany: [RequestItemCreateInput!]
   delete: [RequestItemConnectInput!]
-  deleteMany: [RequestItemWhereInput!]
+  deleteMany: RequestItemWhereInput
   disconnect: [RequestItemConnectInput!]
   set: [RequestItemConnectInput!]
   update: [RequestItemUpsertNestedInput!]
@@ -18120,6 +18964,12 @@ input RequestItemWhereInput {
   """Filter by related AuditLog records."""
   auditLogs: AuditLogWhereInput
 
+  """Filter by related Category records."""
+  category: CategoryWhereInput
+
+  """Filter by categoryId (String)."""
+  categoryId: Json
+
   """Filter by createdAt (DateTime)."""
   createdAt: Json
 
@@ -18129,11 +18979,20 @@ input RequestItemWhereInput {
   """Filter by id (String)."""
   id: Json
 
+  """Filter by related InventoryItem records."""
+  inventoryItem: InventoryItemWhereInput
+
   """Filter by isActive (Boolean)."""
   isActive: Json
 
   """Filter by isInclusiveVat (Boolean)."""
   isInclusiveVat: Json
+
+  """Filter by isPriceNeed (Boolean)."""
+  isPriceNeed: Json
+
+  """Filter by itemId (String)."""
+  itemId: Json
 
   """Filter by quantity (Int)."""
   quantity: Json
@@ -18306,7 +19165,7 @@ input RequestUpdateManyNestedInput {
   create: [RequestCreateInput!]
   createMany: [RequestCreateInput!]
   delete: [RequestConnectInput!]
-  deleteMany: [RequestWhereInput!]
+  deleteMany: RequestWhereInput
   disconnect: [RequestConnectInput!]
   set: [RequestConnectInput!]
   update: [RequestUpsertNestedInput!]
@@ -19349,7 +20208,7 @@ input RolePermissionUpdateManyNestedInput {
   create: [RolePermissionCreateInput!]
   createMany: [RolePermissionCreateInput!]
   delete: [RolePermissionConnectInput!]
-  deleteMany: [RolePermissionWhereInput!]
+  deleteMany: RolePermissionWhereInput
   disconnect: [RolePermissionConnectInput!]
   set: [RolePermissionConnectInput!]
   update: [RolePermissionUpsertNestedInput!]
@@ -19465,7 +20324,7 @@ input RoleUpdateManyNestedInput {
   create: [RoleCreateInput!]
   createMany: [RoleCreateInput!]
   delete: [RoleConnectInput!]
-  deleteMany: [RoleWhereInput!]
+  deleteMany: RoleWhereInput
   disconnect: [RoleConnectInput!]
   set: [RoleConnectInput!]
   update: [RoleUpsertNestedInput!]
@@ -20099,7 +20958,7 @@ input ShiftingScheduleUpdateManyNestedInput {
   create: [ShiftingScheduleCreateInput!]
   createMany: [ShiftingScheduleCreateInput!]
   delete: [ShiftingScheduleConnectInput!]
-  deleteMany: [ShiftingScheduleWhereInput!]
+  deleteMany: ShiftingScheduleWhereInput
   disconnect: [ShiftingScheduleConnectInput!]
   set: [ShiftingScheduleConnectInput!]
   update: [ShiftingScheduleUpsertNestedInput!]
@@ -20690,7 +21549,7 @@ input SignatureUpdateManyNestedInput {
   create: [SignatureCreateInput!]
   createMany: [SignatureCreateInput!]
   delete: [SignatureConnectInput!]
-  deleteMany: [SignatureWhereInput!]
+  deleteMany: SignatureWhereInput
   disconnect: [SignatureConnectInput!]
   set: [SignatureConnectInput!]
   update: [SignatureUpsertNestedInput!]
@@ -21276,7 +22135,7 @@ input StatusUpdateManyNestedInput {
   create: [StatusCreateInput!]
   createMany: [StatusCreateInput!]
   delete: [StatusConnectInput!]
-  deleteMany: [StatusWhereInput!]
+  deleteMany: StatusWhereInput
   disconnect: [StatusConnectInput!]
   set: [StatusConnectInput!]
   update: [StatusUpsertNestedInput!]
@@ -21421,6 +22280,11 @@ type Subscription {
   Real-time subscription for Holiday changes. Emits an event whenever a Holiday record is created, updated, archived, restored, or deleted.
   """
   HolidaySubscription: Holiday
+
+  """
+  Real-time subscription for InventoryItem changes. Emits an event whenever a InventoryItem record is created, updated, archived, restored, or deleted.
+  """
+  InventoryItemSubscription: InventoryItem
 
   """
   Real-time subscription for JobLevel changes. Emits an event whenever a JobLevel record is created, updated, archived, restored, or deleted.
@@ -22075,7 +22939,7 @@ input TypeUpdateManyNestedInput {
   create: [TypeCreateInput!]
   createMany: [TypeCreateInput!]
   delete: [TypeConnectInput!]
-  deleteMany: [TypeWhereInput!]
+  deleteMany: TypeWhereInput
   disconnect: [TypeConnectInput!]
   set: [TypeConnectInput!]
   update: [TypeUpsertNestedInput!]
@@ -23228,7 +24092,7 @@ input UserRoleUpdateManyNestedInput {
   create: [UserRoleCreateInput!]
   createMany: [UserRoleCreateInput!]
   delete: [UserRoleConnectInput!]
-  deleteMany: [UserRoleWhereInput!]
+  deleteMany: UserRoleWhereInput
   disconnect: [UserRoleConnectInput!]
   set: [UserRoleConnectInput!]
   update: [UserRoleUpsertNestedInput!]
@@ -23344,7 +24208,7 @@ input UserUpdateManyNestedInput {
   create: [UserCreateInput!]
   createMany: [UserCreateInput!]
   delete: [UserConnectInput!]
-  deleteMany: [UserWhereInput!]
+  deleteMany: UserWhereInput
   disconnect: [UserConnectInput!]
   set: [UserConnectInput!]
   update: [UserUpsertNestedInput!]
@@ -24627,7 +25491,7 @@ input WorkFlowInstanceStepUpdateManyNestedInput {
   create: [WorkFlowInstanceStepCreateInput!]
   createMany: [WorkFlowInstanceStepCreateInput!]
   delete: [WorkFlowInstanceStepConnectInput!]
-  deleteMany: [WorkFlowInstanceStepWhereInput!]
+  deleteMany: WorkFlowInstanceStepWhereInput
   disconnect: [WorkFlowInstanceStepConnectInput!]
   set: [WorkFlowInstanceStepConnectInput!]
   update: [WorkFlowInstanceStepUpsertNestedInput!]
@@ -24760,7 +25624,7 @@ input WorkFlowInstanceUpdateManyNestedInput {
   create: [WorkFlowInstanceCreateInput!]
   createMany: [WorkFlowInstanceCreateInput!]
   delete: [WorkFlowInstanceConnectInput!]
-  deleteMany: [WorkFlowInstanceWhereInput!]
+  deleteMany: WorkFlowInstanceWhereInput
   disconnect: [WorkFlowInstanceConnectInput!]
   set: [WorkFlowInstanceConnectInput!]
   update: [WorkFlowInstanceUpsertNestedInput!]
@@ -24923,6 +25787,11 @@ type WorkFlowStepTemplate {
   """(Optional) isActive field of WorkFlowStepTemplate. Type: Boolean."""
   isActive: Boolean
 
+  """
+  (Optional) isHaveCondition field of WorkFlowStepTemplate. Type: Boolean.
+  """
+  isHaveCondition: Boolean
+
   """(Optional) isParallel field of WorkFlowStepTemplate. Type: Boolean."""
   isParallel: Boolean
 
@@ -25016,6 +25885,7 @@ input WorkFlowStepTemplateCreateInput {
   escalationRules: Json
   esignatureRequired: Boolean
   isActive: Boolean
+  isHaveCondition: Boolean
   isParallel: Boolean
   requiredApprovals: Int
   slaHours: Int
@@ -25257,6 +26127,11 @@ input WorkFlowStepTemplateFormInput {
   """(Optional) The isActive of the WorkFlowStepTemplate. Type: Boolean."""
   isActive: Boolean
 
+  """
+  (Optional) The isHaveCondition of the WorkFlowStepTemplate. Type: Boolean.
+  """
+  isHaveCondition: Boolean
+
   """(Optional) The isParallel of the WorkFlowStepTemplate. Type: Boolean."""
   isParallel: Boolean
 
@@ -25472,6 +26347,7 @@ input WorkFlowStepTemplateUpdateInput {
   esignatureRequired: Boolean
   id: String
   isActive: Boolean
+  isHaveCondition: Boolean
   isParallel: Boolean
   requiredApprovals: Int
   slaHours: Int
@@ -25489,7 +26365,7 @@ input WorkFlowStepTemplateUpdateManyNestedInput {
   create: [WorkFlowStepTemplateCreateInput!]
   createMany: [WorkFlowStepTemplateCreateInput!]
   delete: [WorkFlowStepTemplateConnectInput!]
-  deleteMany: [WorkFlowStepTemplateWhereInput!]
+  deleteMany: WorkFlowStepTemplateWhereInput
   disconnect: [WorkFlowStepTemplateConnectInput!]
   set: [WorkFlowStepTemplateConnectInput!]
   update: [WorkFlowStepTemplateUpsertNestedInput!]
@@ -25564,6 +26440,9 @@ input WorkFlowStepTemplateWhereInput {
 
   """Filter by isActive (Boolean)."""
   isActive: Json
+
+  """Filter by isHaveCondition (Boolean)."""
+  isHaveCondition: Json
 
   """Filter by isParallel (Boolean)."""
   isParallel: Json
@@ -26654,7 +27533,7 @@ input WorkFlowTemplateScopeUpdateManyNestedInput {
   create: [WorkFlowTemplateScopeCreateInput!]
   createMany: [WorkFlowTemplateScopeCreateInput!]
   delete: [WorkFlowTemplateScopeConnectInput!]
-  deleteMany: [WorkFlowTemplateScopeWhereInput!]
+  deleteMany: WorkFlowTemplateScopeWhereInput
   disconnect: [WorkFlowTemplateScopeConnectInput!]
   set: [WorkFlowTemplateScopeConnectInput!]
   update: [WorkFlowTemplateScopeUpsertNestedInput!]
@@ -26761,7 +27640,7 @@ input WorkFlowTemplateUpdateManyNestedInput {
   create: [WorkFlowTemplateCreateInput!]
   createMany: [WorkFlowTemplateCreateInput!]
   delete: [WorkFlowTemplateConnectInput!]
-  deleteMany: [WorkFlowTemplateWhereInput!]
+  deleteMany: WorkFlowTemplateWhereInput
   disconnect: [WorkFlowTemplateConnectInput!]
   set: [WorkFlowTemplateConnectInput!]
   update: [WorkFlowTemplateUpsertNestedInput!]
@@ -27561,7 +28440,7 @@ input WorkInformationUpdateManyNestedInput {
   create: [WorkInformationCreateInput!]
   createMany: [WorkInformationCreateInput!]
   delete: [WorkInformationConnectInput!]
-  deleteMany: [WorkInformationWhereInput!]
+  deleteMany: WorkInformationWhereInput
   disconnect: [WorkInformationConnectInput!]
   set: [WorkInformationConnectInput!]
   update: [WorkInformationUpsertNestedInput!]

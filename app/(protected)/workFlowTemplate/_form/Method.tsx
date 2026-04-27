@@ -3,7 +3,7 @@ import { ActionType, PopupType } from '@/app/_component/Row/Action';
 import { modelGQL } from '@/lib/api/crud.gql';
 import { useSession } from 'next-auth/react';
 import React, { useEffect } from "react";
-import { useFieldArray, useForm, UseFormReturn } from 'react-hook-form';
+import { useFieldArray, useForm, } from 'react-hook-form';
 import { ok } from '@/lib/util/reponseUtil';
 import { WorkFlowTemplate, WorkFlowTemplateResponse } from '@/lib/generated/api/customHookAPI/graphql';
 import FormTemplate from '@/components/Forms/FormTemplate';
@@ -21,6 +21,7 @@ import { useQuery } from '@apollo/client/react';
 import { WorkFlowTemplateFindUnique } from '@/lib/api/gql/WorkFlowTemplate.gql';
 import { DrawerClose } from '@/components/ui/drawer';
 import WorkFlowTemplateStepForm from './components/WorkFlowTemplateStepForm';
+import useToast from '@/app/_hooks/useToast';
 
 type MethodProps = {
   rowId?: string | null;
@@ -35,6 +36,7 @@ const modelAPI = modelGQL;
 const Method = (props: MethodProps) => {
   const { model } = useListContext();
   const session = useSession();
+  const toast = useToast();
 
   const workFlowTemplateFindUnique = useQuery<
     { WorkFlowTemplateFindUnique: WorkFlowTemplateResponse },
@@ -45,6 +47,8 @@ const Method = (props: MethodProps) => {
     },
     skip: !props.rowId || props.actionType === "none",
   })
+
+  console.log("Workflow Template Unique Data:", workFlowTemplateFindUnique.data);
 
   const defaultValues = {
     name: '',
@@ -61,6 +65,7 @@ const Method = (props: MethodProps) => {
       stepNumber: 1,
       assignmentTypeId: "",
       assignedToUserId: "",
+      isHaveCondition: false,
       conditions: [{
         modelName: "WorkFlowTemplateConfig",
         group: "WorkFlowTemplateConfig",
@@ -101,6 +106,58 @@ const Method = (props: MethodProps) => {
           positionId: "",
           jobLevelId: "",
         }],
+        steps: data.steps?.map(step => ({
+          stepNumber: step.stepNumber ?? 1,
+          assignmentTypeId: step.assignmentTypeId ?? "",
+          assignedToUserId: step.assignedToUserId ?? "",
+          isHaveCondition: step.conditions && step.conditions.length > 0 ? true : false,
+          conditions: step.conditions?.map(condition => ({
+            modelName: condition.modelName ?? "WorkFlowTemplateConfig",
+            group: condition.group ?? "WorkFlowTemplateConfig",
+            codeKey: condition.codeKey ?? "workflow_template_config_conditions",
+            code: condition.code ?? "workflow_template_config_conditions",
+            codeLabel: condition.codeLabel ?? "Conditions",
+            value: condition.value ?? {
+              nodeType: "RULE",
+              logicalOperator: "",
+              field: "",
+              operator: "",
+              value: ""
+            },
+          })) ?? [{
+            modelName: "WorkFlowTemplateConfig",
+            group: "WorkFlowTemplateConfig",
+            codeKey: "workflow_template_config_conditions",
+            code: "workflow_template_config_conditions",
+            codeLabel: "Conditions",
+            value: {
+              nodeType: "RULE",
+              logicalOperator: "",
+              field: "",
+              operator: "",
+              value: ""
+            }
+          }]
+        })) ?? [{
+          stepNumber: 1,
+          assignmentTypeId: "",
+          assignedToUserId: "",
+          isHaveCondition: false,
+          conditions: [{
+            modelName: "WorkFlowTemplateConfig",
+            group: "WorkFlowTemplateConfig",
+            codeKey: "workflow_template_config_conditions",
+            code: "workflow_template_config_conditions",
+            codeLabel: "Conditions",
+            value: {
+              nodeType: "RULE",
+              logicalOperator: "",
+              field: "",
+              operator: "",
+              value: ""
+            }
+          }]
+        }]
       });
     }
   }, [workFlowTemplateFindUnique.data, props.actionType, form]);
@@ -190,6 +247,72 @@ const Method = (props: MethodProps) => {
       }
       : null;
 
+    // Remove all steps fields that have empty values
+    const filteredSteps = modelData.steps?.map(step => {
+      const filteredConditions = step.conditions?.filter(condition => {
+        const value = condition.value as Record<string, unknown>;
+        // For RULE nodes, check if field, operator, and value are filled
+        if (value.nodeType === "RULE") {
+          return value.field && value.operator && value.value;
+        }
+        // For GROUP nodes, check if logicalOperator is filled
+        return value.logicalOperator;
+      }) ?? [];
+
+      // Build condition tree structure
+
+      return {
+        ...step,
+        conditions: filteredConditions,
+      }
+    }) ?? [];
+
+
+
+    // Map filtered steps to create format - remove empty strings
+    const stepsData = filteredSteps?.length > 0
+      ? {
+        create: filteredSteps.map(step => ({
+          stepNumber: step.stepNumber,
+          assignmentTypeId: step.assignmentTypeId ? step.assignmentTypeId : null,
+          assignedToUserId: step.assignedToUserId ? step.assignedToUserId : null,
+          isHaveCondition: step.isHaveCondition,
+          conditions: step.conditions.length > 0 ? {
+            create: step.conditions?.map(condition => ({
+              modelName: condition.modelName,
+              group: condition.group,
+              codeKey: condition.codeKey,
+              code: condition.code,
+              codeLabel: condition.codeLabel,
+              value: condition.value,
+            })) ?? [],
+          } : null
+        }))
+      }
+      : null;
+
+
+    // Don't Update if no changes detected - This is to prevent unnecessary version increment
+    if (props.actionType === "edit" && workFlowTemplateFindUnique.data?.WorkFlowTemplateFindUnique.data) {
+      const existingData = workFlowTemplateFindUnique.data.WorkFlowTemplateFindUnique.data;
+      const isScopeEqual = JSON.stringify(existingData.scope) === JSON.stringify(scopeData?.create);
+      const isStepsEqual = JSON.stringify(existingData.steps) === JSON.stringify(stepsData?.create);
+      const isMainDataEqual =
+        existingData.name === modelData.name &&
+        existingData.description === modelData.description &&
+        existingData.isGlobal === modelData.isGlobal;
+      if (isScopeEqual && isStepsEqual && isMainDataEqual) {
+        toast.error({
+          message: "No Changes Detected",
+          description: `No changes detected in workflow template: ${modelData.name}. Update skipped.`,
+        })
+        return ok("NO_CHANGES_DETECTED",
+          `No changes detected in workflow template: ${modelData.name}. Update skipped.`,
+          modelData
+        );
+      }
+    }
+
     switch (props.actionType) {
       case 'edit':
         await executeUpdate({
@@ -204,7 +327,11 @@ const Method = (props: MethodProps) => {
               scope: scopeData ? {
                 deleteMany: {},
                 create: scopeData.create,
-              } : undefined
+              } : undefined,
+              steps: stepsData ? {
+                deleteMany: {},
+                create: stepsData.create,
+              } : undefined,
             },
             currentUserId: session?.data?.user?.id,
           }
@@ -220,10 +347,14 @@ const Method = (props: MethodProps) => {
                 isGlobal: modelData.isGlobal ?? workFlowTemplateFindUnique.data?.WorkFlowTemplateFindUnique.data?.isGlobal,
                 version: (workFlowTemplateFindUnique?.data?.WorkFlowTemplateFindUnique.data?.version ?? 0) + 1,
                 // Logic: Wipe existing associations, then inject new ones
-                scope: {
+                scope: scopeData ? {
                   deleteMany: {},
-                  create: scopeData?.create ?? [],
-                }
+                  create: scopeData.create,
+                } : undefined,
+                steps: stepsData ? {
+                  deleteMany: {},
+                  create: stepsData.create,
+                } : undefined,
               },
               currentUserId: session?.data?.user?.id,
             }
@@ -237,7 +368,8 @@ const Method = (props: MethodProps) => {
               description: modelData.description,
               isGlobal: modelData.isGlobal,
               version: modelData.version,
-              scope: form.watch("isGlobal") ? null : scopeData
+              scope: form.watch("isGlobal") ? null : scopeData,
+              steps: stepsData
             },
             currentUserId: session?.data?.user?.id,
           }
@@ -254,14 +386,15 @@ const Method = (props: MethodProps) => {
               description: modelData.description,
               isGlobal: modelData.isGlobal,
               version: modelData.version,
-              scope: form.watch("isGlobal") ? null : scopeData
+              scope: form.watch("isGlobal") ? null : scopeData,
+              steps: stepsData
             },
             currentUserId: session?.data?.user?.id,
           }
         })
         return ok("SUCCESS_CREATE_WORKFLOW_TEMPLATE",
           `Successfully created workflow template: ${modelData.name}`,
-          filteredScope
+          modelData
         );
     }
   };
@@ -556,7 +689,7 @@ const Method = (props: MethodProps) => {
               }
 
               {/* WorkFlow Template StepForm */}
-              <WorkFlowTemplateStepForm form={form as unknown as UseFormReturn<Record<string, unknown>>} />
+              <WorkFlowTemplateStepForm form={form as never} />
 
               {/* Versioning Footer */}
               < div className="pt-4 mt-2 border-t bg-slate-50/50 -mx-6 px-6 py-4 rounded-b-xl" >

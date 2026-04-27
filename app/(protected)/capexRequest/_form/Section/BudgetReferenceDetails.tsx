@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { modelGQL } from "@/lib/api/crud.gql";
 import {
   BudgetResponse,
