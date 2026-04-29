@@ -18,6 +18,88 @@ fragment BasicInformationFragment on BasicInformation {
   isActive
   createdAt
   updatedAt
+  user {
+    id
+    name
+    email
+    password
+    userName
+    emailVerified
+    image
+    isTwoFactorAuthEnabled
+    otpCode
+    emailOtpExpiresAt
+    incrementalLoginAttempts
+    isActive
+    createdAt
+    updatedAt
+  }
+  reportingManager {
+    id
+    employeeNumber
+    employeeId
+    groupOfCompanyId
+    companyId
+    departmentId
+    positionId
+    jobLevelId
+    employmentTypeId
+    employmentStatusId
+    reportingManagerId
+    hireDate
+    regularizationDate
+    firstProbationEvaluationDate
+    finalProbationEvaluationDate
+    contractEndDate
+    seasonalEndDate
+    endDate
+    workLocationId
+    workSetupTypeId
+    isActive
+    createdAt
+    updatedAt
+  }
+  workInformations {
+    id
+    employeeNumber
+    employeeId
+    groupOfCompanyId
+    companyId
+    departmentId
+    positionId
+    jobLevelId
+    employmentTypeId
+    employmentStatusId
+    reportingManagerId
+    hireDate
+    regularizationDate
+    firstProbationEvaluationDate
+    finalProbationEvaluationDate
+    contractEndDate
+    seasonalEndDate
+    endDate
+    workLocationId
+    workSetupTypeId
+    isActive
+    createdAt
+    updatedAt
+  }
+  auditLogs {
+    id
+    modelId
+    modelName
+    action
+    actionTypeId
+    timestamp
+    actorId
+    oldDetails
+    newDetails
+    parentId
+    isActive
+    createdAt
+    updatedAt
+    inventoryItemId
+  }
 }
 `;
 

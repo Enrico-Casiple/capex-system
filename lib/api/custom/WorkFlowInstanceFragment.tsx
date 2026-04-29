@@ -1,65 +1,81 @@
 import { gql } from '@apollo/client';
-export const WorkFlowTemplateFragment = gql`
-fragment WorkFlowTemplateFragment on WorkFlowTemplate {
+export const WorkFlowInstanceFragment = gql`
+fragment WorkFlowInstanceFragment on WorkFlowInstance {
   id
-  name
+  templateId
+  title
   description
-  isGlobal
-  version
+  statusId
+  currentStep
+  referenceTypeId
+  startedAt
+  completedAt
+  requestId
+  budgetId
   isActive
   createdAt
   updatedAt
-  scope {
+  template {
     id
-    templateId
-    companyId
-    departmentId
-    positionId
-    jobLevelId
+    name
+    description
+    isGlobal
+    version
+    isActive
+    createdAt
+    updatedAt
+  }
+  status {
+    id
+    name
+    modelNameType
+    isActive
+    createdAt
+    updatedAt
+  }
+  referenceType {
+    id
+    name
+    description
+    modelNameType
     isActive
     createdAt
     updatedAt
   }
   steps {
     id
-    workflowTemplateId
+    instanceId
+    stepTemplateId
     stepNumber
-    assignmentTypeId
+    statusId
+    status {
+      name
+    }
     assignedToUserId
-    assignmentRules
-    isHaveCondition
-    isParallel
-    requiredApprovals
-    slaHours
-    escalationRules
-    esignatureRequired
-    attachmentRequired
+    assignedToUser {
+      name
+      email
+    }
+    startedAt
+    actionAt
+    comments
+    isEditable
+    source
+    isRequired
     isActive
     createdAt
     updatedAt
-    conditions {
-      id
-      modelName
-      group
-      codeKey
-      code
-      codeLabel
-      value
-      modelId
-    }
   }
-  workFlowInstance {
+  signatures {
     id
-    templateId
-    title
-    description
-    statusId
-    currentStep
-    referenceTypeId
-    startedAt
-    completedAt
-    requestId
-    budgetId
+    instanceId
+    stepId
+    attachmentUrl
+    userId
+    signatureHash
+    payload
+    ipAddress
+    userAgent
     isActive
     createdAt
     updatedAt

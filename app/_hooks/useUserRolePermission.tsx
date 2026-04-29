@@ -50,6 +50,8 @@ const useUserRolePermission = () => {
     [rolePermissions],
   );
 
+  // console.log('User permissions:', permissions);
+
   const loading = sessionLoading || userRoleLoading;
 
   // A global admin has isGlobal and isAdmin both true — they bypass all permission checks
@@ -59,6 +61,7 @@ const useUserRolePermission = () => {
   );
 
   // Check if the current user has a specific permission
+  // Check if the current user has a specific permission
   const can = useMemo(
     () =>
       (module: PermissionInput, resource: PermissionInput, action: PermissionInput): boolean => {
@@ -66,16 +69,39 @@ const useUserRolePermission = () => {
         const resourceList = normalizeToArray(resource);
         const actionList = normalizeToArray(action);
 
+        // Filter to only keep modules/resources/actions that user has permission for
+        const allowedModules = moduleList.filter(m =>
+          permissions.some(p => p.module === m || p.module === '*')
+        );
+        const allowedResources = resourceList.filter(r =>
+          permissions.some(p => p.resource === r || p.resource === '*')
+        );
+        const allowedActions = actionList.filter(a =>
+          permissions.some(p => p.action === a || p.action === '*')
+        );
+
+
+        // Validate filtered inputs - reject empty arrays
+        if (allowedModules.length === 0 || allowedResources.length === 0 || allowedActions.length === 0) {
+          console.warn('No allowed permissions after filtering:', {
+            allowedModules,
+            allowedResources,
+            allowedActions,
+          });
+          return false;
+        }
+
         if (isGlobalAdmin) return true;
 
+        // Check if ALL filtered items have a matching permission
         return permissions.some(
           (permission) =>
             permission.module &&
-            moduleList.includes(permission.module) &&
+            allowedModules.includes(permission.module) &&
             permission.resource &&
-            resourceList.includes(permission.resource) &&
+            allowedResources.includes(permission.resource) &&
             permission.action &&
-            actionList.includes(permission.action),
+            allowedActions.includes(permission.action),
         );
       },
     [isGlobalAdmin, permissions],

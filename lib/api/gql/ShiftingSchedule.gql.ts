@@ -15,6 +15,47 @@ fragment ShiftingScheduleFragment on ShiftingSchedule {
   workInformationId
   createdAt
   updatedAt
+  workInformation {
+    id
+    employeeNumber
+    employeeId
+    groupOfCompanyId
+    companyId
+    departmentId
+    positionId
+    jobLevelId
+    employmentTypeId
+    employmentStatusId
+    reportingManagerId
+    hireDate
+    regularizationDate
+    firstProbationEvaluationDate
+    finalProbationEvaluationDate
+    contractEndDate
+    seasonalEndDate
+    endDate
+    workLocationId
+    workSetupTypeId
+    isActive
+    createdAt
+    updatedAt
+  }
+  auditLogs {
+    id
+    modelId
+    modelName
+    action
+    actionTypeId
+    timestamp
+    actorId
+    oldDetails
+    newDetails
+    parentId
+    isActive
+    createdAt
+    updatedAt
+    inventoryItemId
+  }
 }
 `;
 

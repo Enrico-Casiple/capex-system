@@ -7,6 +7,73 @@ fragment LocationFragment on Location {
   isActive
   createdAt
   updatedAt
+  workInformations {
+    id
+    employeeNumber
+    employeeId
+    groupOfCompanyId
+    companyId
+    departmentId
+    positionId
+    jobLevelId
+    employmentTypeId
+    employmentStatusId
+    reportingManagerId
+    hireDate
+    regularizationDate
+    firstProbationEvaluationDate
+    finalProbationEvaluationDate
+    contractEndDate
+    seasonalEndDate
+    endDate
+    workLocationId
+    workSetupTypeId
+    isActive
+    createdAt
+    updatedAt
+  }
+  groupOfCompaniesLocation {
+    id
+    name
+    acronym
+    description
+    industryTypeId
+    headquartersId
+    isActive
+    createdAt
+    updatedAt
+  }
+  companiesLocation {
+    id
+    name
+    acronym
+    description
+    groupOfCompanyId
+    locationsid
+    conctactNumber
+    email
+    logo
+    scopeTypeId
+    isActive
+    createdAt
+    updatedAt
+  }
+  auditLogs {
+    id
+    modelId
+    modelName
+    action
+    actionTypeId
+    timestamp
+    actorId
+    oldDetails
+    newDetails
+    parentId
+    isActive
+    createdAt
+    updatedAt
+    inventoryItemId
+  }
 }
 `;
 

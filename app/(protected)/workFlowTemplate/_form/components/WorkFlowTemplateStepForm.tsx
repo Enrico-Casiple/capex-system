@@ -593,7 +593,7 @@ const ConditionBuilder = ({
                     const d = data as { id?: string; name?: string; userName?: string; email?: string };
                     return {
                       label: d.name ?? d.userName ?? d.email ?? '',
-                      value: d.name ?? '',
+                      value: d.id ?? '',
                     };
                   }}
                   mapDefaultOption={(data: unknown) => {
@@ -603,7 +603,7 @@ const ConditionBuilder = ({
                     if (!d?.data) return null;
                     return {
                       label: d.data.name ?? d.data.userName ?? d.data.email ?? '',
-                      value: d.data.name ?? '',
+                      value: d.data.id ?? '',
                     };
                   }}
                 />

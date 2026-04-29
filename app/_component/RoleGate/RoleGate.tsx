@@ -3,8 +3,7 @@
 
 import { Spinner } from '@/app/_component/Spinner';
 import useUserRolePermission from '@/app/_hooks/useUserRolePermission';
-import { useRouter } from 'next/navigation';
-import React, { ReactNode, useEffect, useRef, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 
 type UnauthorizedStyle = 'default' | 'compact' | 'minimal' | 'card';
 
@@ -38,22 +37,26 @@ const RoleGate = ({
   const { can, loading } = useUserRolePermission();
   const hasPermission = can(modules, resources, actions);
 
-  const router = useRouter();
   const [countdown, setCountdown] = useState(redirectDelay);
-  const hasRedirected = useRef(false);
 
   // Reset countdown when redirectDelay changes
   useEffect(() => {
     setCountdown(redirectDelay);
   }, [redirectDelay]);
 
-  // Handle countdown and redirect
+  // Handle countdown and redirect - only for read actions
   useEffect(() => {
-    if (loading || hasPermission || disableRedirect || fallback || hasRedirected.current) return;
+    // Check if action includes 'read'
+    const isReadAction = Array.isArray(action)
+      ? action.includes('read')
+      : action === 'read';
+
+    // Only redirect if it's a read action without permission
+    if (loading || hasPermission || disableRedirect || fallback || !isReadAction) {
+      return;
+    }
 
     if (countdown === 0) {
-      hasRedirected.current = true;
-      router.push(redirectTo);
       return;
     }
 
@@ -61,8 +64,6 @@ const RoleGate = ({
       setCountdown((prev) => {
         const next = prev - 1;
         if (next <= 0) {
-          hasRedirected.current = true;
-          router.push(redirectTo);
           return 0;
         }
         return next;
@@ -70,19 +71,25 @@ const RoleGate = ({
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [loading, hasPermission, disableRedirect, fallback, countdown, redirectTo, router]);
-
+  }, [loading, hasPermission, disableRedirect, fallback, countdown, redirectTo, action]);
   if (loading) {
     return <Spinner />;
   }
 
   if (!hasPermission) {
     if (fallback) return <>{fallback}</>;
-    // if (loading) {
-    //   return <Spinner />;
-    // }
 
-    // Render based on style
+    // Check if action includes 'read' - handles both string and array
+    const isReadAction = Array.isArray(action)
+      ? action.includes('read')
+      : action === 'read';
+
+    // Only show UI for read action, otherwise return null silently
+    if (!isReadAction) {
+      return null;
+    }
+
+    // Render based on style for read actions only
     switch (style) {
       case 'compact':
         return (
@@ -285,8 +292,11 @@ const RoleGate = ({
     }
   }
 
-  return <React.Fragment>
-    {children}</React.Fragment>;
+  return (
+    <React.Fragment>
+      {children}
+    </React.Fragment>
+  );
 };
 
 export default RoleGate;

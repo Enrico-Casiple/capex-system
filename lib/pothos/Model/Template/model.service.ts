@@ -127,15 +127,24 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
       if (value && typeof value === 'object' && !Array.isArray(value)) {
         const nestedValue = value as Record<string, unknown>;
         const nestedKeys = Object.keys(nestedValue);
+        
+        // Handle one-to-many: deleteMany + create
         const hasDeleteMany = nestedKeys.includes('deleteMany');
+        // Handle one-to-one: delete + create
+        const hasDelete = nestedKeys.includes('delete');
         const hasCreate = nestedKeys.includes('create');
 
-        if (hasDeleteMany && hasCreate) {
+        if ((hasDeleteMany || hasDelete) && hasCreate) {
+          // Order matters: delete/deleteMany MUST come before create
           result[key] = {
-            deleteMany: nestedValue.deleteMany,
+            ...(hasDeleteMany ? { deleteMany: nestedValue.deleteMany } : {}),
+            ...(hasDelete ? { delete: nestedValue.delete } : {}),
             create: nestedValue.create,
+            // Include any other properties (except delete/deleteMany/create)
             ...Object.fromEntries(
-              nestedKeys.filter(k => k !== 'deleteMany' && k !== 'create').map(k => [k, nestedValue[k]])
+              nestedKeys
+                .filter(k => !['deleteMany', 'delete', 'create'].includes(k))
+                .map(k => [k, nestedValue[k]])
             )
           };
         } else {
@@ -1106,8 +1115,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
       );
     }
   }
-
-  async exportCsv(input: ExportCsvInput<PrismaModel>) {
+async exportCsv(input: ExportCsvInput<PrismaModel>) {
     try {
       const columnInclude = this.buildCsvIncludeFromColumns(input.columns);
       const include = this.mergeIncludeTrees(
@@ -1183,6 +1191,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
       return fail(this.code('EXPORT_CSV_FAILED'), `Failed to export CSV: ${message}`);
     }
   }
+
 
   async groupBy(groupByInput: GroupByInput<PrismaModel>) {
     try {

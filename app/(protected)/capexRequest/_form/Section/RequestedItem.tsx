@@ -34,12 +34,13 @@ export interface RequestedItemFormValues {
 
 interface RequestedItemProps {
   form: UseFormReturn<RequestedItemFormValues>;
+  isViewMode?: boolean; // Optional prop to indicate view-only mode
 }
 
 const EMPTY_ITEM: RequestItem = {
   description: "",
   quantity: 1,
-  unitOfMeasure: "pcs",
+  unitOfMeasure: "PCS",
   vatPercentage: 12,
   isInclusiveVat: false,
   unitPrice: 0,
@@ -265,7 +266,7 @@ const MobileItemCard = ({
 
 // --- Main Component ---
 
-const RequestedItem = ({ form }: RequestedItemProps) => {
+const RequestedItem = ({ form, isViewMode }: RequestedItemProps) => {
   const toast = useToast();
 
   const { fields, append, remove, replace } = useFieldArray({
@@ -335,7 +336,7 @@ const RequestedItem = ({ form }: RequestedItemProps) => {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className={`flex items-center gap-2 ${isViewMode ? "hidden" : ""}`}>
           <Button
             variant="ghost"
             type="button"
@@ -362,7 +363,10 @@ const RequestedItem = ({ form }: RequestedItemProps) => {
       </div>
 
       {/* Analytics Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
+      <div className={`grid gap-2 md:gap-3 ${form.watch("requestedCRF.crfReferenceNo" as never)
+        ? 'grid-cols-5'
+        : 'grid-cols-4'
+        }`}>
         {[
           { label: "Items", value: fields.length, variant: "secondary" as const },
           { label: "Net Total", value: formatCurrency(totalNet) },
@@ -373,6 +377,16 @@ const RequestedItem = ({ form }: RequestedItemProps) => {
             className: "text-primary font-bold",
             bg: "bg-primary/5",
           },
+          ...(form.watch("requestedCRF.crfReferenceNo" as never)
+            ? [
+              {
+                label: "CRF Ref No.",
+                value: form.watch("requestedCRF.crfReferenceNo" as never),
+                className: "text-primary font-bold",
+                bg: "bg-primary/5",
+              },
+            ]
+            : []),
         ].map((stat, idx) => (
           <div
             key={idx}
@@ -381,17 +395,16 @@ const RequestedItem = ({ form }: RequestedItemProps) => {
             <span className="text-[10px] md:text-xs text-muted-foreground">{stat.label}</span>
             {stat.variant ? (
               <Badge variant={stat.variant} className="text-xs font-semibold w-fit">
-                {stat.value}
+                {String(stat.value)}
               </Badge>
             ) : (
               <span className={`text-xs md:text-sm font-semibold ${stat.className || "text-slate-800"}`}>
-                {stat.value}
+                {String(stat.value)}
               </span>
             )}
           </div>
         ))}
       </div>
-
       {/* Desktop Table View */}
       <div className="hidden lg:block rounded-xl border overflow-hidden shadow-sm bg-white">
         <div className="overflow-x-auto">
@@ -433,6 +446,7 @@ const RequestedItem = ({ form }: RequestedItemProps) => {
                       clearErrors={form.clearErrors}
                       maxSizeMB={10}
                       allowedExtensions={['pdf']}
+                      disabled={isViewMode}
                     />
                   </TableCell>
 
@@ -442,6 +456,9 @@ const RequestedItem = ({ form }: RequestedItemProps) => {
                       control={form.control}
                       placeholder="Enter specifications..."
                       label=""
+                      inputProps={{
+                        disabled: isViewMode
+                      }}
                     />
                   </TableCell>
 
@@ -449,7 +466,7 @@ const RequestedItem = ({ form }: RequestedItemProps) => {
                     <CustomNumberInput
                       name={`requestItems.${index}.quantity`}
                       control={form.control}
-                      inputProps={{ min: 1 }}
+                      inputProps={{ min: 1, disabled: isViewMode }}
                       label=""
                       placeholder="Qty"
                     />
@@ -461,6 +478,9 @@ const RequestedItem = ({ form }: RequestedItemProps) => {
                       control={form.control}
                       placeholder="UOM"
                       label=""
+                      inputProps={{
+                        disabled: isViewMode
+                      }}
                     />
                   </TableCell>
 
@@ -468,9 +488,10 @@ const RequestedItem = ({ form }: RequestedItemProps) => {
                     <CustomNumberInput
                       name={`requestItems.${index}.unitPrice`}
                       control={form.control}
-                      inputProps={{ min: 0 }}
+                      inputProps={{ min: 0, disabled: isViewMode }}
                       label=""
                       placeholder="Price"
+
                     />
                   </TableCell>
 
@@ -478,9 +499,10 @@ const RequestedItem = ({ form }: RequestedItemProps) => {
                     <CustomNumberInput
                       name={`requestItems.${index}.vatPercentage`}
                       control={form.control}
-                      inputProps={{ min: 0, max: 100 }}
+                      inputProps={{ min: 0, max: 100, disabled: isViewMode }}
                       label=""
                       placeholder="VAT %"
+
                     />
                   </TableCell>
                   <TableCell className="align-middle bg-slate-50/30 py-3">
@@ -489,6 +511,7 @@ const RequestedItem = ({ form }: RequestedItemProps) => {
                         name={`requestItems.${index}.isInclusiveVat`}
                         control={form.control}
                         inputProps={{
+                          disabled: isViewMode,
                           style: {
                             width: '20px',
                             height: '20px'
@@ -531,7 +554,7 @@ const RequestedItem = ({ form }: RequestedItemProps) => {
                       size="icon"
                       disabled={fields.length === 1}
                       onClick={() => remove(index)}
-                      className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all"
+                      className={`opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all ${isViewMode ? "hidden" : ""}`}
                       title="Remove item"
                     >
                       <Trash2 className="h-4 w-4" />

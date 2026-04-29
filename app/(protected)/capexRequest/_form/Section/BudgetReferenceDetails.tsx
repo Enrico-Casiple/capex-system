@@ -26,31 +26,46 @@ import { UseFormReturn } from "react-hook-form";
 import * as React from "react";
 import { BudgetFindBy } from "../../../../../lib/api/gql/Budget.gql";
 import { BudgetLedgerGroupBy } from "@/lib/api/gql/BudgetLedger.gql";
-import { RefreshCw, ChevronDown } from "lucide-react";
+import { ChevronDown, RotateCcw } from "lucide-react";
+import { ActionType } from "@/app/_component/Row/Action";
+import { useListContext } from "@/app/_context/ListContext/ListProvider";
+import ProtectedComponent from "@/app/_component/RoleGate/ProtectedComponent";
+import VerificationButton from "../_component/VerificationButton";
 
 type BudgetFieldMap = {
   quotationAmount: number;
+  "requestedCRF.name": string;
+  "requestedCRF.description": string;
   "requestedCRF.budgetId": string;
+  "requestedCRF.statusId": string;
+  "requestedCRF.companyId": string;
+  "requestedCRF.departmentId": string;
   "requestedCRF.categoryId": string;
   "requestedCRF.approvedAmount": number;
-  "requestedCRF.remainingAmount": number;
+  // "requestedCRF.remainingAmount": number;
   "requestedCRF.utilizedBudget": number;
   "requestedCRF.newBalanceAmmount": number;
   "requestedCRF.projectedBudget": number;
   "requestedCRF.requestedAmount": number;
-  "requestedCRF.remarks.notes": string;
+  "requestedCRF.remark.notes": string;
+  "requestedCRF.remark.verificationNotes": string;
+  "requestedCRF.id": string;
 };
 
 type BudgetFieldName = keyof BudgetFieldMap;
 
 type BudgetReferenceDetailsProps = {
   form: UseFormReturn<Record<string, unknown>>;
+  isViewMode: boolean;
+  actionType?: ActionType;
+  isForFinance: boolean;
 };
 
 const modelAPI = modelGQL;
 
-const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
+const BudgetReferenceDetails = ({ form, isViewMode, actionType, isForFinance }: BudgetReferenceDetailsProps) => {
   const [mobileExpanded, setMobileExpanded] = React.useState(false);
+  const { modelName } = useListContext()
 
   const getField = React.useCallback(
     <K extends BudgetFieldName>(name: K): BudgetFieldMap[K] => {
@@ -77,7 +92,7 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
   );
 
   const watchedBudgetId = getField("requestedCRF.budgetId");
-  const watchedRemainingAmount = getField("requestedCRF.remainingAmount");
+  const watchedRemainingAmount = getField("requestedCRF.approvedAmount");
   const watchedUtilizedBudget = getField("requestedCRF.utilizedBudget");
   const watchedRequestedAmount = getField("requestedCRF.requestedAmount");
 
@@ -119,10 +134,10 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
     skip: !findBudgetRefNo,
   });
 
+  // Effect 1: When budget is selected, populate budget-related fields
   React.useEffect(() => {
     const budgetData = budgetQuery?.data?.BudgetFindBy?.data;
-    const budgetLedgerData =
-      budgetLedgerQueryGroupBy?.data?.BudgetLedgerGroupBy?.data;
+    const budgetLedgerData = budgetLedgerQueryGroupBy?.data?.BudgetLedgerGroupBy?.data;
     const budgetLedgerReleaseSum = Array.isArray(budgetLedgerData)
       ? Number(
         (
@@ -133,56 +148,81 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
       )
       : 0;
 
-    if (budgetData) {
-      setField("quotationAmount", 0);
+    if (budgetData && watchedBudgetId) {
+      // Auto-populate from budget selection
       setField("requestedCRF.categoryId", budgetData.categoryId ?? "");
       setField("requestedCRF.approvedAmount", budgetData.approvedAmount ?? 0);
-      setField("requestedCRF.remainingAmount", budgetData.remainingAmount ?? 0);
       setField("requestedCRF.utilizedBudget", budgetLedgerReleaseSum ?? 0);
       setField("requestedCRF.newBalanceAmmount", 0);
       setField("requestedCRF.projectedBudget", 0);
       setField("requestedCRF.requestedAmount", 0);
+    } else if (!watchedBudgetId) {
+      // Reset all fields when budget is cleared/removed
+      setField("requestedCRF.categoryId", "");
+      setField("requestedCRF.approvedAmount", 0);
+      setField("requestedCRF.utilizedBudget", 0);
+      setField("requestedCRF.newBalanceAmmount", 0);
+      setField("requestedCRF.projectedBudget", 0);
+      setField("requestedCRF.requestedAmount", 0);
     }
-  }, [
-    budgetQuery?.data?.BudgetFindBy?.data,
-    budgetLedgerQueryGroupBy?.data?.BudgetLedgerGroupBy?.data,
-    setField,
-  ]);
+  }, [watchedBudgetId, budgetQuery.data, budgetLedgerQueryGroupBy.data, setField]);
 
+  // Effect 2: Calculate derived fields when amounts change
   React.useEffect(() => {
     const budgetId = watchedBudgetId;
-    const remainingAmount = watchedRemainingAmount;
-    const utilizedBudget = watchedUtilizedBudget;
-    const requestedAmount = watchedRequestedAmount;
+    const remainingAmount = Number(watchedRemainingAmount) || 0;
+    const utilizedBudget = Number(watchedUtilizedBudget) || 0;
+    const requestedAmount = Number(watchedRequestedAmount) || 0;
+    const quotationAmount = getField("quotationAmount") as number;
 
-    const newBalance = Number(remainingAmount) - Number(utilizedBudget);
-    const projectedBalance = newBalance - Number(requestedAmount);
+    // Update name and description
+    setField("requestedCRF.name", `Budget Request for ${findBudgetRefNo || "Unbudgeted"}`);
+    setField(
+      "requestedCRF.description",
+      `This budget request is referencing the budget: ${findBudgetRefNo || "Unbudgeted"}`
+    );
+    setField("requestedCRF.companyId", form.watch("companyId") as string);
+    setField(
+      "requestedCRF.departmentId",
+      form.watch("responsibilityCenterId") as string
+    );
+    setField("requestedCRF.statusId", "69ef2111f681bdf7f3214d83");
 
-    if (!budgetId) {
-      setField("requestedCRF.utilizedBudget", requestedAmount);
-    }
+    // Calculate balances
+    const newBalance = remainingAmount - utilizedBudget;
+    const projectedBalance = newBalance - requestedAmount;
 
     setField("requestedCRF.newBalanceAmmount", newBalance);
     setField("requestedCRF.projectedBudget", projectedBalance);
+
+    // If quotation amount is set, use it as requested amount
+    if (quotationAmount > 0) {
+      setField("requestedCRF.requestedAmount", quotationAmount);
+    }
   }, [
     watchedBudgetId,
     watchedRemainingAmount,
     watchedUtilizedBudget,
     watchedRequestedAmount,
+    getField("quotationAmount"),
+    form,
+    findBudgetRefNo,
     setField,
   ]);
 
   const resetBudgetReferenceDetails = React.useCallback(() => {
     setField("quotationAmount", 0);
+    setField("requestedCRF.id", "");
     setField("requestedCRF.budgetId", "");
     setField("requestedCRF.categoryId", "");
     setField("requestedCRF.approvedAmount", 0);
-    setField("requestedCRF.remainingAmount", 0);
+    // setField("requestedCRF.remainingAmount", 0);
     setField("requestedCRF.utilizedBudget", 0);
     setField("requestedCRF.newBalanceAmmount", 0);
     setField("requestedCRF.projectedBudget", 0);
     setField("requestedCRF.requestedAmount", 0);
-    setField("requestedCRF.remarks.notes", "");
+    setField("requestedCRF.remark.notes", "");
+    setField("requestedCRF.remark.verificationNotes", "");
     form.clearErrors("requestedCRF");
   }, [form, setField]);
 
@@ -198,11 +238,11 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
       value: getValue("requestedCRF.approvedAmount"),
       color: "text-slate-900",
     },
-    {
-      label: "Remaining",
-      value: getValue("requestedCRF.remainingAmount"),
-      color: "text-blue-600",
-    },
+    // {
+    //   label: "Remaining",
+    //   value: getValue("requestedCRF.remainingAmount"),
+    //   color: "text-blue-600",
+    // },
     {
       label: "Utilized",
       value: getValue("requestedCRF.utilizedBudget"),
@@ -225,6 +265,7 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
     },
   ];
 
+
   return (
     <section className="space-y-4">
       {/* Header */}
@@ -242,29 +283,46 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
             </p>
           </div>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          type="button"
-          onClick={resetBudgetReferenceDetails}
-          className="self-start md:self-auto"
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            type="button"
+            size="sm"
+            onClick={resetBudgetReferenceDetails}
+            className={`text-muted-foreground hover:text-destructive gap-1.5 ${isViewMode ? "hidden" : ""}`}
+            title="Reset all items"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Reset</span>
+          </Button>
+          {/* STATUS IS "For Finance Review" */}
+          {
+            !getValue("requestedCRF.budgetId") && actionType === "edit" && !isForFinance && (
+              <VerificationButton
+                modelName={modelName}
+                isViewMode={isViewMode!}
+                getValueBudgetId={() => getValue("requestedCRF.budgetId")}
+                getValueId={() => getValue("requestedCRF.id")}
+                form={form}
+              />
+            )
+          }
+        </div>
       </div>
 
       <div className="space-y-4">
         {/* Upload Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <CustomImportInput<Record<string, unknown>>
-            name="attachmentUrl"
+            name="quotationUrl"
             label="Upload Quotation"
             control={form.control}
             setError={form.setError}
             clearErrors={form.clearErrors}
             maxSizeMB={10}
             allowedExtensions={["pdf"]}
-            dropzoneProps={{ maxFiles: 1 }}
+            dropzoneProps={{ maxFiles: 1, disabled: isViewMode }}
+            disabled={isViewMode}
           />
           <CustomNumberInput
             name="quotationAmount"
@@ -277,6 +335,7 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
                 setField("requestedCRF.requestedAmount", raw);
               },
               required: true,
+              disabled: isViewMode,
             }}
           />
         </div>
@@ -295,9 +354,9 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
                 <TableHead className="font-bold text-slate-900 text-xs text-center">
                   Approved Budget
                 </TableHead>
-                <TableHead className="font-bold text-slate-900 text-xs text-center">
+                {/* <TableHead className="font-bold text-slate-900 text-xs text-center">
                   Remaining
-                </TableHead>
+                </TableHead> */}
                 <TableHead className="font-bold text-slate-900 text-xs text-center">
                   Utilized
                 </TableHead>
@@ -319,7 +378,7 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
                     name="requestedCRF.budgetId"
                     control={form.control}
                     label=""
-                    disabled={Boolean(form.watch("requestedCRF.categoryId"))}
+                    disabled={isViewMode}
                     findAllWithCursorGQL={
                       modelAPI.BudgetGQL.findAllWithCursor
                     }
@@ -369,7 +428,7 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
                     name="requestedCRF.categoryId"
                     control={form.control}
                     label=""
-                    disabled={Boolean(form.watch("requestedCRF.budgetId"))}
+                    disabled={Boolean(form.watch("requestedCRF.budgetId")) || isViewMode}
                     findAllWithCursorGQL={
                       modelAPI.CategoryGQL.findAllWithCursor
                     }
@@ -435,7 +494,7 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
                     placeholder="Auto-calculated the amount from the form"
                   />
                 </TableCell>
-                <TableCell className="text-slate-900 p-2">
+                {/* <TableCell className="text-slate-900 p-2">
                   <CustomNumberInput
                     name="requestedCRF.remainingAmount"
                     control={form.control}
@@ -443,7 +502,7 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
                     inputProps={{ disabled: true }}
                     placeholder="Auto-calculated the total from the form"
                   />
-                </TableCell>
+                </TableCell> */}
                 <TableCell className="text-slate-900 p-2">
                   <CustomNumberInput
                     name="requestedCRF.utilizedBudget"
@@ -651,13 +710,36 @@ const BudgetReferenceDetails = ({ form }: BudgetReferenceDetailsProps) => {
         </div>
 
         {/* Remarks Section */}
-        <div>
+        <div className={`grid grid-cols-${1} gap-4`}>
           <CustomTextAreaInput
-            name="requestedCRF.remarks.notes"
+            name="requestedCRF.remark.notes"
             control={form.control}
             label="Remarks / Purpose"
             placeholder="Enter remarks or purpose for the budget request or if this is Construction In Progress related, indicate the project name and location here."
+            inputProps={{
+              disabled: isViewMode
+            }}
           />
+
+          {/* STATUS IS "For Finance Review" */}
+          {
+            actionType === "edit" && (!getValue("requestedCRF.budgetId") || isForFinance) && (
+              <ProtectedComponent
+                modelName={modelName}
+                action="verification"
+              >
+                <CustomTextAreaInput
+                  name="requestedCRF.remark.verificationNotes"
+                  control={form.control}
+                  label="Verification Notes"
+                  placeholder="Enter all notes this are marked as a title of unbudgeted if the request is unbudgeted, and marked as Construction In Progress if the request is for construction in progress. For construction in progress, indicate the project name and location here."
+                  inputProps={{
+                    disabled: isViewMode,
+                  }}
+                />
+              </ProtectedComponent>
+            )
+          }
         </div>
       </div>
     </section>

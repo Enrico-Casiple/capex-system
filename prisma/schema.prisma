@@ -634,9 +634,9 @@ model WorkFlowInstance {
   steps      WorkFlowInstanceStep[]
   signatures Signature[]
   requestId  String?                @unique @db.ObjectId
-  request    Request?               @relation(fields: [requestId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  budgetId   String?                @unique @db.ObjectId
-  budget     Budget?                @relation(fields: [budgetId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  request    Request?               @relation(fields: [requestId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  budgetId   String?                @db.ObjectId
+  budget     Budget?                @relation(fields: [budgetId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   auditLogs AuditLog[]
   isActive  Boolean?   @default(true)
@@ -652,10 +652,10 @@ model WorkFlowInstanceStep {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
   instanceId String?           @db.ObjectId
-  instance   WorkFlowInstance? @relation(fields: [instanceId], references: [id])
+  instance   WorkFlowInstance? @relation(fields: [instanceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   stepTemplateId String?               @db.ObjectId
-  stepTemplate   WorkFlowStepTemplate? @relation(fields: [stepTemplateId], references: [id])
+  stepTemplate   WorkFlowStepTemplate? @relation(fields: [stepTemplateId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   stepNumber Int?
 
@@ -904,7 +904,7 @@ model CapitalRecoveryFactor {
   newBalanceAmmount Float? // computed as approvedAmount - sum of committed and actual amounts from BudgetLedger, used for reporting and forecasting
   projectedBudget   Float? // the projected budget amount that this request is asking for, used for forecasting and reporting
   remark            Json? // Provided Specs During AOP and Provied purpose During AOP
-
+  remainingAmount Float? // computed as approvedAmount - sum of committed and actual amounts from BudgetLedger, used for reporting and forecasting
   requestId String?  @unique @db.ObjectId
   request   Request? @relation(fields: [requestId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   budgetId  String?  @db.ObjectId
@@ -943,7 +943,7 @@ model Budget {
 
   workflowTemplateId String?           @db.ObjectId
   workflowTemplate   WorkFlowTemplate? @relation(fields: [workflowTemplateId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  workflowInstance   WorkFlowInstance?
+  workflowInstance   WorkFlowInstance[]
 
   submittedAt DateTime?
   approvedAt  DateTime?

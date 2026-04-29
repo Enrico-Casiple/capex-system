@@ -19,28 +19,28 @@ export const generateFragment = (modelName: string) => {
       scalarFields.push(field.name);
     }
 
-    // if (field.kind === 'object') {
-    //   // first layer of relation only — scalar fields of the related model
-    //   const relatedModel = prismaDataModel.datamodel.models[field.type];
-    //   if (!relatedModel) return;
+    if (field.kind === 'object') {
+      // first layer of relation only — scalar fields of the related model
+      const relatedModel = prismaDataModel.datamodel.models[field.type];
+      if (!relatedModel) return;
 
-    //   const relatedScalars = relatedModel.fields
-    //     .filter((f) => f.kind === 'scalar' && !f.name.startsWith('_'))
-    //     .map((f) => f.name)
-    //     .join('\n          ');
+      const relatedScalars = relatedModel.fields
+        .filter((f) => f.kind === 'scalar' && !f.name.startsWith('_'))
+        .map((f) => f.name)
+        .join('\n          ');
 
-    //   if (field.isList) {
-    //     relationFields.push(`
-    //     ${field.name} {
-    //       ${relatedScalars}
-    //     }`);
-    //   } else {
-    //     relationFields.push(`
-    //     ${field.name} {
-    //       ${relatedScalars}
-    //     }`);
-    //   }
-    // }
+      if (field.isList) {
+        relationFields.push(`
+        ${field.name} {
+          ${relatedScalars}
+        }`);
+      } else {
+        relationFields.push(`
+        ${field.name} {
+          ${relatedScalars}
+        }`);
+      }
+    }
   });
 
   const fragmentName = `${modelName}Fragment`;

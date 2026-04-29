@@ -8,6 +8,22 @@ fragment HolidayFragment on Holiday {
   description
   createdAt
   updatedAt
+  auditLogs {
+    id
+    modelId
+    modelName
+    action
+    actionTypeId
+    timestamp
+    actorId
+    oldDetails
+    newDetails
+    parentId
+    isActive
+    createdAt
+    updatedAt
+    inventoryItemId
+  }
 }
 `;
 

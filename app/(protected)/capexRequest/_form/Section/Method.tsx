@@ -90,11 +90,6 @@ const Method = (props: MethodProps) => {
   const handleToSubmit = async (data: unknown) => {
     const modelData = data as unknown as WorkFlowTemplate;
 
-    //  Remove All the field that have empty value in scope
-    const filteredScope = modelData.scope?.filter(scope =>
-      scope.companyId || scope.departmentId || scope.positionId || scope.jobLevelId
-    );
-
 
     switch (props.actionType) {
       case 'edit':
@@ -117,10 +112,10 @@ const Method = (props: MethodProps) => {
               version: modelData.version,
               scope: form.watch("isGlobal") ? null : {
                 create: modelData.scope?.map(scope => ({
-                  companyId: scope.companyId ?? null,
-                  departmentId: scope.departmentId ?? null,
-                  positionId: scope.positionId ?? null,
-                  jobLevelId: scope.jobLevelId ?? null,
+                  companyId: scope.companyId ? scope.companyId : null,
+                  departmentId: scope.departmentId ? scope.departmentId : null,
+                  positionId: scope.positionId ? scope.positionId : null,
+                  jobLevelId: scope.jobLevelId ? scope.jobLevelId : null,
                 }))
               }
             },

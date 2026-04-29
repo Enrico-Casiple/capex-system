@@ -252,7 +252,7 @@ input AuditLogCreateInput {
 
 """Nested create many for AuditLog."""
 input AuditLogCreateManyNestedInput {
-  connect: [AuditLogConnectInput!]
+  connect: AuditLogConnectInput
   connectOrCreate: [AuditLogConnectOrCreateInput!]
   create: [AuditLogCreateInput!]
   createMany: [AuditLogCreateInput!]
@@ -821,6 +821,7 @@ input AuditLogUpdateOneNestedInput {
   connectOrCreate: AuditLogConnectOrCreateInput
   create: AuditLogCreateInput
   delete: Boolean
+  deleteMany: AuditLogWhereInput
   disconnect: Boolean
   update: AuditLogUpsertNestedInput
   upsert: AuditLogUpsertNestedInput
@@ -1144,7 +1145,7 @@ input BasicInformationCreateInput {
 
 """Nested create many for BasicInformation."""
 input BasicInformationCreateManyNestedInput {
-  connect: [BasicInformationConnectInput!]
+  connect: BasicInformationConnectInput
   connectOrCreate: [BasicInformationConnectOrCreateInput!]
   create: [BasicInformationCreateInput!]
   createMany: [BasicInformationCreateInput!]
@@ -1597,6 +1598,7 @@ input BasicInformationUpdateOneNestedInput {
   connectOrCreate: BasicInformationConnectOrCreateInput
   create: BasicInformationCreateInput
   delete: Boolean
+  deleteMany: BasicInformationWhereInput
   disconnect: Boolean
   update: BasicInformationUpsertNestedInput
   upsert: BasicInformationUpsertNestedInput
@@ -1792,8 +1794,10 @@ type Budget {
   """(Optional) updatedAt field of Budget. Type: DateTime (ISO 8601)."""
   updatedAt: DateTime
 
-  """(Optional) Related WorkFlowInstance record linked to this Budget."""
-  workflowInstance: WorkFlowInstance
+  """
+  (Optional) List of related WorkFlowInstance records linked to this Budget.
+  """
+  workflowInstance: [WorkFlowInstance!]!
 
   """(Optional) Related WorkFlowTemplate record linked to this Budget."""
   workflowTemplate: WorkFlowTemplate
@@ -1880,14 +1884,14 @@ input BudgetCreateInput {
   statusId: String
   submittedAt: DateTime
   updatedAt: DateTime
-  workflowInstance: WorkFlowInstanceCreateOneNestedInput
+  workflowInstance: WorkFlowInstanceCreateManyNestedInput
   workflowTemplate: WorkFlowTemplateCreateOneNestedInput
   workflowTemplateId: String
 }
 
 """Nested create many for Budget."""
 input BudgetCreateManyNestedInput {
-  connect: [BudgetConnectInput!]
+  connect: BudgetConnectInput
   connectOrCreate: [BudgetConnectOrCreateInput!]
   create: [BudgetCreateInput!]
   createMany: [BudgetCreateInput!]
@@ -2156,9 +2160,9 @@ input BudgetFormInput {
   updatedAt: DateTime
 
   """
-  (Optional) Single WorkFlowInstance relation for direct nested operations.
+  (Optional) List of WorkFlowInstance relation for direct nested operations.
   """
-  workflowInstance: WorkFlowInstanceFormInput
+  workflowInstance: [WorkFlowInstanceFormInput!]
 
   """
   (Optional) Single WorkFlowTemplate relation for direct nested operations.
@@ -2335,7 +2339,7 @@ input BudgetLedgerCreateInput {
 
 """Nested create many for BudgetLedger."""
 input BudgetLedgerCreateManyNestedInput {
-  connect: [BudgetLedgerConnectInput!]
+  connect: BudgetLedgerConnectInput
   connectOrCreate: [BudgetLedgerConnectOrCreateInput!]
   create: [BudgetLedgerCreateInput!]
   createMany: [BudgetLedgerCreateInput!]
@@ -2748,6 +2752,7 @@ input BudgetLedgerUpdateOneNestedInput {
   connectOrCreate: BudgetLedgerConnectOrCreateInput
   create: BudgetLedgerCreateInput
   delete: Boolean
+  deleteMany: BudgetLedgerWhereInput
   disconnect: Boolean
   update: BudgetLedgerUpsertNestedInput
   upsert: BudgetLedgerUpsertNestedInput
@@ -3024,7 +3029,7 @@ input BudgetSnapshotCreateInput {
 
 """Nested create many for BudgetSnapshot."""
 input BudgetSnapshotCreateManyNestedInput {
-  connect: [BudgetSnapshotConnectInput!]
+  connect: BudgetSnapshotConnectInput
   connectOrCreate: [BudgetSnapshotConnectOrCreateInput!]
   create: [BudgetSnapshotCreateInput!]
   createMany: [BudgetSnapshotCreateInput!]
@@ -3421,6 +3426,7 @@ input BudgetSnapshotUpdateOneNestedInput {
   connectOrCreate: BudgetSnapshotConnectOrCreateInput
   create: BudgetSnapshotCreateInput
   delete: Boolean
+  deleteMany: BudgetSnapshotWhereInput
   disconnect: Boolean
   update: BudgetSnapshotUpsertNestedInput
   upsert: BudgetSnapshotUpsertNestedInput
@@ -3516,7 +3522,7 @@ input BudgetUpdateInput {
   statusId: String
   submittedAt: DateTime
   updatedAt: DateTime
-  workflowInstance: WorkFlowInstanceUpdateOneNestedInput
+  workflowInstance: WorkFlowInstanceUpdateManyNestedInput
   workflowTemplate: WorkFlowTemplateUpdateOneNestedInput
   workflowTemplateId: String
 }
@@ -3542,6 +3548,7 @@ input BudgetUpdateOneNestedInput {
   connectOrCreate: BudgetConnectOrCreateInput
   create: BudgetCreateInput
   delete: Boolean
+  deleteMany: BudgetWhereInput
   disconnect: Boolean
   update: BudgetUpsertNestedInput
   upsert: BudgetUpsertNestedInput
@@ -3744,6 +3751,11 @@ type CapitalRecoveryFactor {
   """
   projectedBudget: Float
 
+  """
+  (Optional) remainingAmount field of CapitalRecoveryFactor. Type: Float.
+  """
+  remainingAmount: Float
+
   """(Optional) remark field of CapitalRecoveryFactor. Type: JSON object."""
   remark: Json
 
@@ -3840,6 +3852,7 @@ input CapitalRecoveryFactorCreateInput {
   name: String
   newBalanceAmmount: Float
   projectedBudget: Float
+  remainingAmount: Float
   remark: Json
   request: RequestCreateOneNestedInput
   requestId: String
@@ -3852,7 +3865,7 @@ input CapitalRecoveryFactorCreateInput {
 
 """Nested create many for CapitalRecoveryFactor."""
 input CapitalRecoveryFactorCreateManyNestedInput {
-  connect: [CapitalRecoveryFactorConnectInput!]
+  connect: CapitalRecoveryFactorConnectInput
   connectOrCreate: [CapitalRecoveryFactorConnectOrCreateInput!]
   create: [CapitalRecoveryFactorCreateInput!]
   createMany: [CapitalRecoveryFactorCreateInput!]
@@ -4093,6 +4106,11 @@ input CapitalRecoveryFactorFormInput {
   """
   projectedBudget: Float
 
+  """
+  (Optional) The remainingAmount of the CapitalRecoveryFactor. Type: Float.
+  """
+  remainingAmount: Float
+
   """(Optional) The remark of the CapitalRecoveryFactor. Type: Json."""
   remark: Json
 
@@ -4310,6 +4328,7 @@ input CapitalRecoveryFactorUpdateInput {
   name: String
   newBalanceAmmount: Float
   projectedBudget: Float
+  remainingAmount: Float
   remark: Json
   request: RequestUpdateOneNestedInput
   requestId: String
@@ -4341,6 +4360,7 @@ input CapitalRecoveryFactorUpdateOneNestedInput {
   connectOrCreate: CapitalRecoveryFactorConnectOrCreateInput
   create: CapitalRecoveryFactorCreateInput
   delete: Boolean
+  deleteMany: CapitalRecoveryFactorWhereInput
   disconnect: Boolean
   update: CapitalRecoveryFactorUpsertNestedInput
   upsert: CapitalRecoveryFactorUpsertNestedInput
@@ -4414,6 +4434,9 @@ input CapitalRecoveryFactorWhereInput {
 
   """Filter by projectedBudget (Float)."""
   projectedBudget: Json
+
+  """Filter by remainingAmount (Float)."""
+  remainingAmount: Json
 
   """Filter by remark (Json)."""
   remark: Json
@@ -4540,7 +4563,7 @@ input CategoryCreateInput {
 
 """Nested create many for Category."""
 input CategoryCreateManyNestedInput {
-  connect: [CategoryConnectInput!]
+  connect: CategoryConnectInput
   connectOrCreate: [CategoryConnectOrCreateInput!]
   create: [CategoryCreateInput!]
   createMany: [CategoryCreateInput!]
@@ -4935,6 +4958,7 @@ input CategoryUpdateOneNestedInput {
   connectOrCreate: CategoryConnectOrCreateInput
   create: CategoryCreateInput
   delete: Boolean
+  deleteMany: CategoryWhereInput
   disconnect: Boolean
   update: CategoryUpsertNestedInput
   upsert: CategoryUpsertNestedInput
@@ -5149,7 +5173,7 @@ input CompanyCreateInput {
 
 """Nested create many for Company."""
 input CompanyCreateManyNestedInput {
-  connect: [CompanyConnectInput!]
+  connect: CompanyConnectInput
   connectOrCreate: [CompanyConnectOrCreateInput!]
   create: [CompanyCreateInput!]
   createMany: [CompanyCreateInput!]
@@ -5598,6 +5622,7 @@ input CompanyUpdateOneNestedInput {
   connectOrCreate: CompanyConnectOrCreateInput
   create: CompanyCreateInput
   delete: Boolean
+  deleteMany: CompanyWhereInput
   disconnect: Boolean
   update: CompanyUpsertNestedInput
   upsert: CompanyUpsertNestedInput
@@ -5868,7 +5893,7 @@ input ConfigConditionCreateInput {
 
 """Nested create many for ConfigCondition."""
 input ConfigConditionCreateManyNestedInput {
-  connect: [ConfigConditionConnectInput!]
+  connect: ConfigConditionConnectInput
   connectOrCreate: [ConfigConditionConnectOrCreateInput!]
   create: [ConfigConditionCreateInput!]
   createMany: [ConfigConditionCreateInput!]
@@ -6285,6 +6310,7 @@ input ConfigConditionUpdateOneNestedInput {
   connectOrCreate: ConfigConditionConnectOrCreateInput
   create: ConfigConditionCreateInput
   delete: Boolean
+  deleteMany: ConfigConditionWhereInput
   disconnect: Boolean
   update: ConfigConditionUpsertNestedInput
   upsert: ConfigConditionUpsertNestedInput
@@ -6415,7 +6441,7 @@ input ConfigCreateInput {
 
 """Nested create many for Config."""
 input ConfigCreateManyNestedInput {
-  connect: [ConfigConnectInput!]
+  connect: ConfigConnectInput
   connectOrCreate: [ConfigConnectOrCreateInput!]
   create: [ConfigCreateInput!]
   createMany: [ConfigCreateInput!]
@@ -6826,6 +6852,7 @@ input ConfigUpdateOneNestedInput {
   connectOrCreate: ConfigConnectOrCreateInput
   create: ConfigCreateInput
   delete: Boolean
+  deleteMany: ConfigWhereInput
   disconnect: Boolean
   update: ConfigUpsertNestedInput
   upsert: ConfigUpsertNestedInput
@@ -7057,7 +7084,7 @@ input DepartmentCreateInput {
 
 """Nested create many for Department."""
 input DepartmentCreateManyNestedInput {
-  connect: [DepartmentConnectInput!]
+  connect: DepartmentConnectInput
   connectOrCreate: [DepartmentConnectOrCreateInput!]
   create: [DepartmentCreateInput!]
   createMany: [DepartmentCreateInput!]
@@ -7480,6 +7507,7 @@ input DepartmentUpdateOneNestedInput {
   connectOrCreate: DepartmentConnectOrCreateInput
   create: DepartmentCreateInput
   delete: Boolean
+  deleteMany: DepartmentWhereInput
   disconnect: Boolean
   update: DepartmentUpsertNestedInput
   upsert: DepartmentUpsertNestedInput
@@ -7672,7 +7700,7 @@ input GroupOfCompanyCreateInput {
 
 """Nested create many for GroupOfCompany."""
 input GroupOfCompanyCreateManyNestedInput {
-  connect: [GroupOfCompanyConnectInput!]
+  connect: GroupOfCompanyConnectInput
   connectOrCreate: [GroupOfCompanyConnectOrCreateInput!]
   create: [GroupOfCompanyCreateInput!]
   createMany: [GroupOfCompanyCreateInput!]
@@ -8079,6 +8107,7 @@ input GroupOfCompanyUpdateOneNestedInput {
   connectOrCreate: GroupOfCompanyConnectOrCreateInput
   create: GroupOfCompanyCreateInput
   delete: Boolean
+  deleteMany: GroupOfCompanyWhereInput
   disconnect: Boolean
   update: GroupOfCompanyUpsertNestedInput
   upsert: GroupOfCompanyUpsertNestedInput
@@ -8225,7 +8254,7 @@ input HolidayCreateInput {
 
 """Nested create many for Holiday."""
 input HolidayCreateManyNestedInput {
-  connect: [HolidayConnectInput!]
+  connect: HolidayConnectInput
   connectOrCreate: [HolidayConnectOrCreateInput!]
   create: [HolidayCreateInput!]
   createMany: [HolidayCreateInput!]
@@ -8598,6 +8627,7 @@ input HolidayUpdateOneNestedInput {
   connectOrCreate: HolidayConnectOrCreateInput
   create: HolidayCreateInput
   delete: Boolean
+  deleteMany: HolidayWhereInput
   disconnect: Boolean
   update: HolidayUpsertNestedInput
   upsert: HolidayUpsertNestedInput
@@ -8758,7 +8788,7 @@ input InventoryItemCreateInput {
 
 """Nested create many for InventoryItem."""
 input InventoryItemCreateManyNestedInput {
-  connect: [InventoryItemConnectInput!]
+  connect: InventoryItemConnectInput
   connectOrCreate: [InventoryItemConnectOrCreateInput!]
   create: [InventoryItemCreateInput!]
   createMany: [InventoryItemCreateInput!]
@@ -9163,6 +9193,7 @@ input InventoryItemUpdateOneNestedInput {
   connectOrCreate: InventoryItemConnectOrCreateInput
   create: InventoryItemCreateInput
   delete: Boolean
+  deleteMany: InventoryItemWhereInput
   disconnect: Boolean
   update: InventoryItemUpsertNestedInput
   upsert: InventoryItemUpsertNestedInput
@@ -9337,7 +9368,7 @@ input JobLevelCreateInput {
 
 """Nested create many for JobLevel."""
 input JobLevelCreateManyNestedInput {
-  connect: [JobLevelConnectInput!]
+  connect: JobLevelConnectInput
   connectOrCreate: [JobLevelConnectOrCreateInput!]
   create: [JobLevelCreateInput!]
   createMany: [JobLevelCreateInput!]
@@ -9742,6 +9773,7 @@ input JobLevelUpdateOneNestedInput {
   connectOrCreate: JobLevelConnectOrCreateInput
   create: JobLevelCreateInput
   delete: Boolean
+  deleteMany: JobLevelWhereInput
   disconnect: Boolean
   update: JobLevelUpsertNestedInput
   upsert: JobLevelUpsertNestedInput
@@ -9905,7 +9937,7 @@ input LocationCreateInput {
 
 """Nested create many for Location."""
 input LocationCreateManyNestedInput {
-  connect: [LocationConnectInput!]
+  connect: LocationConnectInput
   connectOrCreate: [LocationConnectOrCreateInput!]
   create: [LocationCreateInput!]
   createMany: [LocationCreateInput!]
@@ -10294,6 +10326,7 @@ input LocationUpdateOneNestedInput {
   connectOrCreate: LocationConnectOrCreateInput
   create: LocationCreateInput
   delete: Boolean
+  deleteMany: LocationWhereInput
   disconnect: Boolean
   update: LocationUpsertNestedInput
   upsert: LocationUpsertNestedInput
@@ -15534,7 +15567,7 @@ input PermissionCreateInput {
 
 """Nested create many for Permission."""
 input PermissionCreateManyNestedInput {
-  connect: [PermissionConnectInput!]
+  connect: PermissionConnectInput
   connectOrCreate: [PermissionConnectOrCreateInput!]
   create: [PermissionCreateInput!]
   createMany: [PermissionCreateInput!]
@@ -15941,6 +15974,7 @@ input PermissionUpdateOneNestedInput {
   connectOrCreate: PermissionConnectOrCreateInput
   create: PermissionCreateInput
   delete: Boolean
+  deleteMany: PermissionWhereInput
   disconnect: Boolean
   update: PermissionUpsertNestedInput
   upsert: PermissionUpsertNestedInput
@@ -16118,7 +16152,7 @@ input PositionCreateInput {
 
 """Nested create many for Position."""
 input PositionCreateManyNestedInput {
-  connect: [PositionConnectInput!]
+  connect: PositionConnectInput
   connectOrCreate: [PositionConnectOrCreateInput!]
   create: [PositionCreateInput!]
   createMany: [PositionCreateInput!]
@@ -16523,6 +16557,7 @@ input PositionUpdateOneNestedInput {
   connectOrCreate: PositionConnectOrCreateInput
   create: PositionCreateInput
   delete: Boolean
+  deleteMany: PositionWhereInput
   disconnect: Boolean
   update: PositionUpsertNestedInput
   upsert: PositionUpsertNestedInput
@@ -18046,7 +18081,7 @@ input RequestCreateInput {
 
 """Nested create many for Request."""
 input RequestCreateManyNestedInput {
-  connect: [RequestConnectInput!]
+  connect: RequestConnectInput
   connectOrCreate: [RequestConnectOrCreateInput!]
   create: [RequestCreateInput!]
   createMany: [RequestCreateInput!]
@@ -18493,7 +18528,7 @@ input RequestItemCreateInput {
 
 """Nested create many for RequestItem."""
 input RequestItemCreateManyNestedInput {
-  connect: [RequestItemConnectInput!]
+  connect: RequestItemConnectInput
   connectOrCreate: [RequestItemConnectOrCreateInput!]
   create: [RequestItemCreateInput!]
   createMany: [RequestItemCreateInput!]
@@ -18932,6 +18967,7 @@ input RequestItemUpdateOneNestedInput {
   connectOrCreate: RequestItemConnectOrCreateInput
   create: RequestItemCreateInput
   delete: Boolean
+  deleteMany: RequestItemWhereInput
   disconnect: Boolean
   update: RequestItemUpsertNestedInput
   upsert: RequestItemUpsertNestedInput
@@ -19179,6 +19215,7 @@ input RequestUpdateOneNestedInput {
   connectOrCreate: RequestConnectOrCreateInput
   create: RequestCreateInput
   delete: Boolean
+  deleteMany: RequestWhereInput
   disconnect: Boolean
   update: RequestUpsertNestedInput
   upsert: RequestUpsertNestedInput
@@ -19391,7 +19428,7 @@ input RoleCreateInput {
 
 """Nested create many for Role."""
 input RoleCreateManyNestedInput {
-  connect: [RoleConnectInput!]
+  connect: RoleConnectInput
   connectOrCreate: [RoleConnectOrCreateInput!]
   create: [RoleCreateInput!]
   createMany: [RoleCreateInput!]
@@ -19829,7 +19866,7 @@ input RolePermissionCreateInput {
 
 """Nested create many for RolePermission."""
 input RolePermissionCreateManyNestedInput {
-  connect: [RolePermissionConnectInput!]
+  connect: RolePermissionConnectInput
   connectOrCreate: [RolePermissionConnectOrCreateInput!]
   create: [RolePermissionCreateInput!]
   createMany: [RolePermissionCreateInput!]
@@ -20222,6 +20259,7 @@ input RolePermissionUpdateOneNestedInput {
   connectOrCreate: RolePermissionConnectOrCreateInput
   create: RolePermissionCreateInput
   delete: Boolean
+  deleteMany: RolePermissionWhereInput
   disconnect: Boolean
   update: RolePermissionUpsertNestedInput
   upsert: RolePermissionUpsertNestedInput
@@ -20338,6 +20376,7 @@ input RoleUpdateOneNestedInput {
   connectOrCreate: RoleConnectOrCreateInput
   create: RoleCreateInput
   delete: Boolean
+  deleteMany: RoleWhereInput
   disconnect: Boolean
   update: RoleUpsertNestedInput
   upsert: RoleUpsertNestedInput
@@ -20541,7 +20580,7 @@ input ShiftingScheduleCreateInput {
 
 """Nested create many for ShiftingSchedule."""
 input ShiftingScheduleCreateManyNestedInput {
-  connect: [ShiftingScheduleConnectInput!]
+  connect: ShiftingScheduleConnectInput
   connectOrCreate: [ShiftingScheduleConnectOrCreateInput!]
   create: [ShiftingScheduleCreateInput!]
   createMany: [ShiftingScheduleCreateInput!]
@@ -20972,6 +21011,7 @@ input ShiftingScheduleUpdateOneNestedInput {
   connectOrCreate: ShiftingScheduleConnectOrCreateInput
   create: ShiftingScheduleCreateInput
   delete: Boolean
+  deleteMany: ShiftingScheduleWhereInput
   disconnect: Boolean
   update: ShiftingScheduleUpsertNestedInput
   upsert: ShiftingScheduleUpsertNestedInput
@@ -21154,7 +21194,7 @@ input SignatureCreateInput {
 
 """Nested create many for Signature."""
 input SignatureCreateManyNestedInput {
-  connect: [SignatureConnectInput!]
+  connect: SignatureConnectInput
   connectOrCreate: [SignatureConnectOrCreateInput!]
   create: [SignatureCreateInput!]
   createMany: [SignatureCreateInput!]
@@ -21563,6 +21603,7 @@ input SignatureUpdateOneNestedInput {
   connectOrCreate: SignatureConnectOrCreateInput
   create: SignatureCreateInput
   delete: Boolean
+  deleteMany: SignatureWhereInput
   disconnect: Boolean
   update: SignatureUpsertNestedInput
   upsert: SignatureUpsertNestedInput
@@ -21744,7 +21785,7 @@ input StatusCreateInput {
 
 """Nested create many for Status."""
 input StatusCreateManyNestedInput {
-  connect: [StatusConnectInput!]
+  connect: StatusConnectInput
   connectOrCreate: [StatusConnectOrCreateInput!]
   create: [StatusCreateInput!]
   createMany: [StatusCreateInput!]
@@ -22149,6 +22190,7 @@ input StatusUpdateOneNestedInput {
   connectOrCreate: StatusConnectOrCreateInput
   create: StatusCreateInput
   delete: Boolean
+  deleteMany: StatusWhereInput
   disconnect: Boolean
   update: StatusUpsertNestedInput
   upsert: StatusUpsertNestedInput
@@ -22524,7 +22566,7 @@ input TypeCreateInput {
 
 """Nested create many for Type."""
 input TypeCreateManyNestedInput {
-  connect: [TypeConnectInput!]
+  connect: TypeConnectInput
   connectOrCreate: [TypeConnectOrCreateInput!]
   create: [TypeCreateInput!]
   createMany: [TypeCreateInput!]
@@ -22953,6 +22995,7 @@ input TypeUpdateOneNestedInput {
   connectOrCreate: TypeConnectOrCreateInput
   create: TypeCreateInput
   delete: Boolean
+  deleteMany: TypeWhereInput
   disconnect: Boolean
   update: TypeUpsertNestedInput
   upsert: TypeUpsertNestedInput
@@ -23187,7 +23230,7 @@ input UserCreateInput {
 
 """Nested create many for User."""
 input UserCreateManyNestedInput {
-  connect: [UserConnectInput!]
+  connect: UserConnectInput
   connectOrCreate: [UserConnectOrCreateInput!]
   create: [UserCreateInput!]
   createMany: [UserCreateInput!]
@@ -23701,7 +23744,7 @@ input UserRoleCreateInput {
 
 """Nested create many for UserRole."""
 input UserRoleCreateManyNestedInput {
-  connect: [UserRoleConnectInput!]
+  connect: UserRoleConnectInput
   connectOrCreate: [UserRoleConnectOrCreateInput!]
   create: [UserRoleCreateInput!]
   createMany: [UserRoleCreateInput!]
@@ -24106,6 +24149,7 @@ input UserRoleUpdateOneNestedInput {
   connectOrCreate: UserRoleConnectOrCreateInput
   create: UserRoleCreateInput
   delete: Boolean
+  deleteMany: UserRoleWhereInput
   disconnect: Boolean
   update: UserRoleUpsertNestedInput
   upsert: UserRoleUpsertNestedInput
@@ -24222,6 +24266,7 @@ input UserUpdateOneNestedInput {
   connectOrCreate: UserConnectOrCreateInput
   create: UserCreateInput
   delete: Boolean
+  deleteMany: UserWhereInput
   disconnect: Boolean
   update: UserUpsertNestedInput
   upsert: UserUpsertNestedInput
@@ -24404,9 +24449,6 @@ type WorkFlowInstance {
 Input to connect an existing WorkFlowInstance record by a unique field.
 """
 input WorkFlowInstanceConnectInput {
-  """Unique field 'budgetId' for WorkFlowInstance"""
-  budgetId: String
-
   """Unique field 'id' for WorkFlowInstance"""
   id: String
 
@@ -24475,7 +24517,7 @@ input WorkFlowInstanceCreateInput {
 
 """Nested create many for WorkFlowInstance."""
 input WorkFlowInstanceCreateManyNestedInput {
-  connect: [WorkFlowInstanceConnectInput!]
+  connect: WorkFlowInstanceConnectInput
   connectOrCreate: [WorkFlowInstanceConnectOrCreateInput!]
   create: [WorkFlowInstanceCreateInput!]
   createMany: [WorkFlowInstanceCreateInput!]
@@ -25040,7 +25082,7 @@ input WorkFlowInstanceStepCreateInput {
 
 """Nested create many for WorkFlowInstanceStep."""
 input WorkFlowInstanceStepCreateManyNestedInput {
-  connect: [WorkFlowInstanceStepConnectInput!]
+  connect: WorkFlowInstanceStepConnectInput
   connectOrCreate: [WorkFlowInstanceStepConnectOrCreateInput!]
   create: [WorkFlowInstanceStepCreateInput!]
   createMany: [WorkFlowInstanceStepCreateInput!]
@@ -25505,6 +25547,7 @@ input WorkFlowInstanceStepUpdateOneNestedInput {
   connectOrCreate: WorkFlowInstanceStepConnectOrCreateInput
   create: WorkFlowInstanceStepCreateInput
   delete: Boolean
+  deleteMany: WorkFlowInstanceStepWhereInput
   disconnect: Boolean
   update: WorkFlowInstanceStepUpsertNestedInput
   upsert: WorkFlowInstanceStepUpsertNestedInput
@@ -25638,6 +25681,7 @@ input WorkFlowInstanceUpdateOneNestedInput {
   connectOrCreate: WorkFlowInstanceConnectOrCreateInput
   create: WorkFlowInstanceCreateInput
   delete: Boolean
+  deleteMany: WorkFlowInstanceWhereInput
   disconnect: Boolean
   update: WorkFlowInstanceUpsertNestedInput
   upsert: WorkFlowInstanceUpsertNestedInput
@@ -25898,7 +25942,7 @@ input WorkFlowStepTemplateCreateInput {
 
 """Nested create many for WorkFlowStepTemplate."""
 input WorkFlowStepTemplateCreateManyNestedInput {
-  connect: [WorkFlowStepTemplateConnectInput!]
+  connect: WorkFlowStepTemplateConnectInput
   connectOrCreate: [WorkFlowStepTemplateConnectOrCreateInput!]
   create: [WorkFlowStepTemplateCreateInput!]
   createMany: [WorkFlowStepTemplateCreateInput!]
@@ -26379,6 +26423,7 @@ input WorkFlowStepTemplateUpdateOneNestedInput {
   connectOrCreate: WorkFlowStepTemplateConnectOrCreateInput
   create: WorkFlowStepTemplateCreateInput
   delete: Boolean
+  deleteMany: WorkFlowStepTemplateWhereInput
   disconnect: Boolean
   update: WorkFlowStepTemplateUpsertNestedInput
   upsert: WorkFlowStepTemplateUpsertNestedInput
@@ -26591,7 +26636,7 @@ input WorkFlowTemplateCreateInput {
 
 """Nested create many for WorkFlowTemplate."""
 input WorkFlowTemplateCreateManyNestedInput {
-  connect: [WorkFlowTemplateConnectInput!]
+  connect: WorkFlowTemplateConnectInput
   connectOrCreate: [WorkFlowTemplateConnectOrCreateInput!]
   create: [WorkFlowTemplateCreateInput!]
   createMany: [WorkFlowTemplateCreateInput!]
@@ -27108,7 +27153,7 @@ input WorkFlowTemplateScopeCreateInput {
 
 """Nested create many for WorkFlowTemplateScope."""
 input WorkFlowTemplateScopeCreateManyNestedInput {
-  connect: [WorkFlowTemplateScopeConnectInput!]
+  connect: WorkFlowTemplateScopeConnectInput
   connectOrCreate: [WorkFlowTemplateScopeConnectOrCreateInput!]
   create: [WorkFlowTemplateScopeCreateInput!]
   createMany: [WorkFlowTemplateScopeCreateInput!]
@@ -27547,6 +27592,7 @@ input WorkFlowTemplateScopeUpdateOneNestedInput {
   connectOrCreate: WorkFlowTemplateScopeConnectOrCreateInput
   create: WorkFlowTemplateScopeCreateInput
   delete: Boolean
+  deleteMany: WorkFlowTemplateScopeWhereInput
   disconnect: Boolean
   update: WorkFlowTemplateScopeUpsertNestedInput
   upsert: WorkFlowTemplateScopeUpsertNestedInput
@@ -27654,6 +27700,7 @@ input WorkFlowTemplateUpdateOneNestedInput {
   connectOrCreate: WorkFlowTemplateConnectOrCreateInput
   create: WorkFlowTemplateCreateInput
   delete: Boolean
+  deleteMany: WorkFlowTemplateWhereInput
   disconnect: Boolean
   update: WorkFlowTemplateUpsertNestedInput
   upsert: WorkFlowTemplateUpsertNestedInput
@@ -27943,7 +27990,7 @@ input WorkInformationCreateInput {
 
 """Nested create many for WorkInformation."""
 input WorkInformationCreateManyNestedInput {
-  connect: [WorkInformationConnectInput!]
+  connect: WorkInformationConnectInput
   connectOrCreate: [WorkInformationConnectOrCreateInput!]
   create: [WorkInformationCreateInput!]
   createMany: [WorkInformationCreateInput!]
@@ -28454,6 +28501,7 @@ input WorkInformationUpdateOneNestedInput {
   connectOrCreate: WorkInformationConnectOrCreateInput
   create: WorkInformationCreateInput
   delete: Boolean
+  deleteMany: WorkInformationWhereInput
   disconnect: Boolean
   update: WorkInformationUpsertNestedInput
   upsert: WorkInformationUpsertNestedInput

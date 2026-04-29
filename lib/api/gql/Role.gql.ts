@@ -10,6 +10,66 @@ fragment RoleFragment on Role {
   isActive
   createdAt
   updatedAt
+  parentRole {
+    id
+    name
+    description
+    roleType
+    isDefault
+    parentRoleId
+    isActive
+    createdAt
+    updatedAt
+  }
+  childRoles {
+    id
+    name
+    description
+    roleType
+    isDefault
+    parentRoleId
+    isActive
+    createdAt
+    updatedAt
+  }
+  rolePermissions {
+    id
+    roleId
+    permissionId
+    scopeValues
+    isActive
+    createdAt
+    updatedAt
+  }
+  userRoles {
+    id
+    userId
+    roleId
+    scopeTypeId
+    scopeValues
+    conditionOverrides
+    assignedById
+    expiresAt
+    isActive
+    createdAt
+    updatedAt
+  }
+  auditLogs {
+    id
+    modelId
+    modelName
+    action
+    actionTypeId
+    timestamp
+    actorId
+    oldDetails
+    newDetails
+    parentId
+    isActive
+    createdAt
+    updatedAt
+    inventoryItemId
+  }
 }
 `;
 

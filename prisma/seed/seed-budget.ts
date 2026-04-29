@@ -202,3 +202,24 @@ seed()
     await prisma.$disconnect();
   });
 
+  await prisma.request.update({
+    where: {
+      id: "some-request-id"
+    },
+    data: {
+      statusId: "some-status-id",
+      workFlowInstance: {
+        update: {
+          steps: {
+            update: {
+              where: { id: "some-step-id" },
+              data: {
+                statusId: "new-status-id",
+                assignedToUserId: "new-user-id",
+              }
+            }
+          }
+        }
+      }
+    }
+  })

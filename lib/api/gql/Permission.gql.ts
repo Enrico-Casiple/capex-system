@@ -14,6 +14,31 @@ fragment PermissionFragment on Permission {
   isActive
   createdAt
   updatedAt
+  rolePermissions {
+    id
+    roleId
+    permissionId
+    scopeValues
+    isActive
+    createdAt
+    updatedAt
+  }
+  auditLogs {
+    id
+    modelId
+    modelName
+    action
+    actionTypeId
+    timestamp
+    actorId
+    oldDetails
+    newDetails
+    parentId
+    isActive
+    createdAt
+    updatedAt
+    inventoryItemId
+  }
 }
 `;
 

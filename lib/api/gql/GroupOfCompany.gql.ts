@@ -10,6 +10,79 @@ fragment GroupOfCompanyFragment on GroupOfCompany {
   isActive
   createdAt
   updatedAt
+  industryType {
+    id
+    name
+    description
+    modelNameType
+    isActive
+    createdAt
+    updatedAt
+  }
+  headquarters {
+    id
+    name
+    description
+    isActive
+    createdAt
+    updatedAt
+  }
+  companies {
+    id
+    name
+    acronym
+    description
+    groupOfCompanyId
+    locationsid
+    conctactNumber
+    email
+    logo
+    scopeTypeId
+    isActive
+    createdAt
+    updatedAt
+  }
+  auditLogs {
+    id
+    modelId
+    modelName
+    action
+    actionTypeId
+    timestamp
+    actorId
+    oldDetails
+    newDetails
+    parentId
+    isActive
+    createdAt
+    updatedAt
+    inventoryItemId
+  }
+  workInformations {
+    id
+    employeeNumber
+    employeeId
+    groupOfCompanyId
+    companyId
+    departmentId
+    positionId
+    jobLevelId
+    employmentTypeId
+    employmentStatusId
+    reportingManagerId
+    hireDate
+    regularizationDate
+    firstProbationEvaluationDate
+    finalProbationEvaluationDate
+    contractEndDate
+    seasonalEndDate
+    endDate
+    workLocationId
+    workSetupTypeId
+    isActive
+    createdAt
+    updatedAt
+  }
 }
 `;
 

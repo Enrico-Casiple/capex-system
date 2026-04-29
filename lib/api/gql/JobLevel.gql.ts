@@ -10,6 +10,82 @@ fragment JobLevelFragment on JobLevel {
   isActive
   createdAt
   updatedAt
+  jobcodeType {
+    id
+    name
+    description
+    modelNameType
+    isActive
+    createdAt
+    updatedAt
+  }
+  company {
+    id
+    name
+    acronym
+    description
+    groupOfCompanyId
+    locationsid
+    conctactNumber
+    email
+    logo
+    scopeTypeId
+    isActive
+    createdAt
+    updatedAt
+  }
+  WorkFlowTemplateScopeJobLevel {
+    id
+    templateId
+    companyId
+    departmentId
+    positionId
+    jobLevelId
+    isActive
+    createdAt
+    updatedAt
+  }
+  workInformations {
+    id
+    employeeNumber
+    employeeId
+    groupOfCompanyId
+    companyId
+    departmentId
+    positionId
+    jobLevelId
+    employmentTypeId
+    employmentStatusId
+    reportingManagerId
+    hireDate
+    regularizationDate
+    firstProbationEvaluationDate
+    finalProbationEvaluationDate
+    contractEndDate
+    seasonalEndDate
+    endDate
+    workLocationId
+    workSetupTypeId
+    isActive
+    createdAt
+    updatedAt
+  }
+  auditLogs {
+    id
+    modelId
+    modelName
+    action
+    actionTypeId
+    timestamp
+    actorId
+    oldDetails
+    newDetails
+    parentId
+    isActive
+    createdAt
+    updatedAt
+    inventoryItemId
+  }
 }
 `;
 

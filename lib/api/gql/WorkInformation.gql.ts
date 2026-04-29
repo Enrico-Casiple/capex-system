@@ -24,6 +24,169 @@ fragment WorkInformationFragment on WorkInformation {
   isActive
   createdAt
   updatedAt
+  employee {
+    id
+    firstName
+    middleName
+    lastName
+    suffix
+    fullName
+    birthDate
+    gender
+    phoneNumber
+    address
+    city
+    province
+    country
+    userId
+    isActive
+    createdAt
+    updatedAt
+  }
+  groupOfCompany {
+    id
+    name
+    acronym
+    description
+    industryTypeId
+    headquartersId
+    isActive
+    createdAt
+    updatedAt
+  }
+  company {
+    id
+    name
+    acronym
+    description
+    groupOfCompanyId
+    locationsid
+    conctactNumber
+    email
+    logo
+    scopeTypeId
+    isActive
+    createdAt
+    updatedAt
+  }
+  department {
+    id
+    name
+    acronym
+    description
+    companyId
+    scopeTypeId
+    isActive
+    createdAt
+    updatedAt
+  }
+  position {
+    id
+    name
+    acronym
+    description
+    companyId
+    isActive
+    createdAt
+    updatedAt
+    scopeTypeId
+  }
+  jobLevel {
+    id
+    name
+    description
+    acronym
+    jobcodeTypeId
+    companyId
+    isActive
+    createdAt
+    updatedAt
+  }
+  employmentType {
+    id
+    name
+    description
+    modelNameType
+    isActive
+    createdAt
+    updatedAt
+  }
+  employmentStatus {
+    id
+    name
+    modelNameType
+    isActive
+    createdAt
+    updatedAt
+  }
+  reportingManager {
+    id
+    firstName
+    middleName
+    lastName
+    suffix
+    fullName
+    birthDate
+    gender
+    phoneNumber
+    address
+    city
+    province
+    country
+    userId
+    isActive
+    createdAt
+    updatedAt
+  }
+  workLocation {
+    id
+    name
+    description
+    isActive
+    createdAt
+    updatedAt
+  }
+  workSetupType {
+    id
+    name
+    description
+    modelNameType
+    isActive
+    createdAt
+    updatedAt
+  }
+  shiftingSchedule {
+    id
+    name
+    description
+    startTime
+    endTime
+    lunchStart
+    lunchEnd
+    breakStart
+    breakEnd
+    workDays
+    restDays
+    workInformationId
+    createdAt
+    updatedAt
+  }
+  auditLogs {
+    id
+    modelId
+    modelName
+    action
+    actionTypeId
+    timestamp
+    actorId
+    oldDetails
+    newDetails
+    parentId
+    isActive
+    createdAt
+    updatedAt
+    inventoryItemId
+  }
 }
 `;
 

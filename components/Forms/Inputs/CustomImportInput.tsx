@@ -18,6 +18,7 @@ type CustomImportInputProps<TFormValues extends FieldValues> = {
   clearErrors: (name: Path<TFormValues>) => void;
   maxSizeMB?: 5 | 10 | 50;
   allowedExtensions?: AllowedFileTypes[];
+  disabled?: boolean;
   dropzoneProps?: Omit<DropzoneProps, 'onDrop' | 'src'>;
 };
 
@@ -33,25 +34,22 @@ const MIME_TYPE_MAP: Record<AllowedFileTypes, string> = {
 const CustomImportInput = <TFormValues extends FieldValues>({
   maxSizeMB = 5,
   allowedExtensions = ['png', 'jpg', 'jpeg'],
+  disabled = false,
   ...props
 }: CustomImportInputProps<TFormValues>) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const parseS3Url = (url: any) => {
-    // Ensure we are working with a string
     const stringUrl = typeof url === 'string' ? url : '';
     if (!stringUrl) return { rawUrl: '', fileName: '' };
 
-    // 1. Clean the URL (removes Markdown formatting if present)
     let cleanUrl = stringUrl.replace(/[\[\]]/g, '').split('](').pop()?.replace(')', '') || stringUrl;
 
-    // 2. Fix potential protocol issues
     if (cleanUrl.includes('digitaloceanspaces.com')) {
       if (!cleanUrl.startsWith('http')) cleanUrl = `https://${cleanUrl}`;
       else cleanUrl = cleanUrl.replace(/^https?:\/+(?!\/)/, 'https://');
     }
 
-    // 3. Extract filename and remove timestamp prefix (e.g., 1713963382-)
     const fullFileName = cleanUrl.split('/').pop() || 'View File';
     const fileName = fullFileName.replace(/^\d+-/, '');
 
@@ -76,6 +74,8 @@ const CustomImportInput = <TFormValues extends FieldValues>({
   };
 
   const handleUpload = async (file: File, onChange: (value: string) => void) => {
+    if (disabled) return;
+
     const error = validateFile(file);
     if (error) {
       props.setError(props.name, { type: 'manual', message: error });
@@ -91,8 +91,6 @@ const CustomImportInput = <TFormValues extends FieldValues>({
       const res = await fetch('/api/upload', { method: 'POST', body: formData });
       if (!res.ok) throw new Error('Upload failed');
       const { url } = await res.json();
-
-      // Update React Hook Form state
       onChange(url);
     } catch (err) {
       props.setError(props.name, { type: 'manual', message: 'Upload failed. Please try again.' });
@@ -103,10 +101,11 @@ const CustomImportInput = <TFormValues extends FieldValues>({
   };
 
   const handleRemove = async (currentUrl: string, onChange: (value: string | null) => void) => {
+    if (disabled) return;
+
     setIsProcessing(true);
     try {
       const { fileName } = parseS3Url(currentUrl);
-      // Optional: Delete from S3. Using currentUrl as fallback if filename fails.
       await fetch(`/api/upload?fileName=${fileName}`, { method: 'DELETE' });
       onChange(null);
     } catch (err) {
@@ -121,7 +120,6 @@ const CustomImportInput = <TFormValues extends FieldValues>({
       name={props.name}
       control={props.control}
       render={({ field, fieldState }) => {
-        // Correct check for default values
         const hasFile = typeof field.value === 'string' && field.value.trim().length > 0;
         const { rawUrl, fileName } = parseS3Url(field.value);
 
@@ -132,8 +130,8 @@ const CustomImportInput = <TFormValues extends FieldValues>({
               {!hasFile ? (
                 <Dropzone
                   {...props.dropzoneProps}
-                  onDrop={(files) => files[0] && handleUpload(files[0], field.onChange)}
-                  disabled={isProcessing}
+                  onDrop={(files) => !disabled && files[0] && handleUpload(files[0], field.onChange)}
+                  disabled={disabled || isProcessing}
                   className="h-8 min-h-0 border-dashed flex items-center justify-center py-0"
                 >
                   <DropzoneEmptyState>
@@ -166,7 +164,7 @@ const CustomImportInput = <TFormValues extends FieldValues>({
                     size="icon"
                     className="h-6 w-6 text-destructive hover:bg-destructive/10"
                     onClick={() => handleRemove(field.value, field.onChange)}
-                    disabled={isProcessing}
+                    disabled={disabled || isProcessing}
                   >
                     <X className="h-3 w-3" />
                   </Button>

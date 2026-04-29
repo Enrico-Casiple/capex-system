@@ -14,6 +14,189 @@ fragment CompanyFragment on Company {
   isActive
   createdAt
   updatedAt
+  groupOfCompany {
+    id
+    name
+    acronym
+    description
+    industryTypeId
+    headquartersId
+    isActive
+    createdAt
+    updatedAt
+  }
+  locations {
+    id
+    name
+    description
+    isActive
+    createdAt
+    updatedAt
+  }
+  departments {
+    id
+    name
+    acronym
+    description
+    companyId
+    scopeTypeId
+    isActive
+    createdAt
+    updatedAt
+  }
+  jobLevels {
+    id
+    name
+    description
+    acronym
+    jobcodeTypeId
+    companyId
+    isActive
+    createdAt
+    updatedAt
+  }
+  auditLogs {
+    id
+    modelId
+    modelName
+    action
+    actionTypeId
+    timestamp
+    actorId
+    oldDetails
+    newDetails
+    parentId
+    isActive
+    createdAt
+    updatedAt
+    inventoryItemId
+  }
+  workInformations {
+    id
+    employeeNumber
+    employeeId
+    groupOfCompanyId
+    companyId
+    departmentId
+    positionId
+    jobLevelId
+    employmentTypeId
+    employmentStatusId
+    reportingManagerId
+    hireDate
+    regularizationDate
+    firstProbationEvaluationDate
+    finalProbationEvaluationDate
+    contractEndDate
+    seasonalEndDate
+    endDate
+    workLocationId
+    workSetupTypeId
+    isActive
+    createdAt
+    updatedAt
+  }
+  scopeType {
+    id
+    name
+    description
+    modelNameType
+    isActive
+    createdAt
+    updatedAt
+  }
+  request {
+    id
+    title
+    description
+    requestNumber
+    requesterId
+    companyId
+    departmentId
+    dateNeeded
+    responsibilityCenterId
+    quotationUrl
+    quotationAmount
+    currency
+    workflowTemplateId
+    approvedAt
+    statusId
+    isActive
+    createdAt
+    updatedAt
+  }
+  budget {
+    id
+    fiscalYear
+    statusId
+    budgetRefNo
+    companyId
+    departmentId
+    categoryId
+    requesterId
+    purpose
+    specs
+    quantity
+    remark
+    workflowTemplateId
+    submittedAt
+    approvedAt
+    rejectedAt
+    requestedAmount
+    approvedAmount
+    remainingAmount
+    currency
+    isFrozen
+    freezeReason
+    frozenAt
+    isActive
+    createdAt
+    updatedAt
+  }
+  crfCompany {
+    id
+    name
+    description
+    crfReferenceNo
+    statusId
+    companyId
+    departmentId
+    categoryId
+    utilizedBudget
+    approvedAmount
+    requestedAmount
+    newBalanceAmmount
+    projectedBudget
+    remark
+    remainingAmount
+    requestId
+    budgetId
+    isActive
+    createdAt
+    updatedAt
+  }
+  positionCompany {
+    id
+    name
+    acronym
+    description
+    companyId
+    isActive
+    createdAt
+    updatedAt
+    scopeTypeId
+  }
+  workFlowTemplateScopeCompany {
+    id
+    templateId
+    companyId
+    departmentId
+    positionId
+    jobLevelId
+    isActive
+    createdAt
+    updatedAt
+  }
 }
 `;
 

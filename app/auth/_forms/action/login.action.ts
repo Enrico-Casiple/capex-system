@@ -20,7 +20,9 @@ const loginAction = async (data: LoginType) => {
     const ipAddress = rawIp === '::1' ? '127.0.0.1 (localhost)' : rawIp;
 
     const result = await login({ ...data, ipAddress });
+    console.log('Login service result:', result);
     if (!result.isSuccess) return fail(result.code, result.message);
+
 
     try {
       await signIn('credentials', {
@@ -31,6 +33,7 @@ const loginAction = async (data: LoginType) => {
       });
     } catch (authError) {
       if (authError instanceof AuthError) {
+        console.error('Authentication error:', authError);
         switch (authError.type) {
           case 'CredentialsSignin':
             return fail('LOGIN_INVALID', 'Invalid account or password');

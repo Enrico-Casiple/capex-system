@@ -13,6 +13,62 @@ fragment ConfigFragment on Config {
   isActive
   createdAt
   updatedAt
+  conditions {
+    id
+    configId
+    nodeType
+    logicalOperator
+    field
+    operator
+    value
+    parentConditionId
+    isActive
+    createdAt
+    updatedAt
+  }
+  rolePermission {
+    id
+    roleId
+    permissionId
+    scopeValues
+    isActive
+    createdAt
+    updatedAt
+  }
+  workFlowStepTemplate {
+    id
+    workflowTemplateId
+    stepNumber
+    assignmentTypeId
+    assignedToUserId
+    assignmentRules
+    isHaveCondition
+    isParallel
+    requiredApprovals
+    slaHours
+    escalationRules
+    esignatureRequired
+    attachmentRequired
+    isActive
+    createdAt
+    updatedAt
+  }
+  auditLogs {
+    id
+    modelId
+    modelName
+    action
+    actionTypeId
+    timestamp
+    actorId
+    oldDetails
+    newDetails
+    parentId
+    isActive
+    createdAt
+    updatedAt
+    inventoryItemId
+  }
 }
 `;
 

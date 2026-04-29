@@ -1,0 +1,197 @@
+import { gql } from "@apollo/client";
+
+export const RequestFragment = gql`
+fragment RequestFragment on Request {
+  id
+  title
+  description
+  requestNumber
+  requesterId
+  companyId
+  departmentId
+  dateNeeded
+  responsibilityCenterId
+  quotationUrl
+  quotationAmount
+  currency
+  workflowTemplateId
+  approvedAt
+  statusId
+  isActive
+  createdAt
+  updatedAt
+  requester {
+    id
+    name
+    email
+    password
+    userName
+    emailVerified
+    image
+    isTwoFactorAuthEnabled
+    otpCode
+    emailOtpExpiresAt
+    incrementalLoginAttempts
+    isActive
+    createdAt
+    updatedAt
+  }
+  company {
+    id
+    name
+    acronym
+    description
+    groupOfCompanyId
+    locationsid
+    conctactNumber
+    email
+    logo
+    scopeTypeId
+    isActive
+    createdAt
+    updatedAt
+  }
+  department {
+    id
+    name
+    acronym
+    description
+    companyId
+    scopeTypeId
+    isActive
+    createdAt
+    updatedAt
+  }
+  responsibilityCenter {
+    id
+    name
+    acronym
+    description
+    companyId
+    scopeTypeId
+    isActive
+    createdAt
+    updatedAt
+  }
+  requestedCRF {
+    id
+    name
+    description
+    crfReferenceNo
+    statusId
+    companyId
+    departmentId
+    categoryId
+    utilizedBudget
+    approvedAmount
+    remainingAmount
+    requestedAmount
+    newBalanceAmmount
+    projectedBudget
+    remark
+    requestId
+    budgetId
+    isActive
+    createdAt
+    updatedAt
+  }
+  requestItems {
+    id
+    requestId
+    statusId
+    isPriceNeed
+    itemId
+    categoryId
+    description
+    quantity
+    unitOfMeasure
+    vatPercentage
+    isInclusiveVat
+    unitPrice
+    amountGrossOfVat
+    totalPrice
+    attachmentUrl
+    isActive
+    createdAt
+    updatedAt
+  }
+  workflowTemplate {
+    id
+    name
+    description
+    isGlobal
+    version
+    isActive
+    createdAt
+    updatedAt
+  }
+  workFlowInstance {
+    id
+    templateId
+    title
+    description
+    statusId
+    currentStep
+    referenceTypeId
+    startedAt
+    completedAt
+    requestId
+    budget {
+      id
+    }
+    budgetId
+    isActive
+    createdAt
+    updatedAt
+    steps {
+        actionAt
+        assignedToUser {
+          id
+          name
+        }
+        assignedToUserId
+        comments
+        createdAt
+        id
+        instanceId
+        isActive
+        isEditable
+        isRequired
+        source
+        startedAt
+        status {
+          id
+          name
+        }
+        statusId
+        stepNumber
+        stepTemplateId
+        updatedAt
+      }
+  }
+  status {
+    id
+    name
+    modelNameType
+    isActive
+    createdAt
+    updatedAt
+  }
+  auditLogs {
+    id
+    modelId
+    modelName
+    action
+    actionTypeId
+    timestamp
+    actorId
+    oldDetails
+    newDetails
+    parentId
+    isActive
+    createdAt
+    updatedAt
+    inventoryItemId
+  }
+}
+`;

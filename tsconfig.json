@@ -23,6 +23,7 @@
     "paths": {
       "@/*": ["./*"]
     },
+    "types": ["jest", "node"],
     "forceConsistentCasingInFileNames": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,

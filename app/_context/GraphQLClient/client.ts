@@ -139,7 +139,7 @@ const graphqlEndpoint = '/api/graphql';
 
 // ─── Separate host resolution for HTTP vs WS ──────────────────
 // Avoids conflict with Next.js HMR WebSocket on the same host
-const getHost = () => (typeof window !== 'undefined' ? window.location.host : 'localhost:3000');
+const getHost = () => (typeof window !== 'undefined' ? window.location.host : `localhost:${process.env.NEXT_PUBLIC_PORT || process.env.NEXTAUTH_PORT || 3000}`);
 
 // ============================================================================
 // HTTP LINK (for queries & mutations)

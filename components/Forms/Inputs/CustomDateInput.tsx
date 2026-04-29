@@ -12,6 +12,7 @@ type CustomDateInputProps<TFormValues extends FieldValues> = {
   control: Control<TFormValues>;
   label: string;
   numberOfMonths?: number;
+  disabled?: boolean;
 };
 
 const CustomDateInput = <TFormValues extends FieldValues>({
@@ -19,6 +20,7 @@ const CustomDateInput = <TFormValues extends FieldValues>({
   control,
   label,
   numberOfMonths = 1,
+  disabled = false,
 }: CustomDateInputProps<TFormValues>) => {
   const selected = useWatch({ control, name }) as Date | undefined;
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -37,6 +39,7 @@ const CustomDateInput = <TFormValues extends FieldValues>({
                 ref={triggerRef}
                 variant="outline"
                 id={name}
+                disabled={disabled}
                 className="justify-start px-2.5 font-normal"
                 onClick={() => {
                   if (triggerRef.current) {
@@ -60,7 +63,7 @@ const CustomDateInput = <TFormValues extends FieldValues>({
                 defaultMonth={selected}
                 selected={selected}
                 onSelect={(day) => {
-                  field.onChange(day);
+                  if (!disabled) field.onChange(day);
                 }}
                 numberOfMonths={numberOfMonths}
                 showOutsideDays={false}

@@ -284,6 +284,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
   inputRefs[`${modelName}DeleteOneInput`] = builder.inputRef(`${modelName}DeleteOneInput`);
   inputRefs[`${modelName}DeleteManyInput`] = builder.inputRef(`${modelName}DeleteManyInput`);
   inputRefs[`${modelName}WhereInput`] = builder.inputRef(`${modelName}WhereInput`);
+  inputRefs[`${modelName}UpdateWhereOneNestedInput`] = builder.inputRef(`${modelName}UpdateWhereOneNestedInput`);
 });
 
 // ─── SINGLE PASS: Implement all input types ──────────────────────────────────
@@ -440,7 +441,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           required: false,
         }),
         update: t.field({
-          type: inputRefs[`${modelName}UpsertNestedInput`],
+          type: inputRefs[`${modelName}UpdateWhereOneNestedInput`],
           required: false,
         }),
         upsert: t.field({
@@ -449,6 +450,10 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
         disconnect: t.boolean({ required: false }),
         delete: t.boolean({ required: false }),
+        deleteMany: t.field({
+          type: inputRefs[`${modelName}WhereInput`] as never,
+          required: false,
+        }),
       }),
     });
 
@@ -461,7 +466,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           required: false,
         }),
         connect: t.field({
-          type: [inputRefs[`${modelName}ConnectInput`]] as never,
+          type: inputRefs[`${modelName}ConnectInput`] as never,
           required: false,
         }),
         createMany: t.field({
@@ -516,7 +521,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           required: false,
         }),
         update: t.field({
-          type: [inputRefs[`${modelName}UpsertNestedInput`]] as never,
+          type: inputRefs[`${modelName}UpdateWhereOneNestedInput`] as never,
           required: false,
         }),
         updateMany: t.field({
@@ -562,6 +567,21 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           required: true,
         }),
         update: t.field({
+          type: `${modelName}${updateInputSuffix}` as never,
+          required: true,
+        }),
+      }),
+    });
+
+    // 9.5. UpdateWhereOneNestedInput
+    inputRefs[`${modelName}UpdateWhereOneNestedInput`].implement({
+      description: `Nested update with where for ${modelName}.`,
+      fields: (t) => ({
+        where: t.field({
+          type: inputRefs[`${modelName}ConnectInput`],
+          required: true,
+        }),
+        data: t.field({
           type: `${modelName}${updateInputSuffix}` as never,
           required: true,
         }),

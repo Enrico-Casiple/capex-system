@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { modelGQL } from '@/lib/api/crud.gql'
 import { WorkFlowTemplateFindUnique } from '@/lib/api/gql/WorkFlowTemplate.gql'
 import { WorkFlowTemplateResponse } from '@/lib/generated/api/customHookAPI/graphql'
+import { getMatchingSteps } from '@/lib/util/workflowMatcher'
 import { useQuery } from '@apollo/client/react'
 import { RotateCcw } from 'lucide-react'
 import { useEffect } from 'react'
@@ -10,11 +11,12 @@ import { useFieldArray, UseFormReturn } from 'react-hook-form'
 
 type WorkApprovalInstanceProps = {
   form: UseFormReturn<Record<string, unknown>>
+  isViewMode: boolean;
 }
 
 const modelAPI = modelGQL;
 
-const WorkApprovalInstance = ({ form }: WorkApprovalInstanceProps) => {
+const WorkApprovalInstance = ({ form, isViewMode }: WorkApprovalInstanceProps) => {
   // Find The workflowTemplate
   const workflowTemplateQuery = useQuery<
     { WorkFlowTemplateFindUnique: WorkFlowTemplateResponse },
@@ -29,39 +31,65 @@ const WorkApprovalInstance = ({ form }: WorkApprovalInstanceProps) => {
   // IF workflowTemplateQuery as having a data, we need set all the default Value for some Field
   useEffect(() => {
     const workflowTemplate = workflowTemplateQuery.data?.WorkFlowTemplateFindUnique.data;
-    if (workflowTemplate) {
+    const workflowTemplateId = form.watch(`workflowTemplateId`) as string;
+    const existingSteps = form.watch(`workFlowInstance.steps`) as Array<{
+      id?: string;
+      instanceId?: string;
+      stepTemplateId: string | null;
+      stepNumber: number;
+      statusId: string;
+      assignedToUserId: string | null;
+      isEditable: boolean;
+      source: string;
+    }> | undefined;
+
+    // Check if we're in edit mode (have existing steps with data)
+    const isEditMode = existingSteps && existingSteps.length > 0 && existingSteps[0].assignedToUserId;
+
+    if (workflowTemplate && workflowTemplateId && !isEditMode) {
+      // Only generate new steps if NOT in edit mode
       form.setValue(`workFlowInstance.budgetId`, form.watch(`requestedCRF.budgetId`) as never);
       form.setValue(`workFlowInstance.templateId`, workflowTemplate.id as never);
       form.setValue(`workFlowInstance.title`, `Approval Workflow for ${form.watch(`title`) || 'Untitled Request'}` as never);
       form.setValue(`workFlowInstance.description`, `This workflow instance is created based on the selected workflow template: ${workflowTemplate.name}` as never);
-      form.setValue(`workFlowInstance.statusId`, "WORKFLOW_INSTANCE_PENDING_APPROVAL" as never);
 
-      // Set the steps based on the workflow template steps
-      const steps = workflowTemplate.steps?.map((step, index) => ({
+      const rule = {
+        Category: form.watch("requestedCRF.categoryId"),
+        Amount: form.watch("requestedCRF.requestedAmount"),
+      };
+
+      console.log("Evaluating Workflow Template with Rule:", rule);
+
+      const remainingSteps = getMatchingSteps(rule, workflowTemplate?.steps as never);
+      console.log("Generated Steps based on Template and Rule:", remainingSteps);
+
+      const steps = remainingSteps?.map((step, index) => ({
         stepTemplateId: step.id,
         stepNumber: index + 1,
-        statusId: "69ef2115f681bdf7f3214d99",
+        statusId: "69ef2116f681bdf7f3214d9f",
         assignedToUserId: step.assignedToUserId || null,
         startedAt: new Date(),
         isEditable: step.assignedToUserId ? false : true,
         source: "REQUEST_APPROVAL_STEP",
       })) || [];
-      form.setValue(`workFlowInstance.steps`, steps as never);
-    }
 
-    // Remove the steps if the workflow template is unselected
-    if (!form.watch(`workflowTemplateId`)) {
+      form.setValue(`workFlowInstance.steps`, steps as never);
+    } else if (!workflowTemplateId) {
+      // Only reset if workflow template is cleared
       form.setValue(`workFlowInstance.steps`, [{
         stepTemplateId: null,
         stepNumber: 1,
-        statusId: "69ef2115f681bdf7f3214d99",
+        statusId: "69ef2116f681bdf7f3214d9f",
         assignedToUserId: null,
         startedAt: new Date(),
         isEditable: false,
         source: "REQUEST_ITEM_APPROVAL"
       }] as never);
     }
-  }, [form, workflowTemplateQuery.data])
+  }, [
+    workflowTemplateQuery.data,
+    form.watch(`workflowTemplateId`)
+  ])
 
   const stepFieldArray = useFieldArray({
     control: form.control as never,
@@ -83,17 +111,19 @@ const WorkApprovalInstance = ({ form }: WorkApprovalInstanceProps) => {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className={`flex items-center gap-2 ${isViewMode ? "hidden" : ""}`}>
           <Button
             variant="ghost"
             type="button"
             size="sm"
             onClick={() => form.setValue(`workflowTemplateId`, '' as never)}
-            className="text-muted-foreground hover:text-destructive gap-1.5"
+            className={`text-muted-foreground hover:text-destructive gap-1.5 ${isViewMode ? "hidden" : ""}`}
             title="Reset all items"
           >
             <RotateCcw className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Reset</span>
+            <span className="hidden sm:inline">
+              Reset
+            </span>
           </Button>
 
         </div>
@@ -104,6 +134,7 @@ const WorkApprovalInstance = ({ form }: WorkApprovalInstanceProps) => {
           name={`workflowTemplateId`}
           control={form.control}
           label={`Workflow Template`}
+          disabled={!form.watch("quotationAmount") || isViewMode}
           findAllWithCursorGQL={modelAPI.WorkFlowTemplateGQL.findAllWithCursor}
           findUniqueGQL={modelAPI.WorkFlowTemplateGQL.findUnique}
           defaultValueId={form.watch(`workflowTemplateId`) as string | undefined}
@@ -147,7 +178,7 @@ const WorkApprovalInstance = ({ form }: WorkApprovalInstanceProps) => {
                 name={`workFlowInstance.steps.${index}.assignedToUserId`}
                 control={form.control}
                 label={`Assigned To`}
-                disabled={!form.watch(`workFlowInstance.steps.${index}.isEditable`)}
+                disabled={!form.watch(`workFlowInstance.steps.${index}.isEditable`) || isViewMode}
                 findAllWithCursorGQL={modelAPI.UserGQL.findAllWithCursor}
                 findUniqueGQL={modelAPI.UserGQL.findUnique}
                 defaultValueId={form.watch(`workFlowInstance.steps.${index}.assignedToUserId`) as string | undefined}

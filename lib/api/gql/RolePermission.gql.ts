@@ -8,6 +8,62 @@ fragment RolePermissionFragment on RolePermission {
   isActive
   createdAt
   updatedAt
+  conditions {
+    id
+    modelName
+    group
+    codeKey
+    code
+    codeLabel
+    value
+    modelId
+    sortOrder
+    isActive
+    createdAt
+    updatedAt
+  }
+  role {
+    id
+    name
+    description
+    roleType
+    isDefault
+    parentRoleId
+    isActive
+    createdAt
+    updatedAt
+  }
+  permission {
+    id
+    name
+    description
+    module
+    resource
+    action
+    displayOrder
+    isGlobal
+    isAdmin
+    globalLimit
+    isActive
+    createdAt
+    updatedAt
+  }
+  auditLogs {
+    id
+    modelId
+    modelName
+    action
+    actionTypeId
+    timestamp
+    actorId
+    oldDetails
+    newDetails
+    parentId
+    isActive
+    createdAt
+    updatedAt
+    inventoryItemId
+  }
 }
 `;
 

@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { FileText, Table2, CheckCheck } from 'lucide-react'
 import { useListContext } from '@/app/_context/ListContext/ListProvider'
-import { useQuery } from '@apollo/client/react'
+import { useLazyQuery } from '@apollo/client/react'
 import { ExportResponse, ExportFormat, ColumnConfig } from '@/lib/types/export'
 import { downloadFile } from '@/lib/util/download'
 import useToast from '@/app/_hooks/useToast'
@@ -13,13 +13,9 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 type ExportFormWrapperProps = {
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
-  /** Column configuration for this model */
   columns: ColumnConfig[]
-  /** Default selected columns */
   defaultSelectedColumns: string[]
-  /** Optional callback when export completes */
   onExportComplete?: (success: boolean, message?: string) => void
-  /** Optional default export format */
   defaultFormat?: ExportFormat
 }
 
@@ -54,20 +50,9 @@ const ExportFormWrapper = ({
     )
   }
 
-  const { refetch: refetchExportData } = useQuery(
-    modelGQL[model].exportData,
-    {
-      variables: {
-        input: {
-          columns: selectedColumns,
-          filter: initialFilter,
-          isActive: active,
-          search: searchItems,
-          searchFields: searchFields,
-        }
-      },
-      skip: true, // Don't run query on mount
-    }
+  // ✅ FIXED: Removed onCompleted/onError from useLazyQuery options
+  const [executeExport] = useLazyQuery(
+    modelGQL[model].exportData
   )
 
   const handleExport = async () => {
@@ -76,33 +61,49 @@ const ExportFormWrapper = ({
     let message = ''
 
     try {
-      const refetchResult = await refetchExportData()
+      // ✅ Ensure parent fields are included when nested fields are selected
+      const columnsWithParents = new Set(selectedColumns)
+      const addedParents: string[] = []
+
+      selectedColumns.forEach(col => {
+        if (col.includes('.')) {
+          // Extract parent field (e.g., "requestedCRF" from "requestedCRF.request.requestNumber")
+          const parentField = col.split('.')[0]
+          if (!columnsWithParents.has(parentField)) {
+            columnsWithParents.add(parentField)
+            addedParents.push(parentField)
+          }
+        }
+      })
+
+      const finalColumns = Array.from(columnsWithParents)
+
+      // ✅ Build input with parent fields included
+      const exportInput = {
+        columns: finalColumns,
+        filter: initialFilter,
+        isActive: active,
+        search: searchItems,
+        searchFields: searchFields,
+      }
+
+      console.log('📤 Export Input:', {
+        requestedColumns: selectedColumns,
+        columnsCount: finalColumns.length,
+        finalColumns: finalColumns,
+        addedParents: addedParents,
+        filter: exportInput.filter,
+      })
+
+      // ✅ Execute with current variables
+      const refetchResult = await executeExport({
+        variables: {
+          input: exportInput,
+        },
+      })
 
       if (!refetchResult?.data) {
         message = 'No data returned from export query'
-        console.error(message)
-        onExportComplete?.(false, message)
-        return
-      }
-
-      // Build dynamic export key based on format
-      const exportKey = `${modelName}ExportCsv`
-
-      const exportResult = (refetchResult.data as Record<string, ExportResponse>)?.[exportKey]
-
-      if (!exportResult) {
-        message = `No export data found for key: ${exportKey}`
-        console.error(message)
-        onExportComplete?.(false, message)
-        toast.error({
-          message: 'Export Failed',
-          description: 'Unexpected response format from server. Please try again.',
-        })
-        return
-      }
-
-      if (exportResult?.isSuccess === false) {
-        message = exportResult?.message || 'Export failed'
         console.error(message)
         onExportComplete?.(false, message)
         toast.error({
@@ -112,6 +113,40 @@ const ExportFormWrapper = ({
         return
       }
 
+      // Build dynamic export key based on model name
+      const exportKey = `${modelName}ExportCsv`
+      const exportResult = (refetchResult.data as Record<string, ExportResponse>)?.[exportKey]
+
+      if (!exportResult) {
+        message = `No export data found for key: ${exportKey}`
+        console.error('❌ Export result not found. Available keys:', Object.keys(refetchResult.data))
+        onExportComplete?.(false, message)
+        toast.error({
+          message: 'Export Failed',
+          description: 'Unexpected response format from server. Please try again.',
+        })
+        return
+      }
+
+      if (exportResult?.isSuccess === false) {
+        message = exportResult?.message || 'Export failed on server'
+        console.error('❌ Server export failed:', exportResult)
+        onExportComplete?.(false, message)
+        toast.error({
+          message: 'Export Failed',
+          description: message,
+        })
+        return
+      }
+
+      // ✅ Log export stats (with optional chaining for stats)
+      console.log('📊 Export Stats:', {
+        rowCount: exportResult?.data?.rowCount,
+        requestedColumnCount: selectedColumns.length,
+        finalColumnCount: finalColumns.length,
+        stats: (exportResult?.data as any)?.stats,
+      })
+
       // Handle CSV format
       if (format === 'csv') {
         const csvData = exportResult?.data?.csv
@@ -119,11 +154,11 @@ const ExportFormWrapper = ({
         const fileName = exportResult?.data?.fileName || `export_${modelName.toLowerCase()}.csv`
 
         if (!csvData) {
-          console.warn('No CSV data in response:', Object.keys(exportResult?.data || {}))
+          console.warn('❌ No CSV data in response:', Object.keys(exportResult?.data || {}))
           onExportComplete?.(false, 'No CSV data in response')
           toast.error({
             message: 'Export Failed',
-            description: 'No CSV data received from server. Please try again.',
+            description: 'No CSV data received from server.',
           })
           return
         }
@@ -134,14 +169,14 @@ const ExportFormWrapper = ({
       else if (format === 'xlsx') {
         const excelData = exportResult?.data?.excelBase64
         const mimeType = exportResult?.data?.excelMimeType || 'application/vnd.ms-excel'
-        const fileName = (exportResult?.data?.excelFileName || `export_${modelName.toLowerCase()}`).replace(/\.xls$/i, '.xls')
+        const fileName = (exportResult?.data?.excelFileName || `export_${modelName.toLowerCase()}`).replace(/\.xls$/i, '.xlsx')
 
         if (!excelData) {
-          console.warn('No Excel data in response:', Object.keys(exportResult?.data || {}))
+          console.warn('❌ No Excel data in response:', Object.keys(exportResult?.data || {}))
           onExportComplete?.(false, 'No Excel data in response')
           toast.error({
             message: 'Export Failed',
-            description: 'No Excel data received from server. Please try again.',
+            description: 'No Excel data received from server.',
           })
           return
         }
@@ -150,7 +185,7 @@ const ExportFormWrapper = ({
       }
 
       if (success) {
-        message = exportResult?.message || `Successfully exported ${selectedColumns.length} columns`
+        message = `✅ Successfully exported ${exportResult?.data?.rowCount || 0} rows with ${selectedColumns.length} columns`
         console.log(message)
         onExportComplete?.(true, message)
         toast.success({
@@ -159,8 +194,9 @@ const ExportFormWrapper = ({
         })
       }
     } catch (error) {
-      message = error instanceof Error ? error.message : 'Export error'
-      console.error('Export error:', error)
+      const apolloError = error instanceof Error && 'graphQLErrors' in error ? (error as any) : null
+      message = apolloError?.message || (error instanceof Error ? error.message : 'Export error')
+      console.error('❌ Export error:', error)
       onExportComplete?.(false, message)
       toast.error({
         message: 'Export Failed',
@@ -171,7 +207,6 @@ const ExportFormWrapper = ({
       setOpen(false)
     }
   }
-
   return (
     <div className="space-y-6 py-2">
       {/* Format Selection */}

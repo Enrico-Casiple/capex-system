@@ -67,17 +67,11 @@ const EXPORT_COLUMNS: ColumnConfig[] = [
   { id: 'requestItems.isActive', label: 'Active', isRelation: true },
   { id: 'requestItems.createdAt', label: 'Created At', isRelation: true },
   { id: 'requestItems.updatedAt', label: 'Updated At', isRelation: true },
-
-
 ]
 
 // Default columns to show on first load
 const DEFAULT_USER_EXPORT_COLUMNS = [
   'id',
-  'email',
-  'name',
-  'basicInformations.firstName',
-  'basicInformations.lastName',
 ]
 
 type ExportFormProps = {
