@@ -20,14 +20,14 @@ const AppSidebar = ({ width }: AppSidebarProps) => {
     return sidebarData.navMain
       .filter((section) =>
         section.permission
-          ? can(section.permission.module, section.permission.resource, section.permission.action)
+          ? can([section.permission.module, "SYSTEM"], [section.permission.resource, "*"], [section.permission.action, "*"])
           : true,
       )
       .map((section) => ({
         ...section,
         items: section.items?.filter((item) =>
           item.permission
-            ? can(item.permission.module, item.permission.resource, item.permission.action)
+            ? can([item.permission.module, "SYSTEM"], [item.permission.resource, "*"], [item.permission.action, "*"])
             : true,
         ),
       }));

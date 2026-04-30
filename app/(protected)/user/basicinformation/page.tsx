@@ -8,12 +8,12 @@ import { WorkFlowTemplate, WorkFlowTemplateCreateInput } from '@/lib/generated/a
 import useToast from '@/app/_hooks/useToast';
 import dynamic from 'next/dynamic';
 import { useCallback } from 'react';
-import ModelData from '../../_component/ModelData';
-import { workFlowTemplateTableConfig } from '../_config';
 import ExportForm from './_form/ExportForm';
 import ImportForm from './_form/ImportForm';
 import ImportUpdate from '@/app/_component/List/ImportUpdate';
 import ImportUpdateForm from './_form/ImportUpdateForm';
+import { workFlowTemplateTableConfig } from '../../_config';
+import ModelData from '@/app/_component/ModelData';
 
 const Method = dynamic(() => import('./_form/Method'), {
   loading: () => <Spinner />,

@@ -1,3 +1,4 @@
+import { ColumnConfig } from '@/lib/types/export';
 import type { ColumnDef, ColumnFiltersState } from '@tanstack/react-table';
 
 export type StringValueKeys<T> = Extract<
@@ -12,7 +13,17 @@ export type SearchableColumnDef<TData> = ColumnDef<TData, unknown> & {
   meta?: { searchable?: boolean };
 };
 
-export type ListConfigItem<TData = unknown> = {
+// ✅ FIXED: Changed default type from unknown to string | number | boolean | undefined
+export type PreviewColumn<TData = unknown> = {
+  key: keyof TData | string;
+  label: string;
+  default?: string | number | boolean | undefined;
+};
+
+export type ListConfigItem<TData = unknown, 
+TUpdateInput extends Record<string, unknown> = Record<string, unknown>,
+TCreateInput extends Record<string, unknown> = Record<string, unknown>
+> = {
   modelName: string;
   listName: string;
   description: string;
@@ -22,9 +33,18 @@ export type ListConfigItem<TData = unknown> = {
   showActions: boolean;
   initialColumnFilters?: ColumnFiltersState;
   initialSearchField?: StringValueKeys<TData>[];
+  transformRowUpdate?: (row: TData) => TUpdateInput | Promise<TUpdateInput>;
+  previewColumnsUpdate?: PreviewColumn<TData>[];
+  transformRowCreate?: (row: TData) => TCreateInput | Promise<TCreateInput>;
+  previewColumnsCreate?: PreviewColumn<TData>[];
+  exportColumns?: ColumnConfig[];
+  defaultExportColumns?: string[];
 };
 
-export class TableConfig<TData extends Record<string, unknown> = Record<string, unknown>> {
+export class TableConfig<TData extends Record<string, unknown> = Record<string, unknown>, 
+TUpdateInput extends Record<string, unknown> = Record<string, unknown>,
+TCreateInput extends Record<string, unknown> = Record<string, unknown>
+> {
   public readonly modelName: string;
   public readonly listName: string;
   public readonly description: string;
@@ -34,8 +54,14 @@ export class TableConfig<TData extends Record<string, unknown> = Record<string, 
   public readonly showActions: boolean;
   public readonly initialColumnFilters: ColumnFiltersState;
   public readonly initialSearchField?: StringValueKeys<TData>[];
+  public readonly transformRowUpdate?: (row: TData) => TUpdateInput | Promise<TUpdateInput>;
+  public readonly previewColumnsUpdate?: PreviewColumn<TData>[];
+  public readonly transformRowCreate?: (row: TData) => TCreateInput | Promise<TCreateInput>;
+  public readonly previewColumnsCreate?: PreviewColumn<TData>[];
+  public readonly exportColumns?: ColumnConfig[];
+  public readonly defaultExportColumns?: string[];
 
-  constructor(config: ListConfigItem<TData>) {
+  constructor(config: ListConfigItem<TData, TUpdateInput, TCreateInput>) {
     this.modelName = config.modelName;
     this.listName = config.listName;
     this.description = config.description;
@@ -45,6 +71,12 @@ export class TableConfig<TData extends Record<string, unknown> = Record<string, 
     this.showActions = config.showActions;
     this.initialColumnFilters = config.initialColumnFilters ?? [];
     this.initialSearchField = config.initialSearchField;
+    this.transformRowUpdate = config.transformRowUpdate;
+    this.previewColumnsUpdate = config.previewColumnsUpdate;
+    this.transformRowCreate = config.transformRowCreate;
+    this.previewColumnsCreate = config.previewColumnsCreate;
+    this.exportColumns = config.exportColumns;
+    this.defaultExportColumns = config.defaultExportColumns;
   }
 
   public getColumnById(id: string): ColumnDef<TData, unknown> | undefined {
@@ -61,11 +93,35 @@ export class TableConfig<TData extends Record<string, unknown> = Record<string, 
       [columnId]: !this.initialColumnVisibility[columnId],
     };
   }
+
+  public getPreviewColumnsUpdate(): PreviewColumn<TData>[] {
+    return this.previewColumnsUpdate ?? [];
+  }
+
+  public getTransformRowUpdate(): ((row: TData) => TUpdateInput | Promise<TUpdateInput>) | undefined {
+    return this.transformRowUpdate;
+  }
+
+  public getCreatePreviewColumns(): PreviewColumn<TData>[] {
+    return this.previewColumnsCreate ?? [];
+  }
+
+  public getTransformRowCreate(): ((row: TData) => TCreateInput | Promise<TCreateInput>) | undefined {
+    return this.transformRowCreate;
+  }
+
+  public getExportColumns(): ColumnConfig[] {
+    return this.exportColumns ?? [];
+  }
+
+  public getDefaultExportColumns(): string[] {
+    return this.defaultExportColumns ?? [];
+  }
 }
 
-export const createTableConfig = <TData extends Record<string, unknown>>(
-  config: ListConfigItem<TData>,
-) => new TableConfig<TData>(config);
+export const createTableConfig = <TData extends Record<string, unknown>, TUpdateInput extends Record<string, unknown> = Record<string, unknown>, TCreateInput extends Record<string, unknown> = Record<string, unknown>>(
+  config: ListConfigItem<TData, TUpdateInput, TCreateInput>,
+) => new TableConfig<TData, TUpdateInput, TCreateInput>(config);
 
 export const extractSearchFieldsFromColumns = <TData extends Record<string, unknown>>(
   columns: SearchableColumnDef<TData>[],
