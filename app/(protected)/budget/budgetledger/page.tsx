@@ -5,9 +5,9 @@ import ImportUpdate from '@/app/_component/List/ImportUpdate';
 import ModelData from '@/app/_component/ModelData';
 import Action, { ActionType, PopupType } from '@/app/_component/Row/Action';
 import { Spinner } from '@/app/_component/Spinner';
-import { departmentTableConfig } from '@/app/_config';
+import { budgetLedgerTableConfig } from '@/app/_config';
 import ListPage from '@/app/_context/ListWrapper';
-import { Department, DepartmentCreateInput, DepartmentUpdateInput } from '@/lib/generated/api/customHookAPI/graphql';
+import { BudgetLedger, BudgetLedgerCreateInput, BudgetLedgerUpdateInput } from '@/lib/generated/api/customHookAPI/graphql';
 import dynamic from 'next/dynamic';
 import { useCallback } from 'react';
 import ExportForm from './_form/ExportForm';
@@ -20,9 +20,9 @@ const Method = dynamic(() => import('./_form/Method'), {
 });
 
 const ModelPage = () => {
-  type ModelRequest = Department;
-  type ModelCreateInput = DepartmentCreateInput;
-  type ModelUpdateInput = DepartmentUpdateInput;
+  type ModelRequest = BudgetLedger;
+  type ModelCreateInput = BudgetLedgerCreateInput;
+  type ModelUpdateInput = BudgetLedgerUpdateInput;
 
 
   const {
@@ -41,7 +41,7 @@ const ModelPage = () => {
     previewColumnsUpdate,
     exportColumns,
     defaultExportColumns,
-  } = departmentTableConfig;
+  } = budgetLedgerTableConfig;
 
   const renderMethod = useCallback(
     (

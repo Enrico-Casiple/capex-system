@@ -5,9 +5,9 @@ import ImportUpdate from '@/app/_component/List/ImportUpdate';
 import ModelData from '@/app/_component/ModelData';
 import Action, { ActionType, PopupType } from '@/app/_component/Row/Action';
 import { Spinner } from '@/app/_component/Spinner';
-import { companyTableConfig } from '@/app/_config';
+import { capitalRecoveryFactorTableConfig } from '@/app/_config';
 import ListPage from '@/app/_context/ListWrapper';
-import { Company, CompanyCreateInput, CompanyUpdateInput } from '@/lib/generated/api/customHookAPI/graphql';
+import { CapitalRecoveryFactor, CapitalRecoveryFactorCreateInput, CapitalRecoveryFactorUpdateInput } from '@/lib/generated/api/customHookAPI/graphql';
 import dynamic from 'next/dynamic';
 import { useCallback } from 'react';
 import ExportForm from './_form/ExportForm';
@@ -20,9 +20,9 @@ const Method = dynamic(() => import('./_form/Method'), {
 });
 
 const ModelPage = () => {
-  type ModelRequest = Company;
-  type ModelCreateInput = CompanyCreateInput;
-  type ModelUpdateInput = CompanyUpdateInput;
+  type ModelRequest = CapitalRecoveryFactor;
+  type ModelCreateInput = CapitalRecoveryFactorCreateInput;
+  type ModelUpdateInput = CapitalRecoveryFactorUpdateInput;
 
   const {
     modelName,
@@ -40,7 +40,7 @@ const ModelPage = () => {
     previewColumnsUpdate,
     exportColumns,
     defaultExportColumns,
-  } = companyTableConfig;
+  } = capitalRecoveryFactorTableConfig;
 
   const renderMethod = useCallback(
     (

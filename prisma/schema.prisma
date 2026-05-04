@@ -995,7 +995,7 @@ model BudgetLedger {
   // RELEASE      (cancellation)
   // ADJUSTMENT   (manual correction)
 
-  amount   Float
+  amount   Float?
   currency String? @default("PHP")
 
   // =========================================
@@ -1011,9 +1011,9 @@ model BudgetLedger {
   referenceNo String?
   remark      String?
   auditLogs   AuditLog[]
-  isActive    Boolean    @default(true)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  isActive    Boolean?   @default(true)
+  createdAt   DateTime?  @default(now())
+  updatedAt   DateTime?  @updatedAt
 
   @@index([budgetId])
   @@index([typeId])

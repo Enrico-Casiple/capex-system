@@ -2266,8 +2266,8 @@ type BudgetGroupByResponse {
 
 """Represents a BudgetLedger record in the database."""
 type BudgetLedger {
-  """(Required) amount field of BudgetLedger. Type: Float."""
-  amount: Float!
+  """(Optional) amount field of BudgetLedger. Type: Float."""
+  amount: Float
 
   """
   (Optional) List of related AuditLog records linked to this BudgetLedger.
@@ -2280,8 +2280,8 @@ type BudgetLedger {
   """(Optional) budgetId field of BudgetLedger. Type: String."""
   budgetId: String
 
-  """(Required) createdAt field of BudgetLedger. Type: DateTime (ISO 8601)."""
-  createdAt: DateTime!
+  """(Optional) createdAt field of BudgetLedger. Type: DateTime (ISO 8601)."""
+  createdAt: DateTime
 
   """(Optional) currency field of BudgetLedger. Type: String."""
   currency: String
@@ -2289,8 +2289,8 @@ type BudgetLedger {
   """Unique identifier of the BudgetLedger record."""
   id: ID!
 
-  """(Required) isActive field of BudgetLedger. Type: Boolean."""
-  isActive: Boolean!
+  """(Optional) isActive field of BudgetLedger. Type: Boolean."""
+  isActive: Boolean
 
   """(Optional) referenceNo field of BudgetLedger. Type: String."""
   referenceNo: String
@@ -2313,8 +2313,8 @@ type BudgetLedger {
   """(Optional) typeId field of BudgetLedger. Type: String."""
   typeId: String
 
-  """(Required) updatedAt field of BudgetLedger. Type: DateTime (ISO 8601)."""
-  updatedAt: DateTime!
+  """(Optional) updatedAt field of BudgetLedger. Type: DateTime (ISO 8601)."""
+  updatedAt: DateTime
 }
 
 """Input to connect an existing BudgetLedger record by a unique field."""
@@ -2359,7 +2359,7 @@ type BudgetLedgerCountResponse {
 }
 
 input BudgetLedgerCreateInput {
-  amount: Float!
+  amount: Float
   auditLogs: AuditLogCreateManyNestedInput
   budget: BudgetCreateOneNestedInput
   budgetId: String
@@ -2373,7 +2373,7 @@ input BudgetLedgerCreateInput {
   sourceTypeId: String
   type: TypeCreateOneNestedInput
   typeId: String
-  updatedAt: DateTime!
+  updatedAt: DateTime
 }
 
 """Nested create many for BudgetLedger."""
@@ -5138,8 +5138,8 @@ type Company {
   """(Optional) conctactNumber field of Company. Type: String."""
   conctactNumber: String
 
-  """(Required) createdAt field of Company. Type: DateTime (ISO 8601)."""
-  createdAt: DateTime!
+  """(Optional) createdAt field of Company. Type: DateTime (ISO 8601)."""
+  createdAt: DateTime
 
   """
   (Optional) List of related CapitalRecoveryFactor records linked to this Company.
@@ -5194,8 +5194,8 @@ type Company {
   """(Optional) scopeTypeId field of Company. Type: String."""
   scopeTypeId: String
 
-  """(Required) updatedAt field of Company. Type: DateTime (ISO 8601)."""
-  updatedAt: DateTime!
+  """(Optional) updatedAt field of Company. Type: DateTime (ISO 8601)."""
+  updatedAt: DateTime
 
   """
   (Optional) List of related WorkFlowTemplateScope records linked to this Company.
@@ -5271,7 +5271,7 @@ input CompanyCreateInput {
   request: RequestCreateManyNestedInput
   scopeType: TypeCreateOneNestedInput
   scopeTypeId: String
-  updatedAt: DateTime!
+  updatedAt: DateTime
   workFlowTemplateScopeCompany: WorkFlowTemplateScopeCreateManyNestedInput
   workInformations: WorkInformationCreateManyNestedInput
 }

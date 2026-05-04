@@ -1,59 +1,52 @@
-// app/(protected)/user/Form/ImportForm.tsx
 import ImportFormWrapper from '@/app/_component/Form/ImportFormWrapper';
-import { hashPassword } from '../../../../lib/util/bcryptjs';
-import useToast from '../../../_hooks/useToast';
+import { PreviewColumn } from '@/app/_config/shared';
+import useToast from '@/app/_hooks/useToast';
 
-
-type ImportFormProps = {
+type ImportFormProps<TModel, TCreateInput> = {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}
+  transformRow?: (row: TModel) => TCreateInput | Promise<TCreateInput>;
+  previewColumns?: PreviewColumn<TModel>[];
+};
 
-const ImportForm =  <
+const ImportForm = <
   TModel extends Record<string, unknown>,
   TCreateInput extends Record<string, unknown>
->(props: ImportFormProps) => {
+>({
+  open,
+  setOpen,
+  transformRow,
+  previewColumns,
+}: ImportFormProps<TModel, TCreateInput>) => {
   const toast = useToast();
+
+  const handleTransformRow = async (row: TModel): Promise<TCreateInput> => {
+    try {
+      if (!transformRow) {
+        throw new Error('Transform function not provided');
+      }
+
+      const result = await transformRow(row);
+      return result as TCreateInput;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error({
+        message: `Error processing row`,
+        description: `Row ID: ${row['id'] || 'unknown'} - ${errorMessage}`,
+      });
+      throw error;
+    }
+  };
+
   return (
     <ImportFormWrapper<TModel, TCreateInput>
-      {...props}
-      transformRow={async (row: TModel) => {
-        const model = row as unknown as Record<string, unknown>
-
-        // Validate password exists
-        if (!model.password) {
-          throw new Error(`Password is required for user ${model.email || 'unknown'}`);
-        }
-
-        try {
-          const hashedPassword = await hashPassword(model.password as string);
-          return {
-            name: model.name,
-            email: model.email,
-            password: hashedPassword,
-            userName: model.userName,
-            isTwoFactorAuthEnabled: Boolean(model.isTwoFactorAuthEnabled),
-            isActive: Boolean(model.isActive),
-          } as unknown as TCreateInput;
-        } catch (error) {
-          toast.error({
-            message: 'Error hashing password',
-            description: `Failed to hash password for user ${model.email}. Please ensure all required fields are present and try again.`
-          });
-          throw error;
-        }
-      }}
-      previewColumns={[
-        { key: 'name', label: 'Name', default: 'FullName' },
-        { key: 'email', label: 'Email', default: 'WorkEmail@email.com' },
-        { key: 'userName', label: 'Username', default: 'WorkEmail' },
-        {key: 'password', label: 'Password', default: 'password123'},
-        { key: 'isTwoFactorAuthEnabled', label: 'Two-Factor Authentication', default: false },
-        { key: 'isActive', label: 'Active', default: false }
-      ]}
-      applyDefaults={false}  // ← Don't fill in defaults during import
+      open={open}
+      setOpen={setOpen}
+      transformRow={handleTransformRow}
+      previewColumns={previewColumns || []}
+      applyDefaults={false}
     />
-  )
-}
+  );
+};
 
-export default ImportForm
+export default ImportForm;
