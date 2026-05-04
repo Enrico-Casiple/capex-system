@@ -1,5 +1,7 @@
 // lib/permissions/PermissionTemplate.ts
 
+import { getDatamodel } from "@/lib/pothos/pothos-prisma-types";
+
 export interface PermissionDefinition {
   module: string;
   resource: string;
@@ -234,36 +236,6 @@ export class PermissionTemplate {
   }
 }
 
-export const userManagementPermissions = new PermissionTemplate({
-  moduleName: 'USER_MANAGEMENT',
-  resourceName: 'user',
-  displayName: 'User',
-  hasApproval: false,
-  customActions: [
-    { action: 'assign_role', name: 'Assign Role', description: 'Assign roles to users' },
-    { action: 'remove_role', name: 'Remove Role', description: 'Remove roles from users' },
-    { action: 'reset_password', name: 'Reset Password', description: 'Reset user passwords' },
-    { action: 'change_password', name: 'Change Password', description: 'Change user passwords' },
-    { action: 'activate', name: 'Activate User', description: 'Activate user accounts' },
-    { action: 'deactivate', name: 'Deactivate User', description: 'Deactivate user accounts' },
-    { action: 'view_activity', name: 'View Activity', description: 'View user activity logs' },
-  ],
-}).getPermissions();
-
-export const roleManagementPermissions = new PermissionTemplate({
-  moduleName: 'ROLE_MANAGEMENT',
-  resourceName: 'role',
-  displayName: 'Role',
-  hasApproval: false,
-  customActions: [
-    {
-      action: 'assign_permissions',
-      name: 'Assign Permissions',
-      description: 'Assign permissions to roles',
-    },
-    { action: 'clone', name: 'Clone Role', description: 'Clone existing role' },
-  ],
-}).getPermissions();
 
 export const createRolePermissions = (
   moduleName: string,
@@ -279,3 +251,17 @@ export const createRolePermissions = (
     hasApproval,
     customActions,
   }).getPermissions();
+
+const prismaDataModel = getDatamodel()
+
+const allModels = Object.keys(prismaDataModel.datamodel.models)
+
+export const allModelPermissions = allModels.flatMap((model) =>
+  createRolePermissions(
+   `${model.toUpperCase()}_MANAGEMENT`,
+    model.toLowerCase(),
+    model,
+    false,
+    [],
+  ),
+);

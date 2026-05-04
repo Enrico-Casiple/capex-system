@@ -1,12 +1,17 @@
 import { useListContext } from '@/app/_context/ListContext/ListProvider';
 import { Spinner } from '@/app/_component/Spinner';
 import { Button } from '@/components/ui/button';
-import { TableCell, TableFooter, TableRow } from '@/components/ui/table'
+import { TableCell, TableFooter, TableRow } from '@/components/ui/table';
+import { Table } from '@tanstack/react-table';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useMemo, useEffect, useRef } from 'react';
 
-const TableFooterWrapper = () => {
-  const { returnQuery, allRecordData, table, cursorKey, cursor, setCursor, active, filter, searchItems, cursorStack, setCursorStack, currentPage, setCurrentPage } = useListContext();
+type TableFooterWrapperProps<Model> = {
+  table: Table<Model>;
+};
+
+const TableFooterWrapper = <Model,>({ table: tableInstance }: TableFooterWrapperProps<Model>) => {
+  const { returnQuery, allRecordData, cursorKey, cursor, setCursor, active, filter, searchItems, cursorStack, setCursorStack, currentPage, setCurrentPage } = useListContext();
 
   const filterKey = useMemo(() =>
     JSON.stringify({ active, filter, searchItems }),
@@ -58,9 +63,9 @@ const TableFooterWrapper = () => {
   };
 
   return (
-    <TableFooter>
-      <TableRow style={{ display: 'table', width: '100%', tableLayout: 'fixed' }}>
-        <TableCell colSpan={100} className="py-3 text-center border-0">
+    <TableFooter className="bg-background/95 backdrop-blur shadow-[0_-1px_0_theme(colors.border/60)]">
+      <TableRow className="h-10 border-0 bg-background/95 hover:bg-transparent">
+        <TableCell colSpan={tableInstance.getAllLeafColumns().length || 1} className="border-0 px-4 py-2">
           {returnQuery.loading && allRecordData.length > 0 && (
             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
               <Spinner className="size-3" />
@@ -75,8 +80,8 @@ const TableFooterWrapper = () => {
               </span>
               <span className="text-xs text-muted-foreground">
                 {hasNextPage
-                  ? `Showing ${table.getRowCount()} records`
-                  : `All ${table.getRowCount()} records loaded`
+                  ? `Showing ${tableInstance.getRowCount()} records`
+                  : `All ${tableInstance.getRowCount()} records loaded`
                 }
               </span>
               <span className="text-xs text-muted-foreground flex items-center gap-2">

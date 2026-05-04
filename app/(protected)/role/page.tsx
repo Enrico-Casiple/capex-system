@@ -1,16 +1,19 @@
 'use client';
-import Export from '@/app/_component/List/Export';
-import Import from '@/app/_component/List/Import';
+
+import ModelData from '@/app/_component/ModelData';
 import Action, { ActionType, PopupType } from '@/app/_component/Row/Action';
+import { Spinner } from '@/app/_component/Spinner';
 import ListPage from '@/app/_context/ListWrapper';
-import { Role, RoleCreateInput } from '@/lib/generated/api/customHookAPI/graphql';
+import { Role, RoleCreateInput, RoleUpdateInput } from '@/lib/generated/api/customHookAPI/graphql';
+import dynamic from 'next/dynamic';
 import { useCallback } from 'react';
-import ModelData from '../../_component/ModelData';
-import { roleTableConfig } from '../_config';
 import ExportForm from './_form/ExportForm';
 import ImportForm from './_form/ImportForm';
-import dynamic from 'next/dynamic';
-import { Spinner } from '@/app/_component/Spinner';
+import ImportUpdateForm from './_form/ImportUpdateForm';
+import Import from '@/app/_component/List/Import';
+import Export from '@/app/_component/List/Export';
+import ImportUpdate from '@/app/_component/List/ImportUpdate';
+import { roleTableConfig } from '@/app/_config';
 
 const Method = dynamic(() => import('./_form/Method'), {
   loading: () => <Spinner />,
@@ -18,6 +21,29 @@ const Method = dynamic(() => import('./_form/Method'), {
 });
 
 const ModelPage = () => {
+  type ModelRequest = Role;
+  type ModelCreateInput = RoleCreateInput;
+  type ModelUpdateInput = RoleUpdateInput;
+
+
+  const {
+    modelName,
+    extraColumns,
+    initialColumnVisibility,
+    initialFilter,
+    showActions,
+    initialColumnFilters,
+    listName,
+    description,
+    initialSearchField,
+    transformRowCreate,
+    previewColumnsCreate,
+    transformRowUpdate,
+    previewColumnsUpdate,
+    exportColumns,
+    defaultExportColumns,
+  } = roleTableConfig;
+
   const renderMethod = useCallback(
     (
       rowId: string | null,
@@ -38,7 +64,7 @@ const ModelPage = () => {
   );
 
   const actionComponent = useCallback(
-    (row: Role) => <Action rowId={row.id ?? null} component={renderMethod} />,
+    (row: ModelRequest) => <Action rowId={row.id} component={renderMethod} />,
     [renderMethod],
   );
 
@@ -61,42 +87,56 @@ const ModelPage = () => {
     [],
   );
 
-  const BULK_ACTIONS: React.ReactNode[] = [
-
-  ];
-
-  const importForm = useCallback<(open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => React.ReactNode>(
+  const importForm = useCallback(
     (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (
-      <ImportForm<Role, RoleCreateInput> open={open} setOpen={setOpen} />
+      <ImportForm<ModelRequest, ModelCreateInput>
+        open={open}
+        setOpen={setOpen}
+        transformRow={transformRowCreate}
+        previewColumns={previewColumnsCreate}
+      />
     ),
-    [],
+    [transformRowCreate, previewColumnsCreate],
   );
 
-  const exportForm = useCallback<(open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => React.ReactNode>(
+  const updateForm = useCallback(
     (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (
-      <ExportForm open={open} setOpen={setOpen} />
+      <ImportUpdateForm<ModelRequest, ModelUpdateInput>
+        open={open}
+        setOpen={setOpen}
+        transformRow={transformRowUpdate}
+        previewColumns={previewColumnsUpdate}
+      />
     ),
-    [],
+    [transformRowUpdate, previewColumnsUpdate],
+  );
+
+  const exportForm = useCallback(
+    (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (
+      <ExportForm open={open} setOpen={setOpen} exportColumns={exportColumns} defaultSelectedColumns={defaultExportColumns} />
+    ),
+    [defaultExportColumns, exportColumns],
   );
 
   return (
-    <ListPage<Role>
-      modelName={roleTableConfig.modelName}
-      extraColumns={roleTableConfig.extraColumns}
-      initialColumnVisibility={roleTableConfig.initialColumnVisibility}
-      initialFilter={roleTableConfig.initialFilter}
-      showActions={roleTableConfig.showActions}
-      initialColumnFilters={roleTableConfig.initialColumnFilters}
+    <ListPage<ModelRequest>
+      modelName={modelName}
+      extraColumns={extraColumns}
+      initialColumnVisibility={initialColumnVisibility}
+      initialFilter={initialFilter}
+      showActions={showActions}
+      initialColumnFilters={initialColumnFilters}
       actionComponent={actionComponent}
-      initialSearchField={roleTableConfig.initialSearchField as Extract<keyof Role, string>[]}
+      initialSearchField={initialSearchField as Extract<keyof ModelRequest, string>[]}
     >
       <ModelData
-        title={roleTableConfig.listName}
-        description={roleTableConfig.description}
-        newBulkAction={BULK_ACTIONS}
+        title={listName}
+        description={description}
+        newBulkAction={[]}
         createAction={createAction}
         importComponent={<Import importFormComponent={importForm} />}
         exportComponent={<Export exportFormComponent={exportForm} />}
+        updateComponent={<ImportUpdate importUpdateFormComponent={updateForm} />}
       />
     </ListPage>
   );

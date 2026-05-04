@@ -1,17 +1,19 @@
 'use client';
+
+import ModelData from '@/app/_component/ModelData';
+import Action, { ActionType, PopupType } from '@/app/_component/Row/Action';
+import { Spinner } from '@/app/_component/Spinner';
+import { userTableConfig } from '@/app/_config';
 import ListPage from '@/app/_context/ListWrapper';
-import { User, UserCreateInput } from '@/lib/generated/api/customHookAPI/graphql';
-import ModelData from '../../_component/ModelData';
-import Action from '@/app/_component/Row/Action';
+import { User, UserCreateInput, UserUpdateInput } from '@/lib/generated/api/customHookAPI/graphql';
+import dynamic from 'next/dynamic';
 import { useCallback } from 'react';
-import { ActionType, PopupType } from '@/app/_component/Row/Action';
-import { userTableConfig } from '../_config';
+import ExportForm from './_form/ExportForm';
+import ImportForm from './_form/ImportForm';
+import ImportUpdateForm from './_form/ImportUpdateForm';
 import Import from '@/app/_component/List/Import';
 import Export from '@/app/_component/List/Export';
-import ImportForm from './_form/ImportForm';
-import ExportForm from './_form/ExportForm';
-import dynamic from 'next/dynamic';
-import { Spinner } from '@/app/_component/Spinner';
+import ImportUpdate from '@/app/_component/List/ImportUpdate';
 
 const Method = dynamic(() => import('./_form/Method'), {
   loading: () => <Spinner />,
@@ -19,6 +21,29 @@ const Method = dynamic(() => import('./_form/Method'), {
 });
 
 const ModelPage = () => {
+  type ModelRequest = User;
+  type ModelCreateInput = UserCreateInput;
+  type ModelUpdateInput = UserUpdateInput;
+
+
+  const {
+    modelName,
+    extraColumns,
+    initialColumnVisibility,
+    initialFilter,
+    showActions,
+    initialColumnFilters,
+    listName,
+    description,
+    initialSearchField,
+    transformRowCreate,
+    previewColumnsCreate,
+    transformRowUpdate,
+    previewColumnsUpdate,
+    exportColumns,
+    defaultExportColumns,
+  } = userTableConfig;
+
   const renderMethod = useCallback(
     (
       rowId: string | null,
@@ -39,7 +64,7 @@ const ModelPage = () => {
   );
 
   const actionComponent = useCallback(
-    (row: User) => <Action rowId={row.id} component={renderMethod} />,
+    (row: ModelRequest) => <Action rowId={row.id} component={renderMethod} />,
     [renderMethod],
   );
 
@@ -62,42 +87,56 @@ const ModelPage = () => {
     [],
   );
 
-  const BULK_ACTIONS: React.ReactNode[] = [
-
-  ];
-
   const importForm = useCallback(
     (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (
-      <ImportForm<User, UserCreateInput> open={open} setOpen={setOpen} />
+      <ImportForm<ModelRequest, ModelCreateInput>
+        open={open}
+        setOpen={setOpen}
+        transformRow={transformRowCreate}
+        previewColumns={previewColumnsCreate}
+      />
     ),
-    [],
+    [transformRowCreate, previewColumnsCreate],
+  );
+
+  const updateForm = useCallback(
+    (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (
+      <ImportUpdateForm<ModelRequest, ModelUpdateInput>
+        open={open}
+        setOpen={setOpen}
+        transformRow={transformRowUpdate}
+        previewColumns={previewColumnsUpdate}
+      />
+    ),
+    [transformRowUpdate, previewColumnsUpdate],
   );
 
   const exportForm = useCallback(
     (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (
-      <ExportForm open={open} setOpen={setOpen} />
+      <ExportForm open={open} setOpen={setOpen} exportColumns={exportColumns} defaultSelectedColumns={defaultExportColumns} />
     ),
-    [],
+    [defaultExportColumns, exportColumns],
   );
 
   return (
-    <ListPage<User>
-      modelName={userTableConfig.modelName}
-      extraColumns={userTableConfig.extraColumns}
-      initialColumnVisibility={userTableConfig.initialColumnVisibility}
-      initialFilter={userTableConfig.initialFilter}
-      showActions={userTableConfig.showActions}
-      initialColumnFilters={userTableConfig.initialColumnFilters}
+    <ListPage<ModelRequest>
+      modelName={modelName}
+      extraColumns={extraColumns}
+      initialColumnVisibility={initialColumnVisibility}
+      initialFilter={initialFilter}
+      showActions={showActions}
+      initialColumnFilters={initialColumnFilters}
       actionComponent={actionComponent}
-      initialSearchField={userTableConfig.initialSearchField as Extract<keyof User, string>[]}
+      initialSearchField={initialSearchField as Extract<keyof ModelRequest, string>[]}
     >
       <ModelData
-        title={userTableConfig.listName}
-        description={userTableConfig.description}
-        newBulkAction={BULK_ACTIONS}
+        title={listName}
+        description={description}
+        newBulkAction={[]}
         createAction={createAction}
         importComponent={<Import importFormComponent={importForm} />}
         exportComponent={<Export exportFormComponent={exportForm} />}
+        updateComponent={<ImportUpdate importUpdateFormComponent={updateForm} />}
       />
     </ListPage>
   );

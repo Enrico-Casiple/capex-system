@@ -2,6 +2,7 @@ import { useListContext } from '@/app/_context/ListContext/ListProvider';
 import { TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { flexRender, Table } from '@tanstack/react-table';
 import { useRef } from 'react';
+import { FileSearchIcon } from 'lucide-react';
 
 type TableBodyWrapperProps<Model> = { table: Table<Model> };
 
@@ -10,34 +11,42 @@ const TableBodyWrapper = <Model,>({ table }: TableBodyWrapperProps<Model>) => {
   const rows = table.getRowModel().rows;
   const isRefetching = returnQuery.loading && allRecordData.length > 0;
   const parentRef = useRef<HTMLTableSectionElement>(null);
+  const isEmpty = !returnQuery.loading && rows.length === 0;
+  const colSpan = table.getAllLeafColumns().length || 1;
 
-  const shouldScroll = rows.length > 10;
+  // const shouldScroll = rows.length > 10;
 
   return (
     <TableBody
       ref={parentRef}
-      style={{
-        display: 'block',
-        height: '500px',
-        overflow: shouldScroll ? 'auto' : 'visible',
-      }}
       className={`transition-opacity duration-300 ${isRefetching ? 'opacity-60' : ''}`}
     >
-      {rows.map((row) => {
+      {isEmpty ? (
+        <TableRow className="hover:bg-transparent">
+          <TableCell colSpan={colSpan} className="py-16 px-4 text-center border-0">
+            <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
+              <FileSearchIcon size={36} strokeWidth={1.2} className="text-muted-foreground/40" />
+              <span className="text-sm font-medium text-foreground">No records found</span>
+              <span className="text-xs text-muted-foreground">
+                Try adjusting your filters or search criteria
+              </span>
+            </div>
+          </TableCell>
+        </TableRow>
+      ) : rows.map((row) => {
         if (!row) return null;
 
         return (
           <TableRow
             key={row.id}
             data-state={row.getIsSelected() ? 'selected' : undefined}
-            style={{ display: 'table', width: '100%', tableLayout: 'fixed' }}
-            className="hover:bg-muted/50 even:bg-muted/20 data-[state=selected]:bg-primary/10 border-b-2 border-border/50"
+            className="h-10 border-b border-border/50 transition-colors hover:bg-muted/40 data-[state=selected]:bg-primary/5"
           >
-            {row.getVisibleCells().map((cell) => (
+            {row.getVisibleCells().map((cell, cellIndex) => (
               <TableCell
-                key={cell.id}
-                className="px-3 py-1.5 h-9 border border-border last:border-r-0 align-middle overflow-hidden text-ellipsis whitespace-nowrap"
+                key={`${row.id}-${cellIndex}`}
                 style={{ width: cell.column.getSize() }}
+                className={`px-3 py-1 text-sm align-middle overflow-hidden whitespace-nowrap text-ellipsis ${cell.column.id === 'action' ? 'text-left' : ''}`}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </TableCell>

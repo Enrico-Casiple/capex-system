@@ -37,6 +37,9 @@ export type CursorPaginationInput<PrismaModel extends Prisma.ModelName> = {
   filter?: PrismaTypes[PrismaModel]['Where'];
   search?: string;
   searchFields?: (keyof PrismaTypes[PrismaModel]['Shape'])[]; // ← add this
+  orderBy?: PrismaTypes[PrismaModel]['OrderBy'];
+  distinct?: FindManyArgs<PrismaModel>['distinct'];
+  select?: FindManyArgs<PrismaModel>['select'];
 };
 
 export type CursorPaginationResult<PrismaModel extends Prisma.ModelName> = {
@@ -57,6 +60,8 @@ export type ExportCsvInput<PrismaModel extends Prisma.ModelName> = {
   searchFields?: (keyof PrismaTypes[PrismaModel]['Shape'])[];
   columns?: string[];
   fileName?: string;
+  maxRecords?: number | null; // Optional: override default 50K limit (max 1M). Use null for unlimited (⚠️ memory intensive)
+  uploadToSpaces?: boolean; // When true, upload file to DigitalOcean Spaces and return URL
 };
 
 export interface GroupByInput<PrismaModel extends Prisma.ModelName> {

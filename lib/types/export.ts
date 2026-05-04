@@ -17,6 +17,9 @@ export type ExportResponse = {
     fileName?: string;
     excelFileName?: string;
     rowCount?: number;
+    fileUrl?: string | null;
+    fileKey?: string | null;
+    wasTruncated?: boolean;
   };
 }
 

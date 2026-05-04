@@ -58,9 +58,14 @@ function useColumns<Model extends { id?: string | null }>({
       header: 'ID',
       enableSorting: false, // by default, True so we need to disable sorting for this column
       enableColumnFilter: false, // by default, True so we need to disable filtering for this column
+      size: 130,
     });
 
-    columns.push(...extraColumns);
+    // Add extra columns with default size if not specified
+    columns.push(...extraColumns.map(col => ({
+      ...col,
+      size: col.size || 150, // Default to 150px if no size specified
+    })));
 
     columns.push({
       id: 'createdAt',
@@ -88,16 +93,17 @@ function useColumns<Model extends { id?: string | null }>({
       },
       enableSorting: false,
       enableColumnFilter: false,
+      size: 180,
     });
 
     if (showActions) {
       columns.push({
-        id: 'action',
+        id: 'actions',
         header: 'Action',
         enableSorting: false, // by default, True so we need to disable sorting for this column
         enableColumnFilter: false, // by default, True so we need to disable filtering for this column
         cell: ({ row }) => <div className='text-start'>{actionCell ? actionCell(row.original) : row.original.id}</div>,
-        size: 50,
+        size: 160,
       });
     }
 

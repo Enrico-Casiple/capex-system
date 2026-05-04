@@ -25,6 +25,8 @@ export type PrismaModelMethods<PrismaModel extends Prisma.ModelName> = {
     skip?: FindManyArgs<PrismaModel>['skip'];
     take?: FindManyArgs<PrismaModel>['take'];
     include?: Prisma.Args<PrismaModel, 'findMany'>['include'];
+    select?: FindManyArgs<PrismaModel>['select'];
+    distinct?: FindManyArgs<PrismaModel>['distinct'];
   }) => Promise<PrismaTypes[PrismaModel]['Shape'][] | null>;
   count: (args?: { where?: FindManyArgs<PrismaModel>['where'] }) => Promise<number>;
   create: (args: {

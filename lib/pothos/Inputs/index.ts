@@ -133,6 +133,9 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           description: `Fields to search within.`,
         }),
         filter: t.field({ type: 'Json', required: false, description: `Advanced JSON filter.` }),
+        orderBy: t.field({ type: 'Json', required: false, description: `Order by clause.` }),
+        distinct: t.field({ type: ['String'] as never, required: false, description: `Fields to apply distinct on.` }),
+        select: t.field({ type: 'Json', required: false, description: `Fields to select.` }),
       }),
     });
   } catch (error) {

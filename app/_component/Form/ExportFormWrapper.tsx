@@ -28,6 +28,7 @@ const ExportFormWrapper = ({
 }: ExportFormWrapperProps) => {
   const { modelGQL, model, initialFilter, active, searchItems, searchFields, modelName } = useListContext()
   const [format, setFormat] = useState<ExportFormat>(defaultFormat)
+  const [uploadToSpaces, setUploadToSpaces] = useState(true)
   const [selectedColumns, setSelectedColumns] = useState<string[]>(defaultSelectedColumns)
   const [isExporting, setIsExporting] = useState(false)
   const toast = useToast()
@@ -78,7 +79,7 @@ const ExportFormWrapper = ({
 
       const finalColumns = Array.from(columnsWithParents)
 
-      // ✅ Build input with parent fields included
+      // ✅ Build input with parent fields included (uploadToSpaces removed - not part of GraphQL schema)
       const exportInput = {
         columns: finalColumns,
         filter: initialFilter,
@@ -144,14 +145,24 @@ const ExportFormWrapper = ({
         rowCount: exportResult?.data?.rowCount,
         requestedColumnCount: selectedColumns.length,
         finalColumnCount: finalColumns.length,
-        stats: (exportResult?.data as any)?.stats,
+        stats: (exportResult?.data as Record<string, unknown>)?.stats,
       })
 
+      const fileUrl = exportResult?.data?.fileUrl
+      const fileName = exportResult?.data?.fileName || `export_${modelName.toLowerCase()}.csv`
+
+      // If the server uploaded the file to Spaces, just open/download the link
+      if (fileUrl) {
+        window.open(fileUrl, '_blank', 'noopener,noreferrer')
+        success = true
+        message = `✅ Export ready: ${exportResult?.data?.rowCount || 0} rows uploaded to storage`
+        console.log(message, { fileUrl, fileName })
+      }
+
       // Handle CSV format
-      if (format === 'csv') {
+      else if (format === 'csv') {
         const csvData = exportResult?.data?.csv
         const mimeType = exportResult?.data?.mimeType || 'text/csv'
-        const fileName = exportResult?.data?.fileName || `export_${modelName.toLowerCase()}.csv`
 
         if (!csvData) {
           console.warn('❌ No CSV data in response:', Object.keys(exportResult?.data || {}))
@@ -169,7 +180,7 @@ const ExportFormWrapper = ({
       else if (format === 'xlsx') {
         const excelData = exportResult?.data?.excelBase64
         const mimeType = exportResult?.data?.excelMimeType || 'application/vnd.ms-excel'
-        const fileName = (exportResult?.data?.excelFileName || `export_${modelName.toLowerCase()}`).replace(/\.xls$/i, '.xlsx')
+        const xlsxFileName = (exportResult?.data?.excelFileName || `export_${modelName.toLowerCase()}`).replace(/\.xls$/i, '.xlsx')
 
         if (!excelData) {
           console.warn('❌ No Excel data in response:', Object.keys(exportResult?.data || {}))
@@ -181,7 +192,7 @@ const ExportFormWrapper = ({
           return
         }
 
-        success = downloadFile(excelData, mimeType, fileName, true)
+        success = downloadFile(excelData, mimeType, xlsxFileName, true)
       }
 
       if (success) {
@@ -194,7 +205,7 @@ const ExportFormWrapper = ({
         })
       }
     } catch (error) {
-      const apolloError = error instanceof Error && 'graphQLErrors' in error ? (error as any) : null
+      const apolloError = error instanceof Error && 'graphQLErrors' in error ? (error as Error & { graphQLErrors?: unknown[] }) : null
       message = apolloError?.message || (error instanceof Error ? error.message : 'Export error')
       console.error('❌ Export error:', error)
       onExportComplete?.(false, message)
@@ -215,6 +226,19 @@ const ExportFormWrapper = ({
           <FileText className="w-4 h-4 text-primary" />
           <Label className="text-sm font-semibold text-foreground">Export Format</Label>
           <span className="text-xs text-muted-foreground ml-auto">Choose your file type</span>
+        </div>
+
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-input bg-muted/30 px-3 py-2">
+          <div className="min-w-0">
+            <Label className="text-sm font-medium text-foreground">Upload to storage</Label>
+            <p className="text-xs text-muted-foreground truncate">
+              Save the export to DigitalOcean Spaces and open a link
+            </p>
+          </div>
+          <Checkbox
+            checked={uploadToSpaces}
+            onCheckedChange={(checked) => setUploadToSpaces(Boolean(checked))}
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-3">

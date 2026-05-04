@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@/lib/generated/prisma/client';
+import { Prisma, PrismaClient } from '@/generated/prisma/client/client';
 import PrismaTypes from '@/lib/pothos/pothos-prisma-types';
 
 export type FindManyArgs<PrismaModel extends Prisma.ModelName> = Prisma.Args<

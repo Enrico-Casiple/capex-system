@@ -16,7 +16,7 @@ import RoleGate from '../RoleGate/RoleGate';
 export type PreviewColumn<TRow extends Record<string, unknown>> = {
   key: keyof TRow;
   label: string;
-  default?: string | number | boolean;
+  default?: string | number | boolean | undefined | Record<string, unknown>;
 };
 
 type ImportFormWrapperProps<TRow extends Record<string, unknown>, TInput> = {
@@ -43,8 +43,8 @@ const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({
   const [fileName, setFileName] = useState<string | null>(null);
   const [schema, setSchema] = useState<TRow[]>([]);
 
-  const form = useForm<{schema: TRow[]}>({
-    defaultValues: {schema: []}
+  const form = useForm<{ schema: TRow[] }>({
+    defaultValues: { schema: [] }
   })
 
   const handleDrop = (acceptedFiles: File[]) => {
@@ -150,7 +150,7 @@ const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({
       description: 'Excel template has been downloaded.',
     });
   };
-// PerformanceImprovementPlan-WorkInfo
+  // PerformanceImprovementPlan-WorkInfo
   const { execute, executing } = useMutationActions({
     mutationGQL: mutationGQL || modelGQL[model].createMany,
     successMessage: "Records created successfully",
@@ -160,7 +160,7 @@ const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({
   })
 
   const handleToSubmit = async () => {
-    const rawData =  form.getValues('schema');
+    const rawData = form.getValues('schema');
     const payload = await Promise.all(rawData.map(transformRow));
     console.log('Transformed payload for import:', payload);
 
@@ -187,7 +187,7 @@ const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({
     <FormTemplate title='' description='' isHaveBorder={false} form={form} handleToSubmit={handleToSubmit} isFullWidth={true}>
       <div className='space-y-3 p-4 rounded -mt-10'>
         <div className='flex justify-end mb-2'>
-         <RoleGate
+          <RoleGate
             module={[`${modelName.toUpperCase()}_MANAGEMENT`, 'SYSTEM']}
             resource={[`${modelName.toLowerCase()}`, '*']}
             action={['download_template', '*']}

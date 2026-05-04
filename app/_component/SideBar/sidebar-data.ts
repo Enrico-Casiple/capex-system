@@ -1,6 +1,6 @@
 // components/SideBar/sidebar-data.ts
-import { Users, Shield, LucideIcon, Building2Icon } from 'lucide-react';
-import {MODEL_CASE_MAP} from '../../../generated/model-names';
+import { Building2Icon, LucideIcon, Shield, Users } from 'lucide-react';
+import { MODEL_CASE_MAP } from '../../../generated/model-names';
 
 export interface SidebarItem {
   title: string;
@@ -84,7 +84,7 @@ export const sidebarData: {
       items: [
          {
           title: MODEL_CASE_MAP["Role"].properCase,
-          url: `/role/${MODEL_CASE_MAP["Role"].toLower}`,
+          url: `/${MODEL_CASE_MAP["Role"].toLower}`,
           permission: { module: genericNaming(MODEL_CASE_MAP["Role"].uppercase), resource: MODEL_CASE_MAP['Role'].toLower, action: 'read' },
         },
         {
@@ -106,33 +106,33 @@ export const sidebarData: {
     },
     {
       title: 'Organization Management',
-      url: '/organization',
+      url: '/groupofcompany',
       icon: Building2Icon,
       permission: { module: genericNaming(MODEL_CASE_MAP["GroupOfCompany"].uppercase), resource: MODEL_CASE_MAP['GroupOfCompany'].toLower, action: 'read' },
       items: [
         {
           title: MODEL_CASE_MAP["GroupOfCompany"].properCase,
-          url: `/organization/${MODEL_CASE_MAP["GroupOfCompany"].toLower}`,
+          url: `/${MODEL_CASE_MAP["GroupOfCompany"].toLower}`,
           permission: { module: genericNaming(MODEL_CASE_MAP["GroupOfCompany"].uppercase), resource: MODEL_CASE_MAP['GroupOfCompany'].toLower, action: 'read' },
         },
         {
           title: MODEL_CASE_MAP["Company"].properCase,
-          url: `/organization/${MODEL_CASE_MAP["Company"].toLower}`,
+          url: `/groupofcompany/${MODEL_CASE_MAP["Company"].toLower}`,
           permission: { module: genericNaming(MODEL_CASE_MAP["Company"].uppercase), resource: MODEL_CASE_MAP['Company'].toLower, action: 'read' },
         },
                 {
           title: MODEL_CASE_MAP["Department"].properCase,
-          url: `/organization/${MODEL_CASE_MAP["Department"].toLower}`,
+          url: `/groupofcompany/${MODEL_CASE_MAP["Department"].toLower}`,
           permission: { module: genericNaming(MODEL_CASE_MAP["Department"].uppercase), resource: MODEL_CASE_MAP['Department'].toLower, action: 'read' },
         },
         {
           title: MODEL_CASE_MAP["Position"].properCase,
-          url: `/organization/${MODEL_CASE_MAP["Position"].toLower}`,
+          url: `/groupofcompany/${MODEL_CASE_MAP["Position"].toLower}`,
           permission: { module: genericNaming(MODEL_CASE_MAP["Position"].uppercase), resource: MODEL_CASE_MAP['Position'].toLower, action: 'read' },
         },
         {
           title: MODEL_CASE_MAP["JobLevel"].properCase,
-          url: `/organization/${MODEL_CASE_MAP["JobLevel"].toLower}`,
+          url: `/groupofcompany/${MODEL_CASE_MAP["JobLevel"].toLower}`,
           permission: { module: genericNaming(MODEL_CASE_MAP["JobLevel"].uppercase), resource: MODEL_CASE_MAP['JobLevel'].toLower, action: 'read' },
         },
       ],
@@ -150,22 +150,22 @@ export const sidebarData: {
           items: [
             {
               title: MODEL_CASE_MAP["Location"].properCase,
-              url: `/${MODEL_CASE_MAP["Location"].toLower}`,
+              url: `/general/added-columns/${MODEL_CASE_MAP["Location"].toLower}`,
               permission: { module: genericNaming(MODEL_CASE_MAP["Location"].uppercase), resource: MODEL_CASE_MAP['Location'].toLower, action: 'read' },
             },
              {
               title: MODEL_CASE_MAP["ShiftingSchedule"].properCase,
-              url: `/${MODEL_CASE_MAP["ShiftingSchedule"].toLower}`,
+              url: `/general/added-columns/${MODEL_CASE_MAP["ShiftingSchedule"].toLower}`,
               permission: { module: genericNaming(MODEL_CASE_MAP["ShiftingSchedule"].uppercase), resource: MODEL_CASE_MAP['ShiftingSchedule'].toLower, action: 'read' },
             },
              {
               title: MODEL_CASE_MAP["Holiday"].properCase,
-              url: `/${MODEL_CASE_MAP["Holiday"].toLower}`,
+              url: `/general/added-columns/${MODEL_CASE_MAP["Holiday"].toLower}`,
               permission: { module: genericNaming(MODEL_CASE_MAP["Holiday"].uppercase), resource: MODEL_CASE_MAP['Holiday'].toLower, action: 'read' },
             },
             {
               title: MODEL_CASE_MAP["Signature"].properCase,
-              url: `/${MODEL_CASE_MAP["Signature"].toLower}`,
+              url: `/general/added-columns/${MODEL_CASE_MAP["Signature"].toLower}`,
               permission: { module: genericNaming(MODEL_CASE_MAP["Signature"].uppercase), resource: MODEL_CASE_MAP['Signature'].toLower, action: 'read' },
             },
           ],
@@ -177,27 +177,27 @@ export const sidebarData: {
           items: [
             {
               title: MODEL_CASE_MAP["Type"].properCase,
-              url: `/general/${MODEL_CASE_MAP["Type"].toLower}`,
+              url: `/general/defaults/${MODEL_CASE_MAP["Type"].toLower}`,
               permission: { module: genericNaming(MODEL_CASE_MAP["Type"].uppercase), resource: MODEL_CASE_MAP['Type'].toLower, action: 'read' },
             },
              {
               title: MODEL_CASE_MAP["Category"].properCase,
-              url: `/general/${MODEL_CASE_MAP["Category"].toLower}`,
+              url: `/general/defaults/${MODEL_CASE_MAP["Category"].toLower}`,
               permission: { module: genericNaming(MODEL_CASE_MAP["Category"].uppercase), resource: MODEL_CASE_MAP['Category'].toLower, action: 'read' },
             },
              {
               title: MODEL_CASE_MAP["ConfigCondition"].properCase,
-              url: `/general/${MODEL_CASE_MAP["ConfigCondition"].toLower}`,
+              url: `/general/defaults/${MODEL_CASE_MAP["ConfigCondition"].toLower}`,
               permission: { module: genericNaming(MODEL_CASE_MAP["ConfigCondition"].uppercase), resource: MODEL_CASE_MAP['ConfigCondition'].toLower, action: 'read' },
             },
             {
               title: MODEL_CASE_MAP["Config"].properCase,
-              url: `/general/${MODEL_CASE_MAP["Config"].toLower}`,
+              url: `/general/defaults/${MODEL_CASE_MAP["Config"].toLower}`,
               permission: { module: genericNaming(MODEL_CASE_MAP["Config"].uppercase), resource: MODEL_CASE_MAP['Config'].toLower, action: 'read' },
             },
              {
               title: MODEL_CASE_MAP["Status"].properCase,
-              url: `/general/${MODEL_CASE_MAP["Status"].toLower}`,
+              url: `/general/defaults/${MODEL_CASE_MAP["Status"].toLower}`,
               permission: { module: genericNaming(MODEL_CASE_MAP["Status"].uppercase), resource: MODEL_CASE_MAP['Status'].toLower, action: 'read' },
             },
           ],
@@ -242,7 +242,7 @@ export const sidebarData: {
       items: [
         {
           title: MODEL_CASE_MAP["Request"].properCase,
-          url: `/request/${MODEL_CASE_MAP["Request"].toLower}`,
+          url: `/${MODEL_CASE_MAP["Request"].toLower}`,
           permission: { module: genericNaming(MODEL_CASE_MAP["Request"].uppercase), resource: MODEL_CASE_MAP['Request'].toLower, action: 'read' },
         },
          {
@@ -270,7 +270,7 @@ export const sidebarData: {
         },
         {
           title: MODEL_CASE_MAP["Budget"].properCase,
-          url: `/budget/${MODEL_CASE_MAP["Budget"].toLower}`,
+          url: `/${MODEL_CASE_MAP["Budget"].toLower}`,
           permission: { module: genericNaming(MODEL_CASE_MAP["Budget"].uppercase), resource: MODEL_CASE_MAP['Budget'].toLower, action: 'read' },
         },
          {

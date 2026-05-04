@@ -213,8 +213,8 @@ model Company {
   positionCompany              Position[]              @relation("PositionCompany")
   workFlowTemplateScopeCompany WorkFlowTemplateScope[] @relation("WorkFlowTemplateScopeCompany")
   isActive                     Boolean?                @default(true)
-  createdAt                    DateTime                @default(now())
-  updatedAt                    DateTime                @updatedAt
+  createdAt                    DateTime?               @default(now())
+  updatedAt                    DateTime?               @updatedAt
 
   // ✅ Add indexes
   @@unique([name, acronym])
@@ -904,11 +904,11 @@ model CapitalRecoveryFactor {
   newBalanceAmmount Float? // computed as approvedAmount - sum of committed and actual amounts from BudgetLedger, used for reporting and forecasting
   projectedBudget   Float? // the projected budget amount that this request is asking for, used for forecasting and reporting
   remark            Json? // Provided Specs During AOP and Provied purpose During AOP
-  remainingAmount Float? // computed as approvedAmount - sum of committed and actual amounts from BudgetLedger, used for reporting and forecasting
-  requestId String?  @unique @db.ObjectId
-  request   Request? @relation(fields: [requestId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  budgetId  String?  @db.ObjectId
-  budget    Budget?  @relation(fields: [budgetId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  remainingAmount   Float? // computed as approvedAmount - sum of committed and actual amounts from BudgetLedger, used for reporting and forecasting
+  requestId         String?     @unique @db.ObjectId
+  request           Request?    @relation(fields: [requestId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  budgetId          String?     @db.ObjectId
+  budget            Budget?     @relation(fields: [budgetId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   isActive  Boolean?  @default(true)
   createdAt DateTime? @default(now())
@@ -941,8 +941,8 @@ model Budget {
   quantity Int?
   remark   Json? // Provided Specs During AOP and Provied purpose During AOP
 
-  workflowTemplateId String?           @db.ObjectId
-  workflowTemplate   WorkFlowTemplate? @relation(fields: [workflowTemplateId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  workflowTemplateId String?            @db.ObjectId
+  workflowTemplate   WorkFlowTemplate?  @relation(fields: [workflowTemplateId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   workflowInstance   WorkFlowInstance[]
 
   submittedAt DateTime?

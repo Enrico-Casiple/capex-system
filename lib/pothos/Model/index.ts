@@ -36,7 +36,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
                 if (field.isList) {
                   fields[fieldName] = t.field({
                     type: ['String'],
-                    nullable: isNullable,
+                    nullable: false,
                     resolve: (parent) =>
                       (parent as unknown as Record<string, string[]>)[fieldName] ?? [],
                     description: `${nullableNote} ${fieldName} field of ${modelName}. Type: String[].`,
@@ -109,10 +109,6 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
       },
     });
   } catch (error) {
-    return {
-      code: 'MODEL_NOT_FOUND',
-      message: `Model ${modelName} not found in Prisma schema. ${error}`,
-      success: false,
-    };
+    console.error(`Model ${modelName} not found in Prisma schema.`, error);
   }
 });

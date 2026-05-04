@@ -16,6 +16,12 @@ import {
 } from '@tanstack/react-table';
 import { useSession } from 'next-auth/react';
 import React, { useMemo, useState } from 'react';
+
+// ⚡ PERF: Move static row models outside component to avoid recreation every render
+const coreRowModel = getCoreRowModel();
+const filteredRowModel = getFilteredRowModel();
+const sortedRowModel = getSortedRowModel();
+
 interface ListContextValue<TQuery extends Record<string, Query[keyof Query]>, TModel = unknown> {
   singleKey: keyof Query;
   cursorKey: keyof Query;
@@ -133,23 +139,42 @@ const ListProvider = <
   const [cursorStack, setCursorStack] = useState<(string | null)[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const singleKey = `${props.modelName}FindUnique` as keyof Query;
-  const cursorKey = `${props.modelName}FindAllWithCursor` as keyof Query;
-  const subscriptionKey = `${props.modelName}Subscription` as keyof Subscription;
-  const model = `${props.modelName}GQL` as keyof ModelGQLMap;
+  // ⚡ PERF: Memoize derived keys to avoid string concatenation on every render
+  const { singleKey, cursorKey, subscriptionKey, model, gqlDocument } = useMemo(() => {
+    const modelKey = `${props.modelName}GQL` as keyof ModelGQLMap;
+    const gqlModel = props.modelGQL[modelKey];
+
+    return {
+      singleKey: `${props.modelName}FindUnique` as keyof Query,
+      cursorKey: `${props.modelName}FindAllWithCursor` as keyof Query,
+      subscriptionKey: `${props.modelName}Subscription` as keyof Subscription,
+      model: modelKey,
+      gqlDocument: gqlModel,
+    };
+  }, [props.modelName, props.modelGQL]);
+
+  // ⚡ PERF: Memoize query variables object to prevent unnecessary GraphQL queries
+  const cursorInput = useMemo(() => ({
+    cursor,
+    isActive: active,
+    take,
+    filter,
+    search: searchItems,
+    searchFields,
+  }), [cursor, active, take, filter, searchItems, searchFields]);
 
   const returnQuery = useQuery<TQuery, Record<string, OperationVariables>>(
-    props.modelGQL[model].findAllWithCursor,
+    gqlDocument.findAllWithCursor,
     {
-      variables: {
-        cursorInput: { cursor, isActive: active, take, filter, search: searchItems, searchFields },
-      },
+      variables: { cursorInput },
       notifyOnNetworkStatusChange: true,
       fetchPolicy: 'cache-and-network',
+      skip: !gqlDocument, // Skip query if document not ready
     },
   );
 
-  useSubscription<TSubscription>(props.modelGQL[model].subscription, {
+  useSubscription<TSubscription>(gqlDocument.subscription, {
+    skip: !gqlDocument,
     onData(options) {
       const newData = options.data.data?.[subscriptionKey];
       if (!newData) return;
@@ -157,17 +182,20 @@ const ListProvider = <
     },
   });
 
-  const allRecordData = React.useMemo<TModel[]>(() => {
+  // ⚡ PERF: Optimize allRecordData - only spread when data actually changes
+  const allRecordData = useMemo<TModel[]>(() => {
     const currentData = returnQuery.data?.[cursorKey as keyof TQuery] as
       | { data?: TModel[] }
       | undefined;
-    return currentData?.data ? [...newItems, ...currentData.data] : newItems;
+    const queryData = currentData?.data || [];
+
+    // ⚡ Only create new array if both newItems and queryData have content
+    return newItems.length > 0 && queryData.length > 0
+      ? [...newItems, ...queryData]
+      : newItems.length > 0 ? newItems : queryData;
   }, [newItems, returnQuery.data, cursorKey]);
 
-  const coreRowModel = useMemo(() => getCoreRowModel(), []);
-  const filteredRowModel = useMemo(() => getFilteredRowModel(), []);
-  const sortedRowModel = useMemo(() => getSortedRowModel(), []);
-
+  // ⚡ PERF: Use useReactTable only when data or column config changes
   const table = useReactTable<TModel>({
     columns: props.columns as ColumnDef<TModel, unknown>[],
     data: allRecordData,
@@ -184,93 +212,84 @@ const ListProvider = <
     getCoreRowModel: coreRowModel,
     getFilteredRowModel: filteredRowModel,
     getSortedRowModel: sortedRowModel,
-    debugTable: true,
-    debugHeaders: true,
-    debugColumns: true,
+    // ⚡ PERF: Disable debug in production
+    ...(process.env.NODE_ENV !== 'production' && {
+      debugTable: true,
+      debugHeaders: true,
+      debugColumns: true,
+    }),
   });
 
-  const value = useMemo(
-    () => ({
-      singleKey,
-      cursorKey,
-      subscriptionKey,
-      modelGQL: props.modelGQL,
-      model,
-      modelName: props.modelName,
-      session,
-      returnQuery,
-      cursor,
-      setCursor,
-      active,
-      setActive,
-      filter,
-      setFilter,
-      searchItems,
-      setSearchItems,
-      searchFields,
-      setSearchFields,
-      initialFilter: props.initialFilter,
-      initialColumnVisibility: props.initialColumnVisibility,
-      take,
-      setTake,
-      table,
-      allRecordData,
-      newItems,
-      setNewItems,
-      cursorStack,
-      setCursorStack,
-      currentPage,
-      setCurrentPage,
-      columnVisibility,
-      setColumnVisibility,
-      rowSelection,
-      setRowSelection,
-      columnFilters,
-      setColumnFilters,
-      columns: props.columns,
-      paginationPageIndex: { pageIndex: 0, pageSize: MAX_TAKE },
-      setPaginationPageIndex: () => {},
-    }),
-    [
-      session,
-      returnQuery,
-      cursor,
-      active,
-      filter,
-      take,
-      newItems,
-      rowSelection,
-      columnVisibility,
-      columnFilters,
-      searchItems,
-      searchFields,
-      cursorStack,
-      currentPage,
-      allRecordData,
-      cursorKey,
-      model,
-      props.columns,
-      props.initialColumnVisibility,
-      props.initialFilter,
-      props.modelGQL,
-      props.modelName,
-      singleKey,
-      subscriptionKey,
-      table,
-    ],
-  );
+  // ⚡ PERF: Split context value into stable parts to optimize memoization
+  const contextValue = useMemo(() => ({
+    // Model metadata (stable per modelName)
+    singleKey,
+    cursorKey,
+    subscriptionKey,
+    modelGQL: props.modelGQL,
+    model,
+    modelName: props.modelName,
 
-  // if (returnQuery.loading && !allRecordData.length) {
-  //   return (
-  //     <div className="grid place-items-center h-screen">
-  //       <Spinner />
-  //     </div>
-  //   );
-  // }
+    // Session & Query (changes infrequently)
+    session,
+    returnQuery,
+
+    // Pagination state (grouped)
+    cursor,
+    setCursor,
+    cursorStack,
+    setCursorStack,
+    currentPage,
+    setCurrentPage,
+
+    // Filter & Search (grouped)
+    active,
+    setActive,
+    filter,
+    setFilter,
+    searchItems,
+    setSearchItems,
+    searchFields,
+    setSearchFields,
+
+    // Table config (stable from props)
+    initialFilter: props.initialFilter,
+    initialColumnVisibility: props.initialColumnVisibility,
+    columns: props.columns,
+    take,
+    setTake,
+
+    // Data & UI state (grouped)
+    table,
+    allRecordData,
+    columnVisibility,
+    setColumnVisibility,
+    columnFilters,
+    setColumnFilters,
+    rowSelection,
+    setRowSelection,
+
+    // Item management
+    newItems,
+    setNewItems,
+
+    // Pagination (unused but required by interface)
+    hasNextPage: false,
+    nextCursor: null,
+    loadMore: () => { },
+  }), [
+    singleKey, cursorKey, subscriptionKey,
+    props.modelGQL, model, props.modelName,
+    session, returnQuery,
+    cursor, cursorStack, currentPage,
+    active, filter, searchItems, searchFields,
+    props.initialFilter, props.initialColumnVisibility, props.columns, take,
+    table, allRecordData, columnVisibility, columnFilters, rowSelection, newItems,
+  ]);
 
   return (
     <ListContext.Provider
-      value={value as unknown as ListContextValue<Record<string, Query[keyof Query]>, unknown>}
+      value={contextValue as unknown as ListContextValue<Record<string, Query[keyof Query]>, unknown>}
     >
       <RoleGate
         module={[`${props.modelName.toUpperCase()}_MANAGEMENT`, 'SYSTEM']}

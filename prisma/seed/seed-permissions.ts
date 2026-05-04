@@ -5,8 +5,7 @@ config({ path: resolve(__dirname, '../.env') });
 
 import {
   GLOBAL_ACCESS_PERMISSION,
-  roleManagementPermissions,
-  userManagementPermissions,
+  allModelPermissions,
 } from '../../app/_role/role';
 import { prisma } from '../../lib/prisma/prisma';
 
@@ -19,9 +18,8 @@ const seedComplete = async () => {
   console.log('\n📋 Creating permissions...');
 
   const allPermissions = [
-    ...userManagementPermissions,
-    ...roleManagementPermissions,
     GLOBAL_ACCESS_PERMISSION,
+    ...allModelPermissions,
   ];
 
   for (const permission of allPermissions) {

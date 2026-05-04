@@ -311,17 +311,26 @@ input AuditLogCursorPaginationInput {
   """Pagination direction."""
   direction: AuditLogPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -810,7 +819,7 @@ input AuditLogUpdateManyNestedInput {
   deleteMany: AuditLogWhereInput
   disconnect: [AuditLogConnectInput!]
   set: [AuditLogConnectInput!]
-  update: [AuditLogUpsertNestedInput!]
+  update: AuditLogUpdateWhereOneNestedInput
   updateMany: [AuditLogUpsertNestedInput!]
   upsert: [AuditLogUpsertNestedInput!]
 }
@@ -823,8 +832,14 @@ input AuditLogUpdateOneNestedInput {
   delete: Boolean
   deleteMany: AuditLogWhereInput
   disconnect: Boolean
-  update: AuditLogUpsertNestedInput
+  update: AuditLogUpdateWhereOneNestedInput
   upsert: AuditLogUpsertNestedInput
+}
+
+"""Nested update with where for AuditLog."""
+input AuditLogUpdateWhereOneNestedInput {
+  data: AuditLogUpdateInput!
+  where: AuditLogConnectInput!
 }
 
 """Nested upsert for AuditLog."""
@@ -1206,17 +1221,26 @@ input BasicInformationCursorPaginationInput {
   """Pagination direction."""
   direction: BasicInformationPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -1587,7 +1611,7 @@ input BasicInformationUpdateManyNestedInput {
   deleteMany: BasicInformationWhereInput
   disconnect: [BasicInformationConnectInput!]
   set: [BasicInformationConnectInput!]
-  update: [BasicInformationUpsertNestedInput!]
+  update: BasicInformationUpdateWhereOneNestedInput
   updateMany: [BasicInformationUpsertNestedInput!]
   upsert: [BasicInformationUpsertNestedInput!]
 }
@@ -1600,8 +1624,14 @@ input BasicInformationUpdateOneNestedInput {
   delete: Boolean
   deleteMany: BasicInformationWhereInput
   disconnect: Boolean
-  update: BasicInformationUpsertNestedInput
+  update: BasicInformationUpdateWhereOneNestedInput
   upsert: BasicInformationUpsertNestedInput
+}
+
+"""Nested update with where for BasicInformation."""
+input BasicInformationUpdateWhereOneNestedInput {
+  data: BasicInformationUpdateInput!
+  where: BasicInformationConnectInput!
 }
 
 """Nested upsert for BasicInformation."""
@@ -1950,17 +1980,26 @@ input BudgetCursorPaginationInput {
   """Pagination direction."""
   direction: BudgetPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -2400,17 +2439,26 @@ input BudgetLedgerCursorPaginationInput {
   """Pagination direction."""
   direction: BudgetLedgerPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -2741,7 +2789,7 @@ input BudgetLedgerUpdateManyNestedInput {
   deleteMany: BudgetLedgerWhereInput
   disconnect: [BudgetLedgerConnectInput!]
   set: [BudgetLedgerConnectInput!]
-  update: [BudgetLedgerUpsertNestedInput!]
+  update: BudgetLedgerUpdateWhereOneNestedInput
   updateMany: [BudgetLedgerUpsertNestedInput!]
   upsert: [BudgetLedgerUpsertNestedInput!]
 }
@@ -2754,8 +2802,14 @@ input BudgetLedgerUpdateOneNestedInput {
   delete: Boolean
   deleteMany: BudgetLedgerWhereInput
   disconnect: Boolean
-  update: BudgetLedgerUpsertNestedInput
+  update: BudgetLedgerUpdateWhereOneNestedInput
   upsert: BudgetLedgerUpsertNestedInput
+}
+
+"""Nested update with where for BudgetLedger."""
+input BudgetLedgerUpdateWhereOneNestedInput {
+  data: BudgetLedgerUpdateInput!
+  where: BudgetLedgerConnectInput!
 }
 
 """Nested upsert for BudgetLedger."""
@@ -3090,17 +3144,26 @@ input BudgetSnapshotCursorPaginationInput {
   """Pagination direction."""
   direction: BudgetSnapshotPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -3415,7 +3478,7 @@ input BudgetSnapshotUpdateManyNestedInput {
   deleteMany: BudgetSnapshotWhereInput
   disconnect: [BudgetSnapshotConnectInput!]
   set: [BudgetSnapshotConnectInput!]
-  update: [BudgetSnapshotUpsertNestedInput!]
+  update: BudgetSnapshotUpdateWhereOneNestedInput
   updateMany: [BudgetSnapshotUpsertNestedInput!]
   upsert: [BudgetSnapshotUpsertNestedInput!]
 }
@@ -3428,8 +3491,14 @@ input BudgetSnapshotUpdateOneNestedInput {
   delete: Boolean
   deleteMany: BudgetSnapshotWhereInput
   disconnect: Boolean
-  update: BudgetSnapshotUpsertNestedInput
+  update: BudgetSnapshotUpdateWhereOneNestedInput
   upsert: BudgetSnapshotUpsertNestedInput
+}
+
+"""Nested update with where for BudgetSnapshot."""
+input BudgetSnapshotUpdateWhereOneNestedInput {
+  data: BudgetSnapshotUpdateInput!
+  where: BudgetSnapshotConnectInput!
 }
 
 """Nested upsert for BudgetSnapshot."""
@@ -3537,7 +3606,7 @@ input BudgetUpdateManyNestedInput {
   deleteMany: BudgetWhereInput
   disconnect: [BudgetConnectInput!]
   set: [BudgetConnectInput!]
-  update: [BudgetUpsertNestedInput!]
+  update: BudgetUpdateWhereOneNestedInput
   updateMany: [BudgetUpsertNestedInput!]
   upsert: [BudgetUpsertNestedInput!]
 }
@@ -3550,8 +3619,14 @@ input BudgetUpdateOneNestedInput {
   delete: Boolean
   deleteMany: BudgetWhereInput
   disconnect: Boolean
-  update: BudgetUpsertNestedInput
+  update: BudgetUpdateWhereOneNestedInput
   upsert: BudgetUpsertNestedInput
+}
+
+"""Nested update with where for Budget."""
+input BudgetUpdateWhereOneNestedInput {
+  data: BudgetUpdateInput!
+  where: BudgetConnectInput!
 }
 
 """Nested upsert for Budget."""
@@ -3930,17 +4005,26 @@ input CapitalRecoveryFactorCursorPaginationInput {
   """Pagination direction."""
   direction: CapitalRecoveryFactorPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -4349,7 +4433,7 @@ input CapitalRecoveryFactorUpdateManyNestedInput {
   deleteMany: CapitalRecoveryFactorWhereInput
   disconnect: [CapitalRecoveryFactorConnectInput!]
   set: [CapitalRecoveryFactorConnectInput!]
-  update: [CapitalRecoveryFactorUpsertNestedInput!]
+  update: CapitalRecoveryFactorUpdateWhereOneNestedInput
   updateMany: [CapitalRecoveryFactorUpsertNestedInput!]
   upsert: [CapitalRecoveryFactorUpsertNestedInput!]
 }
@@ -4362,8 +4446,14 @@ input CapitalRecoveryFactorUpdateOneNestedInput {
   delete: Boolean
   deleteMany: CapitalRecoveryFactorWhereInput
   disconnect: Boolean
-  update: CapitalRecoveryFactorUpsertNestedInput
+  update: CapitalRecoveryFactorUpdateWhereOneNestedInput
   upsert: CapitalRecoveryFactorUpsertNestedInput
+}
+
+"""Nested update with where for CapitalRecoveryFactor."""
+input CapitalRecoveryFactorUpdateWhereOneNestedInput {
+  data: CapitalRecoveryFactorUpdateInput!
+  where: CapitalRecoveryFactorConnectInput!
 }
 
 """Nested upsert for CapitalRecoveryFactor."""
@@ -4622,17 +4712,26 @@ input CategoryCursorPaginationInput {
   """Pagination direction."""
   direction: CategoryPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -4947,7 +5046,7 @@ input CategoryUpdateManyNestedInput {
   deleteMany: CategoryWhereInput
   disconnect: [CategoryConnectInput!]
   set: [CategoryConnectInput!]
-  update: [CategoryUpsertNestedInput!]
+  update: CategoryUpdateWhereOneNestedInput
   updateMany: [CategoryUpsertNestedInput!]
   upsert: [CategoryUpsertNestedInput!]
 }
@@ -4960,8 +5059,14 @@ input CategoryUpdateOneNestedInput {
   delete: Boolean
   deleteMany: CategoryWhereInput
   disconnect: Boolean
-  update: CategoryUpsertNestedInput
+  update: CategoryUpdateWhereOneNestedInput
   upsert: CategoryUpsertNestedInput
+}
+
+"""Nested update with where for Category."""
+input CategoryUpdateWhereOneNestedInput {
+  data: CategoryUpdateInput!
+  where: CategoryConnectInput!
 }
 
 """Nested upsert for Category."""
@@ -5232,17 +5337,26 @@ input CompanyCursorPaginationInput {
   """Pagination direction."""
   direction: CompanyPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -5611,7 +5725,7 @@ input CompanyUpdateManyNestedInput {
   deleteMany: CompanyWhereInput
   disconnect: [CompanyConnectInput!]
   set: [CompanyConnectInput!]
-  update: [CompanyUpsertNestedInput!]
+  update: CompanyUpdateWhereOneNestedInput
   updateMany: [CompanyUpsertNestedInput!]
   upsert: [CompanyUpsertNestedInput!]
 }
@@ -5624,8 +5738,14 @@ input CompanyUpdateOneNestedInput {
   delete: Boolean
   deleteMany: CompanyWhereInput
   disconnect: Boolean
-  update: CompanyUpsertNestedInput
+  update: CompanyUpdateWhereOneNestedInput
   upsert: CompanyUpsertNestedInput
+}
+
+"""Nested update with where for Company."""
+input CompanyUpdateWhereOneNestedInput {
+  data: CompanyUpdateInput!
+  where: CompanyConnectInput!
 }
 
 """Nested upsert for Company."""
@@ -5954,17 +6074,26 @@ input ConfigConditionCursorPaginationInput {
   """Pagination direction."""
   direction: ConfigConditionPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -6299,7 +6428,7 @@ input ConfigConditionUpdateManyNestedInput {
   deleteMany: ConfigConditionWhereInput
   disconnect: [ConfigConditionConnectInput!]
   set: [ConfigConditionConnectInput!]
-  update: [ConfigConditionUpsertNestedInput!]
+  update: ConfigConditionUpdateWhereOneNestedInput
   updateMany: [ConfigConditionUpsertNestedInput!]
   upsert: [ConfigConditionUpsertNestedInput!]
 }
@@ -6312,8 +6441,14 @@ input ConfigConditionUpdateOneNestedInput {
   delete: Boolean
   deleteMany: ConfigConditionWhereInput
   disconnect: Boolean
-  update: ConfigConditionUpsertNestedInput
+  update: ConfigConditionUpdateWhereOneNestedInput
   upsert: ConfigConditionUpsertNestedInput
+}
+
+"""Nested update with where for ConfigCondition."""
+input ConfigConditionUpdateWhereOneNestedInput {
+  data: ConfigConditionUpdateInput!
+  where: ConfigConditionConnectInput!
 }
 
 """Nested upsert for ConfigCondition."""
@@ -6500,17 +6635,26 @@ input ConfigCursorPaginationInput {
   """Pagination direction."""
   direction: ConfigPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -6841,7 +6985,7 @@ input ConfigUpdateManyNestedInput {
   deleteMany: ConfigWhereInput
   disconnect: [ConfigConnectInput!]
   set: [ConfigConnectInput!]
-  update: [ConfigUpsertNestedInput!]
+  update: ConfigUpdateWhereOneNestedInput
   updateMany: [ConfigUpsertNestedInput!]
   upsert: [ConfigUpsertNestedInput!]
 }
@@ -6854,8 +6998,14 @@ input ConfigUpdateOneNestedInput {
   delete: Boolean
   deleteMany: ConfigWhereInput
   disconnect: Boolean
-  update: ConfigUpsertNestedInput
+  update: ConfigUpdateWhereOneNestedInput
   upsert: ConfigUpsertNestedInput
+}
+
+"""Nested update with where for Config."""
+input ConfigUpdateWhereOneNestedInput {
+  data: ConfigUpdateInput!
+  where: ConfigConnectInput!
 }
 
 """Nested upsert for Config."""
@@ -7143,17 +7293,26 @@ input DepartmentCursorPaginationInput {
   """Pagination direction."""
   direction: DepartmentPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -7496,7 +7655,7 @@ input DepartmentUpdateManyNestedInput {
   deleteMany: DepartmentWhereInput
   disconnect: [DepartmentConnectInput!]
   set: [DepartmentConnectInput!]
-  update: [DepartmentUpsertNestedInput!]
+  update: DepartmentUpdateWhereOneNestedInput
   updateMany: [DepartmentUpsertNestedInput!]
   upsert: [DepartmentUpsertNestedInput!]
 }
@@ -7509,8 +7668,14 @@ input DepartmentUpdateOneNestedInput {
   delete: Boolean
   deleteMany: DepartmentWhereInput
   disconnect: Boolean
-  update: DepartmentUpsertNestedInput
+  update: DepartmentUpdateWhereOneNestedInput
   upsert: DepartmentUpsertNestedInput
+}
+
+"""Nested update with where for Department."""
+input DepartmentUpdateWhereOneNestedInput {
+  data: DepartmentUpdateInput!
+  where: DepartmentConnectInput!
 }
 
 """Nested upsert for Department."""
@@ -7761,17 +7926,26 @@ input GroupOfCompanyCursorPaginationInput {
   """Pagination direction."""
   direction: GroupOfCompanyPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -8096,7 +8270,7 @@ input GroupOfCompanyUpdateManyNestedInput {
   deleteMany: GroupOfCompanyWhereInput
   disconnect: [GroupOfCompanyConnectInput!]
   set: [GroupOfCompanyConnectInput!]
-  update: [GroupOfCompanyUpsertNestedInput!]
+  update: GroupOfCompanyUpdateWhereOneNestedInput
   updateMany: [GroupOfCompanyUpsertNestedInput!]
   upsert: [GroupOfCompanyUpsertNestedInput!]
 }
@@ -8109,8 +8283,14 @@ input GroupOfCompanyUpdateOneNestedInput {
   delete: Boolean
   deleteMany: GroupOfCompanyWhereInput
   disconnect: Boolean
-  update: GroupOfCompanyUpsertNestedInput
+  update: GroupOfCompanyUpdateWhereOneNestedInput
   upsert: GroupOfCompanyUpsertNestedInput
+}
+
+"""Nested update with where for GroupOfCompany."""
+input GroupOfCompanyUpdateWhereOneNestedInput {
+  data: GroupOfCompanyUpdateInput!
+  where: GroupOfCompanyConnectInput!
 }
 
 """Nested upsert for GroupOfCompany."""
@@ -8313,17 +8493,26 @@ input HolidayCursorPaginationInput {
   """Pagination direction."""
   direction: HolidayPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -8616,7 +8805,7 @@ input HolidayUpdateManyNestedInput {
   deleteMany: HolidayWhereInput
   disconnect: [HolidayConnectInput!]
   set: [HolidayConnectInput!]
-  update: [HolidayUpsertNestedInput!]
+  update: HolidayUpdateWhereOneNestedInput
   updateMany: [HolidayUpsertNestedInput!]
   upsert: [HolidayUpsertNestedInput!]
 }
@@ -8629,8 +8818,14 @@ input HolidayUpdateOneNestedInput {
   delete: Boolean
   deleteMany: HolidayWhereInput
   disconnect: Boolean
-  update: HolidayUpsertNestedInput
+  update: HolidayUpdateWhereOneNestedInput
   upsert: HolidayUpsertNestedInput
+}
+
+"""Nested update with where for Holiday."""
+input HolidayUpdateWhereOneNestedInput {
+  data: HolidayUpdateInput!
+  where: HolidayConnectInput!
 }
 
 """Nested upsert for Holiday."""
@@ -8849,17 +9044,26 @@ input InventoryItemCursorPaginationInput {
   """Pagination direction."""
   direction: InventoryItemPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -9182,7 +9386,7 @@ input InventoryItemUpdateManyNestedInput {
   deleteMany: InventoryItemWhereInput
   disconnect: [InventoryItemConnectInput!]
   set: [InventoryItemConnectInput!]
-  update: [InventoryItemUpsertNestedInput!]
+  update: InventoryItemUpdateWhereOneNestedInput
   updateMany: [InventoryItemUpsertNestedInput!]
   upsert: [InventoryItemUpsertNestedInput!]
 }
@@ -9195,8 +9399,14 @@ input InventoryItemUpdateOneNestedInput {
   delete: Boolean
   deleteMany: InventoryItemWhereInput
   disconnect: Boolean
-  update: InventoryItemUpsertNestedInput
+  update: InventoryItemUpdateWhereOneNestedInput
   upsert: InventoryItemUpsertNestedInput
+}
+
+"""Nested update with where for InventoryItem."""
+input InventoryItemUpdateWhereOneNestedInput {
+  data: InventoryItemUpdateInput!
+  where: InventoryItemConnectInput!
 }
 
 """Nested upsert for InventoryItem."""
@@ -9427,17 +9637,26 @@ input JobLevelCursorPaginationInput {
   """Pagination direction."""
   direction: JobLevelPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -9762,7 +9981,7 @@ input JobLevelUpdateManyNestedInput {
   deleteMany: JobLevelWhereInput
   disconnect: [JobLevelConnectInput!]
   set: [JobLevelConnectInput!]
-  update: [JobLevelUpsertNestedInput!]
+  update: JobLevelUpdateWhereOneNestedInput
   updateMany: [JobLevelUpsertNestedInput!]
   upsert: [JobLevelUpsertNestedInput!]
 }
@@ -9775,8 +9994,14 @@ input JobLevelUpdateOneNestedInput {
   delete: Boolean
   deleteMany: JobLevelWhereInput
   disconnect: Boolean
-  update: JobLevelUpsertNestedInput
+  update: JobLevelUpdateWhereOneNestedInput
   upsert: JobLevelUpsertNestedInput
+}
+
+"""Nested update with where for JobLevel."""
+input JobLevelUpdateWhereOneNestedInput {
+  data: JobLevelUpdateInput!
+  where: JobLevelConnectInput!
 }
 
 """Nested upsert for JobLevel."""
@@ -9996,17 +10221,26 @@ input LocationCursorPaginationInput {
   """Pagination direction."""
   direction: LocationPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -10315,7 +10549,7 @@ input LocationUpdateManyNestedInput {
   deleteMany: LocationWhereInput
   disconnect: [LocationConnectInput!]
   set: [LocationConnectInput!]
-  update: [LocationUpsertNestedInput!]
+  update: LocationUpdateWhereOneNestedInput
   updateMany: [LocationUpsertNestedInput!]
   upsert: [LocationUpsertNestedInput!]
 }
@@ -10328,8 +10562,14 @@ input LocationUpdateOneNestedInput {
   delete: Boolean
   deleteMany: LocationWhereInput
   disconnect: Boolean
-  update: LocationUpsertNestedInput
+  update: LocationUpdateWhereOneNestedInput
   upsert: LocationUpsertNestedInput
+}
+
+"""Nested update with where for Location."""
+input LocationUpdateWhereOneNestedInput {
+  data: LocationUpdateInput!
+  where: LocationConnectInput!
 }
 
 """Nested upsert for Location."""
@@ -15626,17 +15866,26 @@ input PermissionCursorPaginationInput {
   """Pagination direction."""
   direction: PermissionPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -15963,7 +16212,7 @@ input PermissionUpdateManyNestedInput {
   deleteMany: PermissionWhereInput
   disconnect: [PermissionConnectInput!]
   set: [PermissionConnectInput!]
-  update: [PermissionUpsertNestedInput!]
+  update: PermissionUpdateWhereOneNestedInput
   updateMany: [PermissionUpsertNestedInput!]
   upsert: [PermissionUpsertNestedInput!]
 }
@@ -15976,8 +16225,14 @@ input PermissionUpdateOneNestedInput {
   delete: Boolean
   deleteMany: PermissionWhereInput
   disconnect: Boolean
-  update: PermissionUpsertNestedInput
+  update: PermissionUpdateWhereOneNestedInput
   upsert: PermissionUpsertNestedInput
+}
+
+"""Nested update with where for Permission."""
+input PermissionUpdateWhereOneNestedInput {
+  data: PermissionUpdateInput!
+  where: PermissionConnectInput!
 }
 
 """Nested upsert for Permission."""
@@ -16211,17 +16466,26 @@ input PositionCursorPaginationInput {
   """Pagination direction."""
   direction: PositionPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -16546,7 +16810,7 @@ input PositionUpdateManyNestedInput {
   deleteMany: PositionWhereInput
   disconnect: [PositionConnectInput!]
   set: [PositionConnectInput!]
-  update: [PositionUpsertNestedInput!]
+  update: PositionUpdateWhereOneNestedInput
   updateMany: [PositionUpsertNestedInput!]
   upsert: [PositionUpsertNestedInput!]
 }
@@ -16559,8 +16823,14 @@ input PositionUpdateOneNestedInput {
   delete: Boolean
   deleteMany: PositionWhereInput
   disconnect: Boolean
-  update: PositionUpsertNestedInput
+  update: PositionUpdateWhereOneNestedInput
   upsert: PositionUpsertNestedInput
+}
+
+"""Nested update with where for Position."""
+input PositionUpdateWhereOneNestedInput {
+  data: PositionUpdateInput!
+  where: PositionConnectInput!
 }
 
 """Nested upsert for Position."""
@@ -18140,17 +18410,26 @@ input RequestCursorPaginationInput {
   """Pagination direction."""
   direction: RequestPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -18587,17 +18866,26 @@ input RequestItemCursorPaginationInput {
   """Pagination direction."""
   direction: RequestItemPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -18956,7 +19244,7 @@ input RequestItemUpdateManyNestedInput {
   deleteMany: RequestItemWhereInput
   disconnect: [RequestItemConnectInput!]
   set: [RequestItemConnectInput!]
-  update: [RequestItemUpsertNestedInput!]
+  update: RequestItemUpdateWhereOneNestedInput
   updateMany: [RequestItemUpsertNestedInput!]
   upsert: [RequestItemUpsertNestedInput!]
 }
@@ -18969,8 +19257,14 @@ input RequestItemUpdateOneNestedInput {
   delete: Boolean
   deleteMany: RequestItemWhereInput
   disconnect: Boolean
-  update: RequestItemUpsertNestedInput
+  update: RequestItemUpdateWhereOneNestedInput
   upsert: RequestItemUpsertNestedInput
+}
+
+"""Nested update with where for RequestItem."""
+input RequestItemUpdateWhereOneNestedInput {
+  data: RequestItemUpdateInput!
+  where: RequestItemConnectInput!
 }
 
 """Nested upsert for RequestItem."""
@@ -19204,7 +19498,7 @@ input RequestUpdateManyNestedInput {
   deleteMany: RequestWhereInput
   disconnect: [RequestConnectInput!]
   set: [RequestConnectInput!]
-  update: [RequestUpsertNestedInput!]
+  update: RequestUpdateWhereOneNestedInput
   updateMany: [RequestUpsertNestedInput!]
   upsert: [RequestUpsertNestedInput!]
 }
@@ -19217,8 +19511,14 @@ input RequestUpdateOneNestedInput {
   delete: Boolean
   deleteMany: RequestWhereInput
   disconnect: Boolean
-  update: RequestUpsertNestedInput
+  update: RequestUpdateWhereOneNestedInput
   upsert: RequestUpsertNestedInput
+}
+
+"""Nested update with where for Request."""
+input RequestUpdateWhereOneNestedInput {
+  data: RequestUpdateInput!
+  where: RequestConnectInput!
 }
 
 """Nested upsert for Request."""
@@ -19487,17 +19787,26 @@ input RoleCursorPaginationInput {
   """Pagination direction."""
   direction: RolePaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -19927,17 +20236,26 @@ input RolePermissionCursorPaginationInput {
   """Pagination direction."""
   direction: RolePermissionPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -20248,7 +20566,7 @@ input RolePermissionUpdateManyNestedInput {
   deleteMany: RolePermissionWhereInput
   disconnect: [RolePermissionConnectInput!]
   set: [RolePermissionConnectInput!]
-  update: [RolePermissionUpsertNestedInput!]
+  update: RolePermissionUpdateWhereOneNestedInput
   updateMany: [RolePermissionUpsertNestedInput!]
   upsert: [RolePermissionUpsertNestedInput!]
 }
@@ -20261,8 +20579,14 @@ input RolePermissionUpdateOneNestedInput {
   delete: Boolean
   deleteMany: RolePermissionWhereInput
   disconnect: Boolean
-  update: RolePermissionUpsertNestedInput
+  update: RolePermissionUpdateWhereOneNestedInput
   upsert: RolePermissionUpsertNestedInput
+}
+
+"""Nested update with where for RolePermission."""
+input RolePermissionUpdateWhereOneNestedInput {
+  data: RolePermissionUpdateInput!
+  where: RolePermissionConnectInput!
 }
 
 """Nested upsert for RolePermission."""
@@ -20365,7 +20689,7 @@ input RoleUpdateManyNestedInput {
   deleteMany: RoleWhereInput
   disconnect: [RoleConnectInput!]
   set: [RoleConnectInput!]
-  update: [RoleUpsertNestedInput!]
+  update: RoleUpdateWhereOneNestedInput
   updateMany: [RoleUpsertNestedInput!]
   upsert: [RoleUpsertNestedInput!]
 }
@@ -20378,8 +20702,14 @@ input RoleUpdateOneNestedInput {
   delete: Boolean
   deleteMany: RoleWhereInput
   disconnect: Boolean
-  update: RoleUpsertNestedInput
+  update: RoleUpdateWhereOneNestedInput
   upsert: RoleUpsertNestedInput
+}
+
+"""Nested update with where for Role."""
+input RoleUpdateWhereOneNestedInput {
+  data: RoleUpdateInput!
+  where: RoleConnectInput!
 }
 
 """Nested upsert for Role."""
@@ -20641,17 +20971,26 @@ input ShiftingScheduleCursorPaginationInput {
   """Pagination direction."""
   direction: ShiftingSchedulePaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -21000,7 +21339,7 @@ input ShiftingScheduleUpdateManyNestedInput {
   deleteMany: ShiftingScheduleWhereInput
   disconnect: [ShiftingScheduleConnectInput!]
   set: [ShiftingScheduleConnectInput!]
-  update: [ShiftingScheduleUpsertNestedInput!]
+  update: ShiftingScheduleUpdateWhereOneNestedInput
   updateMany: [ShiftingScheduleUpsertNestedInput!]
   upsert: [ShiftingScheduleUpsertNestedInput!]
 }
@@ -21013,8 +21352,14 @@ input ShiftingScheduleUpdateOneNestedInput {
   delete: Boolean
   deleteMany: ShiftingScheduleWhereInput
   disconnect: Boolean
-  update: ShiftingScheduleUpsertNestedInput
+  update: ShiftingScheduleUpdateWhereOneNestedInput
   upsert: ShiftingScheduleUpsertNestedInput
+}
+
+"""Nested update with where for ShiftingSchedule."""
+input ShiftingScheduleUpdateWhereOneNestedInput {
+  data: ShiftingScheduleUpdateInput!
+  where: ShiftingScheduleConnectInput!
 }
 
 """Nested upsert for ShiftingSchedule."""
@@ -21253,17 +21598,26 @@ input SignatureCursorPaginationInput {
   """Pagination direction."""
   direction: SignaturePaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -21592,7 +21946,7 @@ input SignatureUpdateManyNestedInput {
   deleteMany: SignatureWhereInput
   disconnect: [SignatureConnectInput!]
   set: [SignatureConnectInput!]
-  update: [SignatureUpsertNestedInput!]
+  update: SignatureUpdateWhereOneNestedInput
   updateMany: [SignatureUpsertNestedInput!]
   upsert: [SignatureUpsertNestedInput!]
 }
@@ -21605,8 +21959,14 @@ input SignatureUpdateOneNestedInput {
   delete: Boolean
   deleteMany: SignatureWhereInput
   disconnect: Boolean
-  update: SignatureUpsertNestedInput
+  update: SignatureUpdateWhereOneNestedInput
   upsert: SignatureUpsertNestedInput
+}
+
+"""Nested update with where for Signature."""
+input SignatureUpdateWhereOneNestedInput {
+  data: SignatureUpdateInput!
+  where: SignatureConnectInput!
 }
 
 """Nested upsert for Signature."""
@@ -21844,17 +22204,26 @@ input StatusCursorPaginationInput {
   """Pagination direction."""
   direction: StatusPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -22179,7 +22548,7 @@ input StatusUpdateManyNestedInput {
   deleteMany: StatusWhereInput
   disconnect: [StatusConnectInput!]
   set: [StatusConnectInput!]
-  update: [StatusUpsertNestedInput!]
+  update: StatusUpdateWhereOneNestedInput
   updateMany: [StatusUpsertNestedInput!]
   upsert: [StatusUpsertNestedInput!]
 }
@@ -22192,8 +22561,14 @@ input StatusUpdateOneNestedInput {
   delete: Boolean
   deleteMany: StatusWhereInput
   disconnect: Boolean
-  update: StatusUpsertNestedInput
+  update: StatusUpdateWhereOneNestedInput
   upsert: StatusUpsertNestedInput
+}
+
+"""Nested update with where for Status."""
+input StatusUpdateWhereOneNestedInput {
+  data: StatusUpdateInput!
+  where: StatusConnectInput!
 }
 
 """Nested upsert for Status."""
@@ -22625,17 +23000,26 @@ input TypeCursorPaginationInput {
   """Pagination direction."""
   direction: TypePaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -22984,7 +23368,7 @@ input TypeUpdateManyNestedInput {
   deleteMany: TypeWhereInput
   disconnect: [TypeConnectInput!]
   set: [TypeConnectInput!]
-  update: [TypeUpsertNestedInput!]
+  update: TypeUpdateWhereOneNestedInput
   updateMany: [TypeUpsertNestedInput!]
   upsert: [TypeUpsertNestedInput!]
 }
@@ -22997,8 +23381,14 @@ input TypeUpdateOneNestedInput {
   delete: Boolean
   deleteMany: TypeWhereInput
   disconnect: Boolean
-  update: TypeUpsertNestedInput
+  update: TypeUpdateWhereOneNestedInput
   upsert: TypeUpsertNestedInput
+}
+
+"""Nested update with where for Type."""
+input TypeUpdateWhereOneNestedInput {
+  data: TypeUpdateInput!
+  where: TypeConnectInput!
 }
 
 """Nested upsert for Type."""
@@ -23289,17 +23679,26 @@ input UserCursorPaginationInput {
   """Pagination direction."""
   direction: UserPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -23803,17 +24202,26 @@ input UserRoleCursorPaginationInput {
   """Pagination direction."""
   direction: UserRolePaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -24138,7 +24546,7 @@ input UserRoleUpdateManyNestedInput {
   deleteMany: UserRoleWhereInput
   disconnect: [UserRoleConnectInput!]
   set: [UserRoleConnectInput!]
-  update: [UserRoleUpsertNestedInput!]
+  update: UserRoleUpdateWhereOneNestedInput
   updateMany: [UserRoleUpsertNestedInput!]
   upsert: [UserRoleUpsertNestedInput!]
 }
@@ -24151,8 +24559,14 @@ input UserRoleUpdateOneNestedInput {
   delete: Boolean
   deleteMany: UserRoleWhereInput
   disconnect: Boolean
-  update: UserRoleUpsertNestedInput
+  update: UserRoleUpdateWhereOneNestedInput
   upsert: UserRoleUpsertNestedInput
+}
+
+"""Nested update with where for UserRole."""
+input UserRoleUpdateWhereOneNestedInput {
+  data: UserRoleUpdateInput!
+  where: UserRoleConnectInput!
 }
 
 """Nested upsert for UserRole."""
@@ -24255,7 +24669,7 @@ input UserUpdateManyNestedInput {
   deleteMany: UserWhereInput
   disconnect: [UserConnectInput!]
   set: [UserConnectInput!]
-  update: [UserUpsertNestedInput!]
+  update: UserUpdateWhereOneNestedInput
   updateMany: [UserUpsertNestedInput!]
   upsert: [UserUpsertNestedInput!]
 }
@@ -24268,8 +24682,14 @@ input UserUpdateOneNestedInput {
   delete: Boolean
   deleteMany: UserWhereInput
   disconnect: Boolean
-  update: UserUpsertNestedInput
+  update: UserUpdateWhereOneNestedInput
   upsert: UserUpsertNestedInput
+}
+
+"""Nested update with where for User."""
+input UserUpdateWhereOneNestedInput {
+  data: UserUpdateInput!
+  where: UserConnectInput!
 }
 
 """Nested upsert for User."""
@@ -24578,17 +24998,26 @@ input WorkFlowInstanceCursorPaginationInput {
   """Pagination direction."""
   direction: WorkFlowInstancePaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -25147,17 +25576,26 @@ input WorkFlowInstanceStepCursorPaginationInput {
   """Pagination direction."""
   direction: WorkFlowInstanceStepPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -25536,7 +25974,7 @@ input WorkFlowInstanceStepUpdateManyNestedInput {
   deleteMany: WorkFlowInstanceStepWhereInput
   disconnect: [WorkFlowInstanceStepConnectInput!]
   set: [WorkFlowInstanceStepConnectInput!]
-  update: [WorkFlowInstanceStepUpsertNestedInput!]
+  update: WorkFlowInstanceStepUpdateWhereOneNestedInput
   updateMany: [WorkFlowInstanceStepUpsertNestedInput!]
   upsert: [WorkFlowInstanceStepUpsertNestedInput!]
 }
@@ -25549,8 +25987,14 @@ input WorkFlowInstanceStepUpdateOneNestedInput {
   delete: Boolean
   deleteMany: WorkFlowInstanceStepWhereInput
   disconnect: Boolean
-  update: WorkFlowInstanceStepUpsertNestedInput
+  update: WorkFlowInstanceStepUpdateWhereOneNestedInput
   upsert: WorkFlowInstanceStepUpsertNestedInput
+}
+
+"""Nested update with where for WorkFlowInstanceStep."""
+input WorkFlowInstanceStepUpdateWhereOneNestedInput {
+  data: WorkFlowInstanceStepUpdateInput!
+  where: WorkFlowInstanceStepConnectInput!
 }
 
 """Nested upsert for WorkFlowInstanceStep."""
@@ -25670,7 +26114,7 @@ input WorkFlowInstanceUpdateManyNestedInput {
   deleteMany: WorkFlowInstanceWhereInput
   disconnect: [WorkFlowInstanceConnectInput!]
   set: [WorkFlowInstanceConnectInput!]
-  update: [WorkFlowInstanceUpsertNestedInput!]
+  update: WorkFlowInstanceUpdateWhereOneNestedInput
   updateMany: [WorkFlowInstanceUpsertNestedInput!]
   upsert: [WorkFlowInstanceUpsertNestedInput!]
 }
@@ -25683,8 +26127,14 @@ input WorkFlowInstanceUpdateOneNestedInput {
   delete: Boolean
   deleteMany: WorkFlowInstanceWhereInput
   disconnect: Boolean
-  update: WorkFlowInstanceUpsertNestedInput
+  update: WorkFlowInstanceUpdateWhereOneNestedInput
   upsert: WorkFlowInstanceUpsertNestedInput
+}
+
+"""Nested update with where for WorkFlowInstance."""
+input WorkFlowInstanceUpdateWhereOneNestedInput {
+  data: WorkFlowInstanceUpdateInput!
+  where: WorkFlowInstanceConnectInput!
 }
 
 """Nested upsert for WorkFlowInstance."""
@@ -26007,17 +26457,26 @@ input WorkFlowStepTemplateCursorPaginationInput {
   """Pagination direction."""
   direction: WorkFlowStepTemplatePaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -26412,7 +26871,7 @@ input WorkFlowStepTemplateUpdateManyNestedInput {
   deleteMany: WorkFlowStepTemplateWhereInput
   disconnect: [WorkFlowStepTemplateConnectInput!]
   set: [WorkFlowStepTemplateConnectInput!]
-  update: [WorkFlowStepTemplateUpsertNestedInput!]
+  update: WorkFlowStepTemplateUpdateWhereOneNestedInput
   updateMany: [WorkFlowStepTemplateUpsertNestedInput!]
   upsert: [WorkFlowStepTemplateUpsertNestedInput!]
 }
@@ -26425,8 +26884,14 @@ input WorkFlowStepTemplateUpdateOneNestedInput {
   delete: Boolean
   deleteMany: WorkFlowStepTemplateWhereInput
   disconnect: Boolean
-  update: WorkFlowStepTemplateUpsertNestedInput
+  update: WorkFlowStepTemplateUpdateWhereOneNestedInput
   upsert: WorkFlowStepTemplateUpsertNestedInput
+}
+
+"""Nested update with where for WorkFlowStepTemplate."""
+input WorkFlowStepTemplateUpdateWhereOneNestedInput {
+  data: WorkFlowStepTemplateUpdateInput!
+  where: WorkFlowStepTemplateConnectInput!
 }
 
 """Nested upsert for WorkFlowStepTemplate."""
@@ -26697,17 +27162,26 @@ input WorkFlowTemplateCursorPaginationInput {
   """Pagination direction."""
   direction: WorkFlowTemplatePaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -27218,17 +27692,26 @@ input WorkFlowTemplateScopeCursorPaginationInput {
   """Pagination direction."""
   direction: WorkFlowTemplateScopePaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -27581,7 +28064,7 @@ input WorkFlowTemplateScopeUpdateManyNestedInput {
   deleteMany: WorkFlowTemplateScopeWhereInput
   disconnect: [WorkFlowTemplateScopeConnectInput!]
   set: [WorkFlowTemplateScopeConnectInput!]
-  update: [WorkFlowTemplateScopeUpsertNestedInput!]
+  update: WorkFlowTemplateScopeUpdateWhereOneNestedInput
   updateMany: [WorkFlowTemplateScopeUpsertNestedInput!]
   upsert: [WorkFlowTemplateScopeUpsertNestedInput!]
 }
@@ -27594,8 +28077,14 @@ input WorkFlowTemplateScopeUpdateOneNestedInput {
   delete: Boolean
   deleteMany: WorkFlowTemplateScopeWhereInput
   disconnect: Boolean
-  update: WorkFlowTemplateScopeUpsertNestedInput
+  update: WorkFlowTemplateScopeUpdateWhereOneNestedInput
   upsert: WorkFlowTemplateScopeUpsertNestedInput
+}
+
+"""Nested update with where for WorkFlowTemplateScope."""
+input WorkFlowTemplateScopeUpdateWhereOneNestedInput {
+  data: WorkFlowTemplateScopeUpdateInput!
+  where: WorkFlowTemplateScopeConnectInput!
 }
 
 """Nested upsert for WorkFlowTemplateScope."""
@@ -27689,7 +28178,7 @@ input WorkFlowTemplateUpdateManyNestedInput {
   deleteMany: WorkFlowTemplateWhereInput
   disconnect: [WorkFlowTemplateConnectInput!]
   set: [WorkFlowTemplateConnectInput!]
-  update: [WorkFlowTemplateUpsertNestedInput!]
+  update: WorkFlowTemplateUpdateWhereOneNestedInput
   updateMany: [WorkFlowTemplateUpsertNestedInput!]
   upsert: [WorkFlowTemplateUpsertNestedInput!]
 }
@@ -27702,8 +28191,14 @@ input WorkFlowTemplateUpdateOneNestedInput {
   delete: Boolean
   deleteMany: WorkFlowTemplateWhereInput
   disconnect: Boolean
-  update: WorkFlowTemplateUpsertNestedInput
+  update: WorkFlowTemplateUpdateWhereOneNestedInput
   upsert: WorkFlowTemplateUpsertNestedInput
+}
+
+"""Nested update with where for WorkFlowTemplate."""
+input WorkFlowTemplateUpdateWhereOneNestedInput {
+  data: WorkFlowTemplateUpdateInput!
+  where: WorkFlowTemplateConnectInput!
 }
 
 """Nested upsert for WorkFlowTemplate."""
@@ -28051,17 +28546,26 @@ input WorkInformationCursorPaginationInput {
   """Pagination direction."""
   direction: WorkInformationPaginationDirection
 
+  """Fields to apply distinct on."""
+  distinct: [String!]
+
   """Advanced JSON filter."""
   filter: Json
 
   """Filter by active status."""
   isActive: Boolean!
 
+  """Order by clause."""
+  orderBy: Json
+
   """Search keyword."""
   search: String
 
   """Fields to search within."""
   searchFields: [String!]
+
+  """Fields to select."""
+  select: Json
 
   """Number of records to return."""
   take: Int!
@@ -28490,7 +28994,7 @@ input WorkInformationUpdateManyNestedInput {
   deleteMany: WorkInformationWhereInput
   disconnect: [WorkInformationConnectInput!]
   set: [WorkInformationConnectInput!]
-  update: [WorkInformationUpsertNestedInput!]
+  update: WorkInformationUpdateWhereOneNestedInput
   updateMany: [WorkInformationUpsertNestedInput!]
   upsert: [WorkInformationUpsertNestedInput!]
 }
@@ -28503,8 +29007,14 @@ input WorkInformationUpdateOneNestedInput {
   delete: Boolean
   deleteMany: WorkInformationWhereInput
   disconnect: Boolean
-  update: WorkInformationUpsertNestedInput
+  update: WorkInformationUpdateWhereOneNestedInput
   upsert: WorkInformationUpsertNestedInput
+}
+
+"""Nested update with where for WorkInformation."""
+input WorkInformationUpdateWhereOneNestedInput {
+  data: WorkInformationUpdateInput!
+  where: WorkInformationConnectInput!
 }
 
 """Nested upsert for WorkInformation."""

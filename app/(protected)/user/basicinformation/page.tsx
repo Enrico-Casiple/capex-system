@@ -4,16 +4,15 @@ import Import from '@/app/_component/List/Import';
 import Action, { ActionType, PopupType } from '@/app/_component/Row/Action';
 import { Spinner } from '@/app/_component/Spinner';
 import ListPage from '@/app/_context/ListWrapper';
-import { WorkFlowTemplate, WorkFlowTemplateCreateInput } from '@/lib/generated/api/customHookAPI/graphql';
-import useToast from '@/app/_hooks/useToast';
+import { BasicInformation, BasicInformationCreateInput, BasicInformationUpdateInput } from '@/lib/generated/api/customHookAPI/graphql';
 import dynamic from 'next/dynamic';
 import { useCallback } from 'react';
 import ExportForm from './_form/ExportForm';
 import ImportForm from './_form/ImportForm';
 import ImportUpdate from '@/app/_component/List/ImportUpdate';
 import ImportUpdateForm from './_form/ImportUpdateForm';
-import { workFlowTemplateTableConfig } from '../../_config';
 import ModelData from '@/app/_component/ModelData';
+import { basicInformationTableConfig } from '@/app/_config';
 
 const Method = dynamic(() => import('./_form/Method'), {
   loading: () => <Spinner />,
@@ -21,11 +20,10 @@ const Method = dynamic(() => import('./_form/Method'), {
 });
 
 const ModelPage = () => {
-  type ModelRequest = WorkFlowTemplate;
-  type ModelCreateInput = WorkFlowTemplateCreateInput;
+  type ModelRequest = BasicInformation;
+  type ModelCreateInput = BasicInformationCreateInput;
+  type ModelUpdateInput = BasicInformationUpdateInput;
 
-  // ✅ Initialize toast hook
-  const toast = useToast();
 
   const {
     modelName,
@@ -43,7 +41,7 @@ const ModelPage = () => {
     previewColumnsUpdate,
     exportColumns,
     defaultExportColumns,
-  } = workFlowTemplateTableConfig;
+  } = basicInformationTableConfig;
 
   const renderMethod = useCallback(
     (
@@ -102,7 +100,7 @@ const ModelPage = () => {
 
   const updateForm = useCallback(
     (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (
-      <ImportUpdateForm<ModelRequest, ModelCreateInput>
+      <ImportUpdateForm<ModelRequest, ModelUpdateInput>
         open={open}
         setOpen={setOpen}
         transformRow={transformRowUpdate}
@@ -116,7 +114,7 @@ const ModelPage = () => {
     (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (
       <ExportForm open={open} setOpen={setOpen} exportColumns={exportColumns} defaultSelectedColumns={defaultExportColumns} />
     ),
-    [],
+    [defaultExportColumns, exportColumns],
   );
 
   return (
