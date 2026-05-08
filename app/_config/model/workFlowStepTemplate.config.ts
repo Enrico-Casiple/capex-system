@@ -113,27 +113,27 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "workflowTemplateId",
         label: "WorkflowTemplateId",
-        default: "",
+        default: null,
       },
       {
         key: "stepNumber",
         label: "StepNumber",
-        default: 0,
+        default: null,
       },
       {
         key: "assignmentTypeId",
         label: "AssignmentTypeId",
-        default: "",
+        default: null,
       },
       {
         key: "assignedToUserId",
         label: "AssignedToUserId",
-        default: "",
+        default: null,
       },
       {
         key: "assignmentRules",
         label: "AssignmentRules",
-        default: {} as Record<string, unknown>,
+        default: null,
       },
       {
         key: "isHaveCondition",
@@ -148,17 +148,17 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "requiredApprovals",
         label: "RequiredApprovals",
-        default: 0,
+        default: null,
       },
       {
         key: "slaHours",
         label: "SlaHours",
-        default: 0,
+        default: null,
       },
       {
         key: "escalationRules",
         label: "EscalationRules",
-        default: {} as Record<string, unknown>,
+        default: null,
       },
       {
         key: "esignatureRequired",
@@ -178,31 +178,31 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "workflowTemplateId",
         label: "WorkflowTemplateId",
-        default: "",
+        default: null,
       },
       {
         key: "stepNumber",
         label: "StepNumber",
-        default: 0,
+        default: null,
       },
       {
         key: "assignmentTypeId",
         label: "AssignmentTypeId",
-        default: "",
+        default: null,
       },
       {
         key: "assignedToUserId",
         label: "AssignedToUserId",
-        default: "",
+        default: null,
       },
       {
         key: "assignmentRules",
         label: "AssignmentRules",
-        default: {} as Record<string, unknown>,
+        default: null,
       },
       {
         key: "isHaveCondition",
@@ -217,17 +217,17 @@ const previewColumnsUpdate: PreviewColumn<Model>[] = [
       {
         key: "requiredApprovals",
         label: "RequiredApprovals",
-        default: 0,
+        default: null,
       },
       {
         key: "slaHours",
         label: "SlaHours",
-        default: 0,
+        default: null,
       },
       {
         key: "escalationRules",
         label: "EscalationRules",
-        default: {} as Record<string, unknown>,
+        default: null,
       },
       {
         key: "esignatureRequired",
@@ -283,38 +283,38 @@ export const workFlowStepTemplate = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            workflowTemplateId: row.workflowTemplateId,
-            stepNumber: row.stepNumber,
-            assignmentTypeId: row.assignmentTypeId,
-            assignedToUserId: row.assignedToUserId,
-            assignmentRules: row.assignmentRules,
-            isHaveCondition: row.isHaveCondition,
-            isParallel: row.isParallel,
-            requiredApprovals: row.requiredApprovals,
-            slaHours: row.slaHours,
-            escalationRules: row.escalationRules,
-            esignatureRequired: row.esignatureRequired,
-            attachmentRequired: row.attachmentRequired,
-            isActive: row.isActive,
+            workflowTemplateId: row.workflowTemplateId ? String(row.workflowTemplateId) : null,
+            stepNumber: row.stepNumber ? Number(row.stepNumber) : null,
+            assignmentTypeId: row.assignmentTypeId ? String(row.assignmentTypeId) : null,
+            assignedToUserId: row.assignedToUserId ? String(row.assignedToUserId) : null,
+            assignmentRules: row.assignmentRules ? JSON.stringify(row.assignmentRules) : null,
+            isHaveCondition: row.isHaveCondition != null ? Boolean(row.isHaveCondition) : null,
+            isParallel: row.isParallel != null ? Boolean(row.isParallel) : null,
+            requiredApprovals: row.requiredApprovals ? Number(row.requiredApprovals) : null,
+            slaHours: row.slaHours ? Number(row.slaHours) : null,
+            escalationRules: row.escalationRules ? JSON.stringify(row.escalationRules) : null,
+            esignatureRequired: row.esignatureRequired != null ? Boolean(row.esignatureRequired) : null,
+            attachmentRequired: row.attachmentRequired != null ? Boolean(row.attachmentRequired) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            workflowTemplateId: row.workflowTemplateId,
-            stepNumber: row.stepNumber,
-            assignmentTypeId: row.assignmentTypeId,
-            assignedToUserId: row.assignedToUserId,
-            assignmentRules: row.assignmentRules,
-            isHaveCondition: row.isHaveCondition,
-            isParallel: row.isParallel,
-            requiredApprovals: row.requiredApprovals,
-            slaHours: row.slaHours,
-            escalationRules: row.escalationRules,
-            esignatureRequired: row.esignatureRequired,
-            attachmentRequired: row.attachmentRequired,
-            isActive: row.isActive,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            workflowTemplateId: row.workflowTemplateId ? String(row.workflowTemplateId) : null,
+            stepNumber: row.stepNumber ? Number(row.stepNumber) : null,
+            assignmentTypeId: row.assignmentTypeId ? String(row.assignmentTypeId) : null,
+            assignedToUserId: row.assignedToUserId ? String(row.assignedToUserId) : null,
+            assignmentRules: row.assignmentRules ? JSON.stringify(row.assignmentRules) : null,
+            isHaveCondition: row.isHaveCondition != null ? Boolean(row.isHaveCondition) : null,
+            isParallel: row.isParallel != null ? Boolean(row.isParallel) : null,
+            requiredApprovals: row.requiredApprovals ? Number(row.requiredApprovals) : null,
+            slaHours: row.slaHours ? Number(row.slaHours) : null,
+            escalationRules: row.escalationRules ? JSON.stringify(row.escalationRules) : null,
+            esignatureRequired: row.esignatureRequired != null ? Boolean(row.esignatureRequired) : null,
+            attachmentRequired: row.attachmentRequired != null ? Boolean(row.attachmentRequired) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 

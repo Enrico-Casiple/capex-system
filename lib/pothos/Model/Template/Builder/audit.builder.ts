@@ -9,7 +9,7 @@ const buildAuditLog = (params: {
   create: {
     modelName: params.modelName,
     action: params.action,
-    actorId: params.actorId ?? null,
+    actorId: params.actorId ? params.actorId : null,
     timestamp: params.timestamp,
     ...(params.oldDetails !== undefined && { oldDetails: JSON.stringify(params.oldDetails) }),
     newDetails: JSON.stringify(params.newDetails),

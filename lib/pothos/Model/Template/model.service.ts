@@ -249,42 +249,131 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
     return batches;
   }
 
-  private async processBatch(
-    dataArray: CreateManyInput<PrismaModel>['data'],
-    currentUserId: string,
-  ): Promise<{
-    isSuccess: boolean;
-    message: string;
-    code: string;
-    data: PrismaTypes[PrismaModel]['Shape'][] | null;
-  }> {
-    try {
-      const createdRecords = await this.prisma.$transaction(
-        async (tx) => {
-          const inserted = await Promise.all(
-            dataArray.map((recordData) =>
-              (tx[this.prismaModel] as unknown as PrismaModelMethods<PrismaModel>).create({
-                data: {
-                  ...recordData,
-                  auditLogs: this.audit('CREATE', currentUserId, recordData),
-                } as CreateArgs<PrismaModel>['data'],
-                include: this.include,
-              }),
-            ),
-          );
-          return inserted.flat() as PrismaTypes[PrismaModel]['Shape'][];
-        },
-        { timeout: Math.max(20000, dataArray.length * 500) },
-      );
-      return ok(
-        this.code('CREATE_MANY_SUCCESS'),
-        `Created ${createdRecords.length} ${this.modelName} records`,
-        createdRecords,
-      );
-    } catch (error) {
-      return { ...fail(this.code('CREATE_MANY_FAILED'), `Batch failed: ${error}`), data: null };
+  
+private getPrismaErrorCode(error: unknown): string | null {
+  const e = error as { code?: unknown };
+  return typeof e?.code === 'string' ? e.code : null;
+}
+
+private cleanPrismaMessage(message: string): string {
+  return String(message ?? '')
+    .replace(/PrismaClient\w+Error:\s*/g, '')
+    .replace(/Invalid `[^`]+` invocation:\s*/g, '')
+    .replace(/\s*\n\s*/g, ' ')
+    .trim();
+}
+
+private humanizeConstraintField(constraint: string): string {
+  const parts = constraint.split('_');
+  const rawField = parts.length >= 3 ? parts.slice(1, -1).join('_') : constraint;
+
+  return rawField
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .trim();
+}
+
+private toReadableCreateError(error: unknown): string {
+  const code = this.getPrismaErrorCode(error);
+  const { message } = getPrismaErrorMessage(error);
+  const readable = this.cleanPrismaMessage(String(message ?? 'Failed to import records'));
+
+  switch (code) {
+    case 'P2002': {
+      const target = (error as { meta?: { target?: unknown } }).meta?.target;
+      const targetField = Array.isArray(target) ? target.join(', ') : String(target ?? '');
+      return targetField
+        ? `Duplicate value detected for "${targetField}". Please use a unique value.`
+        : 'Duplicate value detected. Please use a unique value.';
     }
+
+    case 'P2003':
+      return 'This value is linked to another record and cannot be saved or deleted.';
+
+    case 'P2000':
+      return 'The value is too long for one of the fields. Please shorten it and try again.';
+
+    case 'P2011':
+      return 'A required field is missing. Please fill in all required values.';
+
+    case 'P2025':
+      return 'The requested record was not found. It may have already been deleted.';
+
+    case 'P2014':
+      return 'This operation violates a required relation between records.';
+
+    case 'P2021':
+      return 'The database table was not found. Please check the schema and migration.';
+
+    default:
+      break;
   }
+
+  if (/Unique constraint failed/i.test(readable)) {
+    const constraintMatch = readable.match(/constraint:\s*`([^`]+)`/i);
+    if (constraintMatch?.[1]) {
+      const field = this.humanizeConstraintField(constraintMatch[1]);
+      return `Duplicate value detected for "${field}". Please use a unique value.`;
+    }
+
+    const keyMatch = readable.match(/`([^`]+)`/);
+    if (keyMatch?.[1]) {
+      return `Duplicate value detected for "${this.humanizeConstraintField(keyMatch[1])}". Please use a unique value.`;
+    }
+
+    return 'Duplicate value detected. Please use a unique value.';
+  }
+
+  if (/Malformed ObjectID/i.test(readable)) {
+    const fieldMatch = readable.match(/field '([^']+)'/i);
+    return fieldMatch
+      ? `Invalid ID format for "${fieldMatch[1]}". Please provide a valid ObjectID.`
+      : 'Invalid ID format in one of the fields.';
+  }
+
+  return readable || 'Failed to import records.';
+}
+
+private async processBatch(
+  dataArray: CreateManyInput<PrismaModel>['data'],
+  currentUserId: string,
+): Promise<{
+  isSuccess: boolean;
+  message: string;
+  code: string;
+  data: PrismaTypes[PrismaModel]['Shape'][] | null;
+}> {
+  try {
+    const createdRecords = await this.prisma.$transaction(
+      async (tx) => {
+        const inserted = await Promise.all(
+          dataArray.map((recordData) =>
+            (tx[this.prismaModel] as unknown as PrismaModelMethods<PrismaModel>).create({
+              data: {
+                ...recordData,
+                auditLogs: this.audit('CREATE', currentUserId, recordData),
+              } as CreateArgs<PrismaModel>['data'],
+              include: this.include,
+            }),
+          ),
+        );
+        return inserted.flat() as PrismaTypes[PrismaModel]['Shape'][];
+      },
+      { timeout: Math.max(20000, dataArray.length * 500) },
+    );
+
+    return ok(
+      this.code('CREATE_MANY_SUCCESS'),
+      `Created ${createdRecords.length} ${this.modelName} records`,
+      createdRecords,
+    );
+  } catch (error) {
+    const readable = this.toReadableCreateError(error);
+    return fail(this.code('CREATE_MANY_FAILED'), readable);
+  }
+}
 
   // ─── Server side subscription ──────────────────────────────
   subscribeToModel(callback: (data: PrismaTypes[PrismaModel]['Shape']) => void) {
@@ -310,49 +399,7 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
     });
   }
 
-  // private escapeCsvValue(value: unknown): string {
-  //   if (value === null || value === undefined) return '';
-  //   if (value instanceof Date) return value.toISOString();
-  //   if (typeof value === 'object') return JSON.stringify(value);
-  //   const s = String(value);
-  //   return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-  // }
 
-  private getValueByPath(record: Record<string, unknown>, path: string): unknown {
-    if (!path) return null;
-    const parts = path.split('.').filter(Boolean);
-    if (!parts.length) return null;
-
-    const resolvePath = (current: unknown, index: number): unknown => {
-      if (index >= parts.length) return current;
-      if (current === null || current === undefined) return null;
-
-      if (Array.isArray(current)) {
-        return current.map((item) => resolvePath(item, index));
-      }
-
-      if (typeof current === 'object') {
-        const key = parts[index];
-        return resolvePath((current as Record<string, unknown>)[key], index + 1);
-      }
-
-      return null;
-    };
-
-    return resolvePath(record, 0);
-  }
-
-  private normalizeCsvPathValue(value: unknown): unknown {
-    if (!Array.isArray(value)) return value;
-
-    const flattened = value.flat(Infinity).filter((v) => v !== undefined && v !== null);
-    if (!flattened.length) return '';
-
-    const hasComplex = flattened.some((v) => typeof v === 'object' && !(v instanceof Date));
-    if (hasComplex) return flattened;
-
-    return flattened.map((v) => (v instanceof Date ? v.toISOString() : String(v))).join('\n');
-  }
 
   private toTabularValue(value: unknown): string | number | boolean {
     if (value === null || value === undefined) return '';
@@ -398,75 +445,8 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
     return Buffer.from(html, 'utf8').toString('base64');
   }
 
-  private isPlainObject(value: unknown): value is Record<string, unknown> {
-    return typeof value === 'object' && value !== null && !Array.isArray(value);
-  }
 
-  private buildCsvIncludeFromColumns(columns?: string[]): Record<string, unknown> | undefined {
-    if (!columns?.length) return undefined;
 
-    const include: Record<string, unknown> = {};
-
-    for (const column of columns) {
-      const parts = String(column)
-        .split('.')
-        .map((p) => p.trim())
-        .filter(Boolean);
-
-      // No dot-path means top-level field; no relation include needed.
-      if (parts.length < 2) continue;
-
-      let current = include;
-
-      for (let i = 0; i < parts.length - 1; i += 1) {
-        const relationKey = parts[i];
-        const isLastRelation = i === parts.length - 2;
-        const existing = current[relationKey];
-
-        if (isLastRelation) {
-          current[relationKey] = true;
-          break;
-        }
-
-        if (existing === true || !this.isPlainObject(existing)) {
-          current[relationKey] = { include: {} };
-        }
-
-        const relationConfig = current[relationKey] as Record<string, unknown>;
-        if (!this.isPlainObject(relationConfig.include)) {
-          relationConfig.include = {};
-        }
-
-        current = relationConfig.include as Record<string, unknown>;
-      }
-    }
-
-    return Object.keys(include).length ? include : undefined;
-  }
-
-  private mergeIncludeTrees(
-    base: unknown,
-    extra: Record<string, unknown> | undefined,
-  ): Record<string, unknown> | undefined {
-    if (!extra) return base as Record<string, unknown> | undefined;
-    if (!this.isPlainObject(base)) return extra as Record<string, unknown> | undefined;
-
-    const merged: Record<string, unknown> = { ...base };
-
-    for (const [key, extraValue] of Object.entries(extra)) {
-      const baseValue = merged[key];
-
-      if (this.isPlainObject(baseValue) && this.isPlainObject(extraValue)) {
-        merged[key] = this.mergeIncludeTrees(baseValue, extraValue as Record<string, unknown>);
-      } else if (extraValue === true) {
-        merged[key] = baseValue ?? true;
-      } else {
-        merged[key] = extraValue;
-      }
-    }
-
-    return merged as Record<string, unknown> | undefined;
-  }
 
   // ─── Public Methods ────────────────────────────────────────
   async findAll(input: PaginationInput<PrismaModel>) {
@@ -760,38 +740,52 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
     }
   }
 
-  async createMany(input: CreateManyInput<PrismaModel>) {
-    console.log(`📝 CreateMany ${this.modelName}`, input);
-    try {
-      const mapped = this.mapCreateMany(input.data);
-      const dataArray = Array.isArray(mapped) ? mapped : [mapped];
-      const batchSize = this.getOptimalBatchSize(dataArray);
+async createMany(input: CreateManyInput<PrismaModel>) {
+  console.log(`📝 CreateMany ${this.modelName}`, input);
+  try {
+    const mapped = this.mapCreateMany(input.data);
+    const dataArray = Array.isArray(mapped) ? mapped : [mapped];
+    const batchSize = this.getOptimalBatchSize(dataArray);
 
-      if (dataArray.length <= batchSize) return this.processBatch(dataArray, input.currentUserId);
-
-      const results: PrismaTypes[PrismaModel]['Shape'][] = [];
-      for (const batch of this.splitIntoBatches(dataArray, batchSize)) {
-        const result = await this.processBatch(batch, input.currentUserId);
-        if (result.isSuccess && result.data) results.push(...result.data);
-        else console.error(`Batch failed:`, result.message);
-      }
-
-      results.forEach((record) => this.publish(record));
-
-      return ok(
-        this.code('CREATE_MANY_SUCCESS'),
-        `Created ${results.length} of ${dataArray.length} ${this.modelName} records`,
-        results,
-      );
-    } catch (error) {
-      const { message } = getPrismaErrorMessage(error);
-      console.error(`❌ CreateMany ${this.modelName}:`, error);
-      return fail(
-        this.code('CREATE_MANY_FAILED'),
-        `Failed to createMany ${this.modelName}: ${message}`,
-      );
+    if (dataArray.length <= batchSize) {
+      return this.processBatch(dataArray, input.currentUserId);
     }
+
+    const results: PrismaTypes[PrismaModel]['Shape'][] = [];
+    const batchErrors: string[] = [];
+
+    for (const batch of this.splitIntoBatches(dataArray, batchSize)) {
+      const result = await this.processBatch(batch, input.currentUserId);
+
+      if (result.isSuccess && result.data) {
+        results.push(...result.data);
+      } else {
+        const readable = this.toReadableCreateError(result.message);
+        batchErrors.push(readable);
+        console.error('Batch failed:', readable);
+      }
+    }
+
+    if (!results.length && batchErrors.length) {
+      return fail(this.code('CREATE_MANY_FAILED'), batchErrors[0]);
+    }
+
+    results.forEach((record) => this.publish(record));
+
+    const failedCount = dataArray.length - results.length;
+    return ok(
+      this.code('CREATE_MANY_SUCCESS'),
+      failedCount > 0
+        ? `Imported ${results.length}/${dataArray.length}. Some rows failed: ${batchErrors[0]}`
+        : `Created ${results.length} of ${dataArray.length} ${this.modelName} records`,
+      results,
+    );
+  } catch (error) {
+    const readable = this.toReadableCreateError(error);
+    console.error(`❌ CreateMany ${this.modelName}:`, error);
+    return fail(this.code('CREATE_MANY_FAILED'), readable);
   }
+}
 
   async update(input: UpdateInput<PrismaModel>) {
     console.log(`📝 Update ${this.modelName}`, input);
@@ -882,10 +876,45 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
     if (!id) return fail(this.code('DELETE_ONE_FAILED'), `id is required`);
 
     try {
-      // ⚡ PERF: Fire delete directly; Prisma throws NotFoundError if id doesn't exist (eliminates N+1 findUnique)
-      const record = await this.delegate.delete({
+      // Ensure record exists to avoid Prisma throwing internal findUniqueOrThrow
+      const existing = await this.delegate.findUnique({
         where: { id } as FindManyArgs<PrismaModel>['where'],
+        include: this.include,
       });
+
+      if (!existing) {
+        return fail(
+          this.code('DELETE_ONE_FAILED'),
+          `No ${this.modelName} found with id ${id}`,
+        );
+      }
+
+      // Sanitize oldDetails to a plain JSON object to avoid any lazy relation lookups
+      const oldDetails = JSON.parse(JSON.stringify(existing));
+
+      // Create audit + delete in one transaction to avoid race conditions
+      const [audit, record] = await this.prisma.$transaction(async (tx) => {
+        const createdAudit = await (tx.auditLog as any).create({
+          data: {
+            modelId: id,
+            ...buildAuditLog({
+              modelName: this.modelName,
+              action: 'DELETE',
+              actorId: currentUserId,
+              oldDetails,
+              newDetails: null,
+              timestamp: this.time,
+            }).create,
+          },
+        });
+
+        const deleted = await (tx[this.prismaModel] as any).delete({
+          where: { id } as FindManyArgs<PrismaModel>['where'],
+        });
+
+        return [createdAudit, deleted];
+      });
+
       this.publish(record);
       return ok(this.code('DELETE_ONE_SUCCESS'), `Deleted ${this.modelName} id:${id}`, record);
     } catch (error) {
@@ -1137,158 +1166,292 @@ export class ModelService<PrismaModel extends Prisma.ModelName> {
       );
     }
   }
+private normalizeCsvColumns(columns?: string[]): string[] | undefined {
+  if (!columns?.length) return undefined;
 
-  async exportCsv(input: ExportCsvInput<PrismaModel>) {
-    try {
-      const columnInclude = this.buildCsvIncludeFromColumns(input.columns);
-      const include = this.mergeIncludeTrees(this.include, columnInclude);
+  const cleaned = columns
+    .map((col) => String(col).trim())
+    .filter(Boolean);
 
-      const where = {
-        ...(typeof input.isActive === 'boolean' ? { isActive: input.isActive } : {}),
-        ...(input.filter || {}),
-      } as FindManyArgs<PrismaModel>['where'];
+  // Remove parent relation keys when nested paths exist
+  return cleaned.filter((col) => {
+    if (col.includes('.')) return true;
+    return !cleaned.some((other) => other.startsWith(`${col}.`));
+  });
+}
 
-      if (input.search?.trim() && input.searchFields?.length) {
-        (where as Record<string, unknown>).OR = input.searchFields.map((field) => ({
-          [field]: { contains: input.search, mode: 'insensitive' },
-        }));
+private buildCsvSelectFromColumns(columns?: string[]): Record<string, unknown> | undefined {
+  const normalized = this.normalizeCsvColumns(columns);
+  if (!normalized?.length) return undefined;
+
+  const select: Record<string, unknown> = {};
+
+  for (const column of normalized) {
+    const parts = column
+      .split('.')
+      .map((p) => p.trim())
+      .filter(Boolean);
+
+    if (!parts.length) continue;
+
+    // Top-level scalar field
+    if (parts.length === 1) {
+      select[parts[0]] = true;
+      continue;
+    }
+
+    // Nested relation path
+    let current = select;
+
+    for (let i = 0; i < parts.length; i += 1) {
+      const key = parts[i];
+      const isLast = i === parts.length - 1;
+
+      if (isLast) {
+        current[key] = true;
+        break;
       }
 
-      // ⚡ PERF: Optimized batch processing
-      const batchSize = 500;
-      const uploadToSpaces = input.uploadToSpaces ?? false;
-      const maxRecords = Math.min(
-        input.maxRecords ?? (uploadToSpaces ? 1_000_000 : 50_000),
-        1_000_000,
-      );
-
-      // ⚠️ Memory warning for large exports
-      if (maxRecords > 500_000) {
-        console.warn(
-          `⚠️  LARGE EXPORT WARNING for ${this.modelName}: exporting ${maxRecords.toLocaleString()} records. ` +
-          `This may consume significant memory. Consider using pagination or streaming instead.`,
-        );
+      if (!current[key] || current[key] === true) {
+        current[key] = { select: {} };
       }
 
-      let columns: string[] | undefined = input.columns?.map(String);
-      let exportedCount = 0;
-      let csvParts: string[] = [];
-
-      // ⚡ PERF: Pre-allocate array capacity estimate
-      const estimatedBatches = Math.ceil(maxRecords / batchSize);
-      csvParts = new Array(estimatedBatches + 1);
-      let partIndex = 0;
-
-      // Generate header once
-      if (columns?.length) {
-        csvParts[partIndex++] = Papa.unparse(
-          [Object.fromEntries(columns.map((col) => [col, '']))],
-          { columns, header: true }
-        ).split('\n')[0];
+      const node = current[key] as Record<string, unknown>;
+      if (!node.select || typeof node.select !== 'object') {
+        node.select = {};
       }
 
-      // ⚡ PERF: Cursor-based pagination instead of offset (faster for large datasets)
-      let cursor: string | undefined;
-      let hasMore = true;
-
-      while (hasMore && exportedCount < maxRecords) {
-        const batch = (await this.delegate.findMany({
-          where,
-          orderBy: this.orderBy,
-          take: batchSize,
-          ...(cursor ? { cursor: { id: cursor } as FindManyArgs<PrismaModel>['where'], skip: 1 } : {}),
-          include,
-        })) as Array<Record<string, unknown> & { id: string }>;
-
-        if (!batch.length) {
-          hasMore = false;
-          break;
-        }
-
-        // Auto-detect columns from first batch if not provided
-        if (!columns?.length && batch[0]) {
-          columns = Object.keys(batch[0]).filter((k) => !['password', 'otpCode'].includes(k));
-          csvParts[0] = Papa.unparse([], { columns, header: true }).split('\n')[0];
-          partIndex = 1;
-        }
-
-        // ⚡ PERF: Batch process rows in parallel chunks
-        const rows = batch.map((row) => {
-          const mapped = columns!.reduce((acc, column) => {
-            const raw = this.normalizeCsvPathValue(this.getValueByPath(row, column));
-            acc[column] = this.toTabularValue(raw);
-            return acc;
-          }, {} as Record<string, string | number | boolean>);
-          return mapped;
-        });
-
-        const csvChunk = Papa.unparse(rows, { columns, header: false });
-        if (csvChunk) csvParts[partIndex++] = csvChunk;
-
-        exportedCount += batch.length;
-        cursor = batch[batch.length - 1].id;
-        hasMore = batch.length === batchSize && exportedCount < maxRecords;
-      }
-
-      // ⚡ PERF: Trim unused array slots
-      csvParts = csvParts.slice(0, partIndex);
-
-      const effectiveFileName = this.sanitizeFileName(input.fileName ?? `${this.prismaModel}.csv`);
-      const excelFileName = effectiveFileName.replace(/\.csv$/i, '.xls');
-      const excelMimeType = 'application/vnd.ms-excel';
-
-      if (!exportedCount) {
-        return ok(this.code('EXPORT_CSV_SUCCESS'), `No ${this.modelName} data`, {
-          fileName: effectiveFileName,
-          mimeType: 'text/csv',
-          csv: '',
-          rowCount: 0,
-          excelFileName,
-          excelMimeType,
-          excelBase64: '',
-          fileUrl: null,
-          fileKey: null,
-          wasTruncated: false,
-        });
-      }
-
-      const csv = csvParts.join('\n');
-      const excelBase64 = uploadToSpaces ? '' : this.buildExcelBase64(columns ?? [], []);
-
-      let fileUrl: string | null = null;
-      let fileKey: string | null = null;
-
-      if (uploadToSpaces) {
-        fileKey = `${Date.now()}-${effectiveFileName}`;
-        await spacesClient.send(
-          new PutObjectCommand({
-            Bucket: DO_BUCKET,
-            Key: fileKey,
-            Body: Buffer.from(csv, 'utf8'),
-            ContentType: 'text/csv',
-            ACL: 'public-read',
-          }),
-        );
-        fileUrl = this.buildSpacesUrl(fileKey);
-      }
-
-      return ok(this.code('EXPORT_CSV_SUCCESS'), `Exported ${exportedCount} ${this.modelName} rows`, {
-        fileName: effectiveFileName,
-        mimeType: 'text/csv',
-        csv: uploadToSpaces ? '' : csv,
-        rowCount: exportedCount,
-        excelFileName,
-        excelMimeType,
-        excelBase64,
-        fileUrl,
-        fileKey,
-        wasTruncated: exportedCount >= maxRecords,
-      });
-    } catch (error) {
-      const { message } = getPrismaErrorMessage(error);
-      return fail(this.code('EXPORT_CSV_FAILED'), `Failed to export CSV: ${message}`);
+      current = node.select as Record<string, unknown>;
     }
   }
+
+  return Object.keys(select).length ? select : undefined;
+}
+
+async exportCsv(input: ExportCsvInput<PrismaModel>) {
+  try {
+    const select = this.buildCsvSelectFromColumns(input.columns);
+
+    const where = {
+      ...(typeof input.isActive === 'boolean' ? { isActive: input.isActive } : {}),
+      ...(input.filter || {}),
+    } as FindManyArgs<PrismaModel>['where'];
+
+    if (input.search?.trim() && input.searchFields?.length) {
+      (where as Record<string, unknown>).OR = input.searchFields.map((field) => ({
+        [field]: { contains: input.search, mode: 'insensitive' },
+      }));
+    }
+
+    const batchSize = 500;
+    const uploadToSpaces = input.uploadToSpaces ?? false;
+    const maxRecords = Math.min(
+      input.maxRecords ?? (uploadToSpaces ? 1_000_000 : 50_000),
+      1_000_000,
+    );
+
+    if (maxRecords > 500_000) {
+      console.warn(
+        `⚠️  LARGE EXPORT WARNING for ${this.modelName}: exporting ${maxRecords.toLocaleString()} records. ` +
+          `This may consume significant memory. Consider using pagination or streaming instead.`,
+      );
+    }
+
+    let columns = this.normalizeCsvColumns(input.columns?.map(String));
+    let exportedCount = 0;
+    let csvParts: string[] = [];
+
+    const estimatedBatches = Math.ceil(maxRecords / batchSize);
+    csvParts = new Array(estimatedBatches + 1);
+    let partIndex = 0;
+
+    if (columns?.length) {
+      csvParts[partIndex++] = Papa.unparse(
+        [Object.fromEntries(columns.map((col) => [col, '']))],
+        { columns, header: true },
+      ).split('\n')[0];
+    }
+
+    const isPrimitive = (value: unknown): value is string | number | boolean =>
+      typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean';
+
+    const pickPreferredScalar = (value: unknown): string | number | boolean | '' => {
+      if (value == null) return '';
+      if (isPrimitive(value)) return value;
+      if (value instanceof Date) return value.toISOString();
+
+      if (Array.isArray(value)) {
+        return value
+          .map((item) => pickPreferredScalar(item))
+          .filter((v) => v !== '')
+          .join(';');
+      }
+
+      if (typeof value === 'object') {
+        const obj = value as Record<string, unknown>;
+        const preferred =
+          obj.id ??
+          obj._id ??
+          obj.name ??
+          obj.code ??
+          obj.permissionId ??
+          obj.roleId ??
+          obj.modelName;
+
+        return preferred != null ? String(preferred) : '';
+      }
+
+      return String(value);
+    };
+
+    const getValuesByPath = (record: unknown, path: string): unknown[] => {
+      const parts = path.split('.').filter(Boolean);
+      if (!parts.length) return [];
+
+      const walk = (current: unknown, index: number): unknown[] => {
+        if (current == null) return [];
+
+        if (index >= parts.length) {
+          if (Array.isArray(current)) return current.flatMap((item) => walk(item, index));
+          return [current];
+        }
+
+        if (Array.isArray(current)) {
+          return current.flatMap((item) => walk(item, index));
+        }
+
+        if (typeof current === 'object') {
+          const next = (current as Record<string, unknown>)[parts[index]];
+          return walk(next, index + 1);
+        }
+
+        return [];
+      };
+
+      return walk(record, 0);
+    };
+
+    const normalizePathValue = (record: unknown, path: string): string | number | boolean => {
+      const values = getValuesByPath(record, path);
+      if (!values.length) return '';
+
+      const primitiveValues = values
+        .flatMap((value) => (Array.isArray(value) ? value : [value]))
+        .filter((v) => v !== undefined && v !== null)
+        .map((value) => {
+          if (value instanceof Date) return value.toISOString();
+          if (isPrimitive(value)) return value;
+          return pickPreferredScalar(value);
+        })
+        .filter((v) => v !== '');
+
+      if (!primitiveValues.length) return '';
+      return primitiveValues.length === 1
+        ? primitiveValues[0]
+        : primitiveValues.map(String).join(';');
+    };
+
+    let cursor: string | undefined;
+    let hasMore = true;
+
+    while (hasMore && exportedCount < maxRecords) {
+      const batch = (await this.delegate.findMany({
+        where,
+        orderBy: this.orderBy,
+        take: batchSize,
+        ...(cursor ? { cursor: { id: cursor } as FindManyArgs<PrismaModel>['where'], skip: 1 } : {}),
+        ...(select ? { select } : {}),
+      })) as Array<Record<string, unknown> & { id: string }>;
+
+      if (!batch.length) {
+        hasMore = false;
+        break;
+      }
+
+      if (!columns?.length && batch[0]) {
+        columns = Object.keys(batch[0]).filter((k) => {
+          if (['password', 'otpCode'].includes(k)) return false;
+          const value = batch[0][k];
+          return value === null || value === undefined || isPrimitive(value) || value instanceof Date;
+        });
+
+        csvParts[0] = Papa.unparse([], { columns, header: true }).split('\n')[0];
+        partIndex = 1;
+      }
+
+      const rows = batch.map((row) =>
+        columns!.reduce((acc, column) => {
+          acc[column] = this.toTabularValue(normalizePathValue(row, column));
+          return acc;
+        }, {} as Record<string, string | number | boolean>),
+      );
+
+      const csvChunk = Papa.unparse(rows, { columns, header: false });
+      if (csvChunk) csvParts[partIndex++] = csvChunk;
+
+      exportedCount += batch.length;
+      cursor = batch[batch.length - 1].id;
+      hasMore = batch.length === batchSize && exportedCount < maxRecords;
+    }
+
+    csvParts = csvParts.slice(0, partIndex);
+
+    const effectiveFileName = this.sanitizeFileName(input.fileName ?? `${this.prismaModel}.csv`);
+    const excelFileName = effectiveFileName.replace(/\.csv$/i, '.xls');
+    const excelMimeType = 'application/vnd.ms-excel';
+
+    if (!exportedCount) {
+      return ok(this.code('EXPORT_CSV_SUCCESS'), `No ${this.modelName} data`, {
+        fileName: effectiveFileName,
+        mimeType: 'text/csv',
+        csv: '',
+        rowCount: 0,
+        excelFileName,
+        excelMimeType,
+        excelBase64: '',
+        fileUrl: null,
+        fileKey: null,
+        wasTruncated: false,
+      });
+    }
+
+    const csv = csvParts.join('\n');
+    const excelBase64 = uploadToSpaces ? '' : this.buildExcelBase64(columns ?? [], []);
+
+    let fileUrl: string | null = null;
+    let fileKey: string | null = null;
+
+    if (uploadToSpaces) {
+      fileKey = `${Date.now()}-${effectiveFileName}`;
+      await spacesClient.send(
+        new PutObjectCommand({
+          Bucket: DO_BUCKET,
+          Key: fileKey,
+          Body: Buffer.from(csv, 'utf8'),
+          ContentType: 'text/csv',
+          ACL: 'public-read',
+        }),
+      );
+      fileUrl = this.buildSpacesUrl(fileKey);
+    }
+
+    return ok(this.code('EXPORT_CSV_SUCCESS'), `Exported ${exportedCount} ${this.modelName} rows`, {
+      fileName: effectiveFileName,
+      mimeType: 'text/csv',
+      csv: uploadToSpaces ? '' : csv,
+      rowCount: exportedCount,
+      excelFileName,
+      excelMimeType,
+      excelBase64,
+      fileUrl,
+      fileKey,
+      wasTruncated: exportedCount >= maxRecords,
+    });
+  } catch (error) {
+    const { message } = getPrismaErrorMessage(error);
+    return fail(this.code('EXPORT_CSV_FAILED'), `Failed to export CSV: ${message}`);
+  }
+}
 
 
   async groupBy(groupByInput: GroupByInput<PrismaModel>) {

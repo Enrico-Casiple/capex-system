@@ -18,7 +18,7 @@ export type SearchableColumnDef<TData> = ColumnDef<TData, unknown> & {
 export type PreviewColumn<TData = unknown> = {
   key: keyof TData | string;
   label: string;
-  default?: string | number | boolean | undefined | Record<string, unknown>;
+  default?: string | number | boolean | undefined | Record<string, unknown> | null;
 };
 
 export type ListConfigItem<TData = unknown,

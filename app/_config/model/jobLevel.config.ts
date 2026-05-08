@@ -71,27 +71,27 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "name",
         label: "Name",
-        default: "",
+        default: null,
       },
       {
         key: "description",
         label: "Description",
-        default: "",
+        default: null,
       },
       {
         key: "acronym",
         label: "Acronym",
-        default: "",
+        default: null,
       },
       {
         key: "jobcodeTypeId",
         label: "JobcodeTypeId",
-        default: "",
+        default: null,
       },
       {
         key: "companyId",
         label: "CompanyId",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -101,31 +101,31 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "name",
         label: "Name",
-        default: "",
+        default: null,
       },
       {
         key: "description",
         label: "Description",
-        default: "",
+        default: null,
       },
       {
         key: "acronym",
         label: "Acronym",
-        default: "",
+        default: null,
       },
       {
         key: "jobcodeTypeId",
         label: "JobcodeTypeId",
-        default: "",
+        default: null,
       },
       {
         key: "companyId",
         label: "CompanyId",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -164,24 +164,24 @@ export const jobLevel = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            name: row.name,
-            description: row.description,
-            acronym: row.acronym,
-            jobcodeTypeId: row.jobcodeTypeId,
-            companyId: row.companyId,
-            isActive: row.isActive,
+            name: row.name ? String(row.name) : null,
+            description: row.description ? String(row.description) : null,
+            acronym: row.acronym ? String(row.acronym) : null,
+            jobcodeTypeId: row.jobcodeTypeId ? String(row.jobcodeTypeId) : null,
+            companyId: row.companyId ? String(row.companyId) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            name: row.name,
-            description: row.description,
-            acronym: row.acronym,
-            jobcodeTypeId: row.jobcodeTypeId,
-            companyId: row.companyId,
-            isActive: row.isActive,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            name: row.name ? String(row.name) : null,
+            description: row.description ? String(row.description) : null,
+            acronym: row.acronym ? String(row.acronym) : null,
+            jobcodeTypeId: row.jobcodeTypeId ? String(row.jobcodeTypeId) : null,
+            companyId: row.companyId ? String(row.companyId) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 

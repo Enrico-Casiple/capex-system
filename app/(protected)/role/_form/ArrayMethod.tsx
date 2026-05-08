@@ -7,14 +7,14 @@ import { Button } from '@/components/ui/button';
 import { Trash2Icon } from 'lucide-react';
 import React, { useEffect } from 'react';
 import CustomSingleSelectInput from '@/components/Forms/Inputs/CustomSingleSelectInput';
-import { RoleFormValues } from '@/lib/components/RoleMethodForm';
+import { RoleFormValues } from '../_components/RoleMethodForm';
 
 type ArrayMethodProps = {
   form: UseFormReturn<RoleFormValues, any, RoleFormValues>
   fieldArray: UseFieldArrayReturn<RoleFormValues, "conditions", "id">
   addField: () => void
   removeField: (index: number) => void
-
+  isViewMode: boolean
 }
 export const MODEL_NAME_OPTIONS = [
   { label: 'User', value: 'User' },
@@ -41,6 +41,7 @@ type ConditionRowProps = {
   fieldArray: UseFieldArrayReturn<RoleFormValues, "conditions", "id">;
   removeField: (index: number) => void;
   watchedModelNames: string[];
+  isViewMode: boolean;
 };
 const conditionalReturn = (codeLabel: string): { code: string; codeKey: string } => {
   switch (codeLabel) {
@@ -59,7 +60,7 @@ const conditionalReturn = (codeLabel: string): { code: string; codeKey: string }
   }
 };
 
-const ConditionRow = ({ field, index, form, removeField, watchedModelNames }: ConditionRowProps) => {
+const ConditionRow = ({ field, index, form, removeField, watchedModelNames, isViewMode }: ConditionRowProps) => {
   const toast = useToast();
 
   const codeLabel = CONDITION_NAME_OPTIONS.find(opt => opt.value === form.watch(`conditions.${index}.codeLabel`))?.label || 'Greater than';
@@ -103,7 +104,7 @@ const ConditionRow = ({ field, index, form, removeField, watchedModelNames }: Co
             label="Model Name"
             options={availableModelOptions}
             placeholder="Select model name"
-
+            disabled={isViewMode}
           />
         </div>
         <div className='col-span-3'>
@@ -113,31 +114,58 @@ const ConditionRow = ({ field, index, form, removeField, watchedModelNames }: Co
             label="Condition"
             options={CONDITION_NAME_OPTIONS}
             placeholder="Select condition"
-            disabled={!form.watch(`conditions.${index}.modelName`)}
+            disabled={!form.watch(`conditions.${index}.modelName`) || isViewMode}
           />
         </div>
         <div className='col-span-4'>
           {form.watch(`conditions.${index}.codeLabel`) === 'CONTAINS' ? (
             <div>
-              {/* Show text input for CONTAINS condition */}
-            </div>
-          ) : !form.watch(`conditions.${index}.modelName`) ? (
-            <div className='text-sm text-muted-foreground'>
-              Select a model first
+              <CustomSingleSelectInput
+                name={`conditions.${index}.value.stringValue`}
+                control={form.control}
+                disabled={!form.watch(`conditions.${index}.modelName`)}
+                label={`Select ${form.watch(`conditions.${index}.modelName`)}`}
+                defaultValueId={form.watch(`conditions.${index}.value.stringValue`)}
+                findAllWithCursorGQL={modelAPI[model]?.findAllWithCursor}
+                findUniqueGQL={modelAPI[model].findUnique}
+                cursorVariables={(search, cursor, take) => ({
+                  cursorInput: {
+                    cursor,
+                    isActive: true,
+                    take,
+                    filter: search ? { name: { contains: search, mode: 'insensitive' } } : undefined,
+                  },
+                })}
+                uniqueVariables={(id) => ({ id })}
+                mapOption={(data: unknown) => {
+                  const d = data as { id?: string; name?: string };
+                  return {
+                    label: d.name ?? '',
+                    value: d.name ?? '',
+                  };
+                }}
+                mapDefaultOption={(data: unknown) => {
+                  const d = data as {
+                    data?: { id?: string; name?: string; };
+                  };
+                  if (!d?.data) return null;
+                  return {
+                    label: d.data.name ?? '',
+                    value: d.data.name ?? '',
+                  };
+                }}
+              />
             </div>
           ) : (
             <>
               <CustomSingleSelectInput
                 name={`conditions.${index}.value.stringValue`}
                 control={form.control}
+                disabled={!form.watch(`conditions.${index}.modelName`) || isViewMode}
                 label={`Select ${form.watch(`conditions.${index}.modelName`)}`}
-                findAllWithCursorGQL={modelAPI[model].findAllWithCursor}
+                findAllWithCursorGQL={modelAPI[model]?.findAllWithCursor}
                 findUniqueGQL={modelAPI[model].findUnique}
-                defaultValueId={""}
-                placeholder={`Search ${form.watch(`conditions.${index}.modelName`)}...`}
-                searchPlaceholder={`Search ${form.watch(`conditions.${index}.modelName`)}...`}
-                emptySelectedMessage={` ${form.watch(`conditions.${index}.modelName`)} already selected.`}
-                emptyMessage={`No ${form.watch(`conditions.${index}.modelName`)} found.`}
+                defaultValueId={form.watch(`conditions.${index}.value.stringValue`)}
                 cursorVariables={(search, cursor, take) => ({
                   cursorInput: {
                     cursor,
@@ -168,7 +196,7 @@ const ConditionRow = ({ field, index, form, removeField, watchedModelNames }: Co
             </>
           )}
         </div>
-        <div className='col-span-1 flex items-end justify-center'>
+        <div className={`col-span-1 flex items-end justify-center ${isViewMode ? 'hidden' : ''}`}>
           <Button variant={'destructive'} onClick={() => removeField(index)}>
             <Trash2Icon className='size-4' />
             Remove
@@ -182,7 +210,8 @@ const ConditionRow = ({ field, index, form, removeField, watchedModelNames }: Co
 const ArrayMethod = ({
   fieldArray,
   removeField,
-  form
+  form,
+  isViewMode
 }: ArrayMethodProps) => {
   // Watch all condition modelNames once at component level
   const watchedModelNames = fieldArray.fields.map((_, i) =>
@@ -198,6 +227,7 @@ const ArrayMethod = ({
       fieldArray={fieldArray}
       removeField={removeField}
       watchedModelNames={watchedModelNames}
+      isViewMode={isViewMode}
     />
   ));
 };

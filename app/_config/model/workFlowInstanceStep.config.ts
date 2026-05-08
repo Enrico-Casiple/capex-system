@@ -107,42 +107,42 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "instanceId",
         label: "InstanceId",
-        default: "",
+        default: null,
       },
       {
         key: "stepTemplateId",
         label: "StepTemplateId",
-        default: "",
+        default: null,
       },
       {
         key: "stepNumber",
         label: "StepNumber",
-        default: 0,
+        default: null,
       },
       {
         key: "statusId",
         label: "StatusId",
-        default: "",
+        default: null,
       },
       {
         key: "assignedToUserId",
         label: "AssignedToUserId",
-        default: "",
+        default: null,
       },
       {
         key: "startedAt",
         label: "StartedAt",
-        default: "",
+        default: null,
       },
       {
         key: "actionAt",
         label: "ActionAt",
-        default: "",
+        default: null,
       },
       {
         key: "comments",
         label: "Comments",
-        default: "",
+        default: null,
       },
       {
         key: "isEditable",
@@ -152,7 +152,7 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "source",
         label: "Source",
-        default: "",
+        default: null,
       },
       {
         key: "isRequired",
@@ -167,46 +167,46 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "instanceId",
         label: "InstanceId",
-        default: "",
+        default: null,
       },
       {
         key: "stepTemplateId",
         label: "StepTemplateId",
-        default: "",
+        default: null,
       },
       {
         key: "stepNumber",
         label: "StepNumber",
-        default: 0,
+        default: null,
       },
       {
         key: "statusId",
         label: "StatusId",
-        default: "",
+        default: null,
       },
       {
         key: "assignedToUserId",
         label: "AssignedToUserId",
-        default: "",
+        default: null,
       },
       {
         key: "startedAt",
         label: "StartedAt",
-        default: "",
+        default: null,
       },
       {
         key: "actionAt",
         label: "ActionAt",
-        default: "",
+        default: null,
       },
       {
         key: "comments",
         label: "Comments",
-        default: "",
+        default: null,
       },
       {
         key: "isEditable",
@@ -216,7 +216,7 @@ const previewColumnsUpdate: PreviewColumn<Model>[] = [
       {
         key: "source",
         label: "Source",
-        default: "",
+        default: null,
       },
       {
         key: "isRequired",
@@ -266,36 +266,36 @@ export const workFlowInstanceStep = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            instanceId: row.instanceId,
-            stepTemplateId: row.stepTemplateId,
-            stepNumber: row.stepNumber,
-            statusId: row.statusId,
-            assignedToUserId: row.assignedToUserId,
-            startedAt: row.startedAt,
-            actionAt: row.actionAt,
-            comments: row.comments,
-            isEditable: row.isEditable,
-            source: row.source,
-            isRequired: row.isRequired,
-            isActive: row.isActive,
+            instanceId: row.instanceId ? String(row.instanceId) : null,
+            stepTemplateId: row.stepTemplateId ? String(row.stepTemplateId) : null,
+            stepNumber: row.stepNumber ? Number(row.stepNumber) : null,
+            statusId: row.statusId ? String(row.statusId) : null,
+            assignedToUserId: row.assignedToUserId ? String(row.assignedToUserId) : null,
+            startedAt: row.startedAt ? new Date(row.startedAt) : null,
+            actionAt: row.actionAt ? new Date(row.actionAt) : null,
+            comments: row.comments ? String(row.comments) : null,
+            isEditable: row.isEditable != null ? Boolean(row.isEditable) : null,
+            source: row.source ? String(row.source) : null,
+            isRequired: row.isRequired != null ? Boolean(row.isRequired) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            instanceId: row.instanceId,
-            stepTemplateId: row.stepTemplateId,
-            stepNumber: row.stepNumber,
-            statusId: row.statusId,
-            assignedToUserId: row.assignedToUserId,
-            startedAt: row.startedAt,
-            actionAt: row.actionAt,
-            comments: row.comments,
-            isEditable: row.isEditable,
-            source: row.source,
-            isRequired: row.isRequired,
-            isActive: row.isActive,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            instanceId: row.instanceId ? String(row.instanceId) : null,
+            stepTemplateId: row.stepTemplateId ? String(row.stepTemplateId) : null,
+            stepNumber: row.stepNumber ? Number(row.stepNumber) : null,
+            statusId: row.statusId ? String(row.statusId) : null,
+            assignedToUserId: row.assignedToUserId ? String(row.assignedToUserId) : null,
+            startedAt: row.startedAt ? new Date(row.startedAt) : null,
+            actionAt: row.actionAt ? new Date(row.actionAt) : null,
+            comments: row.comments ? String(row.comments) : null,
+            isEditable: row.isEditable != null ? Boolean(row.isEditable) : null,
+            source: row.source ? String(row.source) : null,
+            isRequired: row.isRequired != null ? Boolean(row.isRequired) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 

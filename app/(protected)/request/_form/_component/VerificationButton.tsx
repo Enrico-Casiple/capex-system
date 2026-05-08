@@ -6,6 +6,7 @@ import { modelGQL } from '@/lib/api/crud.gql'
 import { CapitalRecoveryFactorFindUnique } from '@/lib/api/gql/CapitalRecoveryFactor.gql'
 import { BudgetResponse, CapitalRecoveryFactorResponse, RequestResponse } from '@/lib/generated/api/customHookAPI/graphql'
 import { generate_code } from '@/lib/util/bcryptjs'
+import { buildRefCode } from '@/lib/util/generateOtpCode'
 import { useQuery } from '@apollo/client/react'
 import { connect } from 'http2'
 import { CheckCircle2Icon, PackagePlus, RefreshCcwIcon } from 'lucide-react'
@@ -44,8 +45,24 @@ const VerificationButton = ({
   })
 
   const currentDate = new Date();
-  const yearComplete = currentDate.getFullYear().toString()
-  const budgetNumberPrefix = `${yearComplete}AX-${crfFindUniqueQuery.data?.CapitalRecoveryFactorFindUnique.data?.company?.acronym}-${generate_code(5)}`;
+  const yearComplete = currentDate.getFullYear().toString();
+  const statusCode = 'AX'; // or determine dynamically
+
+  // Use buildRefCode instead
+  const [budgetNumberPrefix, setBudgetNumberPrefix] = React.useState<string>('');
+
+  React.useEffect(() => {
+    const generatePrefix = async () => {
+      const prefix = await buildRefCode({
+        yearCode: yearComplete,
+        statusCode,
+        companyAcronym: crfFindUniqueQuery.data?.CapitalRecoveryFactorFindUnique.data?.company?.acronym,
+        fallbackName: crfFindUniqueQuery.data?.CapitalRecoveryFactorFindUnique.data?.company?.name,
+      });
+      setBudgetNumberPrefix(prefix);
+    };
+    generatePrefix();
+  }, [crfFindUniqueQuery.data]);
 
 
   const { execute: executeCreate, executing: executingCreate } = useMutationActions({

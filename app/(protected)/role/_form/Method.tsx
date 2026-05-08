@@ -1,5 +1,5 @@
 import { ActionType, PopupType } from '@/app/_component/Row/Action';
-import RoleMethodForm from '@/lib/components/RoleMethodForm';
+import RoleMethodForm from '../_components/RoleMethodForm';
 
 type MethodProps = {
   rowId?: string | null;

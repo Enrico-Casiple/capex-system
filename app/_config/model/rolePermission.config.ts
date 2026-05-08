@@ -59,17 +59,17 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "roleId",
         label: "RoleId",
-        default: "",
+        default: null,
       },
       {
         key: "permissionId",
         label: "PermissionId",
-        default: "",
+        default: null,
       },
       {
         key: "scopeValues",
         label: "ScopeValues",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -79,21 +79,21 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "roleId",
         label: "RoleId",
-        default: "",
+        default: null,
       },
       {
         key: "permissionId",
         label: "PermissionId",
-        default: "",
+        default: null,
       },
       {
         key: "scopeValues",
         label: "ScopeValues",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -130,20 +130,20 @@ export const rolePermission = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            roleId: row.roleId,
-            permissionId: row.permissionId,
-            scopeValues: row.scopeValues,
-            isActive: row.isActive,
+            roleId: row.roleId ? String(row.roleId) : null,
+            permissionId: row.permissionId ? String(row.permissionId) : null,
+            scopeValues: row.scopeValues ? String(row.scopeValues) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            roleId: row.roleId,
-            permissionId: row.permissionId,
-            scopeValues: row.scopeValues,
-            isActive: row.isActive,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            roleId: row.roleId ? String(row.roleId) : null,
+            permissionId: row.permissionId ? String(row.permissionId) : null,
+            scopeValues: row.scopeValues ? String(row.scopeValues) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 

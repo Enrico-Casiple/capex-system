@@ -506,6 +506,28 @@ fragment AuditLogFragment on AuditLog {
     updatedAt
     inventoryItemId
   }
+  capitalRecoveryFactor {
+    id
+    name
+    description
+    crfReferenceNo
+    statusId
+    companyId
+    departmentId
+    categoryId
+    utilizedBudget
+    approvedAmount
+    requestedAmount
+    newBalanceAmmount
+    projectedBudget
+    remark
+    remainingAmount
+    requestId
+    budgetId
+    isActive
+    createdAt
+    updatedAt
+  }
   inventoryItem {
     id
     name

@@ -1,15 +1,14 @@
-// app/_component/RoleGate/RoleGate.tsx
 'use client';
 
-import { Spinner } from '@/app/_component/Spinner';
 import useUserRolePermission from '@/app/_hooks/useUserRolePermission';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState, useRef } from 'react';
+import { Spinner } from '../Spinner';
 
 type UnauthorizedStyle = 'default' | 'compact' | 'minimal' | 'card';
 
 interface RoleGateProps {
   module: string | string[];
-  resource: string | string[];
+  // resource: string | string[];
   action: string | string[];
   children: ReactNode;
   fallback?: ReactNode;
@@ -21,7 +20,7 @@ interface RoleGateProps {
 
 const RoleGate = ({
   module,
-  resource,
+  // resource,
   action,
   children,
   fallback,
@@ -31,27 +30,33 @@ const RoleGate = ({
   disableRedirect = false,
 }: RoleGateProps) => {
   const modules = Array.isArray(module) ? module : [module];
-  const resources = Array.isArray(resource) ? resource : [resource];
+  // const resources = Array.isArray(resource) ? resource : [resource];
   const actions = Array.isArray(action) ? action : [action];
 
   const { can, loading } = useUserRolePermission();
-  const hasPermission = can(modules, resources, actions);
+  const hasPermission = can(modules, actions);
 
   const [countdown, setCountdown] = useState(redirectDelay);
+  const isInitialized = useRef(false);
+
+  // Only show loading on initial mount
+  useEffect(() => {
+    if (!loading && !isInitialized.current) {
+      isInitialized.current = true;
+    }
+  }, [loading]);
 
   // Reset countdown when redirectDelay changes
   useEffect(() => {
     setCountdown(redirectDelay);
   }, [redirectDelay]);
 
-  // Handle countdown and redirect - only for read actions
+  // Handle countdown and redirect
   useEffect(() => {
-    // Check if action includes 'read'
     const isReadAction = Array.isArray(action)
       ? action.includes('read')
       : action === 'read';
 
-    // Only redirect if it's a read action without permission
     if (loading || hasPermission || disableRedirect || fallback || !isReadAction) {
       return;
     }
@@ -63,33 +68,30 @@ const RoleGate = ({
     const timer = setTimeout(() => {
       setCountdown((prev) => {
         const next = prev - 1;
-        if (next <= 0) {
-          return 0;
-        }
-        return next;
+        return next <= 0 ? 0 : next;
       });
     }, 1000);
 
     return () => clearTimeout(timer);
   }, [loading, hasPermission, disableRedirect, fallback, countdown, redirectTo, action]);
-  if (loading) {
+
+  // Return null on initial loading only
+  if (loading && !isInitialized.current) {
     return <Spinner />;
   }
 
   if (!hasPermission) {
     if (fallback) return <>{fallback}</>;
 
-    // Check if action includes 'read' - handles both string and array
     const isReadAction = Array.isArray(action)
       ? action.includes('read')
       : action === 'read';
 
-    // Only show UI for read action, otherwise return null silently
     if (!isReadAction) {
       return null;
     }
 
-    // Render based on style for read actions only
+    // ...existing switch statement for styles...
     switch (style) {
       case 'compact':
         return (
@@ -119,15 +121,13 @@ const RoleGate = ({
                 </p>
                 {!disableRedirect && (
                   <p className="text-xs text-gray-500">
-                    Redirecting in <span className="font-semibold text-red-600">{countdown}</span>{' '}
-                    seconds...
+                    Redirecting in <span className="font-semibold text-red-600">{countdown}</span> seconds...
                   </p>
                 )}
               </div>
             </div>
           </div>
         );
-
       case 'minimal':
         return (
           <div className="flex items-center justify-center h-[80vh] w-screen p-4">
@@ -161,58 +161,6 @@ const RoleGate = ({
             </div>
           </div>
         );
-
-      case 'card':
-        return (
-          <div className="flex items-center justify-center p-4 min-h-[80vh] w-full">
-            <div className="relative overflow-hidden rounded-2xl bg-white shadow-xl border border-gray-100 max-w-sm w-full">
-              <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-orange-500/5 to-yellow-500/5"></div>
-              <div className="relative p-8 text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-red-100 to-orange-100 mb-4">
-                  <svg
-                    className="w-8 h-8 text-red-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">Permission Required</h3>
-                <p className="text-sm text-gray-600 leading-relaxed mb-4">
-                  You do not have permission to access this resource.
-                </p>
-
-                {!disableRedirect && (
-                  <div className="mb-4">
-                    <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                      <div
-                        className="bg-gradient-to-r from-red-500 to-orange-500 h-2 transition-all duration-1000 ease-linear"
-                        style={{ width: `${(countdown / redirectDelay) * 100}%` }}
-                      ></div>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-2">
-                      Redirecting in <span className="font-bold text-red-600">{countdown}</span>{' '}
-                      seconds
-                    </p>
-                  </div>
-                )}
-
-                <div className="mt-6 pt-6 border-t border-gray-100">
-                  <p className="text-xs text-gray-500">
-                    💡 Contact your administrator to request access
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
       default:
         return (
           <div className="flex items-center justify-center h-[80vh] w-full p-4">
@@ -237,7 +185,6 @@ const RoleGate = ({
                 <p className="text-gray-600 mb-6">
                   You do not have permission to access this resource.
                 </p>
-
                 {!disableRedirect && (
                   <>
                     <div className="flex items-center justify-center mb-6">
@@ -273,18 +220,6 @@ const RoleGate = ({
                     <p className="text-sm text-gray-500 mb-4">Redirecting to home page...</p>
                   </>
                 )}
-
-                <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  <span>Contact your administrator for access</span>
-                </div>
               </div>
             </div>
           </div>
@@ -292,11 +227,7 @@ const RoleGate = ({
     }
   }
 
-  return (
-    <React.Fragment>
-      {children}
-    </React.Fragment>
-  );
+  return <React.Fragment>{children}</React.Fragment>;
 };
 
 export default RoleGate;

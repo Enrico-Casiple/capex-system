@@ -1,21 +1,28 @@
+'use client';
+
 import { ActionType, PopupType } from '@/app/_component/Row/Action';
-import { useListContext } from '@/app/_context/ListContext/ListProvider';
-import useMutationActions from '@/app/_hooks/useBulkActions';
 import FormTemplate from '@/components/Forms/FormTemplate';
-import CustomStaticSelectInput from '@/components/Forms/Inputs/CustomStaticSelectInput';
-import CustomTextInput from '@/components/Forms/Inputs/CustomTextInput';
+
 import { Button } from '@/components/ui/button';
 import { DrawerClose } from '@/components/ui/drawer';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { modelGQL } from '@/lib/api/crud.gql';
 import { UserFindUnique } from '@/lib/api/gql/User.gql';
-import { User, UserResponse } from '@/lib/generated/api/customHookAPI/graphql';
-import { ok } from '@/lib/util/reponseUtil';
+import { UserResponse } from '@/lib/generated/api/customHookAPI/graphql';
+import { fail, ok } from '@/lib/util/reponseUtil';
 import { useQuery } from '@apollo/client/react';
-import { Layers } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import React, { useEffect } from "react";
+import React, { lazy, Suspense, useCallback, useEffect, useMemo } from "react";
+import handleToSubmitToCreate from './action/handleToSubmitToCreate';
+import useToast from '@/app/_hooks/useToast';
 import { useForm } from 'react-hook-form';
+
+// Lazy load components
+const BasicInformationCreate = lazy(() => import('./components/BasicInformationCreate'));
+const WorkInformationCreate = lazy(() => import('./components/WorkInformationCreate'));
+const UserCreate = lazy(() => import('./components/UserCreate'));
+const UserRoleCreate = lazy(() => import('./components/UserRoleCreate'));
+
 type MethodProps = {
   rowId?: string | null;
   actionType?: ActionType;
@@ -24,16 +31,17 @@ type MethodProps = {
   setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-type UserFormValues = {
+export type UserFormValues = {
   id: string;
   name: string;
   email: string;
   password: string;
+  confirmPassword: string;
   userName: string;
   emailVerified: string;
   image: string;
   isTwoFactorAuthEnabled: boolean;
-  userRoles: { userId: string; roleId: string }[];
+  userRoles: { roleId: string }[];
   basicInformations: {
     id: string;
     firstName: string;
@@ -58,11 +66,61 @@ type UserFormValues = {
   };
 };
 
-const modelAPI = modelGQL;
+const DEFAULT_VALUES: UserFormValues = {
+  id: "",
+  name: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+  userName: "",
+  emailVerified: "",
+  image: "",
+  isTwoFactorAuthEnabled: true,
+  userRoles: [{
+    roleId: "",
+  }],
+  basicInformations: {
+    id: "",
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    suffix: "",
+    fullName: "",
+    birthDate: "",
+    gender: "",
+    workInformations: [{
+      id: "",
+      employeeNumber: "",
+      groupOfCompanyId: "",
+      companyId: "",
+      departmentId: "",
+      positionId: "",
+      jobLevelId: "",
+      employmentTypeId: "",
+      employmentStatusId: "",
+      reportingManagerId: "",
+    }]
+  }
+};
+
+// Loading skeleton component
+const FormSectionLoader = () => (
+  <div className='py-6 px-4'>
+    <div className='space-y-4'>
+      <div className='h-4 bg-muted rounded w-1/4'></div>
+      <div className='h-10 bg-muted rounded'></div>
+      <div className='h-10 bg-muted rounded'></div>
+    </div>
+  </div>
+);
+
+
 
 const Method = (props: MethodProps) => {
-  const { model } = useListContext();
   const session = useSession();
+  const toast = useToast();
+  const [loading, setLoading] = React.useState(false);
+  const [hasInitialized, setHasInitialized] = React.useState(false);
 
   const userFindUnique = useQuery<
     { UserFindUnique: UserResponse },
@@ -72,70 +130,37 @@ const Method = (props: MethodProps) => {
       id: props.rowId ?? "",
     },
     skip: !props.rowId || props.actionType === "none",
-  })
-
-  const normalizeUserRoles = (
-    userRoles?: Array<{ userId?: string | null; roleId?: string | null } | null>,
-  ): UserFormValues['userRoles'] =>
-    userRoles?.map((userRole) => ({
-      userId: userRole?.userId ?? '',
-      roleId: userRole?.roleId ?? '',
-    })) ?? [
-      {
-        userId: '',
-        roleId: '',
-      },
-    ];
-
-  const defaultValues = {
-    id: "",
-    name: "",
-    email: "",
-    password: "",
-    userName: "",
-    emailVerified: "",
-    image: "",
-    isTwoFactorAuthEnabled: true,
-    userRoles: [{
-      userId: "",
-      roleId: "",
-    }],
-    basicInformations: {
-      id: "",
-      firstName: "",
-      middleName: "",
-      lastName: "",
-      suffix: "",
-      fullName: "",
-      birthDate: "",
-      gender: "",
-      workInformations: [{
-        id: "",
-        employeeNumber: "",
-        groupOfCompanyId: "",
-        companyId: "",
-        departmentId: "",
-        positionId: "",
-        jobLevelId: "",
-        employmentTypeId: "",
-        employmentStatusId: "",
-        reportingManagerId: "",
-      }]
-    }
-  };
-
-  const form = useForm<UserFormValues>({
-    defaultValues,
   });
 
+  const normalizeUserRoles = useCallback(
+    (userRoles?: Array<{ roleId?: string | null } | null>): UserFormValues['userRoles'] =>
+      userRoles?.map((userRole) => ({
+        roleId: userRole?.roleId ?? '',
+      })) ?? [{
+        roleId: '',
+      }],
+    []
+  );
+
+  const form = useForm<UserFormValues>({
+    defaultValues: DEFAULT_VALUES,
+  });
+
+  // Initialize form only once when data is fetched
   useEffect(() => {
-    if (props.actionType !== "none" && userFindUnique.data?.UserFindUnique.data) {
+    if (
+      !hasInitialized &&
+      props.actionType !== "none" &&
+      userFindUnique.data?.UserFindUnique.data
+    ) {
       const data = userFindUnique.data.UserFindUnique.data;
+
       form.reset({
         id: data.id ?? "",
         name: data.name ?? "",
         email: data.email ?? "",
         password: data.password ?? "",
+        confirmPassword: "",
         userName: data.userName ?? "",
         emailVerified: data.emailVerified ?? "",
         image: data.image ?? "",
@@ -175,72 +200,71 @@ const Method = (props: MethodProps) => {
           }]
         }
       });
+
+      setHasInitialized(true);
     }
-  }, [userFindUnique.data, props.actionType, form]);
+  }, [userFindUnique.data?.UserFindUnique.data?.id, props.actionType, hasInitialized, normalizeUserRoles, form]);
 
-
-
-  const { execute: executeCreate, executing: executingCreate } = useMutationActions({
-    mutationGQL: modelAPI[model].create,
-    setOpen: props.setOpen,
-    successMessage: 'Create Workflow Template Successfully',
-    successDescription: `The workflow template has been created successfully.`,
-    errorMessage: 'Create Workflow Template Failed',
-    errorDescription: `There was an error creating the workflow template. Please try again.`,
-  });
-
-
-  const { execute: executeUpdate, executing: executingUpdate } = useMutationActions({
-    mutationGQL: modelAPI[model].update,
-    setOpen: props.setOpen,
-    successMessage: 'Update Workflow Template Successfully',
-    successDescription: `The workflow template has been updated successfully.`,
-    errorMessage: 'Update Workflow Template Failed',
-    errorDescription: `There was an error updating the workflow template. Please try again.`,
-  });
+  // Reset initialization flag when rowId changes
+  useEffect(() => {
+    setHasInitialized(false);
+  }, [props.rowId]);
 
   const handleToSubmit = async (data: unknown) => {
-    const modelData = data as unknown as User;
+    try {
+      setLoading(true);
 
+      const result = await handleToSubmitToCreate(
+        data,
+        props.actionType!,
+        session.data?.user?.id!,
+        props.rowId ?? ""
+      );
 
-    switch (props.actionType) {
-      case 'edit':
-        await executeUpdate({
-          variables: {
-            id: props.rowId ?? "",
-            data: {},
-            currentUserId: session?.data?.user?.id,
-          }
-        })
-        return ok("SUCCESS_UPDATE_WORKFLOW_TEMPLATE",
-          `Successfully updated workflow template: ${modelData.name}`,
-          data
-        );
-      case "duplicate":
-        await executeCreate({
-          variables: {
-            data: {},
-            currentUserId: session?.data?.user?.id,
-          }
-        })
-        return ok("SUCCESS_DUPLICATE_WORKFLOW_TEMPLATE",
-          `Successfully duplicated workflow template: ${modelData.name}`,
-          data
-        );
-      default:
-        await executeCreate({
-          variables: {
-            data: {},
-            currentUserId: session?.data?.user?.id,
-          }
-        })
-        return ok("SUCCESS_CREATE_WORKFLOW_TEMPLATE",
-          `Successfully created workflow template: ${modelData.name}`,
-          data
-        );
+      if (!result.isSuccess) {
+        toast.error({
+          message: result.code,
+          description: result.message
+        });
+        setLoading(false);
+        return fail(result.code, result.message);
+      }
+
+      toast.success({
+        message: result.code,
+        description: result.message
+      });
+
+      // Reset form state when closing
+      setHasInitialized(false);
+      props.setOpen?.(false);
+
+      setLoading(false);
+      return ok(result.code, result.message, result.data);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast.error({
+        message: 'ERROR',
+        description: error instanceof Error ? error.message : 'An unexpected error occurred'
+      });
+      setLoading(false);
+      return fail('ERROR', 'An unexpected error occurred');
     }
   };
 
+  const isViewMode = useMemo(() => props.actionType === "view", [props.actionType]);
+
+  // Memoized user data to prevent unnecessary re-renders
+  const userData = useMemo(() => ({
+    isActive: userFindUnique.data?.UserFindUnique.data?.isActive,
+    isTwoFactorAuthEnabled: userFindUnique.data?.UserFindUnique.data?.isTwoFactorAuthEnabled,
+  }), [userFindUnique.data?.UserFindUnique.data?.isActive, userFindUnique.data?.UserFindUnique.data?.isTwoFactorAuthEnabled]);
+
+  const memoUserRoleCreate = useMemo(
+    () => <UserRoleCreate isViewMode={isViewMode} form={form} />,
+    // these should be the minimal stable deps
+    [isViewMode, form]
+  );
   return (
     <FormTemplate
       title=""
@@ -251,183 +275,58 @@ const Method = (props: MethodProps) => {
       isFullWidth={true}
     >
       <div className='flex flex-col gap-6 -mt-5 overflow-hidden'>
-        {/* {JSON.stringify(userFindUnique.data?.UserFindUnique.data, null, 2)} */}
         <ScrollArea className='h-[calc(100vh-210px)]'>
-          <div className="space-y-6">
-            {/* Header section with Icon */}
-            <div className="flex items-center gap-3 pb-2 border-b">
-              <div className="p-2 bg-primary/10 rounded-lg text-primary">
-                <Layers className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold uppercase tracking-tight text-slate-700">Basic Information Configuration</h3>
-                <p className="text-xs text-muted-foreground">
-                  Configure the basic information of the workflow template, including its name, description, and global applicability.
-                </p>
-              </div>
-            </div>
-            {/* Form section with Icon */}
-            <div className='grid grid-cols-1 gap-4'>
-              <div className='grid grid-cols-10 gap-4'>
-                <div className='col-span-3'>
-                  <CustomTextInput
-                    name="basicInformations.firstName"
-                    control={form.control}
-                    label="First Name"
-                    placeholder="Please enter first name"
-                  />
-                </div>
-                <div className='col-span-3'>
-                  <CustomTextInput
-                    name="basicInformations.middleName"
-                    control={form.control}
-                    label="Middle Name"
-                    placeholder="Please enter middle name"
-                  />
-                </div>
-                <div className='col-span-3'>
-                  <CustomTextInput
-                    name="basicInformations.lastName"
-                    control={form.control}
-                    label="Last Name"
-                    placeholder="Please enter last name"
-                  />
-                </div>
-                <div className='col-span-1'>
-                  <CustomStaticSelectInput
-                    name={`basicInformations.suffix`}
-                    control={form.control}
-                    label="Suffix"
-                    options={[
-                      {
-                        label: "Junior",
-                        value: "Jr."
-                      },
-                      {
-                        label: "Senior",
-                        value: "Sr."
-                      },
-                      {
-                        label: "The Second",
-                        value: "II."
-                      },
-                      {
-                        label: "The Third",
-                        value: "III."
-                      },
-                    ]}
-                    placeholder="Select suffix"
-                  />
-                </div>
-              </div>
-              <div className='grid grid-cols-2 gap-4'>
-                <div className='col-span-1'>
-                  <CustomTextInput
-                    name="basicInformations.fullName"
-                    control={form.control}
-                    label="Full Name"
-                    placeholder="Please enter full name"
-                  />
-                </div>
-                <div className='col-span-1'>
-                  <CustomStaticSelectInput
-                    name={`basicInformations.gender`}
-                    control={form.control}
-                    label="Gender"
-                    options={[
-                      {
-                        label: "Male",
-                        value: "Male."
-                      },
-                      {
-                        label: "Female",
-                        value: "Female."
-                      },
-                      {
-                        label: "Other",
-                        value: "Other."
-                      },
-                    ]}
-                    placeholder="Select gender"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="space-y-6">
-            {/* Header section with Icon */}
-            <div className="flex items-center gap-3 pb-2 border-b">
-              <div className="p-2 bg-primary/10 rounded-lg text-primary">
-                <Layers className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold uppercase tracking-tight text-slate-700">Work Information Configuration</h3>
-                <p className="text-xs text-muted-foreground">
-                  Configure the work information of the workflow template, including its name, description, and global applicability.
-                </p>
-              </div>
-            </div>
-            {/* Form section with Icon */}
-            <div className='grid grid-cols-1'></div>
-          </div>
-          <div className="space-y-6">
-            {/* Header section with Icon */}
-            <div className="flex items-center gap-3 pb-2 border-b">
-              <div className="p-2 bg-primary/10 rounded-lg text-primary">
-                <Layers className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold uppercase tracking-tight text-slate-700">User Account Configuration</h3>
-                <p className="text-xs text-muted-foreground">
-                  Configure the user account of the workflow template, including its name, description, and global applicability.
-                </p>
-              </div>
-            </div>
+          {/* BASIC INFO */}
+          <Suspense fallback={<FormSectionLoader />}>
+            <BasicInformationCreate isViewMode={isViewMode} form={form} />
+          </Suspense>
 
-          </div>
-          <div className="space-y-6">
-            {/* Header section with Icon */}
-            <div className="flex items-center gap-3 pb-2 border-b">
-              <div className="p-2 bg-primary/10 rounded-lg text-primary">
-                <Layers className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold uppercase tracking-tight text-slate-700">User Role Configuration</h3>
-                <p className="text-xs text-muted-foreground">
-                  Configure the user role of the workflow template, including its name, description, and global applicability.
-                </p>
-              </div>
-            </div>
+          {/* WORK INFO */}
+          <Suspense fallback={<FormSectionLoader />}>
+            <WorkInformationCreate isViewMode={isViewMode} form={form} />
+          </Suspense>
 
-          </div>
+          {/* USER ACCOUNT */}
+          <Suspense fallback={<FormSectionLoader />}>
+            <UserCreate
+              isViewMode={isViewMode}
+              form={form}
+              actionType={props.actionType}
+              id={props.rowId!}
+              setOpen={props.setOpen!}
+              isBlocked={userData.isActive!}
+              isAuth={userData.isTwoFactorAuthEnabled!}
+            />
+          </Suspense>
+
+          {/* ROLE */}
+          <Suspense fallback={<FormSectionLoader />}>
+            {memoUserRoleCreate}
+          </Suspense>
         </ScrollArea>
+
         {/* Action Buttons - Fixed at Bottom */}
-        {
-          props.actionType === "view" ? null : (
-
-            <div className='flex gap-3 justify-end bg-background border-t pt-4'>
-              <DrawerClose asChild>
-                <Button
-                  variant='outline'
-                  disabled={executingCreate || executingUpdate}
-                  className={`px-8 ${(executingCreate || executingUpdate) ? 'cursor-not-allowed' : ''}`}
-                  type='button'
-                >
-                  Cancel
-                </Button>
-              </DrawerClose>
-              <Button type='submit'
-                className={`px-8 ${(executingCreate || executingUpdate) ? 'cursor-not-allowed' : ''}`}
-                disabled={executingCreate || executingUpdate}
-
+        {props.actionType === "view" ? null : (
+          <div className='flex gap-3 justify-end bg-background border-t pt-4'>
+            <DrawerClose asChild>
+              <Button
+                variant='outline'
+                disabled={loading}
+                className={`px-8 ${loading ? 'cursor-not-allowed' : ''}`}
+                type='button'
               >
-                {
-                  (executingCreate || executingUpdate) ? 'Submit...' : 'Submit'
-                }
+                Cancel
               </Button>
-            </div>
-          )
-        }
+            </DrawerClose>
+            <Button
+              type='submit'
+              className={`px-8 ${loading ? 'cursor-not-allowed' : ''}`}
+              disabled={loading}
+            >
+              {loading ? 'Submit...' : 'Submit'}
+            </Button>
+          </div>
+        )}
       </div>
     </FormTemplate>
   );

@@ -5,25 +5,25 @@ import ImportUpdate from '@/app/_component/List/ImportUpdate';
 import ModelData from '@/app/_component/ModelData';
 import Action, { ActionType, PopupType } from '@/app/_component/Row/Action';
 import { Spinner } from '@/app/_component/Spinner';
-import { jobLevelTableConfig } from '@/app/_config';
 import ListPage from '@/app/_context/ListWrapper';
-import { JobLevel, JobLevelCreateInput, JobLevelUpdateInput } from '@/lib/generated/api/customHookAPI/graphql';
 import dynamic from 'next/dynamic';
 import { useCallback } from 'react';
 import ExportForm from './_form/ExportForm';
 import ImportForm from './_form/ImportForm';
 import ImportUpdateForm from './_form/ImportUpdateForm';
+import { shiftingScheduleTableConfig } from '@/app/_config';
+import { ShiftingSchedule, ShiftingScheduleCreateInput, ShiftingScheduleUpdateInput } from '@/lib/generated/api/customHookAPI/graphql';
+
 
 const Method = dynamic(() => import('./_form/Method'), {
   loading: () => <Spinner />,
-  ssr: false
+  ssr: false,
 });
 
 const ModelPage = () => {
-  type ModelRequest = JobLevel;
-  type ModelCreateInput = JobLevelCreateInput;
-  type ModelUpdateInput = JobLevelUpdateInput;
-
+  type ModelRequest = ShiftingSchedule;
+  type ModelCreateInput = ShiftingScheduleCreateInput;
+  type ModelUpdateInput = ShiftingScheduleUpdateInput;
 
   const {
     modelName,
@@ -41,80 +41,46 @@ const ModelPage = () => {
     previewColumnsUpdate,
     exportColumns,
     defaultExportColumns,
-  } = jobLevelTableConfig;
+  } = shiftingScheduleTableConfig;
 
   const renderMethod = useCallback(
-    (
-      rowId: string | null,
-      actionType: ActionType,
-      popupType: PopupType,
-      open?: boolean,
-      setOpen?: React.Dispatch<React.SetStateAction<boolean>>,
-    ) => (
-      <Method
-        rowId={rowId}
-        actionType={actionType}
-        popupType={popupType}
-        open={open}
-        setOpen={setOpen}
-      />
+    (rowId: string | null, actionType: ActionType, popupType: PopupType, open?: boolean, setOpen?: React.Dispatch<React.SetStateAction<boolean>>) => (
+      <Method rowId={rowId} actionType={actionType} popupType={popupType} open={open} setOpen={setOpen} />
     ),
-    [],
+    []
   );
 
   const actionComponent = useCallback(
     (row: ModelRequest) => <Action rowId={row.id} component={renderMethod} />,
-    [renderMethod],
+    [renderMethod]
   );
 
   const createAction = useCallback(
-    (
-      rowId: string | null,
-      actionType: ActionType,
-      popupType: PopupType,
-      open?: boolean,
-      setOpen?: React.Dispatch<React.SetStateAction<boolean>>,
-    ) => (
-      <Method
-        rowId={rowId}
-        actionType={actionType}
-        popupType={popupType}
-        open={open}
-        setOpen={setOpen}
-      />
+    (rowId: string | null, actionType: ActionType, popupType: PopupType, open?: boolean, setOpen?: React.Dispatch<React.SetStateAction<boolean>>) => (
+      <Method rowId={rowId} actionType={actionType} popupType={popupType} open={open} setOpen={setOpen} />
     ),
-    [],
+    []
   );
 
   const importForm = useCallback(
     (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (
-      <ImportForm<ModelRequest, ModelCreateInput>
-        open={open}
-        setOpen={setOpen}
-        transformRow={transformRowCreate}
-        previewColumns={previewColumnsCreate}
-      />
+      <ImportForm<ModelRequest, ModelCreateInput> open={open} setOpen={setOpen} transformRow={transformRowCreate} previewColumns={previewColumnsCreate} />
     ),
-    [transformRowCreate, previewColumnsCreate],
+    [transformRowCreate, previewColumnsCreate]
   );
 
   const updateForm = useCallback(
     (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (
-      <ImportUpdateForm<ModelRequest, ModelUpdateInput>
-        open={open}
-        setOpen={setOpen}
-        transformRow={transformRowUpdate}
-        previewColumns={previewColumnsUpdate}
-      />
+      <ImportUpdateForm<ModelRequest, ModelUpdateInput> open={open} setOpen={setOpen} transformRow={transformRowUpdate} previewColumns={previewColumnsUpdate} />
     ),
-    [transformRowUpdate, previewColumnsUpdate],
+    [transformRowUpdate, previewColumnsUpdate]
   );
 
   const exportForm = useCallback(
     (open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>>) => (
       <ExportForm open={open} setOpen={setOpen} exportColumns={exportColumns} defaultSelectedColumns={defaultExportColumns} />
     ),
-    [defaultExportColumns, exportColumns],
+    [defaultExportColumns, exportColumns]
   );
 
   return (

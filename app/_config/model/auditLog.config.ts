@@ -101,47 +101,47 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "modelId",
         label: "ModelId",
-        default: "",
+        default: null,
       },
       {
         key: "modelName",
         label: "ModelName",
-        default: "",
+        default: null,
       },
       {
         key: "action",
         label: "Action",
-        default: "",
+        default: null,
       },
       {
         key: "actionTypeId",
         label: "ActionTypeId",
-        default: "",
+        default: null,
       },
       {
         key: "timestamp",
         label: "Timestamp",
-        default: "",
+        default: null,
       },
       {
         key: "actorId",
         label: "ActorId",
-        default: "",
+        default: null,
       },
       {
         key: "oldDetails",
         label: "OldDetails",
-        default: {} as Record<string, unknown>,
+        default: null,
       },
       {
         key: "newDetails",
         label: "NewDetails",
-        default: {} as Record<string, unknown>,
+        default: null,
       },
       {
         key: "parentId",
         label: "ParentId",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -151,56 +151,56 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "inventoryItemId",
         label: "InventoryItemId",
-        default: "",
+        default: null,
       }
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "modelId",
         label: "ModelId",
-        default: "",
+        default: null,
       },
       {
         key: "modelName",
         label: "ModelName",
-        default: "",
+        default: null,
       },
       {
         key: "action",
         label: "Action",
-        default: "",
+        default: null,
       },
       {
         key: "actionTypeId",
         label: "ActionTypeId",
-        default: "",
+        default: null,
       },
       {
         key: "timestamp",
         label: "Timestamp",
-        default: "",
+        default: null,
       },
       {
         key: "actorId",
         label: "ActorId",
-        default: "",
+        default: null,
       },
       {
         key: "oldDetails",
         label: "OldDetails",
-        default: {} as Record<string, unknown>,
+        default: null,
       },
       {
         key: "newDetails",
         label: "NewDetails",
-        default: {} as Record<string, unknown>,
+        default: null,
       },
       {
         key: "parentId",
         label: "ParentId",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -210,7 +210,7 @@ const previewColumnsUpdate: PreviewColumn<Model>[] = [
       {
         key: "inventoryItemId",
         label: "InventoryItemId",
-        default: "",
+        default: null,
       }
 ];
 
@@ -249,34 +249,34 @@ export const auditLog = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            modelId: row.modelId,
-            modelName: row.modelName,
-            action: row.action,
-            actionTypeId: row.actionTypeId,
-            timestamp: row.timestamp,
-            actorId: row.actorId,
-            oldDetails: row.oldDetails,
-            newDetails: row.newDetails,
-            parentId: row.parentId,
-            isActive: row.isActive,
-            inventoryItemId: row.inventoryItemId,
+            modelId: row.modelId ? String(row.modelId) : null,
+            modelName: row.modelName ? String(row.modelName) : null,
+            action: row.action ? String(row.action) : null,
+            actionTypeId: row.actionTypeId ? String(row.actionTypeId) : null,
+            timestamp: row.timestamp ? new Date(row.timestamp) : null,
+            actorId: row.actorId ? String(row.actorId) : null,
+            oldDetails: row.oldDetails ? JSON.stringify(row.oldDetails) : null,
+            newDetails: row.newDetails ? JSON.stringify(row.newDetails) : null,
+            parentId: row.parentId ? String(row.parentId) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
+            inventoryItemId: row.inventoryItemId ? String(row.inventoryItemId) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            modelId: row.modelId,
-            modelName: row.modelName,
-            action: row.action,
-            actionTypeId: row.actionTypeId,
-            timestamp: row.timestamp,
-            actorId: row.actorId,
-            oldDetails: row.oldDetails,
-            newDetails: row.newDetails,
-            parentId: row.parentId,
-            isActive: row.isActive,
-            inventoryItemId: row.inventoryItemId,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            modelId: row.modelId ? String(row.modelId) : null,
+            modelName: row.modelName ? String(row.modelName) : null,
+            action: row.action ? String(row.action) : null,
+            actionTypeId: row.actionTypeId ? String(row.actionTypeId) : null,
+            timestamp: row.timestamp ? new Date(row.timestamp) : null,
+            actorId: row.actorId ? String(row.actorId) : null,
+            oldDetails: row.oldDetails ? JSON.stringify(row.oldDetails) : null,
+            newDetails: row.newDetails ? JSON.stringify(row.newDetails) : null,
+            parentId: row.parentId ? String(row.parentId) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
+            inventoryItemId: row.inventoryItemId ? String(row.inventoryItemId) : null,
     };
   },
 

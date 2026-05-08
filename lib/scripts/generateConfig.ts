@@ -22,25 +22,21 @@ const existingFiles = readdirSync(outputDir).filter((f) => f.endsWith(".config.t
 const toConfigName = (modelName: string) =>
   modelName.charAt(0).toLowerCase() + modelName.slice(1)
 
-
 const defaultValueForField = (field: any) => {
   switch (field.type) {
+    case "Boolean":
+      return `false`
     case "String":
     case "DateTime":
     case "Bytes":
-      return `""`
-    case "Boolean":
-      return `false`
     case "Int":
     case "Float":
     case "Decimal":
-      return `0`
     case "BigInt":
-      return `0n`
     case "Json":
-      return `{} as Record<string, unknown>`
+    case "Enum":
     default:
-      return `""`
+      return `null`
   }
 }
 
@@ -60,6 +56,33 @@ export const getJSTypeFromPrisma = (prismaType: string): string => {
     Json: "object",
   }
   return typeMap[prismaType] || "string"
+}
+
+const transformValueForField = (field: any) => {
+  const value = `row.${field.name}`
+  const hasValue = `${value}`
+
+  switch (field.type) {
+    case "String":
+    case "Enum":
+      return `${hasValue} ? String(${value}) : null`
+    case "Int":
+    case "Float":
+    case "Decimal":
+      return `${hasValue} ? Number(${value}) : null`
+    case "BigInt":
+      return `${hasValue} ? BigInt(${value}) : null`
+    case "Boolean":
+      return `${value} != null ? Boolean(${value}) : null`
+    case "DateTime":
+      return `${hasValue} ? new Date(${value}) : null`
+    case "Json":
+      return `${hasValue} ? JSON.stringify(${value}) : null`
+    case "Bytes":
+      return `${hasValue} ? ${value} : null`
+    default:
+      return `${hasValue} ? ${value} : null`
+  }
 }
 
 const modelConfigContent = (modelName: string) => {
@@ -83,7 +106,7 @@ const modelConfigContent = (modelName: string) => {
 
   const previewColumnsUpdate = [
     fields.some((f: any) => f.name === "id")
-      ? `      { key: "id", label: "ID", default: "" }`
+      ? `      { key: "id", label: "ID", default: null }`
       : null,
     ...formFields.map(
       (field: any) => `      {
@@ -97,12 +120,20 @@ const modelConfigContent = (modelName: string) => {
     .join(",\n")
 
   const transformCreate = formFields
-    .map((field: any) => `            ${field.name}: row.${field.name},`)
+    .map(
+      (field: any) =>
+        `            ${field.name}: ${transformValueForField(field)},`,
+    )
     .join("\n")
 
   const transformUpdate = [
-    fields.some((f: any) => f.name === "id") ? `            id: row.id,` : null,
-    ...formFields.map((field: any) => `            ${field.name}: row.${field.name},`),
+    fields.some((f: any) => f.name === "id")
+      ? `            id: row.id != null && row.id !== "" ? String(row.id) : null,`
+      : null,
+    ...formFields.map(
+      (field: any) =>
+        `            ${field.name}: ${transformValueForField(field)},`,
+    ),
   ]
     .filter((item): item is string => item !== null)
     .join("\n")
@@ -202,6 +233,7 @@ ${transformUpdate}
 existingFiles.forEach((file) => {
   const modelName = file.replace(".config.ts", "")
   const activeFileNames = activeModels.map(toConfigName)
+
   if (!activeFileNames.includes(modelName)) {
     if (!force) {
       console.log(`Skipped deleting ${file} (use --force to remove)`)
@@ -217,8 +249,9 @@ activeModels.forEach((modelName) => {
   const filePath = `${outputDir}/${toConfigName(modelName)}.config.ts`
   const content = modelConfigContent(modelName)
   const prev = existsSync(filePath) ? readFileSync(filePath, "utf8") : ""
+  const existedBefore = existsSync(filePath)
 
-  if (existsSync(filePath) && !force) {
+  if (existedBefore && !force) {
     console.log(`Skipped ${modelName}.config.ts (existing file preserved; use --force to overwrite)`)
     return
   }
@@ -229,7 +262,7 @@ activeModels.forEach((modelName) => {
   }
 
   writeFileSync(filePath, content)
-  console.log(`${existsSync(filePath) ? "Updated" : "Generated"} ${modelName}.config.ts`)
+  console.log(`${existedBefore ? "Updated" : "Generated"} ${modelName}.config.ts`)
 })
 
 console.log(`Done - processed ${activeModels.length} models`)

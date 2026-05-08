@@ -5,7 +5,7 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Check, ChevronsUpDown } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 import { cn } from '@/lib/utils';
 
@@ -38,6 +38,8 @@ const CustomStaticSelectInput = <TFormValues extends FieldValues>({
 }: CustomStaticSelectInputProps<TFormValues>) => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   const filteredOptions = options.filter((opt) =>
     opt.label.toLowerCase().includes(search.toLowerCase()),
@@ -51,7 +53,7 @@ const CustomStaticSelectInput = <TFormValues extends FieldValues>({
         const selectedOption = options.find((opt) => opt.value === field.value);
 
         return (
-          <Field data-invalid={fieldState.invalid} >
+          <Field data-invalid={fieldState.invalid}>
             <FieldLabel htmlFor={String(name)}>
               {label}
               {required && <span className="text-destructive">*</span>}
@@ -59,6 +61,7 @@ const CustomStaticSelectInput = <TFormValues extends FieldValues>({
             <Popover open={open && !disabled} onOpenChange={(newOpen) => !disabled && setOpen(newOpen)}>
               <PopoverTrigger asChild>
                 <button
+                  ref={triggerRef}
                   id={String(name)}
                   disabled={disabled}
                   className={cn(
@@ -68,24 +71,34 @@ const CustomStaticSelectInput = <TFormValues extends FieldValues>({
                   onClick={() => !disabled && setOpen(!open)}
                 >
                   <span className={selectedOption ? '' : 'text-muted-foreground'}>
-                    {selectedOption ? selectedOption.label : placeholder}
+                    {selectedOption ? selectedOption.label : `Select ${label.toLowerCase()}...`}
                   </span>
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="w-full p-0 overflow-hidden" align="start">
-                <Command shouldFilter={false} className="w-full" >
+              <PopoverContent
+                className="p-0 overflow-visible"
+                align="start"
+                style={{ width: triggerRef.current?.offsetWidth }}
+              >
+                <Command shouldFilter={false} className="w-full">
                   {/* ─── Search Input ────────────────────────── */}
                   <div className="border-b w-full">
                     <Input
-                      placeholder={searchPlaceholder}
+                      placeholder={`Search ${label.toLowerCase()}...`}
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                       className="border-0 rounded-none focus-visible:ring-0 focus-visible:outline-none"
                     />
                   </div>
 
-                  <CommandList className="w-full max-h-[300px]">
+                  <CommandList
+                    ref={listRef}
+                    className="w-full max-h-[300px] overflow-y-scroll"
+                    onWheel={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
                     <CommandEmpty className="py-2 text-center text-sm text-muted-foreground">
                       {filteredOptions.length === 0 ? emptyMessage : null}
                     </CommandEmpty>
@@ -103,7 +116,6 @@ const CustomStaticSelectInput = <TFormValues extends FieldValues>({
                               setSearch('');
                             }}
                             className="cursor-pointer"
-                            
                           >
                             <Check
                               className={cn(

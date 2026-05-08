@@ -71,27 +71,27 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "templateId",
         label: "TemplateId",
-        default: "",
+        default: null,
       },
       {
         key: "companyId",
         label: "CompanyId",
-        default: "",
+        default: null,
       },
       {
         key: "departmentId",
         label: "DepartmentId",
-        default: "",
+        default: null,
       },
       {
         key: "positionId",
         label: "PositionId",
-        default: "",
+        default: null,
       },
       {
         key: "jobLevelId",
         label: "JobLevelId",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -101,31 +101,31 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "templateId",
         label: "TemplateId",
-        default: "",
+        default: null,
       },
       {
         key: "companyId",
         label: "CompanyId",
-        default: "",
+        default: null,
       },
       {
         key: "departmentId",
         label: "DepartmentId",
-        default: "",
+        default: null,
       },
       {
         key: "positionId",
         label: "PositionId",
-        default: "",
+        default: null,
       },
       {
         key: "jobLevelId",
         label: "JobLevelId",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -164,24 +164,24 @@ export const workFlowTemplateScope = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            templateId: row.templateId,
-            companyId: row.companyId,
-            departmentId: row.departmentId,
-            positionId: row.positionId,
-            jobLevelId: row.jobLevelId,
-            isActive: row.isActive,
+            templateId: row.templateId ? String(row.templateId) : null,
+            companyId: row.companyId ? String(row.companyId) : null,
+            departmentId: row.departmentId ? String(row.departmentId) : null,
+            positionId: row.positionId ? String(row.positionId) : null,
+            jobLevelId: row.jobLevelId ? String(row.jobLevelId) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            templateId: row.templateId,
-            companyId: row.companyId,
-            departmentId: row.departmentId,
-            positionId: row.positionId,
-            jobLevelId: row.jobLevelId,
-            isActive: row.isActive,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            templateId: row.templateId ? String(row.templateId) : null,
+            companyId: row.companyId ? String(row.companyId) : null,
+            departmentId: row.departmentId ? String(row.departmentId) : null,
+            positionId: row.positionId ? String(row.positionId) : null,
+            jobLevelId: row.jobLevelId ? String(row.jobLevelId) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 

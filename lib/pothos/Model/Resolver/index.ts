@@ -266,7 +266,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         const result = await service.create({
           ...query,
           data: args.data,
-          currentUserId: (ctx.session?.user?.id as string) ?? 'system',
+          currentUserId: (ctx.session?.user?.id as string) ?? args.currentUserId ?? 'system',
         } as never);
         ctx.pubsub.publish(subscriptionPublishName, result.data);
         return result as any;
@@ -300,7 +300,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         const result = await service.createMany({
           ...query,
           data: args.data,
-          currentUserId: (ctx.session?.user?.id as string) ?? 'system',
+          currentUserId: (ctx.session?.user?.id as string) ?? args.currentUserId ?? 'system',
         } as never);
 
         if (result.isSuccess && Array.isArray(result.data)) {
@@ -343,7 +343,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
           ...query,
           id: args.id,
           data: args.data,
-          currentUserId: (ctx.session?.user?.id as string) ?? 'system',
+          currentUserId: (ctx.session?.user?.id as string) ?? args.currentUserId ?? 'system',
         } as never);
         ctx.pubsub.publish(subscriptionPublishName, result.data);
         return result as any;
@@ -380,7 +380,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         const result = await service.updateMany({
           ...query,
           data: args.data,
-          currentUserId: (ctx.session?.user?.id as string) ?? 'system',
+          currentUserId: (ctx.session?.user?.id as string) ?? args.currentUserId ?? 'system',
         } as never);
         if (result.isSuccess && Array.isArray(result.data)) {
           result.data.forEach((record) => {
@@ -404,7 +404,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
         currentUserId: t.arg.string({
           required: false,
-          description: `(Optional) The ID of the user performing the archive. Defaults to 'system' if not provided.`,
+          description: `(Optional) The ID of the user performing the archive. Defaults to args.currentUserId ?? 'system' if not provided.`,
         }),
       },
       resolve: async (_parent, args, ctx) => {
@@ -413,7 +413,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         if (middlewareError) return middlewareError;
         const result = await service.archive({
           id: args.id,
-          currentUserId: (ctx.session?.user?.id as string) ?? 'system',
+          currentUserId: (ctx.session?.user?.id as string) ?? args.currentUserId ?? 'system',
         } as never);
         ctx.pubsub.publish(subscriptionPublishName, result.data);
         return result;
@@ -433,7 +433,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
         currentUserId: t.arg.string({
           required: false,
-          description: `(Optional) The ID of the user performing the bulk archive. Defaults to 'system' if not provided.`,
+          description: `(Optional) The ID of the user performing the bulk archive. Defaults to args.currentUserId ?? 'system' if not provided.`,
         }),
       },
       resolve: async (_parent, args, ctx) => {
@@ -445,7 +445,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         if (middlewareError) return middlewareError;
         const result = await service.archiveMany({
           ids: args.ids,
-          currentUserId: (ctx.session?.user?.id as string) ?? 'system',
+          currentUserId: (ctx.session?.user?.id as string) ?? args.currentUserId ?? 'system',
         } as never);
         if (result.isSuccess && Array.isArray(result.data)) {
           result.data.forEach((record) => {
@@ -469,7 +469,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
         currentUserId: t.arg.string({
           required: false,
-          description: `(Optional) The ID of the user performing the restore. Defaults to 'system' if not provided.`,
+          description: `(Optional) The ID of the user performing the restore. Defaults to args.currentUserId ?? 'system' if not provided.`,
         }),
       },
       resolve: async (_parent, args, ctx) => {
@@ -478,7 +478,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         if (middlewareError) return middlewareError;
         const result = await service.restore({
           id: args.id,
-          currentUserId: (ctx.session?.user?.id as string) ?? 'system',
+          currentUserId: (ctx.session?.user?.id as string) ?? args.currentUserId ?? 'system',
         } as never);
         ctx.pubsub.publish(subscriptionPublishName, result.data);
         return result;
@@ -498,7 +498,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
         currentUserId: t.arg.string({
           required: false,
-          description: `(Optional) The ID of the user performing the bulk restore. Defaults to 'system' if not provided.`,
+          description: `(Optional) The ID of the user performing the bulk restore. Defaults to args.currentUserId ?? 'system' if not provided.`,
         }),
       },
       resolve: async (_parent, args, ctx) => {
@@ -510,7 +510,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         if (middlewareError) return middlewareError;
         const result = await service.restoreMany({
           ids: args.ids,
-          currentUserId: (ctx.session?.user?.id as string) ?? 'system',
+          currentUserId: (ctx.session?.user?.id as string) ?? args.currentUserId ?? 'system',
         } as never);
         if (result.isSuccess && Array.isArray(result.data)) {
           result.data.forEach((record) => {
@@ -534,7 +534,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
         currentUserId: t.arg.string({
           required: false,
-          description: `(Optional) The ID of the user performing the delete. Defaults to 'system' if not provided.`,
+          description: `(Optional) The ID of the user performing the delete. Defaults to args.currentUserId ?? 'system' if not provided.`,
         }),
       },
       resolve: async (_parent, args, ctx) => {
@@ -543,7 +543,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         if (middlewareError) return middlewareError;
         const result = await service.remove({
           id: args.id,
-          currentUserId: (ctx.session?.user?.id as string) ?? 'system',
+          currentUserId: (ctx.session?.user?.id as string) ?? args.currentUserId ?? 'system',
         } as never);
         ctx.pubsub.publish(subscriptionPublishName, result.data);
         return result;
@@ -563,7 +563,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         }),
         currentUserId: t.arg.string({
           required: false,
-          description: `(Optional) The ID of the user performing the bulk delete. Defaults to 'system' if not provided.`,
+          description: `(Optional) The ID of the user performing the bulk delete. Defaults to args.currentUserId ?? 'system' if not provided.`,
         }),
       },
       resolve: async (_parent, args, ctx) => {
@@ -575,7 +575,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
         if (middlewareError) return middlewareError;
         const result = await service.removeMany({
           ids: args.ids,
-          currentUserId: (ctx.session?.user?.id as string) ?? 'system',
+          currentUserId: (ctx.session?.user?.id as string) ?? args.currentUserId ?? 'system',
         } as never);
         if (result.isSuccess && Array.isArray(result.data)) {
           result.data.forEach((record) => {

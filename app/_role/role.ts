@@ -1,5 +1,4 @@
-// lib/permissions/PermissionTemplate.ts
-
+import { MODEL_DISPLAY_NAMES } from "@/generated/model-names";
 import { getDatamodel } from "@/lib/pothos/pothos-prisma-types";
 
 export interface PermissionDefinition {
@@ -30,7 +29,7 @@ export const GLOBAL_ACCESS_PERMISSION: PermissionDefinition = {
   module: 'SYSTEM',
   resource: '*',
   action: '*',
-  description: 'Grants full access to all resources and actions in the system.',
+  description: 'Grants unrestricted access to all system resources, operations, and administrative functions.',
   isGlobal: true,
   isAdmin: true,
   displayOrder: 0,
@@ -72,11 +71,11 @@ export class PermissionTemplate {
 
   private addCRUDPermissions(startOrder: number): void {
     [
-      { action: 'create', name: 'Create', description: `Create new ${this.resource}` },
-      { action: 'read', name: 'View', description: `View ${this.resource} details` },
-      { action: 'update', name: 'Edit', description: `Edit ${this.resource}` },
-      { action: 'delete', name: 'Delete', description: `Delete ${this.resource}` },
-      { action: 'duplicate', name: 'Duplicate', description: `Duplicate ${this.resource}` },
+      { action: 'create', name: 'Create', description: `Create and add new ${this.resource} records to the system` },
+      { action: 'read', name: 'View', description: `Access and view ${this.resource} information and details` },
+      { action: 'update', name: 'Edit', description: `Modify and update existing ${this.resource} data and attributes` },
+      { action: 'delete', name: 'Delete', description: `Permanently remove ${this.resource} from the system` },
+      { action: 'duplicate', name: 'Duplicate', description: `Create a copy of existing ${this.resource} with all settings` },
     ].forEach((item, i) =>
       this.permissions.push({
         module: this.module,
@@ -91,18 +90,18 @@ export class PermissionTemplate {
 
   private addBulkPermissions(startOrder: number): void {
     [
-      { action: 'bulk_create', name: 'Bulk Create' },
-      { action: 'bulk_update', name: 'Bulk Update' },
-      { action: 'bulk_delete', name: 'Bulk Delete' },
-      { action: 'bulk_archive', name: 'Bulk Archive' },
-      { action: 'bulk_restore', name: 'Bulk Restore' },
+      { action: 'bulk_create', name: 'Bulk Create', description: `Add multiple ${this.resource}s simultaneously using batch operations` },
+      { action: 'bulk_update', name: 'Bulk Update', description: `Edit multiple ${this.resource}s at once with mass updates` },
+      { action: 'bulk_delete', name: 'Bulk Delete', description: `Remove multiple ${this.resource}s in a single operation` },
+      { action: 'bulk_archive', name: 'Bulk Archive', description: `Archive multiple ${this.resource}s for inactive or historical records` },
+      { action: 'bulk_restore', name: 'Bulk Restore', description: `Reactivate and restore multiple archived ${this.resource}s` },
     ].forEach((item, i) =>
       this.permissions.push({
         module: this.module,
         resource: this.resource,
         action: item.action,
         name: `${item.name} ${this.displayName}s`,
-        description: `${item.name} multiple ${this.resource}s at once`,
+        description: item.description,
         displayOrder: startOrder + i,
       }),
     );
@@ -110,12 +109,17 @@ export class PermissionTemplate {
 
   private addArchivePermissions(startOrder: number): void {
     [
-      { action: 'archive', name: 'Archive', description: `Archive ${this.resource}` },
-      { action: 'restore', name: 'Restore', description: `Restore archived ${this.resource}` },
+      { action: 'archive', name: 'Archive', description: `Move ${this.resource} to archived status without permanent deletion` },
+      { action: 'restore', name: 'Restore', description: `Restore previously archived ${this.resource} back to active status` },
       {
         action: 'view_archived',
         name: 'View Archived',
-        description: `View archived ${this.resource}s`,
+        description: `Access and display archived ${this.resource}s in reports and lists`,
+      },
+      {
+        action: 'view_itself',
+        name: 'View Itself',
+        description: `Allow users to view ${this.resource} records they created or own`,
       },
     ].forEach((item, i) =>
       this.permissions.push({
@@ -131,12 +135,12 @@ export class PermissionTemplate {
 
   private addImportExportPermissions(startOrder: number): void {
     [
-      { action: 'export', name: 'Export', description: `Export ${this.resource}s to file` },
-      { action: 'import', name: 'Import', description: `Import ${this.resource}s from file` },
+      { action: 'export', name: 'Export', description: `Download ${this.resource}s as Excel, CSV, or other file formats` },
+      { action: 'import', name: 'Import', description: `Upload and process ${this.resource}s from files into the system` },
       {
         action: 'download_template',
         name: 'Download Template',
-        description: 'Download import template',
+        description: `Get pre-formatted import template with correct columns and structure`,
       },
     ].forEach((item, i) =>
       this.permissions.push({
@@ -155,24 +159,24 @@ export class PermissionTemplate {
       {
         action: 'submit_for_approval',
         name: 'Submit for Approval',
-        description: `Submit ${this.resource} for approval`,
+        description: `Send ${this.resource} to designated approvers for review and authorization`,
       },
-      { action: 'approve', name: 'Approve', description: `Approve ${this.resource}` },
-      { action: 'reject', name: 'Reject', description: `Reject ${this.resource}` },
+      { action: 'approve', name: 'Approve', description: `Review and authorize ${this.resource} submissions` },
+      { action: 'reject', name: 'Reject', description: `Decline ${this.resource} and return to submitter with feedback` },
       {
         action: 'cancel_approval',
         name: 'Cancel Approval',
-        description: 'Cancel approval request',
+        description: `Withdraw approval request and revert to draft status`,
       },
       {
         action: 'view_approval_history',
         name: 'View Approval History',
-        description: 'View approval workflow history',
+        description: `Track approval workflow including submitter, approver, timestamps, and comments`,
       },
       {
         action: 'reassign_approver',
         name: 'Reassign Approver',
-        description: 'Reassign to different approver',
+        description: `Transfer approval responsibility to another authorized user or department`,
       },
     ].forEach((item, i) =>
       this.permissions.push({
@@ -236,7 +240,6 @@ export class PermissionTemplate {
   }
 }
 
-
 export const createRolePermissions = (
   moduleName: string,
   resourceName: string,
@@ -252,15 +255,14 @@ export const createRolePermissions = (
     customActions,
   }).getPermissions();
 
-const prismaDataModel = getDatamodel()
-
-const allModels = Object.keys(prismaDataModel.datamodel.models)
+const prismaDataModel = getDatamodel();
+const allModels = Object.keys(prismaDataModel.datamodel.models);
 
 export const allModelPermissions = allModels.flatMap((model) =>
   createRolePermissions(
-   `${model.toUpperCase()}_MANAGEMENT`,
-    model.toLowerCase(),
-    model,
+    `${model.toUpperCase()}_MANAGEMENT`,
+    MODEL_DISPLAY_NAMES[model as keyof typeof MODEL_DISPLAY_NAMES].toLowerCase(),
+    MODEL_DISPLAY_NAMES[model as keyof typeof MODEL_DISPLAY_NAMES],
     false,
     [],
   ),

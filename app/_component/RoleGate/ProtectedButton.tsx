@@ -18,7 +18,6 @@ const ProtectedButton = (props: ProtectedButtonProps) => {
   return (
     <RoleGate
       module={[`${props.modelName.toUpperCase()}_MANAGEMENT`, 'SYSTEM']}
-      resource={[`${props.modelName.toLowerCase()}`, '*']}
       action={[props.action, '*']}
     >
 

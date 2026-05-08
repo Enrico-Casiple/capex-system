@@ -241,9 +241,7 @@ model Department {
   createdAt                       DateTime?               @default(now())
   updatedAt                       DateTime?               @updatedAt
 
-  @@unique([name, acronym]) // Department names should be unique within a company
-  // ✅ Add indexes
-  @@index([companyId]) // Lookup by company
+  @@unique([companyId, name, acronym]) // Department names should be unique within a company
 }
 
 model Position {
@@ -263,7 +261,7 @@ model Position {
   workFlowTemplateScopePosition WorkFlowTemplateScope[] @relation("WorkFlowTemplateScopePosition")
 
   // ✅ Add indexes
-  @@unique([name, acronym]) // Ensure unique position names
+  @@unique([ name, acronym]) // Ensure unique position names
 }
 
 model JobLevel {
@@ -284,8 +282,6 @@ model JobLevel {
   updatedAt DateTime? @updatedAt
 
   @@unique([name, acronym]) // Job level names should be unique within a company
-  // ✅ Add indexes
-  @@index([companyId]) // Lookup by company
 }
 
 model Location {
@@ -507,6 +503,7 @@ model AuditLog {
   parentId              String?                @db.ObjectId // For hierarchical logs (e.g. a batch of changes)
   parent                AuditLog?              @relation("ParentLog", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   auditLogs             AuditLog[]             @relation("ParentLog")
+  capitalRecoveryFactor CapitalRecoveryFactor? @relation(fields: [modelId], references: [id], onDelete: SetNull, onUpdate: Cascade)
 
   isActive        Boolean?       @default(true)
   createdAt       DateTime?      @default(now())
@@ -910,6 +907,7 @@ model CapitalRecoveryFactor {
   budgetId          String?     @db.ObjectId
   budget            Budget?     @relation(fields: [budgetId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
+ auditLogs    AuditLog[]
   isActive  Boolean?  @default(true)
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt

@@ -95,32 +95,32 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "name",
         label: "Name",
-        default: "",
+        default: null,
       },
       {
         key: "description",
         label: "Description",
-        default: "",
+        default: null,
       },
       {
         key: "module",
         label: "Module",
-        default: "",
+        default: null,
       },
       {
         key: "resource",
         label: "Resource",
-        default: "",
+        default: null,
       },
       {
         key: "action",
         label: "Action",
-        default: "",
+        default: null,
       },
       {
         key: "displayOrder",
         label: "DisplayOrder",
-        default: 0,
+        default: null,
       },
       {
         key: "isGlobal",
@@ -135,7 +135,7 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "globalLimit",
         label: "GlobalLimit",
-        default: 0,
+        default: null,
       },
       {
         key: "isActive",
@@ -145,36 +145,36 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "name",
         label: "Name",
-        default: "",
+        default: null,
       },
       {
         key: "description",
         label: "Description",
-        default: "",
+        default: null,
       },
       {
         key: "module",
         label: "Module",
-        default: "",
+        default: null,
       },
       {
         key: "resource",
         label: "Resource",
-        default: "",
+        default: null,
       },
       {
         key: "action",
         label: "Action",
-        default: "",
+        default: null,
       },
       {
         key: "displayOrder",
         label: "DisplayOrder",
-        default: 0,
+        default: null,
       },
       {
         key: "isGlobal",
@@ -189,7 +189,7 @@ const previewColumnsUpdate: PreviewColumn<Model>[] = [
       {
         key: "globalLimit",
         label: "GlobalLimit",
-        default: 0,
+        default: null,
       },
       {
         key: "isActive",
@@ -232,32 +232,32 @@ export const permission = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            name: row.name,
-            description: row.description,
-            module: row.module,
-            resource: row.resource,
-            action: row.action,
-            displayOrder: row.displayOrder,
-            isGlobal: row.isGlobal,
-            isAdmin: row.isAdmin,
-            globalLimit: row.globalLimit,
-            isActive: row.isActive,
+            name: row.name ? String(row.name) : null,
+            description: row.description ? String(row.description) : null,
+            module: row.module ? String(row.module) : null,
+            resource: row.resource ? String(row.resource) : null,
+            action: row.action ? String(row.action) : null,
+            displayOrder: row.displayOrder ? Number(row.displayOrder) : null,
+            isGlobal: row.isGlobal != null ? Boolean(row.isGlobal) : null,
+            isAdmin: row.isAdmin != null ? Boolean(row.isAdmin) : null,
+            globalLimit: row.globalLimit ? Number(row.globalLimit) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            name: row.name,
-            description: row.description,
-            module: row.module,
-            resource: row.resource,
-            action: row.action,
-            displayOrder: row.displayOrder,
-            isGlobal: row.isGlobal,
-            isAdmin: row.isAdmin,
-            globalLimit: row.globalLimit,
-            isActive: row.isActive,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            name: row.name ? String(row.name) : null,
+            description: row.description ? String(row.description) : null,
+            module: row.module ? String(row.module) : null,
+            resource: row.resource ? String(row.resource) : null,
+            action: row.action ? String(row.action) : null,
+            displayOrder: row.displayOrder ? Number(row.displayOrder) : null,
+            isGlobal: row.isGlobal != null ? Boolean(row.isGlobal) : null,
+            isAdmin: row.isAdmin != null ? Boolean(row.isAdmin) : null,
+            globalLimit: row.globalLimit ? Number(row.globalLimit) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 

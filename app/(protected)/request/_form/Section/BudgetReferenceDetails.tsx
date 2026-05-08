@@ -268,6 +268,7 @@ const BudgetReferenceDetails = ({ form, isViewMode, actionType, isForFinance }: 
 
   return (
     <section className="space-y-4">
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pb-3 border-b">
         <div className="flex items-center gap-3">
@@ -428,12 +429,12 @@ const BudgetReferenceDetails = ({ form, isViewMode, actionType, isForFinance }: 
                     name="requestedCRF.categoryId"
                     control={form.control}
                     label=""
-                    disabled={Boolean(form.watch("requestedCRF.budgetId")) || isViewMode}
+                    disabled={isViewMode}
                     findAllWithCursorGQL={
                       modelAPI.CategoryGQL.findAllWithCursor
                     }
                     findUniqueGQL={modelAPI.CategoryGQL.findUnique}
-                    defaultValueId={getValue("requestedCRF.categoryId") ?? ""}
+                    defaultValueId={form.watch("requestedCRF.categoryId") ?? ""}
                     placeholder="Search category..."
                     searchPlaceholder="Search category..."
                     emptySelectedMessage="Category already selected."

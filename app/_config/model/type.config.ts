@@ -59,17 +59,17 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "name",
         label: "Name",
-        default: "",
+        default: null,
       },
       {
         key: "description",
         label: "Description",
-        default: "",
+        default: null,
       },
       {
         key: "modelNameType",
         label: "ModelNameType",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -79,21 +79,21 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "name",
         label: "Name",
-        default: "",
+        default: null,
       },
       {
         key: "description",
         label: "Description",
-        default: "",
+        default: null,
       },
       {
         key: "modelNameType",
         label: "ModelNameType",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -130,20 +130,20 @@ export const type = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            name: row.name,
-            description: row.description,
-            modelNameType: row.modelNameType,
-            isActive: row.isActive,
+            name: row.name ? String(row.name) : null,
+            description: row.description ? String(row.description) : null,
+            modelNameType: row.modelNameType ? String(row.modelNameType) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            name: row.name,
-            description: row.description,
-            modelNameType: row.modelNameType,
-            isActive: row.isActive,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            name: row.name ? String(row.name) : null,
+            description: row.description ? String(row.description) : null,
+            modelNameType: row.modelNameType ? String(row.modelNameType) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 

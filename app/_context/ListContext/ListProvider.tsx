@@ -293,7 +293,6 @@ const ListProvider = <
     >
       <RoleGate
         module={[`${props.modelName.toUpperCase()}_MANAGEMENT`, 'SYSTEM']}
-        resource={[`${props.modelName.toLowerCase()}`, '*']}
         action={['read', '*']}
       >
         {props.children}

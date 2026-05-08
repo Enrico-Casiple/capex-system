@@ -2,7 +2,7 @@ import { Query, UserRolePageInput } from '@/lib/generated/api/customHookAPI/grap
 import { useQuery } from '@apollo/client/react';
 import { useSession } from 'next-auth/react';
 import { UserRoleFindAll } from '@/lib/api/gql/UserRole.gql';
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 
 type PermissionInput = string | string[];
 
@@ -27,6 +27,8 @@ const useUserRolePermission = () => {
       },
     },
     skip: !currentUserId || sessionLoading,
+    // Add cache policy to prevent unnecessary fetches
+    fetchPolicy: 'cache-first',
   });
 
   // Extract all rolePermissions from all roles assigned to the current user
@@ -35,7 +37,7 @@ const useUserRolePermission = () => {
       userRoleData?.UserRoleFindAll?.data
         ?.flatMap((userRole) => userRole.role?.rolePermissions ?? [])
         .filter(Boolean) ?? [],
-    [userRoleData],
+    [userRoleData?.UserRoleFindAll?.data],
   );
 
   // Extract the actual permission details from each rolePermission
@@ -50,8 +52,6 @@ const useUserRolePermission = () => {
     [rolePermissions],
   );
 
-  // console.log('User permissions:', permissions);
-
   const loading = sessionLoading || userRoleLoading;
 
   // A global admin has isGlobal and isAdmin both true — they bypass all permission checks
@@ -60,76 +60,44 @@ const useUserRolePermission = () => {
     [permissions],
   );
 
-  // Check if the current user has a specific permission
-  // Check if the current user has a specific permission
-  const can = useMemo(
-    () =>
-      (module: PermissionInput, resource: PermissionInput, action: PermissionInput): boolean => {
-        const moduleList = normalizeToArray(module);
-        const resourceList = normalizeToArray(resource);
-        const actionList = normalizeToArray(action);
+  // Memoize the can function to prevent recreation
+  const can = useCallback(
+    (module: PermissionInput, action: PermissionInput): boolean => {
+      if (isGlobalAdmin) return true;
 
-        // Filter to only keep modules/resources/actions that user has permission for
-        const allowedModules = moduleList.filter(m =>
-          permissions.some(p => p.module === m || p.module === '*')
-        );
-        const allowedResources = resourceList.filter(r =>
-          permissions.some(p => p.resource === r || p.resource === '*')
-        );
-        const allowedActions = actionList.filter(a =>
-          permissions.some(p => p.action === a || p.action === '*')
-        );
+      const moduleList = normalizeToArray(module);
+      // const resourceList = normalizeToArray(resource);
+      const actionList = normalizeToArray(action);
 
+      // Filter to only keep modules/resources/actions that user has permission for
+      const allowedModules = moduleList.filter(m =>
+        permissions.some(p => p.module === m || p.module === '*')
+      );
+      // const allowedResources = resourceList.filter(r =>
+      //   permissions.some(p => p.resource === r || p.resource === '*')
+      // );
+      const allowedActions = actionList.filter(a =>
+        permissions.some(p => p.action === a || p.action === '*')
+      );
 
-        // Validate filtered inputs - reject empty arrays
-        if (allowedModules.length === 0 || allowedResources.length === 0 || allowedActions.length === 0) {
-          console.warn('No allowed permissions after filtering:', {
-            allowedModules,
-            allowedResources,
-            allowedActions,
-          });
-          return false;
-        }
+      // Validate filtered inputs - reject empty arrays
+      if (allowedModules.length === 0 || allowedActions.length === 0) {
+        return false;
+      }
 
-        if (isGlobalAdmin) return true;
-
-        // Check if ALL filtered items have a matching permission
-        return permissions.some(
-          (permission) =>
-            permission.module &&
-            allowedModules.includes(permission.module) &&
-            permission.resource &&
-            allowedResources.includes(permission.resource) &&
-            permission.action &&
-            allowedActions.includes(permission.action),
-        );
-      },
+      // Check if ALL filtered items have a matching permission
+      return permissions.some(
+        (permission) =>
+          permission.module &&
+          allowedModules.includes(permission.module) &&
+          // permission.resource &&
+          // allowedResources.includes(permission.resource) &&
+          permission.action &&
+          allowedActions.includes(permission.action),
+      );
+    },
     [isGlobalAdmin, permissions],
   );
-
-  // Get the scope (which records the user is allowed to see) for a specific permission
-  // const getScope = useMemo(
-  //   () => (module: string, resource: string, action: string) => {
-  //     const matchedPermission = permissions.find(
-  //       (permission) =>
-  //         permission.module === module &&
-  //         permission.resource === resource &&
-  //         permission.action === action,
-  //     );
-
-  //     if (!matchedPermission) return null;
-
-  //     const matchedRolePermission = rolePermissions.find(
-  //       (rolePermission) => rolePermission.permissionId === matchedPermission.id,
-  //     );
-
-  //     return {
-  //       scopeTypeId: matchedRolePermission?.scopeTypeId ?? null,
-  //       scopeValues: matchedRolePermission?.scopeValues ?? [],
-  //     };
-  //   },
-  //   [permissions, rolePermissions],
-  // );
 
   return { permissions, rolePermissions, isGlobalAdmin, can, loading };
 };

@@ -19,7 +19,6 @@ const ListAction = ({ importComponent, exportComponent, updateComponent }: ListA
           <React.Fragment>
             <RoleGate
               module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
-              resource={[`${modelName.toLowerCase()}`, "*"]}
               action={['bulk_create', '*', 'import']}
             >
               {importComponent}
@@ -30,14 +29,12 @@ const ListAction = ({ importComponent, exportComponent, updateComponent }: ListA
             </Button> */}
             <RoleGate
               module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
-              resource={[`${modelName.toLowerCase()}`, "*"]}
               action={['bulk_update', '*', 'import']}
             >
               {updateComponent}
             </RoleGate>
             <RoleGate
               module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
-              resource={[`${modelName.toLowerCase()}`, "*"]}
               action={['export', '*']}
             >
               {exportComponent}
@@ -51,7 +48,6 @@ const ListAction = ({ importComponent, exportComponent, updateComponent }: ListA
         active ? (
           <RoleGate
             module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
-            resource={[`${modelName.toLowerCase()}`, "*"]}
             action={['archive', '*']}
           >
             <Button variant="outline" size="sm" className="gap-2" onClick={() => setActive(false)}>
@@ -63,7 +59,6 @@ const ListAction = ({ importComponent, exportComponent, updateComponent }: ListA
         ) : (
           <RoleGate
             module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
-            resource={[`${modelName.toLowerCase()}`, "*"]}
             action={['restore', '*']}
           >
             <Button variant="outline" size="sm" className="gap-2" onClick={() => setActive(true)}>

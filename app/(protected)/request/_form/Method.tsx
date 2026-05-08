@@ -730,6 +730,7 @@ const Method = (props: MethodProps) => {
     >
       <div className='flex flex-col gap-6 -mt-9 overflow-hidden'>
         {/* Form Sections Container */}
+        {/* <pre>{JSON.stringify(requestQuery.data?.RequestFindUnique.data?.requestedCRF?.categoryId, null, 2)}</pre> */}
         <ScrollArea className='h-[calc(100vh-200px)]'>
           <div className='space-y-8 pr-4'>
             {/* I. Requester Details */}
@@ -940,13 +941,9 @@ const Method = (props: MethodProps) => {
             </section>
 
             {/* II. Budget Reference Details */}
-            {
-              form.watch("companyId") && <BudgetReferenceDetails form={form as unknown as UseFormReturn<Record<string, unknown>>} isViewMode={isViewMode} actionType={props.actionType} isForFinance={isForFinance} />
-            }
+            <BudgetReferenceDetails form={form as unknown as UseFormReturn<Record<string, unknown>>} isViewMode={isViewMode} actionType={props.actionType} isForFinance={isForFinance} />
             {/* III. Workflow Approval Step */}
-            {
-              form.watch("requestedCRF.categoryId") && <RequestedItem form={form as unknown as UseFormReturn<RequestedItemFormValues>} isViewMode={isViewMode} />
-            }
+            <RequestedItem form={form as unknown as UseFormReturn<RequestedItemFormValues>} isViewMode={isViewMode} />
 
             {/* IV. Workflow Approval Step */}
             {

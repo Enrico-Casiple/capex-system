@@ -125,12 +125,12 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "requestId",
         label: "RequestId",
-        default: "",
+        default: null,
       },
       {
         key: "statusId",
         label: "StatusId",
-        default: "",
+        default: null,
       },
       {
         key: "isPriceNeed",
@@ -140,32 +140,32 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "itemId",
         label: "ItemId",
-        default: "",
+        default: null,
       },
       {
         key: "categoryId",
         label: "CategoryId",
-        default: "",
+        default: null,
       },
       {
         key: "description",
         label: "Description",
-        default: "",
+        default: null,
       },
       {
         key: "quantity",
         label: "Quantity",
-        default: 0,
+        default: null,
       },
       {
         key: "unitOfMeasure",
         label: "UnitOfMeasure",
-        default: "",
+        default: null,
       },
       {
         key: "vatPercentage",
         label: "VatPercentage",
-        default: 0,
+        default: null,
       },
       {
         key: "isInclusiveVat",
@@ -175,22 +175,22 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "unitPrice",
         label: "UnitPrice",
-        default: 0,
+        default: null,
       },
       {
         key: "amountGrossOfVat",
         label: "AmountGrossOfVat",
-        default: 0,
+        default: null,
       },
       {
         key: "totalPrice",
         label: "TotalPrice",
-        default: 0,
+        default: null,
       },
       {
         key: "attachmentUrl",
         label: "AttachmentUrl",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -200,16 +200,16 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "requestId",
         label: "RequestId",
-        default: "",
+        default: null,
       },
       {
         key: "statusId",
         label: "StatusId",
-        default: "",
+        default: null,
       },
       {
         key: "isPriceNeed",
@@ -219,32 +219,32 @@ const previewColumnsUpdate: PreviewColumn<Model>[] = [
       {
         key: "itemId",
         label: "ItemId",
-        default: "",
+        default: null,
       },
       {
         key: "categoryId",
         label: "CategoryId",
-        default: "",
+        default: null,
       },
       {
         key: "description",
         label: "Description",
-        default: "",
+        default: null,
       },
       {
         key: "quantity",
         label: "Quantity",
-        default: 0,
+        default: null,
       },
       {
         key: "unitOfMeasure",
         label: "UnitOfMeasure",
-        default: "",
+        default: null,
       },
       {
         key: "vatPercentage",
         label: "VatPercentage",
-        default: 0,
+        default: null,
       },
       {
         key: "isInclusiveVat",
@@ -254,22 +254,22 @@ const previewColumnsUpdate: PreviewColumn<Model>[] = [
       {
         key: "unitPrice",
         label: "UnitPrice",
-        default: 0,
+        default: null,
       },
       {
         key: "amountGrossOfVat",
         label: "AmountGrossOfVat",
-        default: 0,
+        default: null,
       },
       {
         key: "totalPrice",
         label: "TotalPrice",
-        default: 0,
+        default: null,
       },
       {
         key: "attachmentUrl",
         label: "AttachmentUrl",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -317,42 +317,42 @@ export const requestItem = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            requestId: row.requestId,
-            statusId: row.statusId,
-            isPriceNeed: row.isPriceNeed,
-            itemId: row.itemId,
-            categoryId: row.categoryId,
-            description: row.description,
-            quantity: row.quantity,
-            unitOfMeasure: row.unitOfMeasure,
-            vatPercentage: row.vatPercentage,
-            isInclusiveVat: row.isInclusiveVat,
-            unitPrice: row.unitPrice,
-            amountGrossOfVat: row.amountGrossOfVat,
-            totalPrice: row.totalPrice,
-            attachmentUrl: row.attachmentUrl,
-            isActive: row.isActive,
+            requestId: row.requestId ? String(row.requestId) : null,
+            statusId: row.statusId ? String(row.statusId) : null,
+            isPriceNeed: row.isPriceNeed != null ? Boolean(row.isPriceNeed) : null,
+            itemId: row.itemId ? String(row.itemId) : null,
+            categoryId: row.categoryId ? String(row.categoryId) : null,
+            description: row.description ? String(row.description) : null,
+            quantity: row.quantity ? Number(row.quantity) : null,
+            unitOfMeasure: row.unitOfMeasure ? String(row.unitOfMeasure) : null,
+            vatPercentage: row.vatPercentage ? Number(row.vatPercentage) : null,
+            isInclusiveVat: row.isInclusiveVat != null ? Boolean(row.isInclusiveVat) : null,
+            unitPrice: row.unitPrice ? Number(row.unitPrice) : null,
+            amountGrossOfVat: row.amountGrossOfVat ? Number(row.amountGrossOfVat) : null,
+            totalPrice: row.totalPrice ? Number(row.totalPrice) : null,
+            attachmentUrl: row.attachmentUrl ? String(row.attachmentUrl) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            requestId: row.requestId,
-            statusId: row.statusId,
-            isPriceNeed: row.isPriceNeed,
-            itemId: row.itemId,
-            categoryId: row.categoryId,
-            description: row.description,
-            quantity: row.quantity,
-            unitOfMeasure: row.unitOfMeasure,
-            vatPercentage: row.vatPercentage,
-            isInclusiveVat: row.isInclusiveVat,
-            unitPrice: row.unitPrice,
-            amountGrossOfVat: row.amountGrossOfVat,
-            totalPrice: row.totalPrice,
-            attachmentUrl: row.attachmentUrl,
-            isActive: row.isActive,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            requestId: row.requestId ? String(row.requestId) : null,
+            statusId: row.statusId ? String(row.statusId) : null,
+            isPriceNeed: row.isPriceNeed != null ? Boolean(row.isPriceNeed) : null,
+            itemId: row.itemId ? String(row.itemId) : null,
+            categoryId: row.categoryId ? String(row.categoryId) : null,
+            description: row.description ? String(row.description) : null,
+            quantity: row.quantity ? Number(row.quantity) : null,
+            unitOfMeasure: row.unitOfMeasure ? String(row.unitOfMeasure) : null,
+            vatPercentage: row.vatPercentage ? Number(row.vatPercentage) : null,
+            isInclusiveVat: row.isInclusiveVat != null ? Boolean(row.isInclusiveVat) : null,
+            unitPrice: row.unitPrice ? Number(row.unitPrice) : null,
+            amountGrossOfVat: row.amountGrossOfVat ? Number(row.amountGrossOfVat) : null,
+            totalPrice: row.totalPrice ? Number(row.totalPrice) : null,
+            attachmentUrl: row.attachmentUrl ? String(row.attachmentUrl) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 

@@ -15,7 +15,7 @@ import { useForm } from 'react-hook-form';
 export type PreviewColumn<TRow extends Record<string, unknown>> = {
   key: keyof TRow;
   label: string;
-  default?: string | number | boolean;
+  default?: string | number | boolean | null | Record<string, unknown>;
 };
 
 type ImportUpdateFormWrapperProps<TRow extends Record<string, unknown>, TInput> = {

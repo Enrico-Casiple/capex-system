@@ -14,6 +14,8 @@ export const UserRoleFragment = gql`
     createdAt
     updatedAt
     role {
+      id
+      name
       rolePermissions {
         permission {
           action

@@ -1,6 +1,6 @@
 import ImportFormWrapper from '@/app/_component/Form/ImportFormWrapper';
+import { PreviewColumn } from '@/app/_config/shared';
 import useToast from '@/app/_hooks/useToast';
-import { PreviewColumn } from '../../_config/shared';
 
 type ImportFormProps<TModel, TCreateInput> = {
   open: boolean;

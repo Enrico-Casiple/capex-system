@@ -55,10 +55,33 @@ const buildScalarField = (
   _required: boolean,
   description: string,
 ): GenericInputFieldRef => {
-  const required = false;
+  const required = _required; // Use the actual _required parameter
+  
   if (field.isList) {
-    return t.field({ type: ['String'] as never, required, description });
+    // Map field type to correct list type
+    const listType = (() => {
+      switch (field.type) {
+        case 'String':
+          return ['String'] as never;
+        case 'Int':
+          return ['Int'] as never;
+        case 'Boolean':
+          return ['Boolean'] as never;
+        case 'DateTime':
+          return ['DateTime'] as never;
+        case 'Json':
+          return ['Json'] as never;
+        case 'Float':
+        case 'Decimal':
+          return ['Float'] as never;
+        default:
+          return ['String'] as never;
+      }
+    })();
+    
+    return t.field({ type: listType, required, description });
   }
+  
   switch (field.type) {
     case 'String':
       return t.string({ required, description });
@@ -351,10 +374,40 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
                 ? 'Json'
                 : field.type;
 
-            fields[field.name] = t.field({
-              type: fieldType as any,
-              required: field.isRequired && !field.hasDefaultValue,
-            });
+            // Handle scalar lists (String[], Int[], etc.)
+            if (field.isList) {
+              const listType = (() => {
+                switch (fieldType) {
+                  case 'String':
+                    return ['String'] as never;
+                  case 'Int':
+                    return ['Int'] as never;
+                  case 'Boolean':
+                    return ['Boolean'] as never;
+                  case 'DateTime':
+                    return ['DateTime'] as never;
+                  case 'Json':
+                    return ['Json'] as never;
+                  case 'Float':
+                  case 'Decimal':
+                    return ['Float'] as never;
+                  default:
+                    return ['String'] as never;
+                }
+              })();
+
+              fields[field.name] = t.field({
+                type: listType,
+                required: false,
+                description: `(Optional) List of ${field.type} values.`,
+              });
+            } else {
+              // Single scalar field
+              fields[field.name] = t.field({
+                type: fieldType as any,
+                required: false,
+              });
+            }
           }
 
           if (field.kind === 'object') {
@@ -388,10 +441,41 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
                 ? 'Json'
                 : field.type;
 
-            fields[field.name] = t.field({
-              type: fieldType as any,
-              required: false,
-            });
+            // Handle scalar lists (String[], Int[], etc.)
+            if (field.isList) {
+              const listType = (() => {
+                switch (fieldType) {
+                  case 'String':
+                    return ['String'] as never;
+                  case 'Int':
+                    return ['Int'] as never;
+                  case 'Boolean':
+                    return ['Boolean'] as never;
+                  case 'DateTime':
+                    return ['DateTime'] as never;
+                  case 'Json':
+                    return ['Json'] as never;
+                  case 'Float':
+                  case 'Decimal':
+                    return ['Float'] as never;
+                  default:
+                    return ['String'] as never;
+                }
+              })();
+
+              fields[field.name] = t.field({
+                type: listType,
+                required: false,
+                description: `(Optional) List of ${field.type} values.`,
+              });
+            } else {
+              // Single scalar field
+              fields[field.name] = t.field({
+                type: fieldType as any,
+                required: false,
+                description: `(Optional) The ${field.name} of the ${modelName}. Type: ${field.type}.`,
+              });
+            }
           }
 
           if (field.kind === 'object') {
@@ -400,6 +484,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
                 ? (inputRefs[`${field.type}UpdateManyNestedInput`] as any)
                 : (inputRefs[`${field.type}UpdateOneNestedInput`] as any),
               required: false,
+              description: `(Optional) Update nested ${field.type} relation${field.isList ? 's' : ''}.`,
             });
           }
         });

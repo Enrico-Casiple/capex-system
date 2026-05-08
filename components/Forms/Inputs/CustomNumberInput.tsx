@@ -6,7 +6,7 @@ type CustomNumberInputProps<TFormValues extends FieldValues> = {
   name: Path<TFormValues>;
   control: Control<TFormValues>;
   label: string;
-  placeholder: string;
+  placeholder?: string;
   inputProps?: React.ComponentProps<typeof Input>;
 };
 
@@ -33,7 +33,7 @@ const CustomNumberInput = <TFormValues extends FieldValues>(
             {...field}
             {...props.inputProps}
             id={props.name}
-            placeholder={props.placeholder}
+            placeholder={`Please enter your ${props.label} number`}
             aria-invalid={fieldState.invalid}
             autoComplete="off"
             type="text"

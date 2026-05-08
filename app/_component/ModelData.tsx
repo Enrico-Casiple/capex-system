@@ -56,7 +56,6 @@ const ModelData = <ModelShape, Response extends Record<string, Query[keyof Query
             {active && (
               <RoleGate
                 module={[`${modelName.toUpperCase()}_MANAGEMENT`, 'SYSTEM']}
-                resource={[`${modelName.toLowerCase()}`, '*']}
                 action={['create', '*']}
               >
                 <Button

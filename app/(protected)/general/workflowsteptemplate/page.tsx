@@ -5,9 +5,9 @@ import ImportUpdate from '@/app/_component/List/ImportUpdate';
 import ModelData from '@/app/_component/ModelData';
 import Action, { ActionType, PopupType } from '@/app/_component/Row/Action';
 import { Spinner } from '@/app/_component/Spinner';
-import { groupOfCompanyTableConfig } from '@/app/_config';
+import { workFlowStepTemplateTableConfig, workFlowTemplateTableConfig } from '@/app/_config';
 import ListPage from '@/app/_context/ListWrapper';
-import { GroupOfCompany, GroupOfCompanyCreateInput, GroupOfCompanyUpdateInput } from '@/lib/generated/api/customHookAPI/graphql';
+import { WorkFlowStepTemplate, WorkFlowStepTemplateCreateInput, WorkFlowStepTemplateUpdateInput, WorkFlowTemplate, WorkFlowTemplateCreateInput, WorkFlowTemplateUpdateInput } from '@/lib/generated/api/customHookAPI/graphql';
 import dynamic from 'next/dynamic';
 import { useCallback } from 'react';
 import ExportForm from './_form/ExportForm';
@@ -20,9 +20,9 @@ const Method = dynamic(() => import('./_form/Method'), {
 });
 
 const ModelPage = () => {
-  type ModelRequest = GroupOfCompany;
-  type ModelCreateInput = GroupOfCompanyCreateInput;
-  type ModelUpdateInput = GroupOfCompanyUpdateInput;
+  type ModelRequest = WorkFlowStepTemplate;
+  type ModelCreateInput = WorkFlowStepTemplateCreateInput;
+  type ModelUpdateInput = WorkFlowStepTemplateUpdateInput;
 
 
   const {
@@ -41,7 +41,7 @@ const ModelPage = () => {
     previewColumnsUpdate,
     exportColumns,
     defaultExportColumns,
-  } = groupOfCompanyTableConfig;
+  } = workFlowStepTemplateTableConfig;
 
   const renderMethod = useCallback(
     (

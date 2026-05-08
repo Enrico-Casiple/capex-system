@@ -77,32 +77,32 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "budgetId",
         label: "BudgetId",
-        default: "",
+        default: null,
       },
       {
         key: "approvedAmount",
         label: "ApprovedAmount",
-        default: 0,
+        default: null,
       },
       {
         key: "committedAmount",
         label: "CommittedAmount",
-        default: 0,
+        default: null,
       },
       {
         key: "actualAmount",
         label: "ActualAmount",
-        default: 0,
+        default: null,
       },
       {
         key: "availableAmount",
         label: "AvailableAmount",
-        default: 0,
+        default: null,
       },
       {
         key: "currency",
         label: "Currency",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -112,36 +112,36 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "budgetId",
         label: "BudgetId",
-        default: "",
+        default: null,
       },
       {
         key: "approvedAmount",
         label: "ApprovedAmount",
-        default: 0,
+        default: null,
       },
       {
         key: "committedAmount",
         label: "CommittedAmount",
-        default: 0,
+        default: null,
       },
       {
         key: "actualAmount",
         label: "ActualAmount",
-        default: 0,
+        default: null,
       },
       {
         key: "availableAmount",
         label: "AvailableAmount",
-        default: 0,
+        default: null,
       },
       {
         key: "currency",
         label: "Currency",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -181,26 +181,26 @@ export const budgetSnapshot = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            budgetId: row.budgetId,
-            approvedAmount: row.approvedAmount,
-            committedAmount: row.committedAmount,
-            actualAmount: row.actualAmount,
-            availableAmount: row.availableAmount,
-            currency: row.currency,
-            isActive: row.isActive,
+            budgetId: row.budgetId ? String(row.budgetId) : null,
+            approvedAmount: row.approvedAmount ? Number(row.approvedAmount) : null,
+            committedAmount: row.committedAmount ? Number(row.committedAmount) : null,
+            actualAmount: row.actualAmount ? Number(row.actualAmount) : null,
+            availableAmount: row.availableAmount ? Number(row.availableAmount) : null,
+            currency: row.currency ? String(row.currency) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            budgetId: row.budgetId,
-            approvedAmount: row.approvedAmount,
-            committedAmount: row.committedAmount,
-            actualAmount: row.actualAmount,
-            availableAmount: row.availableAmount,
-            currency: row.currency,
-            isActive: row.isActive,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            budgetId: row.budgetId ? String(row.budgetId) : null,
+            approvedAmount: row.approvedAmount ? Number(row.approvedAmount) : null,
+            committedAmount: row.committedAmount ? Number(row.committedAmount) : null,
+            actualAmount: row.actualAmount ? Number(row.actualAmount) : null,
+            availableAmount: row.availableAmount ? Number(row.availableAmount) : null,
+            currency: row.currency ? String(row.currency) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 

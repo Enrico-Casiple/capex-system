@@ -105,7 +105,6 @@ const ListBulkAction = (props: ListBulkActionProps) => {
             <React.Fragment>
               <RoleGate
                 module={[`${modelName.toUpperCase()}_MANAGEMENT`, 'SYSTEM']}
-                resource={[`${modelName.toLowerCase()}`, '*']}
                 action={['bulk_archive', '*']}
               >
                 <Button
@@ -124,7 +123,6 @@ const ListBulkAction = (props: ListBulkActionProps) => {
             <React.Fragment>
               <RoleGate
                 module={[`${modelName.toUpperCase()}_MANAGEMENT`, 'SYSTEM']}
-                resource={[`${modelName.toLowerCase()}`, '*']}
                 action={['bulk_restore', '*']}
               >
                 <Button
@@ -139,7 +137,6 @@ const ListBulkAction = (props: ListBulkActionProps) => {
               </RoleGate>
               <RoleGate
                 module={[`${modelName.toUpperCase()}_MANAGEMENT`, 'SYSTEM']}
-                resource={[`${modelName.toLowerCase()}`, '*']}
                 action={['bulk_delete', '*']}
               >
                 <Button

@@ -83,37 +83,37 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "configId",
         label: "ConfigId",
-        default: "",
+        default: null,
       },
       {
         key: "nodeType",
         label: "NodeType",
-        default: "",
+        default: null,
       },
       {
         key: "logicalOperator",
         label: "LogicalOperator",
-        default: "",
+        default: null,
       },
       {
         key: "field",
         label: "Field",
-        default: "",
+        default: null,
       },
       {
         key: "operator",
         label: "Operator",
-        default: "",
+        default: null,
       },
       {
         key: "value",
         label: "Value",
-        default: {} as Record<string, unknown>,
+        default: null,
       },
       {
         key: "parentConditionId",
         label: "ParentConditionId",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -123,41 +123,41 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "configId",
         label: "ConfigId",
-        default: "",
+        default: null,
       },
       {
         key: "nodeType",
         label: "NodeType",
-        default: "",
+        default: null,
       },
       {
         key: "logicalOperator",
         label: "LogicalOperator",
-        default: "",
+        default: null,
       },
       {
         key: "field",
         label: "Field",
-        default: "",
+        default: null,
       },
       {
         key: "operator",
         label: "Operator",
-        default: "",
+        default: null,
       },
       {
         key: "value",
         label: "Value",
-        default: {} as Record<string, unknown>,
+        default: null,
       },
       {
         key: "parentConditionId",
         label: "ParentConditionId",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -198,28 +198,28 @@ export const configCondition = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            configId: row.configId,
-            nodeType: row.nodeType,
-            logicalOperator: row.logicalOperator,
-            field: row.field,
-            operator: row.operator,
-            value: row.value,
-            parentConditionId: row.parentConditionId,
-            isActive: row.isActive,
+            configId: row.configId ? String(row.configId) : null,
+            nodeType: row.nodeType ? String(row.nodeType) : null,
+            logicalOperator: row.logicalOperator ? String(row.logicalOperator) : null,
+            field: row.field ? String(row.field) : null,
+            operator: row.operator ? String(row.operator) : null,
+            value: row.value ? JSON.stringify(row.value) : null,
+            parentConditionId: row.parentConditionId ? String(row.parentConditionId) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            configId: row.configId,
-            nodeType: row.nodeType,
-            logicalOperator: row.logicalOperator,
-            field: row.field,
-            operator: row.operator,
-            value: row.value,
-            parentConditionId: row.parentConditionId,
-            isActive: row.isActive,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            configId: row.configId ? String(row.configId) : null,
+            nodeType: row.nodeType ? String(row.nodeType) : null,
+            logicalOperator: row.logicalOperator ? String(row.logicalOperator) : null,
+            field: row.field ? String(row.field) : null,
+            operator: row.operator ? String(row.operator) : null,
+            value: row.value ? JSON.stringify(row.value) : null,
+            parentConditionId: row.parentConditionId ? String(row.parentConditionId) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 

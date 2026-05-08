@@ -3,25 +3,28 @@ import { ActionType, PopupType } from '@/app/_component/Row/Action';
 import { modelGQL } from '@/lib/api/crud.gql';
 import { useSession } from 'next-auth/react';
 import React, { useEffect } from "react";
-import { useFieldArray, useForm, } from 'react-hook-form';
-import { ok } from '@/lib/util/reponseUtil';
-import { WorkFlowTemplate, WorkFlowTemplateResponse } from '@/lib/generated/api/customHookAPI/graphql';
+
+import { fail, ok } from '@/lib/util/reponseUtil';
+import { BasicInformation, BasicInformationResponse, Permission, PermissionResponse } from '@/lib/generated/api/customHookAPI/graphql';
 import FormTemplate from '@/components/Forms/FormTemplate';
 import CustomTextInput from '@/components/Forms/Inputs/CustomTextInput';
-import CustomTextAreaInput from '@/components/Forms/Inputs/CustomTextAreaInput';
-import CustomNumberInput from '@/components/Forms/Inputs/CustomNumberInput';
-import CustomCheckbox from '@/components/Forms/Inputs/CustomCheckbox';
-import { Layers, Info, Trash2, PackagePlus } from 'lucide-react';
+import { Layers, } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import useMutationActions from '@/app/_hooks/useBulkActions';
 import { useListContext } from '@/app/_context/ListContext/ListProvider';
 import CustomSingleSelectInput from '@/components/Forms/Inputs/CustomSingleSelectInput';
 import { useQuery } from '@apollo/client/react';
-import { WorkFlowTemplateFindUnique } from '@/lib/api/gql/WorkFlowTemplate.gql';
 import { DrawerClose } from '@/components/ui/drawer';
-import WorkFlowTemplateStepForm from './components/WorkFlowTemplateStepForm';
 import useToast from '@/app/_hooks/useToast';
+import { BasicInformationFindUnique } from '@/lib/api/gql/BasicInformation.gql';
+import CustomStaticSelectInput from '@/components/Forms/Inputs/CustomStaticSelectInput';
+import { MODEL_DISPLAY_NAMES } from '@/generated/model-names';
+import { useForm } from 'react-hook-form';
+import { PermissionFindUnique } from '@/lib/api/gql/Permission.gql';
+import CustomNumberInput from '@/components/Forms/Inputs/CustomNumberInput';
+import CustomCheckbox from '@/components/Forms/Inputs/CustomCheckbox';
+import CustomTextAreaInput from '@/components/Forms/Inputs/CustomTextAreaInput';
 
 type MethodProps = {
   rowId?: string | null;
@@ -34,53 +37,33 @@ type MethodProps = {
 const modelAPI = modelGQL;
 
 const Method = (props: MethodProps) => {
-  const { model } = useListContext();
+  const { model, modelName } = useListContext();
   const session = useSession();
   const toast = useToast();
+  const tableName = MODEL_DISPLAY_NAMES[modelName as keyof typeof MODEL_DISPLAY_NAMES]?.toLowerCase();
 
-  const workFlowTemplateFindUnique = useQuery<
-    { WorkFlowTemplateFindUnique: WorkFlowTemplateResponse },
+  const permissionFindUnique = useQuery<
+    { PermissionFindUnique: PermissionResponse },
     { id: string }
-  >(WorkFlowTemplateFindUnique, {
+  >(PermissionFindUnique, {
     variables: {
       id: props.rowId ?? "",
     },
     skip: !props.rowId || props.actionType === "none",
   })
 
-  console.log("Workflow Template Unique Data:", workFlowTemplateFindUnique.data);
 
   const defaultValues = {
-    name: '',
-    description: '',
+    id: "",
+    name: "",
+    description: "",
+    module: "",
+    resource: "",
+    action: "",
+    displayOrder: 0,
     isGlobal: false,
-    version: 1,
-    scope: [{
-      companyId: "",
-      departmentId: "",
-      positionId: "",
-      jobLevelId: "",
-    }],
-    steps: [{
-      stepNumber: 1,
-      assignmentTypeId: "",
-      assignedToUserId: "",
-      isHaveCondition: false,
-      conditions: [{
-        modelName: "WorkFlowTemplateConfig",
-        group: "WorkFlowTemplateConfig",
-        codeKey: "workflow_template_config_conditions",
-        code: "workflow_template_config_conditions",
-        codeLabel: "Conditions",
-        value: {
-          nodeType: "RULE",
-          logicalOperator: "",
-          field: "",
-          operator: "",
-          value: ""
-        }
-      }]
-    }]
+    isAdmin: false,
+    globalLimit: 0,
   };
 
   const form = useForm({
@@ -88,316 +71,157 @@ const Method = (props: MethodProps) => {
   });
 
   useEffect(() => {
-    if (props.actionType !== "none" && workFlowTemplateFindUnique.data?.WorkFlowTemplateFindUnique.data) {
-      const data = workFlowTemplateFindUnique.data.WorkFlowTemplateFindUnique.data;
+    if (props.actionType !== "none" && permissionFindUnique.data?.PermissionFindUnique.data) {
+      const data = permissionFindUnique.data.PermissionFindUnique.data;
       form.reset({
-        name: data.name ?? '',
-        description: data.description ?? '',
-        isGlobal: data.isGlobal ?? false,
-        version: data.version ?? 1,
-        scope: data.scope?.map(scope => ({
-          companyId: scope.companyId ?? "",
-          departmentId: scope.departmentId ?? "",
-          positionId: scope.positionId ?? "",
-          jobLevelId: scope.jobLevelId ?? "",
-        })) ?? [{
-          companyId: "",
-          departmentId: "",
-          positionId: "",
-          jobLevelId: "",
-        }],
-        steps: data.steps?.map(step => ({
-          stepNumber: step.stepNumber ?? 1,
-          assignmentTypeId: step.assignmentTypeId ?? "",
-          assignedToUserId: step.assignedToUserId ?? "",
-          isHaveCondition: step.conditions && step.conditions.length > 0 ? true : false,
-          conditions: step.conditions?.map(condition => ({
-            modelName: condition.modelName ?? "WorkFlowTemplateConfig",
-            group: condition.group ?? "WorkFlowTemplateConfig",
-            codeKey: condition.codeKey ?? "workflow_template_config_conditions",
-            code: condition.code ?? "workflow_template_config_conditions",
-            codeLabel: condition.codeLabel ?? "Conditions",
-            value: condition.value ?? {
-              nodeType: "RULE",
-              logicalOperator: "",
-              field: "",
-              operator: "",
-              value: ""
-            },
-          })) ?? [{
-            modelName: "WorkFlowTemplateConfig",
-            group: "WorkFlowTemplateConfig",
-            codeKey: "workflow_template_config_conditions",
-            code: "workflow_template_config_conditions",
-            codeLabel: "Conditions",
-            value: {
-              nodeType: "RULE",
-              logicalOperator: "",
-              field: "",
-              operator: "",
-              value: ""
-            }
-          }]
-        })) ?? [{
-          stepNumber: 1,
-          assignmentTypeId: "",
-          assignedToUserId: "",
-          isHaveCondition: false,
-          conditions: [{
-            modelName: "WorkFlowTemplateConfig",
-            group: "WorkFlowTemplateConfig",
-            codeKey: "workflow_template_config_conditions",
-            code: "workflow_template_config_conditions",
-            codeLabel: "Conditions",
-            value: {
-              nodeType: "RULE",
-              logicalOperator: "",
-              field: "",
-              operator: "",
-              value: ""
-            }
-          }]
-        }]
+        id: data.id,
+        name: data.name ?? "",
+        description: data.description ?? "",
+        module: data.module ?? "",
+        resource: data.resource ?? "",
+        action: data.action ?? "",
+        displayOrder: Number(data.displayOrder) ?? 0,
+        isGlobal: Boolean(data.isGlobal) ?? false,
+        isAdmin: Boolean(data.isAdmin) ?? false,
+        globalLimit: Number(data.globalLimit) ?? 0,
       });
     }
-  }, [workFlowTemplateFindUnique.data, props.actionType, form]);
+  }, [permissionFindUnique.data, props.actionType, form]);
 
 
-
-  const scopeFieldArray = useFieldArray({
-    control: form.control,
-    name: "scope"
-  })
-
-  const isGlobal = form.watch("isGlobal");
-  const previousScope = React.useRef(form.getValues("scope"));
-
-  useEffect(() => {
-    if (isGlobal) {
-      previousScope.current = form.getValues("scope");
-      form.setValue("scope", [{
-        companyId: "",
-        departmentId: "",
-        positionId: "",
-        jobLevelId: "",
-      }]);
-    }
-  }, [isGlobal, form])
-
-
-  const handleToAddScope = () => {
-    scopeFieldArray.append({
-      companyId: "",
-      departmentId: "",
-      positionId: "",
-      jobLevelId: "",
-    })
-  }
-
-  const handleToRemoveScope = (index: number) => {
-    // Remain one but i clcik delete all the field are reset to default value
-    if (scopeFieldArray.fields.length === 1) {
-      scopeFieldArray.update(0, {
-        companyId: "",
-        departmentId: "",
-        positionId: "",
-        jobLevelId: "",
-      })
-    } else {
-      scopeFieldArray.remove(index);
-    }
-  }
 
   const { execute: executeCreate, executing: executingCreate } = useMutationActions({
     mutationGQL: modelAPI[model].create,
     setOpen: props.setOpen,
-    successMessage: 'Create Workflow Template Successfully',
-    successDescription: `The workflow template has been created successfully.`,
-    errorMessage: 'Create Workflow Template Failed',
-    errorDescription: `There was an error creating the workflow template. Please try again.`,
+    successMessage: `Create ${tableName} Successfully`,
+    successDescription: `The ${tableName} has been created successfully.`,
+    errorMessage: `Create ${tableName} Failed`,
+    errorDescription: `There was an error creating the ${tableName}. Please try again.`,
   });
 
 
   const { execute: executeUpdate, executing: executingUpdate } = useMutationActions({
     mutationGQL: modelAPI[model].update,
     setOpen: props.setOpen,
-    successMessage: 'Update Workflow Template Successfully',
-    successDescription: `The workflow template has been updated successfully.`,
-    errorMessage: 'Update Workflow Template Failed',
-    errorDescription: `There was an error updating the workflow template. Please try again.`,
+    successMessage: `Update ${tableName} Successfully`,
+    successDescription: `The ${tableName} has been updated successfully.`,
+    errorMessage: `Update ${tableName} Failed`,
+    errorDescription: `There was an error updating the ${tableName}. Please try again.`,
   });
 
+  const isViewMode = props.actionType === "view";
+  const isEditMode = props.actionType === "edit";
+
   const handleToSubmit = async (data: unknown) => {
-    const modelData = data as unknown as WorkFlowTemplate;
+    const modelData = data as unknown as Permission;
 
-    // Remove all scope fields that have empty values
-    const filteredScope = modelData.scope?.filter(scope =>
-      scope.companyId || scope.departmentId || scope.positionId || scope.jobLevelId
-    ) ?? null;
-
-    // Map filtered scope to create format - remove empty strings
-    const scopeData = filteredScope?.length > 0
-      ? {
-        create: filteredScope?.map(scope => ({
-          companyId: scope.companyId ? scope.companyId : null,
-          departmentId: scope.departmentId ? scope.departmentId : null,
-          positionId: scope.positionId ? scope.positionId : null,
-          jobLevelId: scope.jobLevelId ? scope.jobLevelId : null,
-        }))
-      }
-      : null;
-
-    // Remove all steps fields that have empty values
-    const filteredSteps = modelData.steps?.map(step => {
-      const filteredConditions = step.conditions?.filter(condition => {
-        const value = condition.value as Record<string, unknown>;
-        // For RULE nodes, check if field, operator, and value are filled
-        if (value.nodeType === "RULE") {
-          return value.field && value.operator && value.value;
-        }
-        // For GROUP nodes, check if logicalOperator is filled
-        return value.logicalOperator;
-      }) ?? [];
-
-      // Build condition tree structure
-
-      return {
-        ...step,
-        conditions: filteredConditions,
-      }
-    }) ?? [];
-
-
-
-    // Map filtered steps to create format - remove empty strings
-    const stepsData = filteredSteps?.length > 0
-      ? {
-        create: filteredSteps.map(step => ({
-          stepNumber: step.stepNumber,
-          assignmentTypeId: step.assignmentTypeId ? step.assignmentTypeId : null,
-          assignedToUserId: step.assignedToUserId ? step.assignedToUserId : null,
-          isHaveCondition: step.isHaveCondition,
-          conditions: step.conditions.length > 0 ? {
-            create: step.conditions?.map(condition => ({
-              modelName: condition.modelName,
-              group: condition.group,
-              codeKey: condition.codeKey,
-              code: condition.code,
-              codeLabel: condition.codeLabel,
-              value: condition.value,
-            })) ?? [],
-          } : null
-        }))
-      }
-      : null;
-
-
-    // Don't Update if no changes detected - This is to prevent unnecessary version increment
-    if (props.actionType === "edit" && workFlowTemplateFindUnique.data?.WorkFlowTemplateFindUnique.data) {
-      const existingData = workFlowTemplateFindUnique.data.WorkFlowTemplateFindUnique.data;
-      const isScopeEqual = JSON.stringify(existingData.scope) === JSON.stringify(scopeData?.create);
-      const isStepsEqual = JSON.stringify(existingData.steps) === JSON.stringify(stepsData?.create);
-      const isMainDataEqual =
-        existingData.name === modelData.name &&
-        existingData.description === modelData.description &&
-        existingData.isGlobal === modelData.isGlobal;
-      if (isScopeEqual && isStepsEqual && isMainDataEqual) {
-        toast.error({
-          message: "No Changes Detected",
-          description: `No changes detected in workflow template: ${modelData.name}. Update skipped.`,
-        })
-        return ok("NO_CHANGES_DETECTED",
-          `No changes detected in workflow template: ${modelData.name}. Update skipped.`,
-          modelData
-        );
-      }
+    const payload = {
+      ...(isEditMode ? { id: props.rowId || modelData.id } : {}),
+      data: {
+        name: modelData.name ? String(modelData.name) : undefined,
+        description: modelData.description ? String(modelData.description) : undefined,
+        module: modelData.module ? String(modelData.module) : undefined,
+        resource: modelData.resource ? String(modelData.resource) : undefined,
+        action: modelData.action ? String(modelData.action) : undefined,
+        displayOrder: modelData.displayOrder ? Number(modelData.displayOrder) : undefined,
+        isGlobal: modelData.isGlobal ? Boolean(modelData.isGlobal) : undefined,
+        isAdmin: modelData.isAdmin ? Boolean(modelData.isAdmin) : undefined,
+        globalLimit: modelData.globalLimit ? Number(modelData.globalLimit) : undefined,
+      },
+      currentUserId: session?.data?.user?.id,
     }
+
+
 
     switch (props.actionType) {
       case 'edit':
         await executeUpdate({
-          variables: {
-            id: props.rowId ?? "",
-            data: {
-              name: modelData.name ?? workFlowTemplateFindUnique.data?.WorkFlowTemplateFindUnique.data?.name,
-              description: modelData.description ?? workFlowTemplateFindUnique.data?.WorkFlowTemplateFindUnique.data?.description,
-              isGlobal: modelData.isGlobal ?? workFlowTemplateFindUnique.data?.WorkFlowTemplateFindUnique.data?.isGlobal,
-              version: (workFlowTemplateFindUnique?.data?.WorkFlowTemplateFindUnique.data?.version ?? 0) + 1,
-              // Logic: Wipe existing associations, then inject new ones
-              scope: scopeData ? {
-                deleteMany: {},
-                create: scopeData.create,
-              } : undefined,
-              steps: stepsData ? {
-                deleteMany: {},
-                create: stepsData.create,
-              } : undefined,
-            },
-            currentUserId: session?.data?.user?.id,
+          variables: payload,
+          onCompleted: (data) => {
+            const result = data as unknown as {
+              PermissionUpdate: PermissionResponse
+            }
+
+            if (!result.PermissionUpdate.isSuccess) {
+              toast.error({
+                message: result.PermissionUpdate.code || `Failed to update ${tableName}`,
+                description: result.PermissionUpdate.message || `There was an error updating the ${tableName}. Please try again.`,
+              })
+              return
+            }
+
+            toast.success({
+              message: `Successfully updated ${tableName}`,
+              description: `The ${tableName} has been updated successfully.`,
+            })
+            return props.setOpen?.(false)
           }
         })
-        return ok("SUCCESS_UPDATE_WORKFLOW_TEMPLATE",
-          `Successfully updated workflow template: ${modelData.name}`,
-          {
-            variables: {
-              id: props.rowId ?? "",
-              data: {
-                name: modelData.name ?? workFlowTemplateFindUnique.data?.WorkFlowTemplateFindUnique.data?.name,
-                description: modelData.description ?? workFlowTemplateFindUnique.data?.WorkFlowTemplateFindUnique.data?.description,
-                isGlobal: modelData.isGlobal ?? workFlowTemplateFindUnique.data?.WorkFlowTemplateFindUnique.data?.isGlobal,
-                version: (workFlowTemplateFindUnique?.data?.WorkFlowTemplateFindUnique.data?.version ?? 0) + 1,
-                // Logic: Wipe existing associations, then inject new ones
-                scope: scopeData ? {
-                  deleteMany: {},
-                  create: scopeData.create,
-                } : undefined,
-                steps: stepsData ? {
-                  deleteMany: {},
-                  create: stepsData.create,
-                } : undefined,
-              },
-              currentUserId: session?.data?.user?.id,
-            }
-          }
+        return ok(`SUCCESS_UPDATE_${tableName.toUpperCase().replace(/\s+/g, '_')}`,
+          `Successfully updated ${tableName}: ${modelData.name}`,
+          payload
         );
       case "duplicate":
         await executeCreate({
-          variables: {
-            data: {
-              name: modelData.name,
-              description: modelData.description,
-              isGlobal: modelData.isGlobal,
-              version: modelData.version,
-              scope: form.watch("isGlobal") ? null : scopeData,
-              steps: stepsData
-            },
-            currentUserId: session?.data?.user?.id,
+          variables: payload,
+          onCompleted: (data) => {
+            const result = data as unknown as {
+              PermissionCreate: PermissionResponse
+            }
+
+            if (!result.PermissionCreate.isSuccess) {
+              toast.error({
+                message: result.PermissionCreate.code || `Failed to update ${tableName}`,
+                description: result.PermissionCreate.message || `There was an error updating the ${tableName}. Please try again.`,
+              })
+              return
+            }
+
+            toast.success({
+              message: `Successfully updated ${tableName}`,
+              description: `The ${tableName} has been updated successfully.`,
+            })
+
+            return props.setOpen?.(false)
           }
         })
-        return ok("SUCCESS_DUPLICATE_WORKFLOW_TEMPLATE",
-          `Successfully duplicated workflow template: ${modelData.name}`,
-          filteredScope
+        return ok(`SUCCESS_DUPLICATE_${tableName.toUpperCase().replace(/\s+/g, '_')}`,
+          `Successfully duplicated ${tableName}: ${modelData.name}`,
+          payload
         );
       default:
         await executeCreate({
-          variables: {
-            data: {
-              name: modelData.name,
-              description: modelData.description,
-              isGlobal: modelData.isGlobal,
-              version: modelData.version,
-              scope: form.watch("isGlobal") ? null : scopeData,
-              steps: stepsData
-            },
-            currentUserId: session?.data?.user?.id,
+          variables: payload,
+          onCompleted: (data) => {
+            const result = data as unknown as {
+              PermissionCreate: PermissionResponse
+            }
+
+            if (!result.PermissionCreate.isSuccess) {
+              toast.error({
+                message: result.PermissionCreate.code || `Failed to update ${tableName}`,
+                description: result.PermissionCreate.message || `There was an error updating the ${tableName}. Please try again.`,
+              })
+              return
+            }
+
+            toast.success({
+              message: `Successfully updated ${tableName}`,
+              description: `The ${tableName} has been updated successfully.`,
+            })
+
+            return props.setOpen?.(false)
           }
         })
-        return ok("SUCCESS_CREATE_WORKFLOW_TEMPLATE",
-          `Successfully created workflow template: ${modelData.name}`,
-          modelData
+
+        return ok(`SUCCESS_CREATE_${tableName.toUpperCase().replace(/\s+/g, '_')}`,
+          `Successfully created ${tableName}: ${modelData.name}`,
+          payload
         );
     }
   };
+
+
 
   return (
     <FormTemplate
@@ -418,302 +242,88 @@ const Method = (props: MethodProps) => {
                 <Layers className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-bold uppercase tracking-tight text-slate-700">Workflow Configuration</h3>
-                <p className="text-xs text-muted-foreground">Define the properties for this system template.</p>
+                <h3 className="text-sm font-bold uppercase tracking-tight text-slate-700">
+                  {tableName} Configuration
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Configure the {tableName} details and settings here.
+                </p>
               </div>
             </div>
-
-            <div className="grid grid-cols-1 gap-5">
-              {/* Template Name & Global Toggle */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-                <div className="md:col-span-9">
-                  <CustomTextInput
-                    name="name"
-                    control={form.control}
-                    label="Template Name"
-                    placeholder="e.g., Standard Approval Process"
-                  />
-                </div>
-                <div className="">
-                  <CustomCheckbox
-                    label="Global Template"
-                    name="isGlobal"
-                    control={form.control}
-                    inputProps={{
-                      style: {
-                        width: '20px',
-                        height: '20px'
-                      }
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Description */}
-              <div className="relative">
-                <CustomTextAreaInput
-                  name="description"
+            {/* Form section with Icon */}
+            {/* Form section with Icon */}
+            <div className='grid grid-cols-1 gap-4'>
+              <div className='grid grid-cols-2 gap-4'>
+                <CustomCheckbox
+                  name="isAdmin"
                   control={form.control}
-                  label="Description"
-                  placeholder="Describe the purpose and steps of this workflow..."
+                  label="Is Admin"
+                  inputProps={{
+                    disabled: isViewMode,
+                    style: {
+                      cursor: isViewMode ? 'not-allowed' : 'pointer',
+                      width: '20px',
+                      height: '20px',
+                    }
+                  }}
+                />
+                <CustomCheckbox
+                  name="isGlobal"
+                  control={form.control}
+                  label="Is Global"
+                  inputProps={{
+                    disabled: isViewMode,
+                    style: {
+                      cursor: isViewMode ? 'not-allowed' : 'pointer',
+                      width: '20px',
+                      height: '20px',
+                    }
+                  }}
                 />
               </div>
+              <CustomTextInput
+                name="name"
+                control={form.control}
+                label="Role Name"
+                inputProps={{ disabled: isViewMode }}
+              />
+              <CustomTextAreaInput
+                name="description"
+                control={form.control}
+                label="Role description"
+                inputProps={{ disabled: isViewMode }}
+              />
+              <CustomTextInput
+                name="module"
+                control={form.control}
+                label="Role Name"
+                inputProps={{ disabled: isViewMode }}
+              />
+              <CustomTextInput
+                name="resource"
+                control={form.control}
+                label="Resource Name"
+                inputProps={{ disabled: isViewMode }}
+              />
+              <CustomTextInput
+                name="action"
+                control={form.control}
+                label="Action Name"
+                inputProps={{ disabled: isViewMode }}
+              />
 
-              {/* Header section with Icon */}
-              {
-                form.watch("isGlobal") ? null : (
-                  <div>
-                    <div className='flex  items-center justify-between gap-3 pb-2 border-b group'>
-                      <div className="flex items-center gap-3 pb-2">
-                        <div className="p-2 bg-primary/10 rounded-lg text-primary">
-                          <Layers className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <h3 className="text-sm font-bold uppercase tracking-tight text-slate-700">Scope ({`Who's the view`})</h3>
-                          <p className="text-xs text-muted-foreground">
-                            Define the scope of this workflow template. This helps the system auto-assign templates based on user attributes.
-                          </p>
-                        </div>
-                      </div>
-                      <div>
-                        <Button
-                          variant="default"
-                          type="button"
-                          size="sm"
-                          onClick={handleToAddScope}
-                          className="gap-1.5"
-                          title="Add new item"
-                        >
-                          <PackagePlus className="h-4 w-4" />
-                          <span className="hidden sm:inline">Add Scope</span>
-                        </Button>
-                      </div>
-
-                    </div>
-
-                    {
-                      scopeFieldArray.fields.map((field, index) => (
-                        <div key={index} className="grid grid-cols-5 gap-4 items-end space-y-4">
-                          <CustomSingleSelectInput
-                            name={`scope.${index}.companyId`}
-                            control={form.control}
-                            label={`Company`}
-                            findAllWithCursorGQL={modelAPI.CompanyGQL.findAllWithCursor}
-                            findUniqueGQL={modelAPI.CompanyGQL.findUnique}
-                            defaultValueId={""}
-                            placeholder={`Search company...`}
-                            searchPlaceholder={`Search company...`}
-                            emptySelectedMessage={`Company already selected.`}
-                            emptyMessage={`No company found.`}
-                            cursorVariables={(search, cursor, take) => ({
-                              cursorInput: {
-                                cursor,
-                                isActive: true,
-                                take,
-                                filter: search ? { name: { contains: search, mode: 'insensitive' } } : undefined,
-                              },
-                            })}
-                            uniqueVariables={(id) => ({ id })}
-                            mapOption={(data: unknown) => {
-                              const d = data as { id?: string; name?: string; userName?: string; email?: string };
-                              return {
-                                label: d.name ?? d.userName ?? d.email ?? '',
-                                value: d.id ?? '',
-                              };
-                            }}
-                            mapDefaultOption={(data: unknown) => {
-                              const d = data as {
-                                data?: { id?: string; name?: string; userName?: string; email?: string };
-                              };
-                              if (!d?.data) return null;
-                              return {
-                                label: d.data.name ?? d.data.userName ?? d.data.email ?? '',
-                                value: d.data.id ?? '',
-                              };
-                            }}
-                          />
-                          <CustomSingleSelectInput
-                            name={`scope.${index}.departmentId`}
-                            control={form.control}
-                            label={`Department`}
-                            findAllWithCursorGQL={modelAPI.DepartmentGQL.findAllWithCursor}
-                            findUniqueGQL={modelAPI.DepartmentGQL.findUnique}
-                            defaultValueId={field.departmentId ?? ""}
-                            disabled={!form.watch(`scope.${index}.companyId`)}
-                            placeholder={`Search department...`}
-                            searchPlaceholder={`Search department...`}
-                            emptySelectedMessage={`Department already selected.`}
-                            emptyMessage={`No department found.`}
-                            cursorVariables={(search, cursor, take) => {
-                              const selectedCompanyId = form.watch(`scope.${index}.companyId`);
-                              return {
-                                cursorInput: {
-                                  cursor,
-                                  isActive: true,
-                                  take,
-                                  filter: {
-                                    ...(search ? { name: { contains: search, mode: 'insensitive' } } : {}),
-                                    ...(selectedCompanyId ? { companyId: selectedCompanyId } : {}),
-                                  },
-                                },
-                              }
-                            }}
-                            uniqueVariables={(id) => ({ id })}
-                            mapOption={(data: unknown) => {
-                              const d = data as { id?: string; name?: string; userName?: string; email?: string };
-                              return {
-                                label: d.name ?? d.userName ?? d.email ?? '',
-                                value: d.id ?? '',
-                              };
-                            }}
-                            mapDefaultOption={(data: unknown) => {
-                              const d = data as {
-                                data?: { id?: string; name?: string; userName?: string; email?: string };
-                              };
-                              if (!d?.data) return null;
-                              return {
-                                label: d.data.name ?? d.data.userName ?? d.data.email ?? '',
-                                value: d.data.id ?? '',
-                              };
-                            }}
-                          />
-                          <CustomSingleSelectInput
-                            name={`scope.${index}.positionId`}
-                            control={form.control}
-                            label={`Position`}
-                            findAllWithCursorGQL={modelAPI.PositionGQL.findAllWithCursor}
-                            findUniqueGQL={modelAPI.PositionGQL.findUnique}
-                            defaultValueId={field.positionId ?? ""}
-                            disabled={!form.watch(`scope.${index}.companyId`)}
-                            placeholder={`Search position...`}
-                            searchPlaceholder={`Search position...`}
-                            emptySelectedMessage={`Position already selected.`}
-                            emptyMessage={`No position found.`}
-                            cursorVariables={(search, cursor, take) => {
-                              const selectedCompanyId = form.watch(`scope.${index}.companyId`);
-                              return {
-                                cursorInput: {
-                                  cursor,
-                                  isActive: true,
-                                  take,
-                                  filter: {
-                                    ...(search ? { name: { contains: search, mode: 'insensitive' } } : {}),
-                                    ...(selectedCompanyId ? { companyId: selectedCompanyId } : {}),
-                                  },
-                                },
-                              }
-                            }}
-                            uniqueVariables={(id) => ({ id })}
-                            mapOption={(data: unknown) => {
-                              const d = data as { id?: string; name?: string; userName?: string; email?: string };
-                              return {
-                                label: d.name ?? d.userName ?? d.email ?? '',
-                                value: d.id ?? '',
-                              };
-                            }}
-                            mapDefaultOption={(data: unknown) => {
-                              const d = data as {
-                                data?: { id?: string; name?: string; userName?: string; email?: string };
-                              };
-                              if (!d?.data) return null;
-                              return {
-                                label: d.data.name ?? d.data.userName ?? d.data.email ?? '',
-                                value: d.data.id ?? '',
-                              };
-                            }}
-                          />
-                          <CustomSingleSelectInput
-                            name={`scope.${index}.jobLevelId`}
-                            control={form.control}
-                            label={`Job Level`}
-                            findAllWithCursorGQL={modelAPI.JobLevelGQL.findAllWithCursor}
-                            findUniqueGQL={modelAPI.JobLevelGQL.findUnique}
-                            defaultValueId={field.jobLevelId ?? ""}
-                            disabled={!form.watch(`scope.${index}.companyId`)}
-                            placeholder={`Search joblevel...`}
-                            searchPlaceholder={`Search joblevel...`}
-                            emptySelectedMessage={`Job Level already selected.`}
-                            emptyMessage={`No joblevel found.`}
-                            cursorVariables={(search, cursor, take) => {
-                              const selectedCompanyId = form.watch(`scope.${index}.companyId`);
-                              return {
-                                cursorInput: {
-                                  cursor,
-                                  isActive: true,
-                                  take,
-                                  filter: {
-                                    ...(search ? { name: { contains: search, mode: 'insensitive' } } : {}),
-                                    ...(selectedCompanyId ? { companyId: selectedCompanyId } : {}),
-                                  },
-                                },
-                              }
-                            }}
-                            uniqueVariables={(id) => ({ id })}
-                            mapOption={(data: unknown) => {
-                              const d = data as { id?: string; name?: string; };
-                              return {
-                                label: d.name ?? '',
-                                value: d.id ?? '',
-                              };
-                            }}
-                            mapDefaultOption={(data: unknown) => {
-                              const d = data as {
-                                data?: { id?: string; name?: string; };
-                              };
-                              if (!d?.data) return null;
-                              return {
-                                label: d.data.name ?? '',
-                                value: d.data.id ?? '',
-                              };
-                            }}
-                          />
-
-                          <div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              type="button"
-                              disabled={scopeFieldArray.fields.length === 1}
-                              onClick={() => handleToRemoveScope(index)}
-                              className="text-red-500 hover:bg-red-100/50 focus:bg-red-100/50 disabled:text-red-300 disabled:hover:bg-transparent"
-                              title="Remove item"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))
-                    }
-                  </div>
-                )
-              }
-
-              {/* WorkFlow Template StepForm */}
-              <WorkFlowTemplateStepForm form={form as never} />
-
-              {/* Versioning Footer */}
-              < div className="pt-4 mt-2 border-t bg-slate-50/50 -mx-6 px-6 py-4 rounded-b-xl" >
-                <div className="flex items-start gap-4">
-                  <div className="mt-1">
-                    <Info className="w-4 h-4 text-slate-400" />
-                  </div>
-                  <div className="flex-1">
-                    <CustomNumberInput
-                      name="version"
-                      control={form.control}
-                      label={`System Version Control`}
-                      inputProps={{
-                        disabled: true,
-                        className: "bg-white/50 border-slate-200 font-mono text-xs"
-                      }}
-                      placeholder="Auto-generated version"
-                    />
-                    <p className="mt-1.5 text-[10px] text-slate-500 italic">
-                      The current revision is <span className="font-bold text-slate-700">{defaultValues.version}</span>. Versions are automatically incremented upon system deployment.
-                    </p>
-                  </div>
-                </div>
-              </div>
+              <CustomNumberInput
+                name="displayOrder"
+                control={form.control}
+                label="Order"
+                inputProps={{ disabled: isViewMode }}
+              />
+              <CustomNumberInput
+                name="globalLimit"
+                control={form.control}
+                label="Global Limit"
+                inputProps={{ disabled: isViewMode }}
+              />
             </div>
           </div>
         </ScrollArea>

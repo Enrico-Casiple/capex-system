@@ -36,7 +36,7 @@ Object.keys(prismaDataModel.datamodel.models).forEach((modelName) => {
                 if (field.isList) {
                   fields[fieldName] = t.field({
                     type: ['String'],
-                    nullable: false,
+                    nullable: !isNullable,
                     resolve: (parent) =>
                       (parent as unknown as Record<string, string[]>)[fieldName] ?? [],
                     description: `${nullableNote} ${fieldName} field of ${modelName}. Type: String[].`,

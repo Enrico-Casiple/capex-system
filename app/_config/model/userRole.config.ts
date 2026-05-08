@@ -83,37 +83,37 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "userId",
         label: "UserId",
-        default: "",
+        default: null,
       },
       {
         key: "roleId",
         label: "RoleId",
-        default: "",
+        default: null,
       },
       {
         key: "scopeTypeId",
         label: "ScopeTypeId",
-        default: "",
+        default: null,
       },
       {
         key: "scopeValues",
         label: "ScopeValues",
-        default: "",
+        default: null,
       },
       {
         key: "conditionOverrides",
         label: "ConditionOverrides",
-        default: {} as Record<string, unknown>,
+        default: null,
       },
       {
         key: "assignedById",
         label: "AssignedById",
-        default: "",
+        default: null,
       },
       {
         key: "expiresAt",
         label: "ExpiresAt",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -123,41 +123,41 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "userId",
         label: "UserId",
-        default: "",
+        default: null,
       },
       {
         key: "roleId",
         label: "RoleId",
-        default: "",
+        default: null,
       },
       {
         key: "scopeTypeId",
         label: "ScopeTypeId",
-        default: "",
+        default: null,
       },
       {
         key: "scopeValues",
         label: "ScopeValues",
-        default: "",
+        default: null,
       },
       {
         key: "conditionOverrides",
         label: "ConditionOverrides",
-        default: {} as Record<string, unknown>,
+        default: null,
       },
       {
         key: "assignedById",
         label: "AssignedById",
-        default: "",
+        default: null,
       },
       {
         key: "expiresAt",
         label: "ExpiresAt",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -198,28 +198,28 @@ export const userRole = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            userId: row.userId,
-            roleId: row.roleId,
-            scopeTypeId: row.scopeTypeId,
-            scopeValues: row.scopeValues,
-            conditionOverrides: row.conditionOverrides,
-            assignedById: row.assignedById,
-            expiresAt: row.expiresAt,
-            isActive: row.isActive,
+            userId: row.userId ? String(row.userId) : null,
+            roleId: row.roleId ? String(row.roleId) : null,
+            scopeTypeId: row.scopeTypeId ? String(row.scopeTypeId) : null,
+            scopeValues: row.scopeValues ? String(row.scopeValues) : null,
+            conditionOverrides: row.conditionOverrides ? JSON.stringify(row.conditionOverrides) : null,
+            assignedById: row.assignedById ? String(row.assignedById) : null,
+            expiresAt: row.expiresAt ? new Date(row.expiresAt) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            userId: row.userId,
-            roleId: row.roleId,
-            scopeTypeId: row.scopeTypeId,
-            scopeValues: row.scopeValues,
-            conditionOverrides: row.conditionOverrides,
-            assignedById: row.assignedById,
-            expiresAt: row.expiresAt,
-            isActive: row.isActive,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            userId: row.userId ? String(row.userId) : null,
+            roleId: row.roleId ? String(row.roleId) : null,
+            scopeTypeId: row.scopeTypeId ? String(row.scopeTypeId) : null,
+            scopeValues: row.scopeValues ? String(row.scopeValues) : null,
+            conditionOverrides: row.conditionOverrides ? JSON.stringify(row.conditionOverrides) : null,
+            assignedById: row.assignedById ? String(row.assignedById) : null,
+            expiresAt: row.expiresAt ? new Date(row.expiresAt) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 

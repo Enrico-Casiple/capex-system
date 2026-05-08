@@ -16,7 +16,7 @@ import RoleGate from '../RoleGate/RoleGate';
 export type PreviewColumn<TRow extends Record<string, unknown>> = {
   key: keyof TRow;
   label: string;
-  default?: string | number | boolean | undefined | Record<string, unknown>;
+  default?: string | number | boolean | undefined | Record<string, unknown> | null;
 };
 
 type ImportFormWrapperProps<TRow extends Record<string, unknown>, TInput> = {
@@ -50,18 +50,16 @@ const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({
   const handleDrop = (acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
       setFileName(acceptedFiles[0].name);
-      Papa.parse<TRow>(acceptedFiles[0], {
+      Papa.parse<Record<string, unknown>>(acceptedFiles[0], {
         header: true,
         complete: (results) => {
           // Only use provided columns - no auto-generation
-
-          // Filter out completely empty rows and don't apply defaults
           const enrichedData = results.data
-            .filter((row: Record<string, unknown>) => {
+            .filter((row) => {
               // Keep row if it has at least one non-empty value
-              return Object.values(row).some(value => value !== '' && value !== null && value !== undefined);
+              return Object.values(row).some((value) => value !== null && value !== undefined && String(value).trim() !== '');
             })
-            .map((row: Record<string, unknown>) => row as TRow);
+            .map((row) => row as TRow);
 
           form.setValue('schema', enrichedData);
           setSchema(enrichedData);
@@ -100,7 +98,6 @@ const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({
 
     // Create Excel HTML table with headers showing default values
     const headers = previewColumns.map(col => {
-      // const defaultText = col.default !== undefined ? ` (default: ${col.default})` : '';
       return `<th style="background-color: #f2f2f2; border: 1px solid #000; padding: 8px; font-weight: bold; text-align: left;">${String(col.key)}</th>`;
     }).join('');
 
@@ -150,18 +147,47 @@ const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({
       description: 'Excel template has been downloaded.',
     });
   };
-  // PerformanceImprovementPlan-WorkInfo
+
   const { execute, executing } = useMutationActions({
     mutationGQL: mutationGQL || modelGQL[model].createMany,
     successMessage: "Records created successfully",
     successDescription: `The selected records have been created.`,
     errorMessage: "Failed to create records",
     errorDescription: `An error occurred while creating the records.`,
-  })
+  });
+
+  const cleanRow = (row: Record<string, unknown>): Record<string, unknown> => {
+    const out: Record<string, unknown> = {};
+    // narrow to any for safe runtime checks
+    for (const [key, rawValue] of Object.entries(row as Record<string, any>)) {
+      let value: any = rawValue;
+
+      if (typeof value === "string") {
+        value = value.trim();
+        if (
+          value === "" ||
+          value.toLowerCase() === "null" ||
+          value.toLowerCase() === "undefined" ||
+          value === "0"
+        ) {
+          continue;
+        }
+      }
+
+      if (value === null || value === undefined) continue;
+      if (typeof value === "number" && value === 0) continue;
+      if (Array.isArray(value) && value.length === 0) continue;
+      if (typeof value === "object" && !Array.isArray(value) && Object.keys(value).length === 0) continue;
+
+      out[key] = value;
+    }
+    return out;
+  };
 
   const handleToSubmit = async () => {
     const rawData = form.getValues('schema');
-    const payload = await Promise.all(rawData.map(transformRow));
+    const cleaned = rawData.map((r) => cleanRow(r as Record<string, unknown>) as TRow);
+    const payload = await Promise.all(cleaned.map((row) => transformRow(row)));
     console.log('Transformed payload for import:', payload);
 
     await execute({
@@ -169,6 +195,28 @@ const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({
         data: payload,
         currentUserId: session.data?.user?.id || '',
         ...additionalVariables
+      },
+      onCompleted(data) {
+        const key = `${modelName}CreateMany` as keyof typeof data;
+        console.log('Mutation response data:', data);
+        console.log('Looking for key in response:', key);
+        const result = (data as Record<string, any>)[key]
+        console.log('Import mutation result:', result);
+        if (!result?.isSuccess) {
+          toast.error({
+            message: result?.code || 'Import failed',
+            description: result?.message || 'An error occurred during import. Please check the data and try again.',
+          });
+
+          return;
+        }
+
+        toast.success({
+          message: 'Import successful',
+          description: 'The records have been imported successfully.',
+        });
+
+        return { isSuccess: true, message: 'Import successful', code: 'IMPORT_SUCCESS', data: null };
       },
       onError(error) {
         console.error('Error during import mutation:', error);
@@ -189,7 +237,6 @@ const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({
         <div className='flex justify-end mb-2'>
           <RoleGate
             module={[`${modelName.toUpperCase()}_MANAGEMENT`, 'SYSTEM']}
-            resource={[`${modelName.toLowerCase()}`, '*']}
             action={['download_template', '*']}
           >
             <Button
@@ -264,7 +311,7 @@ const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({
                     <tr key={idx} className='hover:bg-muted/20'>
                       {previewColumns.map(col => (
                         <td key={String(col.key)} className='px-2 py-1.5'>
-                          {String(row[col.key] ?? '-')}
+                          {String(((row as any)[col.key as any]) ?? '-')}
                         </td>
                       ))}
                     </tr>
@@ -298,4 +345,4 @@ const ImportFormWrapper = <TRow extends Record<string, unknown>, TInput>({
   )
 }
 
-export default ImportFormWrapper
+export default ImportFormWrapper;

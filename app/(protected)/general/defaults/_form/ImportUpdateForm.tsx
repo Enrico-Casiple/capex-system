@@ -1,6 +1,6 @@
 import ImportUpdateFormWrapper from '@/app/_component/Form/ImportUpdateFormWrapper';
+import { PreviewColumn } from '@/app/_config/shared';
 import useToast from '@/app/_hooks/useToast';
-import { PreviewColumn } from '../../_config/shared';
 
 type ImportUpdateFormProps<TModel, TUpdateInput> = {
   open: boolean;

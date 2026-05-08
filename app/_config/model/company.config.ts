@@ -95,47 +95,47 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "name",
         label: "Name",
-        default: "",
+        default: null,
       },
       {
         key: "acronym",
         label: "Acronym",
-        default: "",
+        default: null,
       },
       {
         key: "description",
         label: "Description",
-        default: "",
+        default: null,
       },
       {
         key: "groupOfCompanyId",
         label: "GroupOfCompanyId",
-        default: "",
+        default: null,
       },
       {
         key: "locationsid",
         label: "Locationsid",
-        default: "",
+        default: null,
       },
       {
         key: "conctactNumber",
         label: "ConctactNumber",
-        default: "",
+        default: null,
       },
       {
         key: "email",
         label: "Email",
-        default: "",
+        default: null,
       },
       {
         key: "logo",
         label: "Logo",
-        default: "",
+        default: null,
       },
       {
         key: "scopeTypeId",
         label: "ScopeTypeId",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -145,51 +145,51 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "name",
         label: "Name",
-        default: "",
+        default: null,
       },
       {
         key: "acronym",
         label: "Acronym",
-        default: "",
+        default: null,
       },
       {
         key: "description",
         label: "Description",
-        default: "",
+        default: null,
       },
       {
         key: "groupOfCompanyId",
         label: "GroupOfCompanyId",
-        default: "",
+        default: null,
       },
       {
         key: "locationsid",
         label: "Locationsid",
-        default: "",
+        default: null,
       },
       {
         key: "conctactNumber",
         label: "ConctactNumber",
-        default: "",
+        default: null,
       },
       {
         key: "email",
         label: "Email",
-        default: "",
+        default: null,
       },
       {
         key: "logo",
         label: "Logo",
-        default: "",
+        default: null,
       },
       {
         key: "scopeTypeId",
         label: "ScopeTypeId",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -232,32 +232,32 @@ export const company = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            name: row.name,
-            acronym: row.acronym,
-            description: row.description,
-            groupOfCompanyId: row.groupOfCompanyId,
-            locationsid: row.locationsid,
-            conctactNumber: row.conctactNumber,
-            email: row.email,
-            logo: row.logo,
-            scopeTypeId: row.scopeTypeId,
-            isActive: row.isActive,
+            name: row.name ? String(row.name) : null,
+            acronym: row.acronym ? String(row.acronym) : null,
+            description: row.description ? String(row.description) : null,
+            groupOfCompanyId: row.groupOfCompanyId ? String(row.groupOfCompanyId) : null,
+            locationsid: row.locationsid ? String(row.locationsid) : null,
+            conctactNumber: row.conctactNumber ? String(row.conctactNumber) : null,
+            email: row.email ? String(row.email) : null,
+            logo: row.logo ? String(row.logo) : null,
+            scopeTypeId: row.scopeTypeId ? String(row.scopeTypeId) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            name: row.name,
-            acronym: row.acronym,
-            description: row.description,
-            groupOfCompanyId: row.groupOfCompanyId,
-            locationsid: row.locationsid,
-            conctactNumber: row.conctactNumber,
-            email: row.email,
-            logo: row.logo,
-            scopeTypeId: row.scopeTypeId,
-            isActive: row.isActive,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            name: row.name ? String(row.name) : null,
+            acronym: row.acronym ? String(row.acronym) : null,
+            description: row.description ? String(row.description) : null,
+            groupOfCompanyId: row.groupOfCompanyId ? String(row.groupOfCompanyId) : null,
+            locationsid: row.locationsid ? String(row.locationsid) : null,
+            conctactNumber: row.conctactNumber ? String(row.conctactNumber) : null,
+            email: row.email ? String(row.email) : null,
+            logo: row.logo ? String(row.logo) : null,
+            scopeTypeId: row.scopeTypeId ? String(row.scopeTypeId) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 

@@ -101,116 +101,116 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "name",
         label: "Name",
-        default: "",
+        default: null,
       },
       {
         key: "description",
         label: "Description",
-        default: "",
+        default: null,
       },
       {
         key: "startTime",
         label: "StartTime",
-        default: "",
+        default: null,
       },
       {
         key: "endTime",
         label: "EndTime",
-        default: "",
+        default: null,
       },
       {
         key: "lunchStart",
         label: "LunchStart",
-        default: "",
+        default: null,
       },
       {
         key: "lunchEnd",
         label: "LunchEnd",
-        default: "",
+        default: null,
       },
       {
         key: "breakStart",
         label: "BreakStart",
-        default: "",
+        default: null,
       },
       {
         key: "breakEnd",
         label: "BreakEnd",
-        default: "",
+        default: null,
       },
       {
         key: "workDays",
         label: "WorkDays",
-        default: 0,
+        default: null,
       },
       {
         key: "restDays",
         label: "RestDays",
-        default: 0,
+        default: null,
       },
       {
         key: "workInformationId",
         label: "WorkInformationId",
-        default: "",
+        default: null,
       }
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "name",
         label: "Name",
-        default: "",
+        default: null,
       },
       {
         key: "description",
         label: "Description",
-        default: "",
+        default: null,
       },
       {
         key: "startTime",
         label: "StartTime",
-        default: "",
+        default: null,
       },
       {
         key: "endTime",
         label: "EndTime",
-        default: "",
+        default: null,
       },
       {
         key: "lunchStart",
         label: "LunchStart",
-        default: "",
+        default: null,
       },
       {
         key: "lunchEnd",
         label: "LunchEnd",
-        default: "",
+        default: null,
       },
       {
         key: "breakStart",
         label: "BreakStart",
-        default: "",
+        default: null,
       },
       {
         key: "breakEnd",
         label: "BreakEnd",
-        default: "",
+        default: null,
       },
       {
         key: "workDays",
         label: "WorkDays",
-        default: 0,
+        default: null,
       },
       {
         key: "restDays",
         label: "RestDays",
-        default: 0,
+        default: null,
       },
       {
         key: "workInformationId",
         label: "WorkInformationId",
-        default: "",
+        default: null,
       }
 ];
 
@@ -249,34 +249,34 @@ export const shiftingSchedule = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            name: row.name,
-            description: row.description,
-            startTime: row.startTime,
-            endTime: row.endTime,
-            lunchStart: row.lunchStart,
-            lunchEnd: row.lunchEnd,
-            breakStart: row.breakStart,
-            breakEnd: row.breakEnd,
-            workDays: row.workDays,
-            restDays: row.restDays,
-            workInformationId: row.workInformationId,
+            name: row.name ? String(row.name) : null,
+            description: row.description ? String(row.description) : null,
+            startTime: row.startTime ? new Date(row.startTime) : null,
+            endTime: row.endTime ? new Date(row.endTime) : null,
+            lunchStart: row.lunchStart ? new Date(row.lunchStart) : null,
+            lunchEnd: row.lunchEnd ? new Date(row.lunchEnd) : null,
+            breakStart: row.breakStart ? new Date(row.breakStart) : null,
+            breakEnd: row.breakEnd ? new Date(row.breakEnd) : null,
+            workDays: row.workDays ? Number(row.workDays) : null,
+            restDays: row.restDays ? Number(row.restDays) : null,
+            workInformationId: row.workInformationId ? String(row.workInformationId) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            name: row.name,
-            description: row.description,
-            startTime: row.startTime,
-            endTime: row.endTime,
-            lunchStart: row.lunchStart,
-            lunchEnd: row.lunchEnd,
-            breakStart: row.breakStart,
-            breakEnd: row.breakEnd,
-            workDays: row.workDays,
-            restDays: row.restDays,
-            workInformationId: row.workInformationId,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            name: row.name ? String(row.name) : null,
+            description: row.description ? String(row.description) : null,
+            startTime: row.startTime ? new Date(row.startTime) : null,
+            endTime: row.endTime ? new Date(row.endTime) : null,
+            lunchStart: row.lunchStart ? new Date(row.lunchStart) : null,
+            lunchEnd: row.lunchEnd ? new Date(row.lunchEnd) : null,
+            breakStart: row.breakStart ? new Date(row.breakStart) : null,
+            breakEnd: row.breakEnd ? new Date(row.breakEnd) : null,
+            workDays: row.workDays ? Number(row.workDays) : null,
+            restDays: row.restDays ? Number(row.restDays) : null,
+            workInformationId: row.workInformationId ? String(row.workInformationId) : null,
     };
   },
 

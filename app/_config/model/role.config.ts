@@ -71,17 +71,17 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "name",
         label: "Name",
-        default: "",
+        default: null,
       },
       {
         key: "description",
         label: "Description",
-        default: "",
+        default: null,
       },
       {
         key: "roleType",
         label: "RoleType",
-        default: "",
+        default: null,
       },
       {
         key: "isDefault",
@@ -91,7 +91,7 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "parentRoleId",
         label: "ParentRoleId",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -101,21 +101,21 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "name",
         label: "Name",
-        default: "",
+        default: null,
       },
       {
         key: "description",
         label: "Description",
-        default: "",
+        default: null,
       },
       {
         key: "roleType",
         label: "RoleType",
-        default: "",
+        default: null,
       },
       {
         key: "isDefault",
@@ -125,7 +125,7 @@ const previewColumnsUpdate: PreviewColumn<Model>[] = [
       {
         key: "parentRoleId",
         label: "ParentRoleId",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -164,24 +164,24 @@ export const role = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            name: row.name,
-            description: row.description,
-            roleType: row.roleType,
-            isDefault: row.isDefault,
-            parentRoleId: row.parentRoleId,
-            isActive: row.isActive,
+            name: row.name ? String(row.name) : null,
+            description: row.description ? String(row.description) : null,
+            roleType: row.roleType ? String(row.roleType) : null,
+            isDefault: row.isDefault != null ? Boolean(row.isDefault) : null,
+            parentRoleId: row.parentRoleId ? String(row.parentRoleId) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            name: row.name,
-            description: row.description,
-            roleType: row.roleType,
-            isDefault: row.isDefault,
-            parentRoleId: row.parentRoleId,
-            isActive: row.isActive,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            name: row.name ? String(row.name) : null,
+            description: row.description ? String(row.description) : null,
+            roleType: row.roleType ? String(row.roleType) : null,
+            isDefault: row.isDefault != null ? Boolean(row.isDefault) : null,
+            parentRoleId: row.parentRoleId ? String(row.parentRoleId) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 

@@ -42,7 +42,7 @@ const TableHeaderWrapper = <Model,>({
             const canSort = header.column.getCanSort();
             const sorted = header.column.getIsSorted();
             const isActionColumn = header.column.id === 'action';
-            console.log(table.getRowModel().rows.map(row => row.original))
+            // console.log(table.getRowModel().rows.map(row => row.original))
             return (
               <TableHead
                 key={`${headerGroup.id}-${idx}`}

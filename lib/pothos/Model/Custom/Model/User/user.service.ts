@@ -9,7 +9,7 @@ import { getPrismaErrorMessage } from '../../../../../util/getPrismaErrorMessage
 
 const rateLimiter = new RateLimiterMemory({
   points: 5,
-  duration: 3600,
+  duration: 1000,
 });
 
 export type LoginArgs = {

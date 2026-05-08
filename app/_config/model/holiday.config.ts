@@ -59,12 +59,12 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "name",
         label: "Name",
-        default: "",
+        default: null,
       },
       {
         key: "date",
         label: "Date",
-        default: "",
+        default: null,
       },
       {
         key: "isRecurring",
@@ -74,21 +74,21 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "description",
         label: "Description",
-        default: "",
+        default: null,
       }
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "name",
         label: "Name",
-        default: "",
+        default: null,
       },
       {
         key: "date",
         label: "Date",
-        default: "",
+        default: null,
       },
       {
         key: "isRecurring",
@@ -98,7 +98,7 @@ const previewColumnsUpdate: PreviewColumn<Model>[] = [
       {
         key: "description",
         label: "Description",
-        default: "",
+        default: null,
       }
 ];
 
@@ -130,20 +130,20 @@ export const holiday = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            name: row.name,
-            date: row.date,
-            isRecurring: row.isRecurring,
-            description: row.description,
+            name: row.name ? String(row.name) : null,
+            date: row.date ? new Date(row.date) : null,
+            isRecurring: row.isRecurring != null ? Boolean(row.isRecurring) : null,
+            description: row.description ? String(row.description) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            name: row.name,
-            date: row.date,
-            isRecurring: row.isRecurring,
-            description: row.description,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            name: row.name ? String(row.name) : null,
+            date: row.date ? new Date(row.date) : null,
+            isRecurring: row.isRecurring != null ? Boolean(row.isRecurring) : null,
+            description: row.description ? String(row.description) : null,
     };
   },
 

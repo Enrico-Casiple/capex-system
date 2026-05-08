@@ -5,9 +5,9 @@ import ImportUpdate from '@/app/_component/List/ImportUpdate';
 import ModelData from '@/app/_component/ModelData';
 import Action, { ActionType, PopupType } from '@/app/_component/Row/Action';
 import { Spinner } from '@/app/_component/Spinner';
-import { positionTableConfig } from '@/app/_config';
+import { positionTableConfig, workFlowInstanceStepTableConfig } from '@/app/_config';
 import ListPage from '@/app/_context/ListWrapper';
-import { Position, PositionCreateInput, PositionUpdateInput } from '@/lib/generated/api/customHookAPI/graphql';
+import { Position, PositionCreateInput, PositionUpdateInput, WorkFlowInstanceStep, WorkFlowInstanceStepCreateInput, WorkFlowInstanceStepUpdateInput } from '@/lib/generated/api/customHookAPI/graphql';
 import dynamic from 'next/dynamic';
 import { useCallback } from 'react';
 import ExportForm from './_form/ExportForm';
@@ -20,9 +20,9 @@ const Method = dynamic(() => import('./_form/Method'), {
 });
 
 const ModelPage = () => {
-  type ModelRequest = Position;
-  type ModelCreateInput = PositionCreateInput;
-  type ModelUpdateInput = PositionUpdateInput;
+  type ModelRequest = WorkFlowInstanceStep;
+  type ModelCreateInput = WorkFlowInstanceStepCreateInput;
+  type ModelUpdateInput = WorkFlowInstanceStepUpdateInput;
 
 
   const {
@@ -41,7 +41,7 @@ const ModelPage = () => {
     previewColumnsUpdate,
     exportColumns,
     defaultExportColumns,
-  } = positionTableConfig;
+  } = workFlowInstanceStepTableConfig;
 
   const renderMethod = useCallback(
     (

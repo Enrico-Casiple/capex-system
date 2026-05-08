@@ -89,42 +89,42 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "modelName",
         label: "ModelName",
-        default: "",
+        default: null,
       },
       {
         key: "group",
         label: "Group",
-        default: "",
+        default: null,
       },
       {
         key: "codeKey",
         label: "CodeKey",
-        default: "",
+        default: null,
       },
       {
         key: "code",
         label: "Code",
-        default: "",
+        default: null,
       },
       {
         key: "codeLabel",
         label: "CodeLabel",
-        default: "",
+        default: null,
       },
       {
         key: "value",
         label: "Value",
-        default: {} as Record<string, unknown>,
+        default: null,
       },
       {
         key: "modelId",
         label: "ModelId",
-        default: "",
+        default: null,
       },
       {
         key: "sortOrder",
         label: "SortOrder",
-        default: 0,
+        default: null,
       },
       {
         key: "isActive",
@@ -134,46 +134,46 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "modelName",
         label: "ModelName",
-        default: "",
+        default: null,
       },
       {
         key: "group",
         label: "Group",
-        default: "",
+        default: null,
       },
       {
         key: "codeKey",
         label: "CodeKey",
-        default: "",
+        default: null,
       },
       {
         key: "code",
         label: "Code",
-        default: "",
+        default: null,
       },
       {
         key: "codeLabel",
         label: "CodeLabel",
-        default: "",
+        default: null,
       },
       {
         key: "value",
         label: "Value",
-        default: {} as Record<string, unknown>,
+        default: null,
       },
       {
         key: "modelId",
         label: "ModelId",
-        default: "",
+        default: null,
       },
       {
         key: "sortOrder",
         label: "SortOrder",
-        default: 0,
+        default: null,
       },
       {
         key: "isActive",
@@ -215,30 +215,30 @@ export const config = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            modelName: row.modelName,
-            group: row.group,
-            codeKey: row.codeKey,
-            code: row.code,
-            codeLabel: row.codeLabel,
-            value: row.value,
-            modelId: row.modelId,
-            sortOrder: row.sortOrder,
-            isActive: row.isActive,
+            modelName: row.modelName ? String(row.modelName) : null,
+            group: row.group ? String(row.group) : null,
+            codeKey: row.codeKey ? String(row.codeKey) : null,
+            code: row.code ? String(row.code) : null,
+            codeLabel: row.codeLabel ? String(row.codeLabel) : null,
+            value: row.value ? JSON.stringify(row.value) : null,
+            modelId: row.modelId ? String(row.modelId) : null,
+            sortOrder: row.sortOrder ? Number(row.sortOrder) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            modelName: row.modelName,
-            group: row.group,
-            codeKey: row.codeKey,
-            code: row.code,
-            codeLabel: row.codeLabel,
-            value: row.value,
-            modelId: row.modelId,
-            sortOrder: row.sortOrder,
-            isActive: row.isActive,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            modelName: row.modelName ? String(row.modelName) : null,
+            group: row.group ? String(row.group) : null,
+            codeKey: row.codeKey ? String(row.codeKey) : null,
+            code: row.code ? String(row.code) : null,
+            codeLabel: row.codeLabel ? String(row.codeLabel) : null,
+            value: row.value ? JSON.stringify(row.value) : null,
+            modelId: row.modelId ? String(row.modelId) : null,
+            sortOrder: row.sortOrder ? Number(row.sortOrder) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 

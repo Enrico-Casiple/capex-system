@@ -101,52 +101,52 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "templateId",
         label: "TemplateId",
-        default: "",
+        default: null,
       },
       {
         key: "title",
         label: "Title",
-        default: "",
+        default: null,
       },
       {
         key: "description",
         label: "Description",
-        default: "",
+        default: null,
       },
       {
         key: "statusId",
         label: "StatusId",
-        default: "",
+        default: null,
       },
       {
         key: "currentStep",
         label: "CurrentStep",
-        default: 0,
+        default: null,
       },
       {
         key: "referenceTypeId",
         label: "ReferenceTypeId",
-        default: "",
+        default: null,
       },
       {
         key: "startedAt",
         label: "StartedAt",
-        default: "",
+        default: null,
       },
       {
         key: "completedAt",
         label: "CompletedAt",
-        default: "",
+        default: null,
       },
       {
         key: "requestId",
         label: "RequestId",
-        default: "",
+        default: null,
       },
       {
         key: "budgetId",
         label: "BudgetId",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -156,56 +156,56 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "templateId",
         label: "TemplateId",
-        default: "",
+        default: null,
       },
       {
         key: "title",
         label: "Title",
-        default: "",
+        default: null,
       },
       {
         key: "description",
         label: "Description",
-        default: "",
+        default: null,
       },
       {
         key: "statusId",
         label: "StatusId",
-        default: "",
+        default: null,
       },
       {
         key: "currentStep",
         label: "CurrentStep",
-        default: 0,
+        default: null,
       },
       {
         key: "referenceTypeId",
         label: "ReferenceTypeId",
-        default: "",
+        default: null,
       },
       {
         key: "startedAt",
         label: "StartedAt",
-        default: "",
+        default: null,
       },
       {
         key: "completedAt",
         label: "CompletedAt",
-        default: "",
+        default: null,
       },
       {
         key: "requestId",
         label: "RequestId",
-        default: "",
+        default: null,
       },
       {
         key: "budgetId",
         label: "BudgetId",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -249,34 +249,34 @@ export const workFlowInstance = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            templateId: row.templateId,
-            title: row.title,
-            description: row.description,
-            statusId: row.statusId,
-            currentStep: row.currentStep,
-            referenceTypeId: row.referenceTypeId,
-            startedAt: row.startedAt,
-            completedAt: row.completedAt,
-            requestId: row.requestId,
-            budgetId: row.budgetId,
-            isActive: row.isActive,
+            templateId: row.templateId ? String(row.templateId) : null,
+            title: row.title ? String(row.title) : null,
+            description: row.description ? String(row.description) : null,
+            statusId: row.statusId ? String(row.statusId) : null,
+            currentStep: row.currentStep ? Number(row.currentStep) : null,
+            referenceTypeId: row.referenceTypeId ? String(row.referenceTypeId) : null,
+            startedAt: row.startedAt ? new Date(row.startedAt) : null,
+            completedAt: row.completedAt ? new Date(row.completedAt) : null,
+            requestId: row.requestId ? String(row.requestId) : null,
+            budgetId: row.budgetId ? String(row.budgetId) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            templateId: row.templateId,
-            title: row.title,
-            description: row.description,
-            statusId: row.statusId,
-            currentStep: row.currentStep,
-            referenceTypeId: row.referenceTypeId,
-            startedAt: row.startedAt,
-            completedAt: row.completedAt,
-            requestId: row.requestId,
-            budgetId: row.budgetId,
-            isActive: row.isActive,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            templateId: row.templateId ? String(row.templateId) : null,
+            title: row.title ? String(row.title) : null,
+            description: row.description ? String(row.description) : null,
+            statusId: row.statusId ? String(row.statusId) : null,
+            currentStep: row.currentStep ? Number(row.currentStep) : null,
+            referenceTypeId: row.referenceTypeId ? String(row.referenceTypeId) : null,
+            startedAt: row.startedAt ? new Date(row.startedAt) : null,
+            completedAt: row.completedAt ? new Date(row.completedAt) : null,
+            requestId: row.requestId ? String(row.requestId) : null,
+            budgetId: row.budgetId ? String(row.budgetId) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 

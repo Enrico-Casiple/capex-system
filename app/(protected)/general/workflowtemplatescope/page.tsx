@@ -5,9 +5,9 @@ import ImportUpdate from '@/app/_component/List/ImportUpdate';
 import ModelData from '@/app/_component/ModelData';
 import Action, { ActionType, PopupType } from '@/app/_component/Row/Action';
 import { Spinner } from '@/app/_component/Spinner';
-import { jobLevelTableConfig } from '@/app/_config';
+import { jobLevelTableConfig, workFlowInstanceStepTableConfig } from '@/app/_config';
 import ListPage from '@/app/_context/ListWrapper';
-import { JobLevel, JobLevelCreateInput, JobLevelUpdateInput } from '@/lib/generated/api/customHookAPI/graphql';
+import { JobLevel, JobLevelCreateInput, JobLevelUpdateInput, WorkFlowInstanceStep, WorkFlowInstanceStepCreateInput, WorkFlowInstanceStepUpdateInput } from '@/lib/generated/api/customHookAPI/graphql';
 import dynamic from 'next/dynamic';
 import { useCallback } from 'react';
 import ExportForm from './_form/ExportForm';
@@ -20,9 +20,9 @@ const Method = dynamic(() => import('./_form/Method'), {
 });
 
 const ModelPage = () => {
-  type ModelRequest = JobLevel;
-  type ModelCreateInput = JobLevelCreateInput;
-  type ModelUpdateInput = JobLevelUpdateInput;
+  type ModelRequest = WorkFlowInstanceStep;
+  type ModelCreateInput = WorkFlowInstanceStepCreateInput;
+  type ModelUpdateInput = WorkFlowInstanceStepUpdateInput;
 
 
   const {
@@ -41,7 +41,7 @@ const ModelPage = () => {
     previewColumnsUpdate,
     exportColumns,
     defaultExportColumns,
-  } = jobLevelTableConfig;
+  } = workFlowInstanceStepTableConfig;
 
   const renderMethod = useCallback(
     (

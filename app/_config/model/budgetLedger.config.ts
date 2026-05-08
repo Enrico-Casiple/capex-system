@@ -89,42 +89,42 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "budgetId",
         label: "BudgetId",
-        default: "",
+        default: null,
       },
       {
         key: "typeId",
         label: "TypeId",
-        default: "",
+        default: null,
       },
       {
         key: "amount",
         label: "Amount",
-        default: 0,
+        default: null,
       },
       {
         key: "currency",
         label: "Currency",
-        default: "",
+        default: null,
       },
       {
         key: "sourceTypeId",
         label: "SourceTypeId",
-        default: "",
+        default: null,
       },
       {
         key: "sourceId",
         label: "SourceId",
-        default: "",
+        default: null,
       },
       {
         key: "referenceNo",
         label: "ReferenceNo",
-        default: "",
+        default: null,
       },
       {
         key: "remark",
         label: "Remark",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -134,46 +134,46 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "budgetId",
         label: "BudgetId",
-        default: "",
+        default: null,
       },
       {
         key: "typeId",
         label: "TypeId",
-        default: "",
+        default: null,
       },
       {
         key: "amount",
         label: "Amount",
-        default: 0,
+        default: null,
       },
       {
         key: "currency",
         label: "Currency",
-        default: "",
+        default: null,
       },
       {
         key: "sourceTypeId",
         label: "SourceTypeId",
-        default: "",
+        default: null,
       },
       {
         key: "sourceId",
         label: "SourceId",
-        default: "",
+        default: null,
       },
       {
         key: "referenceNo",
         label: "ReferenceNo",
-        default: "",
+        default: null,
       },
       {
         key: "remark",
         label: "Remark",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -215,30 +215,30 @@ export const budgetLedger = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            budgetId: row.budgetId,
-            typeId: row.typeId,
-            amount: row.amount,
-            currency: row.currency,
-            sourceTypeId: row.sourceTypeId,
-            sourceId: row.sourceId,
-            referenceNo: row.referenceNo,
-            remark: row.remark,
-            isActive: row.isActive,
+            budgetId: row.budgetId ? String(row.budgetId) : null,
+            typeId: row.typeId ? String(row.typeId) : null,
+            amount: row.amount ? Number(row.amount) : null,
+            currency: row.currency ? String(row.currency) : null,
+            sourceTypeId: row.sourceTypeId ? String(row.sourceTypeId) : null,
+            sourceId: row.sourceId ? String(row.sourceId) : null,
+            referenceNo: row.referenceNo ? String(row.referenceNo) : null,
+            remark: row.remark ? String(row.remark) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            budgetId: row.budgetId,
-            typeId: row.typeId,
-            amount: row.amount,
-            currency: row.currency,
-            sourceTypeId: row.sourceTypeId,
-            sourceId: row.sourceId,
-            referenceNo: row.referenceNo,
-            remark: row.remark,
-            isActive: row.isActive,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            budgetId: row.budgetId ? String(row.budgetId) : null,
+            typeId: row.typeId ? String(row.typeId) : null,
+            amount: row.amount ? Number(row.amount) : null,
+            currency: row.currency ? String(row.currency) : null,
+            sourceTypeId: row.sourceTypeId ? String(row.sourceTypeId) : null,
+            sourceId: row.sourceId ? String(row.sourceId) : null,
+            referenceNo: row.referenceNo ? String(row.referenceNo) : null,
+            remark: row.remark ? String(row.remark) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 

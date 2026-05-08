@@ -137,7 +137,7 @@ const WorkApprovalInstanceProcess = ({ form, isViewMode }: WorkApprovalInstanceP
       return false
     }
 
-    console.log('✅ Can act on step:', { stepNumber: step.stepNumber })
+    // console.log('✅ Can act on step:', { stepNumber: step.stepNumber })
     return true
   }
 
@@ -149,7 +149,6 @@ const WorkApprovalInstanceProcess = ({ form, isViewMode }: WorkApprovalInstanceP
     errorMessage: 'Failed to update capex request.',
     errorDescription: `An error occurred while updating the capex request. Please try again or contact support if the issue persists.`,
   })
-
   const handleToApprove = async (step: WorkFlowInstanceStep) => {
     // Validate comment is provided
     if (!comment.trim()) {
@@ -161,12 +160,13 @@ const WorkApprovalInstanceProcess = ({ form, isViewMode }: WorkApprovalInstanceP
     }
 
     const allPendingSteps = steps.every((s) => s.status?.name === 'Pending')
+    console.log('Approving step', { stepNumber: step.stepNumber, allPendingSteps })
 
     await executeUpdate({
       variables: {
         id: form.watch('id') as unknown as string,
         data: {
-          statusId: allPendingSteps ? "69ef2113f681bdf7f3214d93" : "69ef2114f681bdf7f3214d95",
+          statusId: allPendingSteps ? "69ef2113f681bdf7f3214d8d" : "69ef2112f681bdf7f3214d89",
           workFlowInstance: {
             update: {
               where: {
@@ -175,7 +175,7 @@ const WorkApprovalInstanceProcess = ({ form, isViewMode }: WorkApprovalInstanceP
               data: {
                 currentStep: allPendingSteps ? (step.stepNumber ?? 1) + 1 : step.stepNumber,
                 completedAt: allPendingSteps ? null : new Date().toISOString(),
-                statusId: allPendingSteps ? "69ef2115f681bdf7f3214d9b" : "69ef2115f681bdf7f3214d9d",
+                statusId: allPendingSteps ? "69ef2115f681bdf7f3214d9d" : "69ef2115f681bdf7f3214d9b",
                 steps: {
                   update: {
                     where: {
@@ -279,6 +279,7 @@ const WorkApprovalInstanceProcess = ({ form, isViewMode }: WorkApprovalInstanceP
 
   return (
     <section className="space-y-4">
+      {/* <pre>{JSON.stringify(workFlowInstanceQuery.data?.WorkFlowInstanceFindUnique.data, null, 2)}</pre> */}
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pb-3 border-b">
         <div className="flex items-center gap-3">

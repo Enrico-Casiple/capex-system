@@ -173,9 +173,9 @@ const CustomSingleSelectInput = <TFormValues extends FieldValues>({
   findAllWithCursorGQL,
   findUniqueGQL,
   defaultValueId = '',
-  placeholder = 'Select...',
-  searchPlaceholder = 'Search...',
-  emptyMessage = 'No results found.',
+  placeholder = '',
+  searchPlaceholder = '',
+  emptyMessage = '',
   cursorVariables,
   uniqueVariables,
   mapOption,
@@ -239,7 +239,7 @@ const CustomSingleSelectInput = <TFormValues extends FieldValues>({
                   }}
                 >
                   <span className={selectedOption ? '' : 'text-muted-foreground'}>
-                    {selectedOption ? selectedOption.label : placeholder}
+                    {selectedOption ? selectedOption.label : placeholder || `Select ${label.toLowerCase()}...`}
                   </span>
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </button>
@@ -249,7 +249,7 @@ const CustomSingleSelectInput = <TFormValues extends FieldValues>({
                   {/* ─── Search Input ────────────────────────── */}
                   <div className="border-b w-full">
                     <Input
-                      placeholder={searchPlaceholder}
+                      placeholder={searchPlaceholder || `Search ${label.toLowerCase()}...`}
                       value={search}
                       onChange={(e) => {
                         setSearch(e.target.value);
@@ -267,7 +267,7 @@ const CustomSingleSelectInput = <TFormValues extends FieldValues>({
                     className="w-full max-h-[300px] overflow-y-auto"
                   >
                     <CommandEmpty className="py-2 text-center text-sm text-muted-foreground">
-                      {comboData.isLoading ? 'Loading...' : emptyMessage}
+                      {comboData.isLoading ? 'Loading...' : emptyMessage || `No ${label.toLowerCase()} found.`}
                     </CommandEmpty>
 
                     {allOptions.length > 0 && (

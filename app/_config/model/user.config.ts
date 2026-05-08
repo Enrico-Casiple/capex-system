@@ -101,32 +101,32 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "name",
         label: "Name",
-        default: "",
+        default: null,
       },
       {
         key: "email",
         label: "Email",
-        default: "",
+        default: null,
       },
       {
         key: "password",
         label: "Password",
-        default: "",
+        default: null,
       },
       {
         key: "userName",
         label: "UserName",
-        default: "",
+        default: null,
       },
       {
         key: "emailVerified",
         label: "EmailVerified",
-        default: "",
+        default: null,
       },
       {
         key: "image",
         label: "Image",
-        default: "",
+        default: null,
       },
       {
         key: "isTwoFactorAuthEnabled",
@@ -136,17 +136,17 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "otpCode",
         label: "OtpCode",
-        default: "",
+        default: null,
       },
       {
         key: "emailOtpExpiresAt",
         label: "EmailOtpExpiresAt",
-        default: "",
+        default: null,
       },
       {
         key: "incrementalLoginAttempts",
         label: "IncrementalLoginAttempts",
-        default: 0,
+        default: null,
       },
       {
         key: "isActive",
@@ -156,36 +156,36 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "name",
         label: "Name",
-        default: "",
+        default: null,
       },
       {
         key: "email",
         label: "Email",
-        default: "",
+        default: null,
       },
       {
         key: "password",
         label: "Password",
-        default: "",
+        default: null,
       },
       {
         key: "userName",
         label: "UserName",
-        default: "",
+        default: null,
       },
       {
         key: "emailVerified",
         label: "EmailVerified",
-        default: "",
+        default: null,
       },
       {
         key: "image",
         label: "Image",
-        default: "",
+        default: null,
       },
       {
         key: "isTwoFactorAuthEnabled",
@@ -195,17 +195,17 @@ const previewColumnsUpdate: PreviewColumn<Model>[] = [
       {
         key: "otpCode",
         label: "OtpCode",
-        default: "",
+        default: null,
       },
       {
         key: "emailOtpExpiresAt",
         label: "EmailOtpExpiresAt",
-        default: "",
+        default: null,
       },
       {
         key: "incrementalLoginAttempts",
         label: "IncrementalLoginAttempts",
-        default: 0,
+        default: null,
       },
       {
         key: "isActive",
@@ -249,34 +249,34 @@ export const user = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            name: row.name,
-            email: row.email,
-            password: row.password,
-            userName: row.userName,
-            emailVerified: row.emailVerified,
-            image: row.image,
-            isTwoFactorAuthEnabled: row.isTwoFactorAuthEnabled,
-            otpCode: row.otpCode,
-            emailOtpExpiresAt: row.emailOtpExpiresAt,
-            incrementalLoginAttempts: row.incrementalLoginAttempts,
-            isActive: row.isActive,
+            name: row.name ? String(row.name) : null,
+            email: row.email ? String(row.email) : null,
+            password: row.password ? String(row.password) : null,
+            userName: row.userName ? String(row.userName) : null,
+            emailVerified: row.emailVerified ? new Date(row.emailVerified) : null,
+            image: row.image ? String(row.image) : null,
+            isTwoFactorAuthEnabled: row.isTwoFactorAuthEnabled != null ? Boolean(row.isTwoFactorAuthEnabled) : null,
+            otpCode: row.otpCode ? String(row.otpCode) : null,
+            emailOtpExpiresAt: row.emailOtpExpiresAt ? new Date(row.emailOtpExpiresAt) : null,
+            incrementalLoginAttempts: row.incrementalLoginAttempts ? Number(row.incrementalLoginAttempts) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            name: row.name,
-            email: row.email,
-            password: row.password,
-            userName: row.userName,
-            emailVerified: row.emailVerified,
-            image: row.image,
-            isTwoFactorAuthEnabled: row.isTwoFactorAuthEnabled,
-            otpCode: row.otpCode,
-            emailOtpExpiresAt: row.emailOtpExpiresAt,
-            incrementalLoginAttempts: row.incrementalLoginAttempts,
-            isActive: row.isActive,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            name: row.name ? String(row.name) : null,
+            email: row.email ? String(row.email) : null,
+            password: row.password ? String(row.password) : null,
+            userName: row.userName ? String(row.userName) : null,
+            emailVerified: row.emailVerified ? new Date(row.emailVerified) : null,
+            image: row.image ? String(row.image) : null,
+            isTwoFactorAuthEnabled: row.isTwoFactorAuthEnabled != null ? Boolean(row.isTwoFactorAuthEnabled) : null,
+            otpCode: row.otpCode ? String(row.otpCode) : null,
+            emailOtpExpiresAt: row.emailOtpExpiresAt ? new Date(row.emailOtpExpiresAt) : null,
+            incrementalLoginAttempts: row.incrementalLoginAttempts ? Number(row.incrementalLoginAttempts) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 

@@ -89,42 +89,42 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "name",
         label: "Name",
-        default: "",
+        default: null,
       },
       {
         key: "description",
         label: "Description",
-        default: "",
+        default: null,
       },
       {
         key: "companyId",
         label: "CompanyId",
-        default: "",
+        default: null,
       },
       {
         key: "departmentId",
         label: "DepartmentId",
-        default: "",
+        default: null,
       },
       {
         key: "categoryId",
         label: "CategoryId",
-        default: "",
+        default: null,
       },
       {
         key: "quantityInStock",
         label: "QuantityInStock",
-        default: 0,
+        default: null,
       },
       {
         key: "unitOfMeasure",
         label: "UnitOfMeasure",
-        default: "",
+        default: null,
       },
       {
         key: "remainingStock",
         label: "RemainingStock",
-        default: 0,
+        default: null,
       },
       {
         key: "isActive",
@@ -134,46 +134,46 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "name",
         label: "Name",
-        default: "",
+        default: null,
       },
       {
         key: "description",
         label: "Description",
-        default: "",
+        default: null,
       },
       {
         key: "companyId",
         label: "CompanyId",
-        default: "",
+        default: null,
       },
       {
         key: "departmentId",
         label: "DepartmentId",
-        default: "",
+        default: null,
       },
       {
         key: "categoryId",
         label: "CategoryId",
-        default: "",
+        default: null,
       },
       {
         key: "quantityInStock",
         label: "QuantityInStock",
-        default: 0,
+        default: null,
       },
       {
         key: "unitOfMeasure",
         label: "UnitOfMeasure",
-        default: "",
+        default: null,
       },
       {
         key: "remainingStock",
         label: "RemainingStock",
-        default: 0,
+        default: null,
       },
       {
         key: "isActive",
@@ -215,30 +215,30 @@ export const inventoryItem = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            name: row.name,
-            description: row.description,
-            companyId: row.companyId,
-            departmentId: row.departmentId,
-            categoryId: row.categoryId,
-            quantityInStock: row.quantityInStock,
-            unitOfMeasure: row.unitOfMeasure,
-            remainingStock: row.remainingStock,
-            isActive: row.isActive,
+            name: row.name ? String(row.name) : null,
+            description: row.description ? String(row.description) : null,
+            companyId: row.companyId ? String(row.companyId) : null,
+            departmentId: row.departmentId ? String(row.departmentId) : null,
+            categoryId: row.categoryId ? String(row.categoryId) : null,
+            quantityInStock: row.quantityInStock ? Number(row.quantityInStock) : null,
+            unitOfMeasure: row.unitOfMeasure ? String(row.unitOfMeasure) : null,
+            remainingStock: row.remainingStock ? Number(row.remainingStock) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            name: row.name,
-            description: row.description,
-            companyId: row.companyId,
-            departmentId: row.departmentId,
-            categoryId: row.categoryId,
-            quantityInStock: row.quantityInStock,
-            unitOfMeasure: row.unitOfMeasure,
-            remainingStock: row.remainingStock,
-            isActive: row.isActive,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            name: row.name ? String(row.name) : null,
+            description: row.description ? String(row.description) : null,
+            companyId: row.companyId ? String(row.companyId) : null,
+            departmentId: row.departmentId ? String(row.departmentId) : null,
+            categoryId: row.categoryId ? String(row.categoryId) : null,
+            quantityInStock: row.quantityInStock ? Number(row.quantityInStock) : null,
+            unitOfMeasure: row.unitOfMeasure ? String(row.unitOfMeasure) : null,
+            remainingStock: row.remainingStock ? Number(row.remainingStock) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 

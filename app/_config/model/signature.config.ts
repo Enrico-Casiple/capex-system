@@ -89,42 +89,42 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
       {
         key: "instanceId",
         label: "InstanceId",
-        default: "",
+        default: null,
       },
       {
         key: "stepId",
         label: "StepId",
-        default: "",
+        default: null,
       },
       {
         key: "attachmentUrl",
         label: "AttachmentUrl",
-        default: "",
+        default: null,
       },
       {
         key: "userId",
         label: "UserId",
-        default: "",
+        default: null,
       },
       {
         key: "signatureHash",
         label: "SignatureHash",
-        default: "",
+        default: null,
       },
       {
         key: "payload",
         label: "Payload",
-        default: {} as Record<string, unknown>,
+        default: null,
       },
       {
         key: "ipAddress",
         label: "IpAddress",
-        default: "",
+        default: null,
       },
       {
         key: "userAgent",
         label: "UserAgent",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -134,46 +134,46 @@ const previewColumnsCreate: PreviewColumn<Model>[] = [
 ];
 
 const previewColumnsUpdate: PreviewColumn<Model>[] = [
-      { key: "id", label: "ID", default: "" },
+      { key: "id", label: "ID", default: null },
       {
         key: "instanceId",
         label: "InstanceId",
-        default: "",
+        default: null,
       },
       {
         key: "stepId",
         label: "StepId",
-        default: "",
+        default: null,
       },
       {
         key: "attachmentUrl",
         label: "AttachmentUrl",
-        default: "",
+        default: null,
       },
       {
         key: "userId",
         label: "UserId",
-        default: "",
+        default: null,
       },
       {
         key: "signatureHash",
         label: "SignatureHash",
-        default: "",
+        default: null,
       },
       {
         key: "payload",
         label: "Payload",
-        default: {} as Record<string, unknown>,
+        default: null,
       },
       {
         key: "ipAddress",
         label: "IpAddress",
-        default: "",
+        default: null,
       },
       {
         key: "userAgent",
         label: "UserAgent",
-        default: "",
+        default: null,
       },
       {
         key: "isActive",
@@ -215,30 +215,30 @@ export const signature = {
 
   transformRowCreate: async (row: Model) => {
     return {
-            instanceId: row.instanceId,
-            stepId: row.stepId,
-            attachmentUrl: row.attachmentUrl,
-            userId: row.userId,
-            signatureHash: row.signatureHash,
-            payload: row.payload,
-            ipAddress: row.ipAddress,
-            userAgent: row.userAgent,
-            isActive: row.isActive,
+            instanceId: row.instanceId ? String(row.instanceId) : null,
+            stepId: row.stepId ? String(row.stepId) : null,
+            attachmentUrl: row.attachmentUrl ? String(row.attachmentUrl) : null,
+            userId: row.userId ? String(row.userId) : null,
+            signatureHash: row.signatureHash ? String(row.signatureHash) : null,
+            payload: row.payload ? JSON.stringify(row.payload) : null,
+            ipAddress: row.ipAddress ? String(row.ipAddress) : null,
+            userAgent: row.userAgent ? String(row.userAgent) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 
   transformRowUpdate: async (row: Model) => {
     return {
-            id: row.id,
-            instanceId: row.instanceId,
-            stepId: row.stepId,
-            attachmentUrl: row.attachmentUrl,
-            userId: row.userId,
-            signatureHash: row.signatureHash,
-            payload: row.payload,
-            ipAddress: row.ipAddress,
-            userAgent: row.userAgent,
-            isActive: row.isActive,
+            id: row.id != null && row.id !== "" ? String(row.id) : null,
+            instanceId: row.instanceId ? String(row.instanceId) : null,
+            stepId: row.stepId ? String(row.stepId) : null,
+            attachmentUrl: row.attachmentUrl ? String(row.attachmentUrl) : null,
+            userId: row.userId ? String(row.userId) : null,
+            signatureHash: row.signatureHash ? String(row.signatureHash) : null,
+            payload: row.payload ? JSON.stringify(row.payload) : null,
+            ipAddress: row.ipAddress ? String(row.ipAddress) : null,
+            userAgent: row.userAgent ? String(row.userAgent) : null,
+            isActive: row.isActive != null ? Boolean(row.isActive) : null,
     };
   },
 

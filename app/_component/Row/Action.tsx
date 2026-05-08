@@ -129,7 +129,6 @@ const Action = ({ rowId, component }: ActionProps) => {
             <React.Fragment>
               <RoleGate
                 module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
-                resource={[`${modelName.toLowerCase()}`, "*"]}
                 action={['read', '*']}
               >
                 <DropdownMenuItem
@@ -143,7 +142,6 @@ const Action = ({ rowId, component }: ActionProps) => {
               </RoleGate>
               <RoleGate
                 module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
-                resource={[`${modelName.toLowerCase()}`, "*"]}
                 action={['update', '*']}
               >
                 <DropdownMenuItem
@@ -156,7 +154,6 @@ const Action = ({ rowId, component }: ActionProps) => {
               </RoleGate>
               <RoleGate
                 module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
-                resource={[`${modelName.toLowerCase()}`, "*"]}
                 action={['duplicate', '*']}
               >
 
@@ -174,7 +171,6 @@ const Action = ({ rowId, component }: ActionProps) => {
           {active ? (
             <RoleGate
               module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
-              resource={[`${modelName.toLowerCase()}`, "*"]}
               action={['archive', '*']}
             >
               <DropdownMenuItem
@@ -189,7 +185,6 @@ const Action = ({ rowId, component }: ActionProps) => {
             <>
               <RoleGate
                 module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
-                resource={[`${modelName.toLowerCase()}`, "*"]}
                 action={['restore', '*']}
               >
 
@@ -203,7 +198,6 @@ const Action = ({ rowId, component }: ActionProps) => {
               </RoleGate>
               <RoleGate
                 module={[`${modelName.toUpperCase()}_MANAGEMENT`, "SYSTEM"]}
-                resource={[`${modelName.toLowerCase()}`, "*"]}
                 action={['delete', '*']}
               >
                 <DropdownMenuItem

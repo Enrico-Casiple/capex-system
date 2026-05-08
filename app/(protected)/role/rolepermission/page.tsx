@@ -4,7 +4,7 @@ import Import from '@/app/_component/List/Import';
 import Action, { ActionType, PopupType } from '@/app/_component/Row/Action';
 import { Spinner } from '@/app/_component/Spinner';
 import ListPage from '@/app/_context/ListWrapper';
-import { Permission, PermissionCreateInput, PermissionUpdateInput } from '@/lib/generated/api/customHookAPI/graphql';
+import { Permission, PermissionCreateInput, PermissionUpdateInput, RolePermission, RolePermissionCreateInput, RolePermissionUpdateInput } from '@/lib/generated/api/customHookAPI/graphql';
 import dynamic from 'next/dynamic';
 import { useCallback } from 'react';
 import ExportForm from './_form/ExportForm';
@@ -12,7 +12,7 @@ import ImportForm from './_form/ImportForm';
 import ImportUpdate from '@/app/_component/List/ImportUpdate';
 import ImportUpdateForm from './_form/ImportUpdateForm';
 import ModelData from '@/app/_component/ModelData';
-import { permissionTableConfig } from '@/app/_config';
+import { permissionTableConfig, rolePermissionTableConfig } from '@/app/_config';
 
 const Method = dynamic(() => import('./_form/Method'), {
   loading: () => <Spinner />,
@@ -20,9 +20,9 @@ const Method = dynamic(() => import('./_form/Method'), {
 });
 
 const ModelPage = () => {
-  type ModelRequest = Permission;
-  type ModelCreateInput = PermissionCreateInput;
-  type ModelUpdateInput = PermissionUpdateInput;
+  type ModelRequest = RolePermission;
+  type ModelCreateInput = RolePermissionCreateInput;
+  type ModelUpdateInput = RolePermissionUpdateInput;
 
 
   const {
@@ -41,7 +41,7 @@ const ModelPage = () => {
     previewColumnsUpdate,
     exportColumns,
     defaultExportColumns,
-  } = permissionTableConfig;
+  } = rolePermissionTableConfig;
 
   const renderMethod = useCallback(
     (

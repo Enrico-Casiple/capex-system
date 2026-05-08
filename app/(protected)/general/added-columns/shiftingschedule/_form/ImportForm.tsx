@@ -1,6 +1,6 @@
 import ImportFormWrapper from '@/app/_component/Form/ImportFormWrapper';
+import { PreviewColumn } from '@/app/_config/shared';
 import useToast from '@/app/_hooks/useToast';
-import { PreviewColumn } from '../../_config/shared';
 
 type ImportFormProps<TModel, TCreateInput> = {
   open: boolean;
@@ -22,31 +22,19 @@ const ImportForm = <
 
   const handleTransformRow = async (row: TModel): Promise<TCreateInput> => {
     try {
-      if (!transformRow) {
-        throw new Error('Transform function not provided');
-      }
-
-      const result = await transformRow(row);
-      return result as TCreateInput;
+      if (!transformRow) throw new Error('Transform function not provided');
+      return (await transformRow(row)) as TCreateInput;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       toast.error({
-        message: `Error processing row`,
-        description: `Row ID: ${row['id'] || 'unknown'} - ${errorMessage}`,
+        message: 'Error processing row',
+        description: `Row ID: ${(row as any).id || 'unknown'} - ${errorMessage}`,
       });
       throw error;
     }
   };
 
-  return (
-    <ImportFormWrapper<TModel, TCreateInput>
-      open={open}
-      setOpen={setOpen}
-      transformRow={handleTransformRow}
-      previewColumns={previewColumns || []}
-      applyDefaults={false}
-    />
-  );
+  return <ImportFormWrapper<TModel, TCreateInput> open={open} setOpen={setOpen} transformRow={handleTransformRow} previewColumns={previewColumns || []} applyDefaults={false} />;
 };
 
 export default ImportForm;
